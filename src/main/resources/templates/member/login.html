@@ -13,7 +13,7 @@
 <body>
   <div class="container mt-3" layout:fragment="content">
     <h2>로그인</h2>
-    <form action="@{login}" method="post">
+    <form th:action="@{login}" method="post">
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text">아이디</span>
         <input type="text" class="form-control" id="user" name="username">

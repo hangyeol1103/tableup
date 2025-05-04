@@ -31,8 +31,6 @@ public class HomeController {
 		return "member/login";
 	}
 	
-
-
 	@GetMapping("/test")
 	public String test(Model model) {
 		int num = (int)(Math.random()*10);

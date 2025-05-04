@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
-xmlns:th="http://www.thymeleaf.org"
+	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 	<meta charset="UTF-8">
@@ -24,6 +24,17 @@ xmlns:th="http://www.thymeleaf.org"
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="javascript:void(0)">Link</a>
+						</li>
+						<li class="nav-item" sec:authorize="isAnonymous()">
+							<a class="nav-link" th:href="@{/login}">로그인</a>
+						</li>
+						<li class="nav-item" sec:authorize="isAuthenticated()">
+							<form th:action="@{/logout}" method="post">
+								<button>로그아웃</button>
+							</form>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/signup}">회원가입</a>
 						</li>
 					</ul>
 					<form class="d-flex">

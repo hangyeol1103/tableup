@@ -22,6 +22,7 @@ public class PostController {
   public String postList(Model model, @PathVariable int bo_num) {
     List<PostVO> list = postService.getPostList(bo_num);
     model.addAttribute("list", list);
+    model.addAttribute("url", "/post/list");
     return "post/list";
   }
   

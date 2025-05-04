@@ -14,3 +14,16 @@ CREATE TABLE member (
   me_cookie VARCHAR(255),                  -- 로그인 유지 쿠키값
   me_limit DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE post (
+  po_num INT AUTO_INCREMENT PRIMARY KEY,    -- 글 번호 (기본키, 자동 증가)
+  po_title VARCHAR(255) NOT NULL,           -- 제목
+  po_content LONGTEXT,                      -- 내용
+  po_date DATETIME DEFAULT CURRENT_TIMESTAMP, -- 작성일 (기본값: 현재시간)
+  po_view INT DEFAULT 0,                    -- 조회수
+  po_up INT DEFAULT 0,                      -- 추천수
+  po_down INT DEFAULT 0,                    -- 비추천수
+  po_me_id VARCHAR(15) NOT NULL,            -- 작성자 ID (외래키 후보)
+  po_bo_num INT NOT NULL,                   -- 게시판 번호 (외래키 후보)
+  po_del CHAR(1) DEFAULT 'N'                -- 삭제 여부 (Y/N)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

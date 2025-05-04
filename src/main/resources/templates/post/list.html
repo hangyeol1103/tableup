@@ -40,6 +40,9 @@
             <td th:text="${post.po_view}">조회수</td>
             <td th:text="${post.po_up}+'/'+${post.po_down}">추천/비추천</td>
           </tr>
+          <tr th:if="${list.size() == 0}">
+            <td colspan="6" class="text-center">등록된 게시글이 없습니다.</td>
+          </tr>
         </tbody>
       </table>
 	</main>

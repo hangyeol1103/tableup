@@ -5,11 +5,13 @@ USE tableup;
 
 DROP TABLE IF EXISTS `MEMBER`;
 
-CREATE TABLE `MEMBER` (
-	`me_id`	varchar(15) primary key	NOT NULL,
-	`me_pw`	varchar(255) not	NULL,
-	`me_email`	varchar(255) not	NULL,
-	`me_authority`	varchar(5) default "USER" not	NULL
+CREATE TABLE `member` (
+  `me_id` VARCHAR(15) PRIMARY KEY NOT NULL,
+  `me_pw` VARCHAR(255) NOT NULL,
+  `me_email` VARCHAR(255) NOT NULL,
+  `me_authority` VARCHAR(5) NOT NULL DEFAULT 'USER',
+  `me_cookie` VARCHAR(255),
+  `me_limit` DATETIME
 );
 
 DROP TABLE IF EXISTS `BOARD`;

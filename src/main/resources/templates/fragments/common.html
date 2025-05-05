@@ -22,9 +22,6 @@
 						<li class="nav-item">
 							<a class="nav-link" th:href="@{/post/list/0}" th:classappend="${url == '/post/list' ? 'active' : ''}">게시글 목록</a>
 						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="javascript:void(0)">Link</a>
-						</li>
 						<li class="nav-item" sec:authorize="isAnonymous()">
 							<a class="nav-link" th:href="@{/login}" th:classappend="${url == '/login' ? 'active' : ''}">로그인</a>
 						</li>
@@ -34,7 +31,10 @@
 							</form>
 						</li>
 						<li class="nav-item" sec:authorize="isAnonymous()">
-							<a class="nav-link" th:href="@{/signup}">회원가입</a>
+							<a class="nav-link" th:href="@{/signup}" th:classappend="${url == '/signup' ? 'active' : ''}">회원가입</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="javascript:void(0)">Link</a>
 						</li>
 					</ul>
 					<form class="d-flex">

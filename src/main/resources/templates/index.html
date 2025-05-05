@@ -120,12 +120,63 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		</button>
 		</div>
 
-		<div class="container-fluid mt-3">
-			<h3>Carousel Example</h3>
-			<p>The following example shows how to create a basic carousel with indicators and controls.</p>
+
+		<div class="container mt-4">
+			<h4 class="fw-bold mb-3">요리 테마별 탐색</h4>
+			<div class="d-flex gap-4">
+				<div class="text-center">
+					<img src="img/index/Cuisine/China.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">한식</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/China.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">중식</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/japan.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">일식</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/America.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">양식</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/Italia.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">이탈리아 요리</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/France.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">프랑스 요리</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="container mt-4">
+			<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
+			<div class="d-flex gap-4">
+				<div class="text-center">
+					<img src="img/index/Cuisine/Sushi.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">스시</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">예시</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">예시</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">예시</div>
+				</div>
+				<div class="text-center">
+					<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+					<div class="mt-2">예시</div>
+				</div>
+			</div>
 		</div>
 		
-		<a th:href="@{/test}" >테스트 링크</a>
 	</main>
 </body>
 </html>

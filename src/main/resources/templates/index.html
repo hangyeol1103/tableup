@@ -24,7 +24,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <div class="container mt-5">
   <!-- 상단 지역 선택 버튼 -->
 <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#regionModal" style="margin: 20px;">
-  전국 ▼
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#aaa" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:middle;">
+    <circle cx="12" cy="10" r="3"/>
+    <path d="M12 2C8 2 5 5.5 5 9.5c0 5.5 7 12.5 7 12.5s7-7 7-12.5C19 5.5 16 2 12 2z"/>
+  </svg>
+  <strong>전국</strong>
+	<svg width="24" height="24" viewBox="0 0 24 24">
+		<polyline points="6 9 12 15 18 9" style="fill:none;stroke:black;stroke-width:2"/>
+	</svg>
 </button>
 <!-- 관심지역 설정 모달 -->
 <div class="modal fade" id="regionModal" tabindex="-1" aria-labelledby="regionModalLabel" aria-hidden="true">
@@ -43,10 +50,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             <button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">잠실</button>
             <button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">서초</button>
             <button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">제주</button>
-            <!-- ...추가 -->
           </div>
         </div>
-        <!-- 전체 지역 리스트 -->
         <div class="row">
           <div class="col-4">
             <ul class="list-group">
@@ -57,7 +62,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
               <li class="list-group-item">울산</li>
               <li class="list-group-item">경남</li>
               <li class="list-group-item">대구</li>
-              <!-- ...추가 -->
             </ul>
           </div>
           <div class="col-8">
@@ -89,7 +93,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		</div>
   
   	<!-- The slideshow/carousel -->
-		 <!-- The slideshow/3arousel -->
 		<div class="carousel-inner">
 			<div class="carousel-item active">
 				<img src="/img/index1.jpg" alt="Los Angeles" class="d-block" style="width:100%">

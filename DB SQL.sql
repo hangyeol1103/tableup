@@ -12,7 +12,7 @@ CREATE TABLE User (
   us_nickname VARCHAR(30) NOT NULL,
   us_sociallogin BOOLEAN DEFAULT FALSE,
   us_created DATETIME DEFAULT CURRENT_TIMESTAMP,
-  us_authority ENUM('user', 'admin') NOT NULL DEFAULT 'user');
+  us_authority ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER');
 
 CREATE TABLE TagType (
   tt_num INT AUTO_INCREMENT PRIMARY KEY,

@@ -19,9 +19,11 @@ public class CustomUser extends User {
 		super(username, password, authorities);
 	}
 	public CustomUser(UserVO vo) {
-		super(	vo.getUs_id().toString(),
-				vo.getUs_pw(), 
-				Arrays.asList(new SimpleGrantedAuthority("USER")));
-		this.user = vo;
-	}
+    super(
+			vo.getUs_id().toString(),
+			vo.getUs_pw(), 
+			Arrays.asList(new SimpleGrantedAuthority(vo.getUs_authority()))
+    );
+    this.user = vo;
+}
 }

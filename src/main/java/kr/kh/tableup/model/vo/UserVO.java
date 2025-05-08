@@ -14,5 +14,6 @@ public class UserVO {
   private String us_email;      
   private String us_nickname;   
   private Boolean us_sociallogin;
-  private Date us_created;       
+  private Date us_created;
+  private String us_authority;
 }

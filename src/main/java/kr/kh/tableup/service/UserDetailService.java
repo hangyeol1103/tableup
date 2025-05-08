@@ -14,11 +14,11 @@ import kr.kh.tableup.model.vo.UserVO;
 public class UserDetailService implements UserDetailsService{
 
 	@Autowired
-	UserDAO userDao;
+	UserDAO userDAO;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserVO user = userDao.selectUser(username);
+		UserVO user = userDAO.selectUser(username);
 
 		return user == null ? null : new CustomUser(user);
 	}

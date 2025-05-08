@@ -41,7 +41,7 @@ public class SecurityConfig{
       )
       //자동 로그인 처리
       .rememberMe(rm-> rm
-        .userDetailsService(memberDetailService)//자동 로그인할 때 사용할 userDetailService를 추가
+        .userDetailsService(userDetailService)//자동 로그인할 때 사용할 userDetailService를 추가
         .key(rememberMeKey)//키가 변경되면 기존 토큰이 무효처리
         .rememberMeCookieName("LC")//쿠키 이름
         .tokenValiditySeconds(60 * 60 * 24 * 100)//유지 기간 : x일

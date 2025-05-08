@@ -24,4 +24,11 @@
 			#{us_sociallogin}
 		)
 	</insert>
+	<update id="updateUserInfo" parameterType="userVO">
+    UPDATE User
+    SET us_nickname = #{us_nickname},
+        us_email = #{us_email},
+        us_phone = #{us_phone}
+    WHERE us_id = #{us_id}
+	</update>
 </mapper>

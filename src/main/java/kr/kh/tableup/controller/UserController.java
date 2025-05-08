@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
@@ -34,14 +35,38 @@ public class UserController {
     return "redirect:/";
   }
 
+  // 마이페이지
   @GetMapping("/mypage")
   public String mypage(Model model, Principal principal) {
-    // principal.getName()은 현재 로그인한 사용자의 username을 반환합니다.
     String username = principal.getName();
-    UserVO user = userService.getUserById(username); // 아이디로 회원 정보 조회
+    UserVO user = userService.getUserById(username);
     model.addAttribute("user", user);
     model.addAttribute("url", "/mypage");
     return "user/mypage";
+  }
+
+  // 마이페이지 수정
+  @GetMapping("/user/edit")
+  public String editForm(Model model, Principal principal) {
+    String username = principal.getName();
+    UserVO user = userService.getUserById(username);
+    model.addAttribute("user", user);
+    model.addAttribute("url", "/mypage");
+    return "user/edit";
+}
+
+  // 수정 처리
+  @PostMapping("/user/edit")
+  public String edit(UserVO user, Principal principal, RedirectAttributes ra) {
+    String username = principal.getName();
+    user.setUs_id(username); // 아이디는 로그인 정보로 고정
+    boolean result = userService.updateUserInfo(user);
+    if(result) {
+        ra.addFlashAttribute("msg", "회원정보가 수정되었습니다.");
+    } else {
+        ra.addFlashAttribute("msg", "수정에 실패했습니다.");
+    }
+    return "redirect:/mypage";
 }
 
 }

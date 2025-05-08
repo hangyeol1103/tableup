@@ -7,5 +7,7 @@ public interface UserDAO {
   UserVO selectUser(String id);
 
   boolean insertUser(UserVO user);
+
+	int updateUserInfo(UserVO user);
   
 }

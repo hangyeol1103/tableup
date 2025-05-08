@@ -20,4 +20,8 @@ public class UserService {
     return userDAO.selectUser(us_id);
 
 	}
+
+  public boolean updateUserInfo(UserVO user) {
+    return userDAO.updateUserInfo(user) > 0;
+  }
 }

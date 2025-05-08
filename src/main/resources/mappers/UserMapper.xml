@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kh.tableup.dao.UserDAO">
+	<select id="selectUser" resultType="userVO">
+		select * from User where us_id = #{id}
+	</select>
+	<insert id="insertUser">
+		INSERT INTO User (
+			us_id,
+			us_pw, 
+			us_name, 
+			us_phone, 
+			us_email, 
+			us_nickname, 
+			us_sociallogin, 
+			us_cookie, 
+			us_limit
+		)
+		VALUES (
+			#{us_id}, 
+			#{us_pw}, 
+			#{us_name}, 
+			#{us_phone}, 
+			#{us_email}, 
+			#{us_nickname}, 
+			#{us_sociallogin}, 
+			#{us_cookie}, 
+			#{us_limit}
+		)
+	</insert>
+</mapper>

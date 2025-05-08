@@ -7,14 +7,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import kr.kh.tableup.model.vo.MemberVO;
-import kr.kh.tableup.service.MemberService;
+import kr.kh.tableup.model.vo.UserVO;
+import kr.kh.tableup.service.UserService;
 
 @Controller
-public class MemberController {
+public class UserController {
 
   @Autowired
-  MemberService memberService;
+  UserService userService;
 
   @Autowired
   PasswordEncoder passwordEncoder;
@@ -22,14 +22,13 @@ public class MemberController {
   @GetMapping("/signup")
   public String signupForm(Model model) {
     model.addAttribute("url", "/signup");
-    return "member/signup";
+    return "user/signup";
   }
 
   @PostMapping("/signup")
-  public String signup(MemberVO member) {
-    member.setMe_pw(passwordEncoder.encode(member.getMe_pw()));
-    member.setMe_authority("USER");
-    memberService.insertMember(member);
+  public String signup(UserVO user) {
+    user.setUs_pw(passwordEncoder.encode(user.getUs_pw()));
+    userService.insertUser(user);
     return "redirect:/login";
 }
 

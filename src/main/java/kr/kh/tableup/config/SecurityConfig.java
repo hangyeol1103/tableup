@@ -11,14 +11,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import kr.kh.tableup.model.util.UserRole;
-import kr.kh.tableup.service.MemberDetailService;
+import kr.kh.tableup.service.UserDetailService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig{
 
   @Autowired
-  private MemberDetailService memberDetailService;
+  private UserDetailService memberDetailService;
 
   @Value("${security.rememberme.key}")
   private String rememberMeKey;

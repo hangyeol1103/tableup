@@ -18,7 +18,7 @@ import kr.kh.tableup.service.UserDetailService;
 public class SecurityConfig{
 
   @Autowired
-  private UserDetailService memberDetailService;
+  private UserDetailService userDetailService;
 
   @Value("${security.rememberme.key}")
   private String rememberMeKey;

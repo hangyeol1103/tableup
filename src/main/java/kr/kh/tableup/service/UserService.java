@@ -24,4 +24,18 @@ public class UserService {
   public boolean updateUserInfo(UserVO user) {
     return userDAO.updateUserInfo(user) > 0;
   }
+
+  // 중복 검사
+  
+  public boolean isIdDuplicate(String id) {
+    return userDAO.selectUser(id) != null;
+  }
+  
+  public boolean isPhoneDuplicate(String phone) {
+    return userDAO.selectUserByPhone(phone) != null;
+  }
+  
+  public boolean isEmailDuplicate(String email) {
+    return userDAO.selectUserByEmail(email) != null;
+  }
 }

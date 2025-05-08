@@ -27,8 +27,14 @@
 	<update id="updateUserInfo" parameterType="userVO">
     UPDATE User
     SET us_nickname = #{us_nickname},
-        us_email = #{us_email},
-        us_phone = #{us_phone}
+			us_email = #{us_email},
+			us_phone = #{us_phone}
     WHERE us_id = #{us_id}
 	</update>
+	<select id="selectUserByPhone" resultType="kr.kh.tableup.model.vo.UserVO">
+		SELECT * FROM user WHERE us_phone = #{phone}
+	</select>
+	<select id="selectUserByEmail" resultType="kr.kh.tableup.model.vo.UserVO">
+		SELECT * FROM user WHERE us_email = #{email}
+	</select>
 </mapper>

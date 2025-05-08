@@ -9,5 +9,9 @@ public interface UserDAO {
   boolean insertUser(UserVO user);
 
 	int updateUserInfo(UserVO user);
+
+	UserVO selectUserByPhone(String phone);
+
+	UserVO selectUserByEmail(String email);
   
 }

@@ -1,6 +1,8 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.model.vo.UserVO;
@@ -53,7 +57,7 @@ public class UserController {
     model.addAttribute("user", user);
     model.addAttribute("url", "/mypage");
     return "user/edit";
-}
+  }
 
   // 수정 처리
   @PostMapping("/user/edit")
@@ -67,6 +71,32 @@ public class UserController {
         ra.addFlashAttribute("msg", "수정에 실패했습니다.");
     }
     return "redirect:/mypage";
-}
+  }
+
+  // 중복 검사
+  @GetMapping("/check-duplicate")
+  @ResponseBody
+  public Map<String, Boolean> checkDuplicate(
+    @RequestParam String type,
+    @RequestParam String value) {
+    
+    Map<String, Boolean> response = new HashMap<>();
+    boolean isDuplicate = false;
+    
+    switch(type) {
+      case "id":
+        isDuplicate = userService.isIdDuplicate(value);
+        break;
+      case "phone":
+        isDuplicate = userService.isPhoneDuplicate(value);
+        break;
+      case "email":
+        isDuplicate = userService.isEmailDuplicate(value);
+        break;
+    }
+    
+    response.put("duplicate", isDuplicate);
+    return response;
+  }
 
 }

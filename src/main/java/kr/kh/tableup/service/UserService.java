@@ -15,4 +15,9 @@ public class UserService {
   public boolean insertUser(UserVO user) {
     return userDAO.insertUser(user);
   }
+
+	public UserVO getUserById(String us_id) {
+    return userDAO.selectUser(us_id);
+
+	}
 }

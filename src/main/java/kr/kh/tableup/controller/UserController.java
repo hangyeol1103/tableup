@@ -1,5 +1,7 @@
 package kr.kh.tableup.controller;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -30,6 +32,16 @@ public class UserController {
     user.setUs_pw(passwordEncoder.encode(user.getUs_pw()));
     userService.insertUser(user);
     return "redirect:/";
+  }
+
+  @GetMapping("/mypage")
+  public String mypage(Model model, Principal principal) {
+    // principal.getName()은 현재 로그인한 사용자의 username을 반환합니다.
+    String username = principal.getName();
+    UserVO user = userService.getUserById(username); // 아이디로 회원 정보 조회
+    model.addAttribute("user", user);
+    model.addAttribute("url", "/mypage");
+    return "user/mypage";
 }
 
 }

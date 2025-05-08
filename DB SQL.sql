@@ -11,8 +11,6 @@ CREATE TABLE User (
     us_email VARCHAR(100) NOT NULL UNIQUE,
     us_nickname VARCHAR(50) NOT NULL,
     us_sociallogin BOOLEAN DEFAULT FALSE,             -- 소셜 로그인 여부
-    us_cookie VARCHAR(255),
-    us_limit DATETIME,
     us_created DATETIME DEFAULT CURRENT_TIMESTAMP
     
 );

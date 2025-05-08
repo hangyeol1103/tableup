@@ -29,7 +29,7 @@ public class UserController {
   public String signup(UserVO user) {
     user.setUs_pw(passwordEncoder.encode(user.getUs_pw()));
     userService.insertUser(user);
-    return "redirect:/login";
+    return "redirect:/";
 }
 
 }

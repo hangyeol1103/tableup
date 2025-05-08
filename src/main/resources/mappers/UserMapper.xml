@@ -12,9 +12,7 @@
 			us_phone, 
 			us_email, 
 			us_nickname, 
-			us_sociallogin, 
-			us_cookie, 
-			us_limit
+			us_sociallogin
 		)
 		VALUES (
 			#{us_id}, 
@@ -23,9 +21,7 @@
 			#{us_phone}, 
 			#{us_email}, 
 			#{us_nickname}, 
-			#{us_sociallogin}, 
-			#{us_cookie}, 
-			#{us_limit}
+			#{us_sociallogin}
 		)
 	</insert>
 </mapper>

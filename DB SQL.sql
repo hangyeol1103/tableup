@@ -4,10 +4,10 @@ USE tableup;
 
 CREATE TABLE User (
   us_no INT AUTO_INCREMENT PRIMARY KEY, 
-  us_id VARCHAR(20) NOT NULL,
+  us_id VARCHAR(20) NOT NULL UNIQUE,
   us_pw VARCHAR(255) NOT NULL,
   us_name VARCHAR(50) NOT NULL,         
-  us_phone VARCHAR(20),                 
+  us_phone VARCHAR(20) NOT NULL UNIQUE,
   us_email VARCHAR(50) NOT NULL UNIQUE,
   us_nickname VARCHAR(30) NOT NULL,
   us_sociallogin BOOLEAN DEFAULT FALSE,

@@ -10,35 +10,30 @@
 	<header th:fragment="header">
 		<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
 			<div class="container-fluid">
-				<a class="navbar-brand" th:href="@{/}">Logo</a>
+				<a class="navbar-brand" th:href="@{/manager/main}">테이블업</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
 					<span class="navbar-toggler-icon"></span>
 				</button>
 				<div class="collapse navbar-collapse" id="mynavbar">
 					<ul class="navbar-nav me-auto">
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/}" th:classappend="${url == '/' ? 'active' : ''}">홈</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/post/list/0}" th:classappend="${url == '/post/list' ? 'active' : ''}">게시글 목록</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="javascript:void(0)">식당 리스트</a>
-						</li>
-						<li class="nav-item" sec:authorize="isAnonymous()">
-							<a class="nav-link" th:href="@{/login}" th:classappend="${url == '/login' ? 'active' : ''}">로그인</a>
+						<li class="nav-item" sec:authorize="isAuthenticated()">
+							<a class="nav-link" th:href="@{/manager/main}" th:classappend="${url == '/manager/main' ? 'active' : ''}">매니저페이지</a>
 						</li>
 						<li class="nav-item" sec:authorize="isAuthenticated()">
-							<form th:action="@{/logout}" method="post">
+							<a class="nav-link" th:href="@{/manager/restaurant}" th:classappend="${url == '/manager/restaurant' ? 'active' : ''}">매장관리</a>
+						</li>
+						<li class="nav-item" sec:authorize="isAnonymous()">
+							<a class="nav-link" th:href="@{/manager/login}" th:classappend="${url == '/manager/login' ? 'active' : ''}">로그인</a>
+						</li>
+						<li class="nav-item" sec:authorize="isAuthenticated()">
+							<form th:action="@{/manager/logout}" method="post">
 								<button class="btn nav-link">로그아웃</button>
 							</form>
 						</li>
 						<li class="nav-item" sec:authorize="isAnonymous()">
-							<a class="nav-link" th:href="@{/signup}" th:classappend="${url == '/signup' ? 'active' : ''}">회원가입</a>
+							<a class="nav-link" th:href="@{/manager/signup}" th:classappend="${url == '/manager/signup' ? 'active' : ''}">회원가입</a>
 						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="javascript:void(0)">Link</a>
-						</li>
+						
 					</ul>
 					<form class="d-flex">
 						<input class="form-control me-2" type="text" placeholder="Search">

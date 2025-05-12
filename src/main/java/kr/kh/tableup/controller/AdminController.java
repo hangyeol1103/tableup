@@ -1,16 +1,20 @@
 package kr.kh.tableup.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.kh.tableup.service.AdminService;
 
 @Controller
-@RequestMapping("/admin")
 public class AdminController {
 
-  @GetMapping("")
-  public String adminHome() {
-    return "admin/admin";
-  }
+	@Autowired
+	AdminService adminService;
 
+	@Autowired
+  PasswordEncoder passwordEncoder;
+
+	
+	
 }

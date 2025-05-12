@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kh.tableup.dao.ManagerDAO">
+
+	<insert id="insertManager">
+		insert into restaurantmanager (rm_id, rm_pw, rm_email, rm_name, rm_phone, rm_business)
+		values (#{rm_id},#{rm_pw},#{rm_email},#{rm_name},#{rm_phone},#{rm_business})
+	</insert>
+
+	<select id="findById" resultType="RestaurantManagerVO">
+		select * from restaurantmanager where rm_id=#{username}
+	</select>
+
+	<select id="selectManager" resultType="RestaurantManagerVO">
+		select * from restaurantmanager where rm_id=#{rm_id}
+	</select>
+
+	<select id="selectRestaurant" resultType="RestaurantVO">
+		select * from restaurant 
+		join restaurantmanager on rm_rt_num = rt_num
+		where rm_no=#{rm_num}
+	</select>
+
+	
+</mapper>

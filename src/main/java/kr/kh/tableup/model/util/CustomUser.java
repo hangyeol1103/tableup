@@ -7,23 +7,22 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import kr.kh.tableup.model.vo.UserVO;
+import kr.kh.tableup.model.vo.MemberVO;
+import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import lombok.Data;
 
 @Data
 public class CustomUser extends User {
 	
-	private UserVO user;
+	private MemberVO member;
 	
 	public CustomUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
 	}
-	public CustomUser(UserVO vo) {
-    super(
-			vo.getUs_id().toString(),
-			vo.getUs_pw(), 
-			Arrays.asList(new SimpleGrantedAuthority(vo.getUs_authority()))
-    );
-    this.user = vo;
-}
+	public CustomUser(MemberVO vo) {
+		super(	vo.getMe_id(),
+				vo.getMe_pw(), 
+				Arrays.asList(new SimpleGrantedAuthority(vo.getMe_authority())));
+		this.member = vo;
+	}
 }

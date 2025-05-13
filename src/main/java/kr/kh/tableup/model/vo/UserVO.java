@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class UserVO {
-  private Integer us_no;
+  private Integer us_num;
   private String us_id;        
   private String us_pw;         
   private String us_name;       
@@ -15,5 +15,6 @@ public class UserVO {
   private String us_nickname;   
   private Boolean us_sociallogin;
   private Date us_created;
-  private String us_authority;
+  private int us_state;
+  //private String us_authority;
 }

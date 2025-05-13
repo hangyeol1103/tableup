@@ -133,7 +133,7 @@ public class ManagerController {
 
 
 	@PostMapping("/make")
-	public String insertPage(RestaurantVO restaurant, MultipartFile[] fileList,  
+	public String insertPage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
 													 @AuthenticationPrincipal RestaurantManagerVO manager ) {
 		System.out.println(manager);
 		System.out.println(restaurant);

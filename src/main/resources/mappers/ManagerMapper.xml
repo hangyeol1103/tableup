@@ -45,5 +45,17 @@
 		select * from detailregion where dreg_reg_num=#{reg_num}
 	</select>
 
-	
+	<!--레스토랑 테이블에 값들을 입력-->
+	<insert id="insertRestaurant" useGeneratedKeys="true" keyProperty="rt_num">
+		insert into restaurant
+			(rt_name, rt_closed_days, rt_price_lunch, rt_price_dinner,
+			 rt_accept, rt_dfc_num, rt_dreg_num, rt_description)
+		value(#{rt_name},#{rt_closed_days},#{rt_price_lunch},#{rt_price_dinner}
+					,'N',#{rt_dfc_num},#{rt_dreg_num},#{rt_description})
+	</insert>
+
+	<update id="updateManagerRtNum">
+		update restaurantmanager set rm_rt_num=#{rt_num}
+		where rm_num=#{rm_num}
+	</update>
 </mapper>

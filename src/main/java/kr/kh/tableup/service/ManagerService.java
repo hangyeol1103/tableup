@@ -22,8 +22,8 @@ public class ManagerService {
 	@Autowired
 	ManagerDAO managerDAO;
 
-	@Value("${spring.path.upload}")
-	String uploadPath;
+	// @Value("${spring.path.upload}")
+	// String uploadPath;
 
 	public boolean insertManager(RestaurantManagerVO rm) {
 		return managerDAO.insertManager(rm);
@@ -47,9 +47,14 @@ public class ManagerService {
 			return false;
 		}
 		//매장 이미지 작업
-		uploadFileList(restaurant.getRt_num(), fileList);
+		//uploadFileList(restaurant.getRt_num(), fileList);
 		
 		//매장 정보 등록후 점주에게 매장 정보 부여
+		boolean res1 =managerDAO.updateManagerRtNum(manager.getRm_num(),restaurant.getRt_num());
+		if(!res1){
+			return false;
+		}
+		
 		return true;
 	}
 

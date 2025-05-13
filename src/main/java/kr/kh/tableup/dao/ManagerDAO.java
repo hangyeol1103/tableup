@@ -2,6 +2,8 @@ package kr.kh.tableup.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
@@ -32,5 +34,8 @@ public interface ManagerDAO {
 	List<DetailFoodCategoryVO> selectDetailByFcNum(int fc_num);
 
 	List<DetailRegionVO> selectDetailByRegNum(int reg_num);
+
+	boolean updateManagerRtNum(@Param("rm_num")int rm_num,@Param("rt_num") int rt_num);
+
 	
 }

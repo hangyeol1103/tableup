@@ -17,7 +17,7 @@
 				<div class="collapse navbar-collapse" id="mynavbar">
 					<ul class="navbar-nav me-auto">
 						<li class="nav-item" sec:authorize="isAnonymous()">
-							<a class="nav-link" th:href="@{/login}" th:classappend="${url == '/login' ? 'active' : ''}">로그인</a>
+							<a class="nav-link" th:href="@{/admin/login}" th:classappend="${url == '/admin/login' ? 'active' : ''}">관리자 로그인</a>
 						</li>
 						<li class="nav-item" sec:authorize="isAuthenticated()">
 							<form th:action="@{/logout}" method="post">

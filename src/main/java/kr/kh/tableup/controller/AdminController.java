@@ -39,6 +39,10 @@ public class AdminController {
     adminService.insertAdmin(admin);
     return "redirect:/admin";
   }
+  @GetMapping("/login")
+  public String adminLogin() {
+    return "/admin/login";
+  }
 
   @GetMapping("/region")
   public String regionPage() {

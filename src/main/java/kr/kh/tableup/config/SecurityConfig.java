@@ -34,9 +34,9 @@ public class SecurityConfig{
       )
       .formLogin((form) -> form
         .loginPage("/login")  // 커스텀 로그인 페이지 설정
-        .permitAll()           // 로그인 페이지는 접근 허용
         .loginProcessingUrl("/login")//로그인 화면에서 로그인을 눌렀을 때 처리할 url을 지정
         .defaultSuccessUrl("/")
+        .permitAll()                 // 로그인 페이지는 접근 허용
       )
       //자동 로그인 처리
       .rememberMe(rm-> rm
@@ -46,11 +46,11 @@ public class SecurityConfig{
         .tokenValiditySeconds(60 * 60 * 24 * 100)//유지 기간 : x일
       )
       .logout((logout) -> logout
-          .logoutUrl("/logout")//post방식
-          .logoutSuccessUrl("/")
-          .clearAuthentication(true)
-          .invalidateHttpSession(true)
-          .permitAll());  // 로그아웃도 모두 접근 가능
+        .logoutUrl("/logout")//post방식
+        .logoutSuccessUrl("/")
+        .clearAuthentication(true)
+        .invalidateHttpSession(true)
+        .permitAll());  // 로그아웃도 모두 접근 가능
         return http.build();
     }
 

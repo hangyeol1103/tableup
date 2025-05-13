@@ -13,7 +13,7 @@
 <body>
   <div class="container mt-3" layout:fragment="content">
     <h2>관리자 로그인</h2>
-    <form th:action="@{login}" method="post">
+    <form th:action="@{/admin/login}" method="post">
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text">아이디</span>
         <input type="text" class="form-control" id="user" name="username">
@@ -25,7 +25,7 @@
       <label>
         <input type="checkbox" name="remember-me"> 자동 로그인
       </label>
-      <button class="btn btn-outline-success col-12">로그인</button>
+      <button type="submit" class="btn btn-outline-success col-12">로그인</button>
     </form>
   </div>
 </body>

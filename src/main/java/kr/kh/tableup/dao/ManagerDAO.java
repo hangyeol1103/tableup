@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -36,6 +37,8 @@ public interface ManagerDAO {
 	List<DetailRegionVO> selectDetailByRegNum(int reg_num);
 
 	boolean updateManagerRtNum(@Param("rm_num")int rm_num,@Param("rt_num") int rt_num);
+
+	List<MenuVO> selectMenuList(int rt_num);
 
 	
 }

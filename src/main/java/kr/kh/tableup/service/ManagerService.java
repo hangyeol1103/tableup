@@ -12,6 +12,7 @@ import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -104,6 +105,10 @@ public class ManagerService {
 
 	public List<DetailRegionVO> getDetailByRegNum(int reg_num) {
 		return managerDAO.selectDetailByRegNum(reg_num);
+	}
+
+	public List<MenuVO> getMenuList(int rt_num) {
+		return managerDAO.selectMenuList(rt_num);
 	}
 
 }

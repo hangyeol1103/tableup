@@ -13,6 +13,7 @@ import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -80,12 +81,22 @@ public class ManagerController {
 		//해당 매니저의 매장 외래키를 가져옴
 		int rm_num=manager.getRm_num();
 		RestaurantVO restaurant =managerService.selectRestaurant(rm_num);
+		List<FoodCategoryVO> foodcategory = managerService.getFoodCategory();
+		List<RegionVO> region = managerService.getRegion();
+		List<DetailRegionVO> dr = managerService.getDetailRegion();
+		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
 		
 		System.out.println(manager.getRm_id());
 		System.out.println(restaurant);
 		
 		model.addAttribute("manager", manager);
 		model.addAttribute("restaurant", restaurant);
+		
+		model.addAttribute("foodcategory", foodcategory);
+		model.addAttribute("region", region);
+		model.addAttribute("dr", dr);
+		model.addAttribute("dfc", dfc);
+		
 		model.addAttribute("url", "/restaurant");
 		return "/manager/restaurant";
 	}
@@ -130,8 +141,6 @@ public class ManagerController {
 		return managerService.getDetailByRegNum(reg_num);
 	}
 	
-
-
 	@PostMapping("/make")
 	public String insertPage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
 													 @AuthenticationPrincipal RestaurantManagerVO manager ) {
@@ -142,6 +151,15 @@ public class ManagerController {
 			return "redirect:/manager/restaurant";
 		}
 		return "redirect:/manager/make";
+	}
+	
+	//메뉴 리스트 출력
+	@GetMapping("/menulist/{rt_num}")
+	public String menuListPage(Model model, @PathVariable int rt_num) {
+		System.out.println("menulist rt_num: " + rt_num);
+		List<MenuVO> menulist = managerService.getMenuList(rt_num);
+		model.addAttribute("menulist", menulist);
+		return "manager/menulist";
 	}
 	
 	

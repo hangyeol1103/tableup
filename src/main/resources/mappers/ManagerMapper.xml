@@ -58,4 +58,8 @@
 		update restaurantmanager set rm_rt_num=#{rt_num}
 		where rm_num=#{rm_num}
 	</update>
+
+	<select id="selectMenuList" resultType="MenuVO">
+		select * from `menu` where mn_rt_num=#{rt_num}
+	</select>
 </mapper>

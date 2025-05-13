@@ -62,4 +62,8 @@
 	<select id="selectMenuList" resultType="MenuVO">
 		select * from `menu` where mn_rt_num=#{rt_num}
 	</select>
+
+	<select id="selectMenuTypeList" resultType="MenuTypeVO">
+		select * from menutype
+	</select>
 </mapper>

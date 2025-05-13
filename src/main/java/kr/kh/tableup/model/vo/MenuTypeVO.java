@@ -3,7 +3,7 @@ package kr.kh.tableup.model.vo;
 import lombok.Data;
 
 @Data
-public class MenuType {
+public class MenuTypeVO {
 	
 	int mt_num;
 	String mt_name;

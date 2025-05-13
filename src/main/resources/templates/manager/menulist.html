@@ -17,15 +17,35 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <body>
 	<main layout:fragment="content" class="container">
 		<!-- 메뉴 정보가 등록이 되어 있으면-->
-		<div th:if="${menulist != null}">
 			<h1>메뉴 목록</h1>
-			
-		</div>
-			<!-- 매장 정보가 등록이 되어 있지 않으면-->
-		<div th:unless="${menulist != null}">
-			<h3>아직 메뉴를 입력하지 않앗습니다.</h3>
-      <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/main'">메뉴등록</button>
-		</div>
+			<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>이미지</th>
+					<th>이름</th>
+					<th>가격</th>
+					<th>색인</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="menu : ${menulist}">
+					<td>
+						<a th:href="" th:text="${menu.mn_img}"></a>
+					</td>
+					<td>
+						<a th:href="" th:text="${menu.mn_name}"></a>
+					</td>
+					<td th:text="${menu.mn_price}">가격</td>
+					<td th:text="${menu.mn_div}">색인</td>
+				</tr>
+				<!-- 매장 정보가 등록이 되어 있지 않으면-->
+					<tr th:if="${menulist.size() == 0}">
+						<td colspan="4" class="text-center">아직 메뉴를 입력하지 않았습니다.</td>
+					</tr>
+			</tbody>
+		</table>
+		
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_menu'">메뉴등록</button>
 	</main>
 </body>
 </html>

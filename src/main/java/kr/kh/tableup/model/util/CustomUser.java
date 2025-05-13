@@ -22,7 +22,7 @@ public class CustomUser extends User {
     super(
 			vo.getUs_id().toString(),
 			vo.getUs_pw(), 
-			Arrays.asList(new SimpleGrantedAuthority(vo.getUs_authority()))
+			Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"))
     );
     this.user = vo;
 }

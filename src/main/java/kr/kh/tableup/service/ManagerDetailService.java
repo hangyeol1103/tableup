@@ -26,7 +26,7 @@ public class ManagerDetailService implements UserDetailsService{
             throw new UsernameNotFoundException("점주 정보 없음");
         
         // 권한이 없다면 ROLE 없이 UserDetails 구현 가능 (단, hasAuthority는 못 씀)
-        return new User(manager.getRm_id(), manager.getRm_pw(), List.of()); 
+        return manager; 
 		
 	}
 

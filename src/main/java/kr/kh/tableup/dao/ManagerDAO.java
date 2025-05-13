@@ -28,5 +28,9 @@ public interface ManagerDAO {
 	List<DetailFoodCategoryVO> selectDetailFoodList();
 
 	List<DetailRegionVO> selectDetailRegionList();
+
+	List<DetailFoodCategoryVO> selectDetailByFcNum(int fc_num);
+
+	List<DetailRegionVO> selectDetailByRegNum(int reg_num);
 	
 }

@@ -103,9 +103,9 @@ public class ManagerController {
 		List<DetailRegionVO> dr = managerService.getDetailRegion();
 		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
 
-		System.out.println(foodcategory);
 		System.out.println(region);
 		System.out.println(dr);
+		System.out.println(foodcategory);
 		System.out.println(dfc);
 
 		model.addAttribute("url", "/make");
@@ -116,13 +116,29 @@ public class ManagerController {
 		return "/manager/make";
 	}
 
+	@ResponseBody
+	@GetMapping("/get-detail")
+	public List<DetailFoodCategoryVO> getDetailCategory(@RequestParam("fcNum") int fc_num) {
+    System.out.println("받은 fcNum : " + fc_num);
+		return managerService.getDetailByFcNum(fc_num);
+	}
+
+	@ResponseBody
+	@GetMapping("/get-detailregion")
+	public List<DetailRegionVO> getDetailRegion(@RequestParam("regNum") int reg_num) {
+    System.out.println("받은 regNum : " + reg_num);
+		return managerService.getDetailByRegNum(reg_num);
+	}
+	
+
 
 	@PostMapping("/make")
-	public String insertPage(RestaurantVO restaurant, MultipartFile file,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+	public String insertPage(RestaurantVO restaurant, MultipartFile[] fileList,  
+													 @AuthenticationPrincipal RestaurantManagerVO manager ) {
 		System.out.println(manager);
 		System.out.println(restaurant);
 
-		if(managerService.insertRestaurant(restaurant, manager, file)){
+		if(managerService.insertRestaurant(restaurant, manager, fileList)){
 			return "redirect:/manager/restaurant";
 		}
 		return "redirect:/manager/make";

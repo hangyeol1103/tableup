@@ -18,7 +18,7 @@
 	<select id="selectRestaurant" resultType="RestaurantVO">
 		select * from restaurant 
 		join restaurantmanager on rm_rt_num = rt_num
-		where rm_no=#{rm_num}
+		where rm_num=#{rm_num}
 	</select>
 
 	<select id="selectFoodCategoryList" resultType="FoodCategoryVO">
@@ -35,6 +35,14 @@
 
 	<select id="selectDetailRegionList" resultType="DetailRegionVO">
 		select * from detailregion
+	</select>
+
+	<select id="selectDetailByFcNum" resultType="DetailFoodCategoryVO">
+		select * from detailfoodcategory where dfc_fc_num=#{fc_num}
+	</select>
+
+	<select id="selectDetailByRegNum" resultType="DetailRegionVO">
+		select * from detailregion where dreg_reg_num=#{reg_num}
 	</select>
 
 	

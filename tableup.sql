@@ -30,7 +30,7 @@ CREATE TABLE `UserCoupon` (
 	`UC_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
 	`UC_STATE`	BOOLEAN NOT NULL,
 	`UC_ReC_NUM`	INT	NOT NULL,
-	`UC_us_num`	INT	NULL
+	`UC_us_num`	INT	NOT NULL
 );
 
 DROP TABLE IF EXISTS `BusinessDate`;
@@ -69,8 +69,9 @@ DROP TABLE IF EXISTS `RestaurantFacility`;
 
 CREATE TABLE `RestaurantFacility` (
 	`rf_num`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`rf_rt_num`	INT	NULL,
-	`rf_FD_NUM`	INT	NOT NULL
+    `rf_rt_num`	INT	NULL,
+	`rf_fa_num`	INT	NULL,
+	`rf_detail` LONGTEXT
 );
 
 DROP TABLE IF EXISTS `RestaurantTag`;
@@ -100,7 +101,7 @@ DROP TABLE IF EXISTS `Reservation`;
 
 CREATE TABLE `Reservation` (
 	`res_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`res_us_id`	INT	NULL,
+	`res_us_num`	INT	NOT NULL,
 	`res_rt_num`	INT	NULL,
 	`res_time`	DATETIME NOT NULL,
 	`res_person`	INT NOT NULL,
@@ -171,7 +172,7 @@ DROP TABLE IF EXISTS `UsFollow`;
 
 CREATE TABLE `UsFollow` (
 	`UF_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`uf_us_num`	INT	NULL,
+	`uf_us_num`	INT	NOT NULL,
 	`uf_TYPE`	ENUM('REVIEW', 'RESTAURANT') NOT NULL,
 	`uf_FOREIGN`	INT NOT NULL
 );
@@ -190,7 +191,7 @@ DROP TABLE IF EXISTS `DefaultResTime`;
 
 CREATE TABLE `DefaultResTime` (
 	`DRT_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`drt_rt_num`	INT	NULL,
+	`drt_rt_num`	INT	NOT NULL UNIQUE,
 	`drt_date`		ENUM('월', '화', '수', '목', '금', '토', '일') NOT NULL,
 	`drt_off`		BOOLEAN NOT NULL,
 	`drt_open`	TIME	NULL,
@@ -205,7 +206,7 @@ DROP TABLE IF EXISTS `Sociallogin`;
 
 CREATE TABLE `Sociallogin` (
 	`sl_num`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`sl_us_no`	INT	NULL,
+	`sl_us_num`	INT	NOT NULL UNIQUE,
 	`sl_kakao`	BOOLEAN	NULL,
 	`sl_phone`	BOOLEAN	NULL,
 	`sl_google`	BOOLEAN	NULL
@@ -232,7 +233,7 @@ DROP TABLE IF EXISTS `Review`;
 
 CREATE TABLE `Review` (
 	`rev_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`rev_us_id`	INT	NULL,
+	`rev_us_num`	INT	NULL,
 	`rev_rt_num`	INT	NULL,
 	`rev_content`	LONGTEXT	NULL,
 	`rev_created`	DATETIME  NOT NULL,
@@ -254,7 +255,7 @@ CREATE TABLE `Facility` (
 DROP TABLE IF EXISTS `RestaurantManager`;
 
 CREATE TABLE `RestaurantManager` (
-	`rm_no`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`rm_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	`rm_id`	VARCHAR(50) NOT NULL,
 	`rm_pw`	VARCHAR(255) NOT NULL,
 	`rm_email`	VARCHAR(100) NOT NULL,
@@ -287,16 +288,9 @@ CREATE TABLE `User` (
 	`us_nickname`	VARCHAR(30) NOT NULL,
 	`us_sociallogin`	BOOLEAN	NULL,
 	`us_created`	DATETIME NOT NULL,
-	`us_state`	INT NOT NULL
+	`us_state`	INT NOT NULL DEFAULT 0
 );
 
-DROP TABLE IF EXISTS `FacilityDetail`;
-
-CREATE TABLE `FacilityDetail` (
-	`FD_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`fd_fa_num`	INT	NULL,
-	`fd_detail`	LONGTEXT NOT NULL
-);
 
 DROP TABLE IF EXISTS `BusinessHourTemplate`;
 
@@ -333,12 +327,12 @@ CREATE TABLE `TagType` (
 DROP TABLE IF EXISTS `File`;
 
 CREATE TABLE `File` (
-	`file_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`file_path`	VARCHAR(255) NOT NULL,
-	`file_name`	VARCHAR(255) NOT NULL,
-	`File_type`	ENUM('REIVEW', 'RestaurantDetail') NOT NULL,
-	`File_FOREIGN`	INT NOT NULL,
-	`file_tag`	ENUM('내부', '외부', '메뉴판', '음식') NOT NULL
+    `file_num` INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    `file_path` VARCHAR(255) NOT NULL,
+    `file_name` VARCHAR(255) NOT NULL,
+    `File_type` ENUM('REVIEW', 'RESTAURANTDETAIL', 'MENU') NOT NULL,
+    `File_FOREIGN` INT NOT NULL,
+    `file_tag` ENUM('내부', '외부', '메뉴판', '음식', '기타') NOT NULL
 );
 
 ALTER TABLE `BusinessHour` ADD CONSTRAINT `FK_Restaurant_TO_BusinessHour_1` FOREIGN KEY (
@@ -397,11 +391,11 @@ REFERENCES `Restaurant` (
 	`rt_num`
 );
 
-ALTER TABLE `RestaurantFacility` ADD CONSTRAINT `FK_FacilityDetail_TO_RestaurantFacility_1` FOREIGN KEY (
-	`rf_FD_NUM`
+ALTER TABLE `RestaurantFacility` ADD CONSTRAINT `FK_Facility_TO_RestaurantFacility_1` FOREIGN KEY (
+	`rf_fa_num`
 )
-REFERENCES `FacilityDetail` (
-	`FD_NUM`
+REFERENCES `Facility` (
+	`fa_num`
 );
 
 ALTER TABLE `RestaurantTag` ADD CONSTRAINT `FK_Restaurant_TO_RestaurantTag_1` FOREIGN KEY (
@@ -426,7 +420,7 @@ REFERENCES `TagType` (
 );
 
 ALTER TABLE `Reservation` ADD CONSTRAINT `FK_User_TO_Reservation_1` FOREIGN KEY (
-	`res_us_id`
+	`res_us_num`
 )
 REFERENCES `User` (
 	`us_num`
@@ -496,7 +490,7 @@ REFERENCES `Restaurant` (
 );
 
 ALTER TABLE `Sociallogin` ADD CONSTRAINT `FK_User_TO_Sociallogin_1` FOREIGN KEY (
-	`sl_us_no`
+	`sl_us_num`
 )
 REFERENCES `User` (
 	`us_num`
@@ -524,7 +518,7 @@ REFERENCES `ScoreType` (
 );
 
 ALTER TABLE `Review` ADD CONSTRAINT `FK_User_TO_Review_1` FOREIGN KEY (
-	`rev_us_id`
+	`rev_us_num`
 )
 REFERENCES `User` (
 	`us_num`
@@ -551,12 +545,6 @@ REFERENCES `Reservation` (
 	`res_num`
 );
 
-ALTER TABLE `FacilityDetail` ADD CONSTRAINT `FK_Facility_TO_FacilityDetail_1` FOREIGN KEY (
-	`fd_fa_num`
-)
-REFERENCES `Facility` (
-	`fa_num`
-);
 
 ALTER TABLE `BusinessHourTemplate` ADD CONSTRAINT `FK_Restaurant_TO_BusinessHourTemplate_1` FOREIGN KEY (
 	`bhd_rt_num`

@@ -16,7 +16,7 @@ import kr.kh.tableup.service.UserDetailService;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig{
+public class SecurityConfig {
 
   @Autowired
   private UserDetailService userDetailService;
@@ -27,66 +27,69 @@ public class SecurityConfig{
   @Value("${security.rememberme.key}")
   private String rememberMeKey;
 
+  // 관리자 보안 설정
   @Bean
-    @Order(1)
-    public SecurityFilterChain managerSecurityFilterChain(HttpSecurity http) throws Exception {
-      http
+  @Order(1)
+  public SecurityFilterChain managerSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
       .securityMatcher("/manager/**")
+      .csrf(csrf -> csrf.disable())
       .authorizeHttpRequests(auth -> auth
-          .requestMatchers("/manager/signup", "/manager/register").permitAll()
-          .anyRequest().authenticated()
+        .requestMatchers("/manager/signup", "/manager/register").permitAll()
+        .anyRequest().authenticated()
       )
       .formLogin(form -> form
-          .loginPage("/manager/login")
-          .loginProcessingUrl("/manager/login")
-          .defaultSuccessUrl("/manager/main")
-          .permitAll()
+        .loginPage("/manager/login")
+        .loginProcessingUrl("/manager/login")
+        .defaultSuccessUrl("/manager/main", true)
+        .permitAll()
       )
       .logout(logout -> logout
-          .logoutUrl("/manager/logout")
-          .logoutSuccessUrl("/manager/main")
-          .permitAll()
+        .logoutUrl("/manager/logout")
+        .logoutSuccessUrl("/manager/main")
+        .permitAll()
       )
-        .userDetailsService(managerDetailService);
-  
-      return http.build();
-    }
+      .userDetailsService(managerDetailService);
 
-	@Bean
+    return http.build();
+  }
+
+  // 일반 사용자 보안 설정
+  @Bean
   @Order(2)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-     
-      http.csrf(csrf ->csrf.disable())
-        
-        .formLogin((form) -> form
-          .loginPage("/user/login")  // 커스텀 로그인 페이지 설정
-          .permitAll()           // 로그인 페이지는 접근 허용
-          .loginProcessingUrl("/user/loginPost")//로그인 화면에서 로그인을 눌렀을 때 처리할 url을 지정
-          .defaultSuccessUrl("/")
-          .permitAll()
-        )
-        //자동 로그인 처리
-        .rememberMe(rm-> rm
-          .userDetailsService(userDetailService)//자동 로그인할 때 사용할 userDetailService를 추가
-          .key(rememberMeKey)//키가 변경되면 기존 토큰이 무효처리
-          .rememberMeCookieName("LC")//쿠키 이름
-          .tokenValiditySeconds(60 * 60 * 24 * 100)//유지 기간 : x일
-        )
-        .logout((logout) -> logout
-            .logoutUrl("/user/logoutPost")//post방식
-            .logoutSuccessUrl("/")
-            .clearAuthentication(true)
-            .invalidateHttpSession(true)
-            .permitAll());  // 로그아웃도 모두 접근 가능
-          return http.build();
-    }
-    
-    
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+      .csrf(csrf -> csrf.disable())
+      .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/", "/user/login", "/user/signup", "/css/**", "/js/**").permitAll()
+        .anyRequest().authenticated()
+      )
+      .formLogin(form -> form
+        .loginPage("/user/login")
+        .loginProcessingUrl("/user/loginPost")
+        .defaultSuccessUrl("/", true)
+        .permitAll()
+      )
+      .rememberMe(rm -> rm
+        .userDetailsService(userDetailService)
+        .key(rememberMeKey)
+        .rememberMeCookieName("LC")
+        .tokenValiditySeconds(60 * 60 * 24 * 100)
+      )
+      .logout(logout -> logout
+        .logoutUrl("/user/logoutPost")
+        .logoutSuccessUrl("/")
+        .clearAuthentication(true)
+        .invalidateHttpSession(true)
+        .permitAll()
+      )
+      .userDetailsService(userDetailService);
 
-    //매니저 로그인
-    
+    return http.build();
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }

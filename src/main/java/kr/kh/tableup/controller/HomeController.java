@@ -20,17 +20,7 @@ public class HomeController {
 	@Autowired
 	UserService userService;
 
-	@GetMapping("/login")
-	public String login(Model model) {
-		model.addAttribute("url", "/login");
-		return "user/login";
-	}
-
-	@GetMapping("/signup")
-  public String signupForm(Model model) {
-    model.addAttribute("url", "/signup");
-    return "user/signup";
-  }
+	
 	
 
 

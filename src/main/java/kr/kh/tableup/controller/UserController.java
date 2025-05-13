@@ -29,6 +29,19 @@ public class UserController {
   @Autowired
   PasswordEncoder passwordEncoder;
 
+
+  @GetMapping("/login")
+	public String login(Model model) {
+		model.addAttribute("url", "/login");
+		return "user/login";
+	}
+
+	@GetMapping("/signup")
+  public String signupForm(Model model) {
+    model.addAttribute("url", "/signup");
+    return "user/signup";
+  }
+
   @PostMapping("/signupPost")
   public String signup(UserVO user) {
     user.setUs_pw(passwordEncoder.encode(user.getUs_pw()));

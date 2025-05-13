@@ -4,12 +4,12 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout_admin.html}">
 <head>
-    <title>관리자 페이지</title>
+    <title layout:fragment="title">관리자 페이지</title>
 </head>
 <body>
-<div class="container mt-4" layout:fragment="content">
-    <h2>관리자 페이지</h2>
-    <p>여기에 관리자 기능을 추가하세요.</p>
-</div>
+    <div layout:fragment="content" class="container mt-4" >
+        <h2>관리자 페이지</h2>
+        <p>여기에 관리자 기능을 추가하세요.</p>
+    </div>
 </body>
 </html>

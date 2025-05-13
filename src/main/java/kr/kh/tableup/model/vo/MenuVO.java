@@ -12,4 +12,5 @@ public class MenuVO {
 	String mn_content;
 	int mn_mt_num;
 	int mn_rt_num;
+	String mn_div;
 }

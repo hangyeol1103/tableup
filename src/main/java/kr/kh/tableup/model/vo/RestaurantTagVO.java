@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class RestaurantTagVO {
+	int rta_num;
 	int rta_rt_num;
 	int rta_tag_num;
 }

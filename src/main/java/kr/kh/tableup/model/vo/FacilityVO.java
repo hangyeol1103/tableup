@@ -4,6 +4,8 @@ import lombok.Data;
 
 @Data
 public class FacilityVO {
-	int fc_num;
-	String fc_name;
+	int fa_num;
+	String fa_name;
+	String fa_title;
+	String fa_icon;
 }

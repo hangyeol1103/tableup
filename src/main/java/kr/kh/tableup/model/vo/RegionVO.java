@@ -6,5 +6,4 @@ import lombok.Data;
 public class RegionVO {
 	int reg_num;
 	String reg_main;
-	String reg_sub;
 }

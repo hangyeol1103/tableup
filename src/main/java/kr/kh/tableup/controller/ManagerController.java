@@ -1,6 +1,7 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -9,6 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import kr.kh.tableup.model.util.CustomUser;
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
+import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -72,10 +78,10 @@ public class ManagerController {
 	}
 		RestaurantManagerVO manager = managerService.getManagerId(loginId);
 		//해당 매니저의 매장 외래키를 가져옴
-		int rm_num=manager.getRm_no();
+		int rm_num=manager.getRm_num();
 		RestaurantVO restaurant =managerService.selectRestaurant(rm_num);
 		
-		System.out.println(manager);
+		System.out.println(manager.getRm_id());
 		System.out.println(restaurant);
 		
 		model.addAttribute("manager", manager);
@@ -92,9 +98,24 @@ public class ManagerController {
 
 	@GetMapping("/make")
 	public String makePage(Model model) {
+		List<FoodCategoryVO> foodcategory = managerService.getFoodCategory();
+		List<RegionVO> region = managerService.getRegion();
+		List<DetailRegionVO> dr = managerService.getDetailRegion();
+		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
+
+		System.out.println(foodcategory);
+		System.out.println(region);
+		System.out.println(dr);
+		System.out.println(dfc);
+
 		model.addAttribute("url", "/make");
+		model.addAttribute("foodcategory", foodcategory);
+		model.addAttribute("region", region);
+		model.addAttribute("dr", dr);
+		model.addAttribute("dfc", dfc);
 		return "/manager/make";
 	}
+
 
 	@PostMapping("/make")
 	public String insertPage(RestaurantVO restaurant, MultipartFile file,  @AuthenticationPrincipal RestaurantManagerVO manager) {

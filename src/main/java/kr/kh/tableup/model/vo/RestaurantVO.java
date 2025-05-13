@@ -12,6 +12,5 @@ public class RestaurantVO {
 	String rt_closed_days;
 	String rt_price_lunch;
 	String rt_price_dinner;
-	String rt_image;
 	String rt_accept;
 }

@@ -6,5 +6,9 @@ import lombok.Data;
 public class RestaurantDetailVO {
 	int rd_num;
 	int rd_rt_num;
-	String rd_description;
+	String rd_phone;
+	String rd_close_days;
+	String rd_info;
+	String rd_home;
+	String rd_addr;
 }

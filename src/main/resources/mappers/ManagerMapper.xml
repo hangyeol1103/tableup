@@ -21,5 +21,21 @@
 		where rm_no=#{rm_num}
 	</select>
 
+	<select id="selectFoodCategoryList" resultType="FoodCategoryVO">
+		select * from foodcategory
+	</select>
+
+	<select id="selectRegionList" resultType="RegionVO">
+		select * from region
+	</select>
+
+	<select id="selectDetailFoodList" resultType="DetailFoodCategoryVO">
+		select * from detailfoodcategory
+	</select>
+
+	<select id="selectDetailRegionList" resultType="DetailRegionVO">
+		select * from detailregion
+	</select>
+
 	
 </mapper>

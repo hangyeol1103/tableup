@@ -1,10 +1,16 @@
 package kr.kh.tableup.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.dao.ManagerDAO;
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
+import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
@@ -53,4 +59,21 @@ public class ManagerService {
 		int index = fileName.lastIndexOf(".");
 		return index<0 ? null : fileName.substring(index);
 	}
+
+	public List<FoodCategoryVO> getFoodCategory() {
+		return managerDAO.selectFoodCategoryList();
+	}
+
+	public List<RegionVO> getRegion() {
+	return managerDAO.selectRegionList();
+	}
+
+	public List<DetailRegionVO> getDetailRegion() {
+		return managerDAO.selectDetailRegionList();
+	}
+
+	public List<DetailFoodCategoryVO> getDetailFood() {
+	return managerDAO.selectDetailFoodList();
+	}
+
 }

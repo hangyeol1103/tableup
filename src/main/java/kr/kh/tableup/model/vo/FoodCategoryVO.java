@@ -5,6 +5,5 @@ import lombok.Data;
 @Data
 public class FoodCategoryVO {
 	int fc_num;
-	String fc_main; 
-	String fc_sub; 
+	String fc_main;
 }

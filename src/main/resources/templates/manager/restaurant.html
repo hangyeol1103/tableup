@@ -15,17 +15,43 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   </style>
 </head>
 <body>
-	<main layout:fragment="content">
-		<c:choose>
-		<c:when th:test="${restaurant ne null}">			
-			<h2 class="mb-4 fw-bold text-primary">${restaurant.rt_name}</h2>
+	<main layout:fragment="content" class="container">
+		<!-- 매장 정보가 등록이 되어 있으면-->
+		<div th:if="${restaurant != null}">			
+			<h2 class="mb-4 fw-bold text-primary"  th:text="${manager.rm_id + '님의 매장'}"></h2>
 
-		</c:when>
-		<c:otherwise>
+			<div class="input-group form-group">
+				<div class="form-control col-3">매장이름:</div>
+				<div class="form-control" th:text="${restaurant?.rt_name}"></div>
+			</div>
+			<div class="input-group form-group">
+				<div class="form-control col-3">대표 이미지</div>
+				<div class="form-control" th:text="${restaurant?.rt_name}"></div>
+			</div>
+			<div class="input-group form-group">
+				<div class="form-control col-3">지역:</div>
+				<div class="form-control" th:text="${restaurant?.rt_dreg_num}"></div>
+			</div>
+			<div class="input-group form-group">
+				<div class="form-control col-3">스타일/장르:</div>
+				<div class="form-control" th:text="${restaurant?.rt_dfc_num}"></div>
+			</div>
+			<div class="input-group form-group">
+				<div class="form-control col-3">점심 :</div>
+				<div class="form-control" th:text="${restaurant?.rt_price_lunch}"></div>
+				<div class="form-control col-3">저녁 :</div>
+				<div class="form-control" th:text="${restaurant?.rt_price_dinner}"></div>
+			</div>
+			<div class="input-group form-group">
+				<div class="form-control col-3">매장 간단 설명:</div>
+				<div class="form-control" th:text="${restaurant?.rt_description}"></div>
+			</div>
+		</div>
+			<!-- 매장 정보가 등록이 되어 있지 않으면-->
+		<div th:unless="${restaurant != null}">
 			<h3>아직 식당정보를 입력하지 않앗습니다.</h3>
       <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make'">매장등록</button>
-		</c:otherwise>
-	</c:choose>
+		</div>
 	</main>
 </body>
 </html>

@@ -8,8 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import kr.kh.tableup.model.vo.MemberVO;
-import kr.kh.tableup.service.MemberService;
+
+import kr.kh.tableup.model.vo.UserVO;
+import kr.kh.tableup.service.UserService;
 
 
 
@@ -17,7 +18,7 @@ import kr.kh.tableup.service.MemberService;
 public class HomeController {
 	
 	@Autowired
-	MemberService memberService;
+	UserService memberService;
 
 	@GetMapping("/")
 	public String home(Model model) {
@@ -48,10 +49,10 @@ public class HomeController {
 
 		List<Integer> list = Arrays.asList(10,20,30,40);
 
-		MemberVO user = new MemberVO();
-		user.setMe_id("abc");
-		user.setMe_pw("456");
-		user.setMe_authority("USER");
+		UserVO user = new UserVO();
+		user.setUs_id("abc");
+		user.setUs_pw("456");
+		user.setUs_authority("USER");
 
 		model.addAttribute("num", num);
 		model.addAttribute("role", role);

@@ -25,27 +25,64 @@
         <input type="text" class="form-control" name="rt_reg_num" id="rt_reg_num" required>
       </div>
 			<div class="mb-3 form-group box">
-        <label for="rt_name" class="form-label">음식 종류</label>
-        <input type="text" class="form-control" name="rt_fc_num" id="rt_fc_num" required>
+        <label for="rt_name" class="form-label">장르</label>
+        <select class="form-select" id="fc_num" name="fc_num" required>
+          <option value="">장르 선택</option>
+          <th:block th:each="fc : ${foodcategory}">
+            <option th:value="${fc.fc_num}" th:text="${fc.fc_main}"></option>
+          </th:block>
+        </select>
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="rt_dfc_num" class="form-label">대표장르 선택</label>
+        <select class="form-select" id="rt_dfc_num" name="rt_dfc_num" required>
+          <option value="">장르 선택</option>
+        </select>
       </div>
 			<div class="mb-3 form-group box">
-        <label for="rt_name" class="form-label">휴점일</label>
+        <label for="rt_closed_days" class="form-label">휴점일</label>
         <input type="text" class="form-control" name="rt_closed_days" id="rt_closed_days" required>
       </div>
 			<div class="mb-3 form-group box">
-        <label for="rt_name" class="form-label">점심 가격대</label>
+        <label for="rt_price_lunch" class="form-label">점심 가격대</label>
         <input type="text" class="form-control" name="rt_price_lunch" id="r_price_lunch" required>
       </div>
 			<div class="mb-3 form-group box">
-        <label for="rt_name" class="form-label">저녁 가격대</label>
+        <label for="rt_price_dinner" class="form-label">저녁 가격대</label>
         <input type="text" class="form-control" name="rt_price_dinner" id="rt_price_dinner" required>
       </div>
 			<div class="mb-3 form-group box">
-        <label for="rt_name" class="form-label">대표 이미지</label>
-        <input type="file" class="form-control" name="rt_image" id="rt_image" required>
+        <label  class="form-label">대표 이미지(여러장? 가능)</label>
+        <input type="file" class="form-control" name="fileList">
       </div>
       <button type="submit" class="btn btn-success w-100">매장 등록 하기</button>
     </form>
   </main>
+
+  <script th:inline="javascript">
+    // 서버에서 전달한 소분류 목록
+    const detailFoodList = [[${dfc}]];
+
+    document.getElementById('fc_num').addEventListener('change', function () {
+      const selectedFcNum = this.value;
+      const dfcSelect = document.getElementById('rt_dfc_num');
+
+      // 기존 옵션 초기화
+      dfcSelect.innerHTML = '<option value="">소분류 선택</option>';
+
+      if (!selectedFcNum) return;
+
+      // 선택된 대분류에 해당하는 소분류만 필터링해서 옵션 추가
+      detailFoodList
+        .filter(dfc => dfc.dfc_fc_num == selectedFcNum)
+        .forEach(dfc => {
+          const option = document.createElement('option');
+          option.value = dfc.dfc_num;
+          option.textContent = dfc.dfc_sub;
+          dfcSelect.appendChild(option);
+        });
+    });
+  </script>
+
 </body>
 </html>

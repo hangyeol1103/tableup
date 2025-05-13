@@ -5,4 +5,8 @@
 		INSERT INTO Admin (ad_id, ad_pw)
 		VALUES (#{ad_id}, #{ad_pw})
 	</insert>
+	<select id="selectUser" parameterType="String" resultType="AdminVO">
+		SELECT * FROM admin
+		WHERE ad_id = #{username}
+	</select>
 </mapper>

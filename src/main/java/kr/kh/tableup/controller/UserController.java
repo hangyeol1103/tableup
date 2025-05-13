@@ -29,7 +29,7 @@ public class UserController {
   @Autowired
   PasswordEncoder passwordEncoder;
 
-  @PostMapping("/signup")
+  @PostMapping("/signupPost")
   public String signup(UserVO user) {
     user.setUs_pw(passwordEncoder.encode(user.getUs_pw()));
     userService.insertUser(user);

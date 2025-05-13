@@ -51,7 +51,7 @@ public class SecurityConfig{
   
       return http.build();
     }
-/*
+
 	@Bean
   @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -59,9 +59,9 @@ public class SecurityConfig{
       http.csrf(csrf ->csrf.disable())
         .authorizeHttpRequests((requests) -> requests
         //회원과 관리자가 접근할 수 있는 url(MemberInterceptor 역할)
-        .requestMatchers("/post/insert/*").hasAuthority(UserRole.USER.name())
+        //.requestMatchers("/post/insert/*").hasAuthority(UserRole.USER.name())
         //관리자만 접근할 수 있는 url(AdminInterceptor 역할)
-        .requestMatchers("/admin/**").hasAnyAuthority(UserRole.ADMIN.name())
+        //.requestMatchers("/admin/**").hasAnyAuthority(UserRole.ADMIN.name())
         .anyRequest().permitAll()  // 그 외 요청은 인증 필요
       )
       .formLogin((form) -> form
@@ -86,7 +86,7 @@ public class SecurityConfig{
           .permitAll());  // 로그아웃도 모두 접근 가능
         return http.build();
     }
-    */
+    
     
     @Bean
     public PasswordEncoder passwordEncoder() {

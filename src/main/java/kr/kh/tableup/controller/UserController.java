@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -17,7 +18,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
 
+
 @Controller
+@RequestMapping("user")
 public class UserController {
 
   @Autowired
@@ -25,12 +28,6 @@ public class UserController {
 
   @Autowired
   PasswordEncoder passwordEncoder;
-
-  @GetMapping("/signup")
-  public String signupForm(Model model) {
-    model.addAttribute("url", "/signup");
-    return "user/signup";
-  }
 
   @PostMapping("/signup")
   public String signup(UserVO user) {
@@ -50,7 +47,7 @@ public class UserController {
   }
 
   // 마이페이지 수정
-  @GetMapping("/user/edit")
+  @GetMapping("/edit")
   public String editForm(Model model, Principal principal) {
     String username = principal.getName();
     UserVO user = userService.getUserById(username);
@@ -60,7 +57,7 @@ public class UserController {
   }
 
   // 수정 처리
-  @PostMapping("/user/edit")
+  @PostMapping("/edit")
   public String edit(UserVO user, Principal principal, RedirectAttributes ra) {
     String username = principal.getName();
     user.setUs_id(username); // 아이디는 로그인 정보로 고정
@@ -73,30 +70,6 @@ public class UserController {
     return "redirect:/mypage";
   }
 
-  // 중복 검사
-  @GetMapping("/check-duplicate")
-  @ResponseBody
-  public Map<String, Boolean> checkDuplicate(
-    @RequestParam String type,
-    @RequestParam String value) {
-    
-    Map<String, Boolean> response = new HashMap<>();
-    boolean isDuplicate = false;
-    
-    switch(type) {
-      case "id":
-        isDuplicate = userService.isIdDuplicate(value);
-        break;
-      case "phone":
-        isDuplicate = userService.isPhoneDuplicate(value);
-        break;
-      case "email":
-        isDuplicate = userService.isEmailDuplicate(value);
-        break;
-    }
-    
-    response.put("duplicate", isDuplicate);
-    return response;
-  }
+
 
 }

@@ -40,4 +40,9 @@ public class AdminController {
     return "redirect:/admin";
   }
 
+  @GetMapping("/region")
+  public String regionPage() {
+    return "admin/region";
+  }
+
 }

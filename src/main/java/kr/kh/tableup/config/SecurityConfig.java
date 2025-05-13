@@ -28,9 +28,9 @@ public class SecurityConfig{
       http.csrf(csrf ->csrf.disable())
         .authorizeHttpRequests((requests) -> requests
         //회원과 관리자가 접근할 수 있는 url(MemberInterceptor 역할)
-        .requestMatchers("/post/insert/*").hasAuthority(UserRole.USER.name())
+        //.requestMatchers("/post/insert/*").hasAuthority(UserRole.USER.name())
         //관리자만 접근할 수 있는 url(AdminInterceptor 역할)
-        .requestMatchers("/admin/**").hasAnyAuthority(UserRole.ADMIN.name())
+        //.requestMatchers("/admin/**").hasAnyAuthority(UserRole.ADMIN.name())
         .anyRequest().permitAll()  // 그 외 요청은 인증 필요
       )
       .formLogin((form) -> form

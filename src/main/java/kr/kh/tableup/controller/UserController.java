@@ -1,7 +1,8 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
-
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.model.vo.UserVO;
@@ -67,6 +70,31 @@ public class UserController {
     return "redirect:/mypage";
   }
 
+  	  // 중복 검사
+  @GetMapping("/check-duplicate")
+  @ResponseBody
+  public Map<String, Boolean> checkDuplicate(
+    @RequestParam String type,
+    @RequestParam String value) {
+    
+    Map<String, Boolean> response = new HashMap<>();
+    boolean isDuplicate = false;
+    
+    switch(type) {
+      case "id":
+        isDuplicate = userService.isIdDuplicate(value);
+        break;
+      case "phone":
+        isDuplicate = userService.isPhoneDuplicate(value);
+        break;
+      case "email":
+        isDuplicate = userService.isEmailDuplicate(value);
+        break;
+    }
+    
+    response.put("duplicate", isDuplicate);
+    return response;
+  }
 
 
 }

@@ -34,31 +34,7 @@ public class HomeController {
 	
 
 
-	  // 중복 검사
-  @GetMapping("/check-duplicate")
-  @ResponseBody
-  public Map<String, Boolean> checkDuplicate(
-    @RequestParam String type,
-    @RequestParam String value) {
-    
-    Map<String, Boolean> response = new HashMap<>();
-    boolean isDuplicate = false;
-    
-    switch(type) {
-      case "id":
-        isDuplicate = userService.isIdDuplicate(value);
-        break;
-      case "phone":
-        isDuplicate = userService.isPhoneDuplicate(value);
-        break;
-      case "email":
-        isDuplicate = userService.isEmailDuplicate(value);
-        break;
-    }
-    
-    response.put("duplicate", isDuplicate);
-    return response;
-  }
+
 	
 	
 }

@@ -18,7 +18,7 @@ public class RestaurantManagerVO implements UserDetails{
 	String rm_name;
 	String rm_phone;
 	String rm_business;
-	String rm_rt_num;
+	int rm_rt_num;
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

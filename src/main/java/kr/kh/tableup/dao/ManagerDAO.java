@@ -43,5 +43,9 @@ public interface ManagerDAO {
 
 	List<MenuTypeVO> selectMenuTypeList();
 
+	boolean insertMenu(MenuVO menu);
+
+	boolean updateMenu(MenuVO menu);
+
 	
 }

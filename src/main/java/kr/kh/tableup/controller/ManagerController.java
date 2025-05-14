@@ -41,8 +41,7 @@ public class ManagerController {
 	@Autowired
 	ManagerService managerService;
 
-	@Autowired
-  PasswordEncoder passwordEncoder;
+	
 
 	@GetMapping("main")
 	public String manager(Model model) {
@@ -66,7 +65,6 @@ public class ManagerController {
 	
 	@PostMapping("/signup")
 	public String postMethodName(RestaurantManagerVO rm) {
-		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
 		managerService.insertManager(rm);
 		return "redirect:/manager/login";
 	}
@@ -172,6 +170,20 @@ public class ManagerController {
 		model.addAttribute("menutype", menutype);
 		return "/manager/make_menu";
 	}
+
+	@PostMapping("/make_menu")
+	public String insertMenu(MenuVO menu, MultipartFile mn_img2,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+		menu.setMn_rt_num(manager.getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(menu);
+		System.out.println(mn_img2.getOriginalFilename());
+		if(managerService.makeMenu(menu,mn_img2)){
+			return "redirect:/manager/menulist";
+		}
+
+		return "/manager/make_menu";
+	}
+	
 	
 	
 }

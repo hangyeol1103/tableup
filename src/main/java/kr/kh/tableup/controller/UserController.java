@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -18,6 +19,7 @@ import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
 
 @Controller
+@RequestMapping("/user")
 public class UserController {
 
   @Autowired
@@ -50,7 +52,7 @@ public class UserController {
   }
 
   // 마이페이지 수정
-  @GetMapping("/user/edit")
+  @GetMapping("/edit")
   public String editForm(Model model, Principal principal) {
     String username = principal.getName();
     UserVO user = userService.getUserById(username);
@@ -60,7 +62,7 @@ public class UserController {
   }
 
   // 수정 처리
-  @PostMapping("/user/edit")
+  @PostMapping("/edit")
   public String edit(UserVO user, Principal principal, RedirectAttributes ra) {
     String username = principal.getName();
     user.setUs_id(username); // 아이디는 로그인 정보로 고정

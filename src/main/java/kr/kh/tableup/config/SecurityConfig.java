@@ -57,7 +57,7 @@ public class SecurityConfig{
     }
 
 	@Bean
-  @Order(1)
+  @Order(2)
     public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
       http.securityMatcher("/admin/**")
       .csrf(csrf ->csrf.disable())
@@ -88,15 +88,15 @@ public class SecurityConfig{
       }
 
   @Bean
-  @Order(2)
+  @Order(3)
     public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
       http.csrf(csrf ->csrf.disable())
         .authorizeHttpRequests((requests) -> requests
         .anyRequest().permitAll()  // 그 외 요청은 인증 필요
       )
       .formLogin((form) -> form
-        .loginPage("/login")  // 커스텀 로그인 페이지 설정
-        .loginProcessingUrl("/login")//로그인 화면에서 로그인을 눌렀을 때 처리할 url을 지정
+        .loginPage("/user/login")  // 커스텀 로그인 페이지 설정
+        .loginProcessingUrl("/user/login")//로그인 화면에서 로그인을 눌렀을 때 처리할 url을 지정
         .defaultSuccessUrl("/")
         .permitAll()                 // 로그인 페이지는 접근 허용
       )
@@ -109,7 +109,7 @@ public class SecurityConfig{
         .tokenValiditySeconds(60 * 60 * 24 * 100)//유지 기간 : x일
       )
       .logout((logout) -> logout
-        .logoutUrl("/logout")//post방식
+        .logoutUrl("/user/logout")//post방식
         .logoutSuccessUrl("/")
         .clearAuthentication(true)
         .invalidateHttpSession(true)

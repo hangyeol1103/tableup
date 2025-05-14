@@ -14,6 +14,7 @@ import kr.kh.tableup.model.vo.AdminVO;
 
 
 @Controller
+@RequestMapping("/admin")
 public class AdminController {
 
   @Autowired
@@ -22,7 +23,7 @@ public class AdminController {
   @Autowired
   PasswordEncoder passwordEncoder;
 
-  @GetMapping("")
+  @GetMapping("/*")
   public String adminHome() {
     return "admin/admin";
   }

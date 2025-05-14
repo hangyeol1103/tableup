@@ -4,11 +4,11 @@ USE tableup;
 
 -- 일단 유저 state는 0이면 미삭제, 소셜계정 0이면 미연동으로 놓고 하겠습니다
 -- 123 123 입니다
-INSERT INTO user (
+INSERT INTO `user` (
   us_id, us_pw, us_name, us_phone, us_email, us_nickname, us_sociallogin, us_created, us_state
 ) VALUES (
   '123',
-  '$2a$10$qkMPBfY9Sk27YypLJHTyhu/fip4WOSxtnVA71aMQy3d0pzmZ3rrmu',
+  '$2a$10$juSqcXcXvHzpTdW1Ml/yk.IaLl7uPP77lksZan0T83ZH8Dq4ns7MG',
   '홍길동',
   '010-1234-5678',
   'hong@example.com',
@@ -16,6 +16,14 @@ INSERT INTO user (
   0,
   NOW(),
   0 
+);
+
+
+INSERT INTO `admin` (
+  ad_id, ad_pw
+) VALUES (
+  'a123',
+  '$2a$10$juSqcXcXvHzpTdW1Ml/yk.IaLl7uPP77lksZan0T83ZH8Dq4ns7MG'
 );
 
 

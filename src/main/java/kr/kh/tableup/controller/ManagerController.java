@@ -45,7 +45,7 @@ public class ManagerController {
 	@Autowired
   PasswordEncoder passwordEncoder;
 
-	@GetMapping("main")
+	@GetMapping("/main")
 	public String manager(Model model) {
 		model.addAttribute("url","/main");
 		return "manager/main";

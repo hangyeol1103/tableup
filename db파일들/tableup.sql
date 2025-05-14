@@ -3,6 +3,17 @@ DROP DATABASE IF EXISTS tableup;
 CREATE DATABASE tableup;
 USE tableup;
 
+
+DROP TABLE IF EXISTS `admin`;
+
+CREATE TABLE `Admin` (
+   ad_num INT AUTO_INCREMENT PRIMARY KEY, 
+   ad_id VARCHAR(20) NOT NULL UNIQUE,
+   ad_pw VARCHAR(255) NOT NULL
+);
+
+
+
 DROP TABLE IF EXISTS `ScoreType`;
 
 CREATE TABLE `ScoreType` (

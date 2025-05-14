@@ -22,7 +22,7 @@ public class AdminController {
   @Autowired
   PasswordEncoder passwordEncoder;
 
-  @GetMapping("")
+  @GetMapping("/*")
   public String adminHome() {
     return "admin/admin";
   }

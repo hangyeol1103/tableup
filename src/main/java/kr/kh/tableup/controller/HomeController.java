@@ -21,15 +21,14 @@ public class HomeController {
 
 	@GetMapping("/")
 	public String home(Model model) {
-		model.addAttribute("name", "홍길동");
+
+		UserVO user = userService.getUserById("123");
+		System.out.println(user);
+
+		model.addAttribute("sample", user.getUs_name());
 		model.addAttribute("url", "/");
 		return "index";
 	}
 
-	@GetMapping("/login")
-	public String login(Model model) {
-		model.addAttribute("url", "/login");
-		return "user/login";
-	}
 	
 }

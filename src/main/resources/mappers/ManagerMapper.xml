@@ -66,4 +66,28 @@
 	<select id="selectMenuTypeList" resultType="MenuTypeVO">
 		select * from menutype
 	</select>
+
+	<insert id="insertMenu" useGeneratedKeys="true" keyProperty="mn_num">
+		insert into `menu`(mn_name, mn_price, mn_content, mn_mt_num, mn_rt_num, mn_div)
+		value(#{mn_name}, #{mn_price}, #{mn_content}, #{mn_mt_num}, #{mn_rt_num}, #{mn_div})
+	</insert>
+
+	<update id="updateMenu">
+		update `menu` set	
+						mn_name=#{mn_name},
+						<choose>
+							<when test="mn_img == null">
+								mn_img=mn_img,
+							</when>
+							<otherwise>
+								mn_img=#{mn_img},
+							</otherwise>
+						</choose>
+						mn_price=#{mn_price},
+						mn_content=#{mn_content},
+						mn_mt_num=#{mn_mt_num},
+						mn_rt_num=#{mn_rt_num},
+						mn_div=#{mn_div}
+	where mn_num=#{mn_num}
+	</update>
 </mapper>

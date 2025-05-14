@@ -54,4 +54,19 @@ public class UploadFileUtils {
 					file.delete();
 			}
 	}
+
+	public static String uploadFile(String uploadPath, String originalName, byte[]
+			fileData, String ... paths)throws Exception{
+		String savedPath = calcPath(uploadPath, paths);
+		File target = new File(uploadPath + savedPath, originalName);
+		FileCopyUtils.copy(fileData, target);
+		String uploadFileName = getFileName(savedPath, originalName);
+		return uploadFileName;
+	}
+
+	private static String calcPath(String uploadPath, String... paths) {
+		makeDir(uploadPath, paths);
+		return paths[paths.length-1];
+	}
+
 }

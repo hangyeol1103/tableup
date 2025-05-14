@@ -22,7 +22,7 @@ public class HomeController {
 
 	@GetMapping("/")
 	public String home(Model model) {
-		model.addAttribute("name", "홍길동");
+		//model.addAttribute("name", "홍길동");
 		model.addAttribute("url", "/");
 		return "index";
 	}

@@ -47,5 +47,9 @@ public interface ManagerDAO {
 
 	boolean updateMenu(MenuVO menu);
 
+	MenuVO selectMenu(int mn_num);
+
+	MenuTypeVO selectMenuType(int mn_mt_num);
+
 	
 }

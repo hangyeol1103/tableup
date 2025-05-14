@@ -154,10 +154,12 @@ public class ManagerController {
 	
 	//메뉴 리스트 출력
 	@GetMapping("/menulist/{rt_num}")
-	public String menuListPage(Model model, @PathVariable int rt_num) {
+	public String menuListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal RestaurantManagerVO manager) {
 		System.out.println("menulist rt_num: " + rt_num);
 		List<MenuVO> menulist = managerService.getMenuList(rt_num);
 		model.addAttribute("menulist", menulist);
+		model.addAttribute("rt_num", rt_num);
+		model.addAttribute("manager", manager);
 		return "manager/menulist";
 	}
 
@@ -193,6 +195,16 @@ public class ManagerController {
 		}
 
 		return "/manager/make_menu";
+	}
+	
+
+	@GetMapping("/menu/{mn_num}")
+	public String detailMenu(Model model, @PathVariable int mn_num) {
+		MenuVO menu = managerService.getMenu(mn_num);
+		MenuTypeVO menutype =managerService.getMenuType(menu.getMn_mt_num());
+		model.addAttribute("menu", menu);
+		model.addAttribute("menutype", menutype);
+		return "/manager/menu";
 	}
 	
 	

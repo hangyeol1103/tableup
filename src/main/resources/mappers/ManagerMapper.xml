@@ -90,4 +90,12 @@
 						mn_div=#{mn_div}
 	where mn_num=#{mn_num}
 	</update>
+
+	<select id="selectMenu" resultType="MenuVO">
+		select * from `menu` where mn_num=#{mn_num}
+	</select>
+
+	<select id="selectMenuType" resultType="MenuTypeVO">
+		select * from `menutype` where mt_num=#{mn_mt_num}
+	</select>
 </mapper>

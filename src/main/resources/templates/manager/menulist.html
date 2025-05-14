@@ -30,10 +30,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<tbody>
 				<tr th:each="menu : ${menulist}">
 					<td>
-						<img th:href="a" th:src="@{/file/{path}(path=${menu.mn_img})}" alt="" style="width:200px" height="200px">
+						<a style="cursor : pointer;"
+							 th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}">
+							<img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="" style="width:200px" height="200px">
+						</a>
 					</td>
 					<td>
-						<a th:href="a" th:text="${menu.mn_name}"></a>
+						<a th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}" th:text="${menu.mn_name}"></a>
 					</td>
 					<td th:text="${menu.mn_price} ">가격</td>
 					<td th:text="${menu.mn_div}">색인</td>
@@ -44,8 +47,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</tr>
 			</tbody>
 		</table>
-		
 		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_menu'">메뉴등록</button>
+		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 	</main>
 </body>
 </html>

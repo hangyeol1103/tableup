@@ -151,4 +151,12 @@ public class ManagerService {
 		return index < 0 ? null : fileName.substring(index);
 	}
 
+	public MenuVO getMenu(int mn_num) {
+		return managerDAO.selectMenu(mn_num);
+	}
+
+	public MenuTypeVO getMenuType(int mn_mt_num) {
+		return managerDAO.selectMenuType(mn_mt_num);
+	}
+
 }

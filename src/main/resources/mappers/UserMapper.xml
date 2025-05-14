@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.UserDAO">
 	<select id="selectUser" resultType="userVO">
-		select * from User where us_id = #{id}
+		select * from User where us_id = #{us_id}
 	</select>
 	<insert id="insertUser">
 		INSERT INTO User (

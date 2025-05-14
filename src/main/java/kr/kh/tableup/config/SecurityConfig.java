@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 import kr.kh.tableup.service.AdminDetailService;
 import kr.kh.tableup.service.ManagerDetailService;
@@ -90,7 +93,9 @@ public class SecurityConfig{
   @Bean
   @Order(3)
     public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
-      http.csrf(csrf ->csrf.disable())
+      http
+        .securityMatcher("/user/**", "/","/home")
+        .csrf(csrf ->csrf.disable())
         .authorizeHttpRequests((requests) -> requests
         .anyRequest().permitAll()  // 그 외 요청은 인증 필요
       )
@@ -102,7 +107,8 @@ public class SecurityConfig{
               .usernameParameter("us_id")
               .passwordParameter("us_pw")
               .defaultSuccessUrl("/")
-              .failureUrl("/user/login?error") // 로그인 실패 시 redirect
+              .failureHandler(authenticationFailureHandler())
+              //.failureUrl("/user/login?error") // 로그인 실패 시 
               .permitAll()
       )
       .userDetailsService(userDetailService)
@@ -122,6 +128,28 @@ public class SecurityConfig{
         return http.build();
     }
     
+
+    @Bean   // 로그인 실패 핸들러
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return (request, response, exception) -> {
+            String errorMessage;
+
+            String username = request.getParameter("us_id");
+            request.getSession().setAttribute("loginId", username);
+            
+            if (exception instanceof BadCredentialsException) {
+                errorMessage = "아이디 또는 비밀번호가 틀렸습니다.";
+            } else if (exception instanceof LockedException) {
+                errorMessage = "잠긴 계정입니다.";
+            } else {
+                errorMessage = "로그인에 실패하였습니다.";
+            }
+
+            request.getSession().setAttribute("loginError", errorMessage);
+            response.sendRedirect("/user/login?error");
+        };
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -129,4 +157,6 @@ public class SecurityConfig{
 
     //매니저 로그인
     
+
+
 }

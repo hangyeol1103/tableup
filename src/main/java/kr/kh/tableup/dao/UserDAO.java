@@ -4,7 +4,7 @@ import kr.kh.tableup.model.vo.UserVO;
 
 public interface UserDAO {
 
-  UserVO selectUser(String id);
+  UserVO selectUser(String us_id);
 
   boolean insertUser(UserVO user);
 

@@ -1,7 +1,5 @@
 package kr.kh.tableup.model.vo;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.Data;
 
 @Data

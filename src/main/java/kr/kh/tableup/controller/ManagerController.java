@@ -177,6 +177,17 @@ public class ManagerController {
 		System.out.println(manager);
 		System.out.println(menu);
 		System.out.println(mn_img2.getOriginalFilename());
+		
+		int rtNum = manager.getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    menu.setMn_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+
+		
 		if(managerService.makeMenu(menu,mn_img2)){
 			return "redirect:/manager/menulist";
 		}

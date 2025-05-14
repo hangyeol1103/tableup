@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import kr.kh.tableup.model.vo.AdminVO;
 import kr.kh.tableup.service.AdminService;
+
+import kr.kh.tableup.model.vo.AdminVO;
 
 
 @Controller
-@RequestMapping("/admin")
 public class AdminController {
 
   @Autowired

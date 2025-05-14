@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import kr.kh.tableup.service.AdminDetailService;
+import kr.kh.tableup.service.ManagerDetailService;
 import kr.kh.tableup.service.UserDetailService;
 
 @Configuration
@@ -24,8 +25,36 @@ public class SecurityConfig{
   @Autowired
   private UserDetailService userDetailService;
 
+  @Autowired
+  private ManagerDetailService managerDetailService;
+
   @Value("${security.rememberme.key}")
   private String rememberMeKey;
+
+  @Bean
+    @Order(1)
+    public SecurityFilterChain managerSecurityFilterChain(HttpSecurity http) throws Exception {
+      http
+      .securityMatcher("/manager/**")
+      .authorizeHttpRequests(auth -> auth
+          .requestMatchers("/manager/signup", "/manager/register").permitAll()
+          .anyRequest().authenticated()
+      )
+      .formLogin(form -> form
+          .loginPage("/manager/login")
+          .loginProcessingUrl("/manager/login")
+          .defaultSuccessUrl("/manager/main")
+          .permitAll()
+      )
+      .logout(logout -> logout
+          .logoutUrl("/manager/logout")
+          .logoutSuccessUrl("/manager/main")
+          .permitAll()
+      )
+        .userDetailsService(managerDetailService);
+  
+      return http.build();
+    }
 
 	@Bean
   @Order(1)
@@ -86,11 +115,13 @@ public class SecurityConfig{
         .invalidateHttpSession(true)
         .permitAll());  // 로그아웃도 모두 접근 가능
         return http.build();
-      }
-  
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-      return new BCryptPasswordEncoder();
-  }
+    //매니저 로그인
+    
 }

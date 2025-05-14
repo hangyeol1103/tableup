@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kh.tableup.dao.ManagerDAO">
+
+	<insert id="insertManager">
+		insert into restaurantmanager (rm_id, rm_pw, rm_email, rm_name, rm_phone, rm_business)
+		values (#{rm_id},#{rm_pw},#{rm_email},#{rm_name},#{rm_phone},#{rm_business})
+	</insert>
+
+	<select id="findById" resultType="RestaurantManagerVO">
+		select * from restaurantmanager where rm_id=#{username}
+	</select>
+
+	<select id="selectManager" resultType="RestaurantManagerVO">
+		select * from restaurantmanager where rm_id=#{rm_id}
+	</select>
+
+	<select id="selectRestaurant" resultType="RestaurantVO">
+		select * from restaurant 
+		join restaurantmanager on rm_rt_num = rt_num
+		where rm_num=#{rm_num}
+	</select>
+
+	<select id="selectFoodCategoryList" resultType="FoodCategoryVO">
+		select * from foodcategory
+	</select>
+
+	<select id="selectRegionList" resultType="RegionVO">
+		select * from region
+	</select>
+
+	<select id="selectDetailFoodList" resultType="DetailFoodCategoryVO">
+		select * from detailfoodcategory
+	</select>
+
+	<select id="selectDetailRegionList" resultType="DetailRegionVO">
+		select * from detailregion
+	</select>
+
+	<select id="selectDetailByFcNum" resultType="DetailFoodCategoryVO">
+		select * from detailfoodcategory where dfc_fc_num=#{fc_num}
+	</select>
+
+	<select id="selectDetailByRegNum" resultType="DetailRegionVO">
+		select * from detailregion where dreg_reg_num=#{reg_num}
+	</select>
+
+	<!--레스토랑 테이블에 값들을 입력-->
+	<insert id="insertRestaurant" useGeneratedKeys="true" keyProperty="rt_num">
+		insert into restaurant
+			(rt_name, rt_closed_days, rt_price_lunch, rt_price_dinner,
+			 rt_accept, rt_dfc_num, rt_dreg_num, rt_description)
+		value(#{rt_name},#{rt_closed_days},#{rt_price_lunch},#{rt_price_dinner}
+					,'N',#{rt_dfc_num},#{rt_dreg_num},#{rt_description})
+	</insert>
+
+	<update id="updateManagerRtNum">
+		update restaurantmanager set rm_rt_num=#{rt_num}
+		where rm_num=#{rm_num}
+	</update>
+
+	<select id="selectMenuList" resultType="MenuVO">
+		select * from `menu` where mn_rt_num=#{rt_num}
+	</select>
+
+	<select id="selectMenuTypeList" resultType="MenuTypeVO">
+		select * from menutype
+	</select>
+
+	<insert id="insertFile" useGeneratedKeys="true" keyProperty="file_num">
+    INSERT INTO file
+    (file_path, file_name, file_type, file_foreign, file_tag)
+    VALUES
+    (#{file_path}, #{file_name}, #{file_type}, #{file_foreign}, #{file_tag})
+	</insert>
+	
+	<select id="selectFilesByRtNum" resultType="FileVO">
+		select * from file where file_foreign=#{rt_num} and file_tag='음식'
+	</select>
+</mapper>

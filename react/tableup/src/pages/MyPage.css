@@ -1,0 +1,29 @@
+.mypage-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.user-info {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.reservation-list {
+  list-style: none;
+  padding: 0;
+}
+
+.reservation-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.done {
+  color: green;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}

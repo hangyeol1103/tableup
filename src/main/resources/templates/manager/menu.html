@@ -16,70 +16,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 </head>
 <body>
 	<main layout:fragment="content" class="container">
-		<!-- 매장 정보가 등록이 되어 있으면-->
-		<div>
-			<button type="button" class="btn btn-outline-success col-12 mt-3 mb-3" onclick="location.href='/manager/main'">매장 정보 변경</button>
-		</div>
-		<div th:if="${restaurant != null}">			
-			<h2 class="mb-4 fw-bold text-primary"  th:text="${manager.rm_id + '님의 매장'}"></h2>
+		<div>			
+			<h2 class="mb-4 fw-bold text-primary">메뉴 정보</h2>
 
-			<div class="input-group form-group">
-				<div class="form-control col-3">매장이름:</div>
-				<div class="form-control" th:text="${restaurant?.rt_name}"></div>
-			</div>
-			<div class="input-group form-group">
-				<div class="form-control col-3">대표 이미지</div>
-				<div>
-					
-				</div>
-			</div>
-			<div class="input-group form-group">
-				<div class="form-control col-3">지역:</div>
-				<div class="form-control">
-					<span th:each="d : ${dr}"
-          	th:if="${d.dreg_num} == ${restaurant.rt_dreg_num}">
-      		<span th:each="r : ${region}"
-          	th:if="${r.reg_num} == ${d.dreg_reg_num}"
-            th:text="${r.reg_main} + ' / ' + ${d.dreg_sub}">지역</span>
-    </span>
-				</div>
-			</div>
-			<div class="input-group form-group">
-				<div class="form-control col-3">스타일/장르:</div>
-				<div class="form-control">
-				<span th:each="d : ${dfc}"
-          th:if="${d.dfc_num} == ${restaurant.rt_dfc_num}">
-      	<span th:each="f : ${foodcategory}"
-          th:if="${f.fc_num} == ${d.dfc_fc_num}"
-          th:text="${f.fc_main} + ' / ' + ${d.dfc_sub}">장르</span>
-    		</span>
-				</div>
-			</div>
-			<div class="input-group form-group">
-				<div class="form-control col-3">점심 :</div>
-				<div class="form-control" th:text="${restaurant?.rt_price_lunch}+'원'"></div>
-				<div class="form-control col-3">저녁 :</div>
-				<div class="form-control" th:text="${restaurant?.rt_price_dinner}+'원'"></div>
-			</div>
-			<div class="input-group form-group">
-				<div class="form-control col-3">매장 간단 설명:</div>
-				<div class="form-control" th:text="${restaurant?.rt_description}"></div>
-			</div>
-			<div>
-				<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/main'">메뉴 리스트</button>
-				<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/main'">상세정보</button>
-				<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/main'">쿠폰 관리</button>
-				<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/main'">소식/공지사항 관리</button>
-				<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/main'">영업시간 관리</button>
-				<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/main'">예약 가능 시간 관리</button>
+			<div class="input-group form-group menu-img">
+				<img th:src="@{/file/{nenuImage}(menuImage=${menu.mn_img})}" alt="이미지 없음" width="100%"></img>
 			</div>
 			
-
-		</div>
-			<!-- 매장 정보가 등록이 되어 있지 않으면-->
-		<div th:unless="${restaurant != null}">
-			<h3>아직 식당정보를 입력하지 않앗습니다.</h3>
-      <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make'">매장등록</button>
+			<div>
+				<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make'">메뉴 정보 변경</button>
+				<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make'">메뉴 삭제</button>
+			</div>
 		</div>
 	</main>
 </body>

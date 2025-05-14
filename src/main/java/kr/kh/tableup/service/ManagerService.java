@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,10 +25,14 @@ public class ManagerService {
 	@Autowired
 	ManagerDAO managerDAO;
 
-	// @Value("${spring.path.upload}")
-	// String uploadPath;
+	 @Value("${spring.path.upload}")
+	 String uploadPath;
 
+	@Autowired
+  PasswordEncoder passwordEncoder;
+	
 	public boolean insertManager(RestaurantManagerVO rm) {
+		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
 		return managerDAO.insertManager(rm);
 	}
 
@@ -114,6 +119,36 @@ public class ManagerService {
 
 	public List<MenuTypeVO> getMenuTypeList() {
 		return managerDAO.selectMenuTypeList();
+	}
+
+	public boolean makeMenu(MenuVO menu, MultipartFile mn_img) {
+		if(menu == null|| mn_img == null|| mn_img.getOriginalFilename().isEmpty()){
+			return false;
+		}
+		boolean res=managerDAO.insertMenu(menu);
+		if(!res){
+			return false;
+		}
+
+		//메뉴 이미지 작업
+		String fileName = mn_img.getOriginalFilename();
+		String suffix = getSuffix(fileName);
+		String newFileName = menu.getMn_num() + suffix;
+		String menuImage;
+		try{
+			menuImage = UploadFileUtils.uploadFile(uploadPath, newFileName, mn_img.getBytes(),"menu");
+			menu.setMn_img(menuImage);
+			managerDAO.updateMenu(menu);
+
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	private String getSuffix(String fileName) {
+		int index = fileName.lastIndexOf(".");
+		return index < 0 ? null : fileName.substring(index);
 	}
 
 }

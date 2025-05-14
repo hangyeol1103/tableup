@@ -30,10 +30,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<tbody>
 				<tr th:each="menu : ${menulist}">
 					<td>
-						<a th:href="" th:text="${menu.mn_img}"></a>
+						<a th:href="a" th:text="${menu.mn_img}"></a>
 					</td>
 					<td>
-						<a th:href="" th:text="${menu.mn_name}"></a>
+						<a th:href="a" th:text="${menu.mn_name}"></a>
 					</td>
 					<td th:text="${menu.mn_price}">가격</td>
 					<td th:text="${menu.mn_div}">색인</td>

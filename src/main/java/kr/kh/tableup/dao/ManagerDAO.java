@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
-import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -44,8 +43,5 @@ public interface ManagerDAO {
 
 	List<MenuTypeVO> selectMenuTypeList();
 
-	boolean insertFile(FileVO fvo);
-
-	List<FileVO> selectFilesByRtNum(int rt_num);
 	
 }

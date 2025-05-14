@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
-import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -83,11 +82,6 @@ public class ManagerController {
 		//해당 매니저의 매장 외래키를 가져옴
 		int rm_num=manager.getRm_num();
 		RestaurantVO restaurant =managerService.selectRestaurant(rm_num);
-		//해당 레스토랑의 기본키를 가진 사진들만 가져오기 위한 작업
-		List<FileVO> fileList = managerService.getFileListByRtNum(restaurant.getRt_num());
-		restaurant.setFileList(fileList);
-		System.out.println(fileList);
-		//지역,음식 카테고리에 집어넣기위해 해당 테이블 값들을 가져옴
 		List<FoodCategoryVO> foodcategory = managerService.getFoodCategory();
 		List<RegionVO> region = managerService.getRegion();
 		List<DetailRegionVO> dr = managerService.getDetailRegion();
@@ -96,10 +90,8 @@ public class ManagerController {
 		System.out.println(manager.getRm_id());
 		System.out.println(restaurant);
 		
-		
 		model.addAttribute("manager", manager);
 		model.addAttribute("restaurant", restaurant);
-		model.addAttribute("fileList", fileList);
 		
 		model.addAttribute("foodcategory", foodcategory);
 		model.addAttribute("region", region);

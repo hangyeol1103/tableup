@@ -29,8 +29,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			</div>
 			<div class="input-group form-group">
 				<div class="form-control col-3">대표 이미지</div>
-				<div>
-					
+				<div th:each="file : ${restaurant.fileList}">
+    			<img th:src="@{|/upload/${file.file_name}|}" alt="" />
 				</div>
 			</div>
 			<div class="input-group form-group">

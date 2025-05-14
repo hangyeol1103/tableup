@@ -1,5 +1,7 @@
 package kr.kh.tableup.model.vo;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -14,4 +16,14 @@ public class RestaurantVO {
 	String rt_price_dinner;
 	String rt_accept;
 	String rt_description;
+
+	private List<FileVO> fileList;
+
+	public List<FileVO> getFileList() {
+    return fileList;
+	}
+
+	public void setFileList(List<FileVO> fileList) {
+			this.fileList = fileList;
+	}
 }

@@ -66,4 +66,15 @@
 	<select id="selectMenuTypeList" resultType="MenuTypeVO">
 		select * from menutype
 	</select>
+
+	<insert id="insertFile" useGeneratedKeys="true" keyProperty="file_num">
+    INSERT INTO file
+    (file_path, file_name, file_type, file_foreign, file_tag)
+    VALUES
+    (#{file_path}, #{file_name}, #{file_type}, #{file_foreign}, #{file_tag})
+	</insert>
+	
+	<select id="selectFilesByRtNum" resultType="FileVO">
+		select * from file where file_foreign=#{rt_num} and file_tag='음식'
+	</select>
 </mapper>

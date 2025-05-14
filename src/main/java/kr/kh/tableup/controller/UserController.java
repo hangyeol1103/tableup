@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
 
@@ -27,6 +29,12 @@ public class UserController {
 
   @Autowired
   PasswordEncoder passwordEncoder;
+  
+	@GetMapping("/login")
+	public String login(Model model) {
+		model.addAttribute("url", "/login");
+		return "user/login";
+	}
 
   @GetMapping("/signup")
   public String signupForm(Model model) {
@@ -43,13 +51,19 @@ public class UserController {
 
   // 마이페이지
   @GetMapping("/mypage")
-  public String mypage(Model model, Principal principal) {
-    String username = principal.getName();
-    UserVO user = userService.getUserById(username);
-    model.addAttribute("user", user);
-    model.addAttribute("url", "/mypage");
-    return "user/mypage";
+  public String mypage(Model model, Principal principal, HttpServletRequest request) {
+      model.addAttribute("url", request.getRequestURI());
+      if (principal == null) {
+        return "user/mypage/indexnot";
+      }
+      String username = principal.getName();
+      UserVO user = userService.getUserById(username);
+      model.addAttribute("user", user);
+      model.addAttribute("url", request.getRequestURI());
+      return "user/mypage/index";
   }
+
+
 
   // 마이페이지 수정
   @GetMapping("/edit")
@@ -57,7 +71,7 @@ public class UserController {
     String username = principal.getName();
     UserVO user = userService.getUserById(username);
     model.addAttribute("user", user);
-    model.addAttribute("url", "/mypage");
+    model.addAttribute("url", "/mypage/index");
     return "user/edit";
   }
 

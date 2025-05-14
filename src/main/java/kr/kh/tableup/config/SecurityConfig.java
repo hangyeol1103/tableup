@@ -94,11 +94,16 @@ public class SecurityConfig{
         .authorizeHttpRequests((requests) -> requests
         .anyRequest().permitAll()  // 그 외 요청은 인증 필요
       )
-      .formLogin((form) -> form
-        .loginPage("/user/login")  // 커스텀 로그인 페이지 설정
-        .loginProcessingUrl("/user/login")//로그인 화면에서 로그인을 눌렀을 때 처리할 url을 지정
-        .defaultSuccessUrl("/")
-        .permitAll()                 // 로그인 페이지는 접근 허용
+     
+      .formLogin(form -> 
+            form
+              .loginPage("/user/login")
+              .loginProcessingUrl("/user/loginPost")
+              .usernameParameter("us_id")
+              .passwordParameter("us_pw")
+              .defaultSuccessUrl("/")
+              .failureUrl("/user/login?error") // 로그인 실패 시 redirect
+              .permitAll()
       )
       .userDetailsService(userDetailService)
       //자동 로그인 처리

@@ -343,7 +343,8 @@ CREATE TABLE `File` (
     `file_name` VARCHAR(255) NOT NULL,
     `File_type` ENUM('REVIEW', 'RESTAURANTDETAIL', 'MENU') NOT NULL,
     `File_FOREIGN` INT NOT NULL,
-    `file_tag` ENUM('내부', '외부', '메뉴판', '음식', '기타') NOT NULL
+    `file_tag` ENUM('내부', '외부', '메뉴판', '음식', '기타') NOT NULL,
+    `FILE_RES_NUM` INT NOT NULL DEFAULT 0
 );
 
 ALTER TABLE `BusinessHour` ADD CONSTRAINT `FK_Restaurant_TO_BusinessHour_1` FOREIGN KEY (

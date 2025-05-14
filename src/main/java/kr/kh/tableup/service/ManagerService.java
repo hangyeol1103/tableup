@@ -77,7 +77,7 @@ public class ManagerService {
 		}
 		String fi_ori_name=file.getOriginalFilename();
 		try{
-			String fi_name=UploadFileUtils.uploadFile(uploadPath, fi_ori_name, file.getBytes());
+			//String fi_name=UploadFileUtils.uploadFile(uploadPath, fi_ori_name, file.getBytes());
 
 		}catch(Exception e){
 			e.printStackTrace();

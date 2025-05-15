@@ -114,7 +114,7 @@
       }).catch(() => {
         alert("중복 확인 중 오류 발생");
       });
-    }
+    
 
     document.getElementById("signupForm").addEventListener("submit", function (e) {
       if (duplicateStatus.id || duplicateStatus.email || duplicateStatus.phone) {

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout_admin.html}">
+<head>
+  <title layout:fragment="title">관리자 페이지</title>
+</head>
+<body>
+  <div layout:fragment="content" class="container mt-4">
+    <div class="input-group mb-3 input-group-lg">
+      <span class="input-group-text">음식 소분류 추가</span>
+      <input type="text" class="form-control" id="detailFoodCategoryName" required>
+    </div>
+  <button type="button" class="btn btn-primary mt-3" id="addBtn">추가</button>
+
+  <div class="mt-5">
+    <h5>등록된 소분류 목록</h5>
+    <ul id="detailFoodCategoryList" class="list-group"></ul>
+  </div>
+
+<th:block layout:fragment="script">
+<script>
+document.getElementById("addBtn").addEventListener("click", function() {
+  const detailFoodCategoryName = document.getElementById("detailFoodCategoryName").value.trim();
+  if (!detailFoodCategoryName) {
+    alert("대분류를 입력하세요.");
+    return;
+  }
+  fetch('/admin/detailfoodcategory/insert', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ detailFoodCategoryName: detailFoodCategoryName })
+  })
+  .then(resp => resp.json())
+  .then(data => {
+    if (data.success) {
+      alert("등록 성공!");
+      location.reload();
+    } else {
+      alert("등록 실패: " + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('에러:', error);
+    alert("요청 중 오류 발생");
+  });
+});
+function loadDetailFoodCategoryList() {
+  fetch("/admin/detailfoodcategory/list")
+    .then((resp) => resp.json())
+    .then((data) => {
+      const detailFoodCategoryBox = document.getElementById("detailFoodCategoryList");
+      detailFoodCategoryBox.innerHTML = "";
+      data.forEach((detailFoodCategory) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.innerText = detailFoodCategory;
+        detailFoodCategoryBox.appendChild(li);
+      });
+    });
+}
+document.addEventListener("DOMContentLoaded", loadDetailFoodCategoryList);
+</script>
+</body>
+</html>

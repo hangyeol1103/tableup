@@ -209,6 +209,23 @@ public class AdminController {
     return map;
   }
   
+  @PostMapping("/detailfoodcategory/insert")
+  @ResponseBody
+  public Map<String, Object> insertDetailFoodCategory(@RequestBody Map<String, String> param) {
+    String name = param.get("detailFoodCategoryName");
+    Map<String, Object> map = new HashMap<>();
+
+    if (name == null || name.trim().isEmpty()) {
+        map.put("success", false);
+        map.put("message", "이름이 비어있습니다.");
+        return map;
+    }
+
+    boolean result = adminService.insertDetailFoodCategory(name);
+    map.put("success", result);
+    map.put("message", result ? "등록 완료" : "등록 실패");
+    return map;
+  }
   
   //조회
   @GetMapping("/region/list")
@@ -245,6 +262,11 @@ public class AdminController {
   @ResponseBody
   public List<String> getFoodCategoryList() {
     return adminService.getFoodCategoryList();
+  }
+  @GetMapping("/detailfoodcategory/list")
+  @ResponseBody
+  public List<String> getDetailFoodCategoryList() {
+    return adminService.getDetailFoodCategoryList();
   }
   
 }

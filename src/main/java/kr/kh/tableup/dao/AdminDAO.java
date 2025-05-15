@@ -22,6 +22,7 @@ public interface AdminDAO {
 	boolean insertFacility(FacilityVO facility);
 	boolean insertMenuType(@Param("name") String name);
 	boolean insertFoodCategory(@Param("name") String name);
+	boolean insertDetailFoodCategory(@Param("name") String name);
 
 
 	
@@ -33,5 +34,6 @@ public interface AdminDAO {
 	List<FacilityVO> selectFacilityList();
 	List<String> selectMenuTypeList();
 	List<String> selectFoodCategoryList();
+	List<String> selectDetailFoodCategoryList();
 
 }

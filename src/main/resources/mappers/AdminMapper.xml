@@ -37,6 +37,10 @@
 	  INSERT INTO foodcategory (fc_main)
   	VALUES (#{name})
 	</insert>
+	<insert id="insertDetailFoodCategory" parameterType="String">
+	  INSERT INTO detailfoodcategory (dfc_sub)
+  	VALUES (#{name})
+	</insert>
 
 
 
@@ -60,6 +64,9 @@
 	</select>
 	<select id="selectFoodCategoryList" resultType="String">
 		SELECT fc_main FROM foodcategory
+	</select>
+	<select id="selectDetailFoodCategoryList" resultType="String">
+		SELECT dfc_sub FROM detailfoodcategory
 	</select>
 
 

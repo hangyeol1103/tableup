@@ -47,6 +47,11 @@ public class AdminService {
 		return adminDAO.insertFoodCategory(name);
 	}
 
+	public boolean insertDetailFoodCategory(String name) {
+		return adminDAO.insertDetailFoodCategory(name);
+	}
+
+
 
 	public List<String> getRegionList() {
     return adminDAO.selectRegionList();
@@ -74,6 +79,10 @@ public class AdminService {
 
 	public List<String> getFoodCategoryList() {
 		return adminDAO.selectFoodCategoryList();
+	}
+
+	public List<String> getDetailFoodCategoryList() {
+		return adminDAO.selectDetailFoodCategoryList();
 	}
 
 }

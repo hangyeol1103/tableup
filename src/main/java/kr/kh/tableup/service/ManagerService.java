@@ -10,12 +10,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.dao.ManagerDAO;
 import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
+import kr.kh.tableup.model.vo.ResCouponVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
+import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
@@ -142,6 +146,7 @@ public class ManagerService {
 
 		} catch(Exception e){
 			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
@@ -149,6 +154,75 @@ public class ManagerService {
 	private String getSuffix(String fileName) {
 		int index = fileName.lastIndexOf(".");
 		return index < 0 ? null : fileName.substring(index);
+	}
+
+	public MenuVO getMenu(int mn_num) {
+		return managerDAO.selectMenu(mn_num);
+	}
+
+	public MenuTypeVO getMenuType(int mn_mt_num) {
+		return managerDAO.selectMenuType(mn_mt_num);
+	}
+
+	public boolean updateMenu(MenuVO menu, MultipartFile mn_img2) {
+		if(menu == null){
+			return false;
+		}
+		//메뉴 이미지 작업
+		try{
+			String fileName = mn_img2.getOriginalFilename();
+			if(mn_img2 != null && fileName.length() !=0){
+				String suffix = getSuffix(fileName);
+				String newFileName = menu.getMn_num() + suffix;
+				String menuImage;
+				menuImage = UploadFileUtils.uploadFile(uploadPath, newFileName, mn_img2.getBytes(),"menu");
+				menu.setMn_img(menuImage);
+			}
+			return managerDAO.updateMenu(menu);
+
+		} catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean deleteMenu(int mn_num) {
+		return managerDAO.deleteMenu(mn_num);
+	}
+
+	public RestaurantDetailVO getResDetail(int rt_num) {
+		return managerDAO.selectResDetail(rt_num);
+	}
+
+	public boolean insertResDetail(RestaurantDetailVO resdetail) {
+		return managerDAO.insertResDetail(resdetail);
+	}
+
+	public boolean updateDetail(RestaurantDetailVO resdetail) {
+		return managerDAO.updateDetail(resdetail);
+	}
+
+	public List<ResCouponVO> getCouponList(int rt_num) {
+		return managerDAO.selectCouponList(rt_num);
+	}
+
+	public List<ResNewsVO> getNewsList(int rt_num) {
+			return managerDAO.selectNewsList(rt_num);
+	}
+
+	public List<BusinessHourVO> getResTimeList(int rt_num) {
+		return managerDAO.selectResTimeList(rt_num);
+	}
+
+	public boolean makeResTiem(BusinessHourVO restime) {
+		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
+			return false;
+		}
+		boolean res =managerDAO.insertResTime(restime);
+		if(!res){
+			return false;
+		}
+		return true;
 	}
 
 }

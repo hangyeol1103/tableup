@@ -90,4 +90,58 @@
 						mn_div=#{mn_div}
 	where mn_num=#{mn_num}
 	</update>
+
+	<select id="selectMenu" resultType="MenuVO">
+		select * from `menu` where mn_num=#{mn_num}
+	</select>
+
+	<select id="selectMenuType" resultType="MenuTypeVO">
+		select * from `menutype` where mt_num=#{mn_mt_num}
+	</select>
+
+	<delete id="deleteMenu">
+		delete from menu where mn_num = #{mn_num}
+	</delete>
+
+	<!-- 매장 상세정보 -->
+	<select id="selectResDetail" resultType="RestaurantDetailVO">
+		select * from restaurantdetail where rd_rt_num=#{rt_num}
+	</select>
+
+	<insert id="insertResDetail" useGeneratedKeys="true" keyProperty="rd_num">
+		insert into restaurantdetail(rd_rt_num, rd_phone, rd_closed_days, rd_info, rd_home, rd_addr)
+		value(#{rd_rt_num},#{rd_phone},#{rd_closed_days},#{rd_info},#{rd_home},#{rd_addr})
+	</insert>
+
+	<update id="updateDetail">
+		update restaurantdetail set
+			rd_phone = #{rd_phone}, 
+			rd_closed_days = #{rd_closed_days}, 
+			rd_info = #{rd_info}, 
+			rd_home = #{rd_home}, 
+			rd_addr = #{rd_addr}
+		where rd_rt_num=#{rd_rt_num}
+	</update>
+
+	<!-- 쿠폰 -->
+	<select id="selectCouponList" resultType="ResCouponVO">
+		select * from rescoupon where rec_rt_num=#{rt_num}
+	</select>
+
+	<!-- 소식 -->
+	<select id="selectNewsList" resultType="ResNewsVO">
+		select * from resnews where rn_rt_num=#{rt_num}
+	</select>
+
+	<!-- 예약 시간 -->
+	<select id="selectResTimeList" resultType="BusinessHourVO">
+		select * from businesshour where bh_rt_num=#{rt_num}
+	</select>
+
+	<insert id="insertResTime" useGeneratedKeys="true" keyProperty="bh_num">
+		insert into businesshour
+			(bh_start, bh_end, bh_seat_max, bh_seat_current, bh_table_max, bh_table_current, bh_state, bh_rt_num)
+		value(#{bh_start}, #{bh_end}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
+	</insert>
+	
 </mapper>

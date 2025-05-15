@@ -51,15 +51,7 @@
       <div class="d-flex justify-content-between">
         <a th:href="@{/user/find-id}" class="text-decoration-none">아이디 찾기</a>
         <a th:href="@{/user/find-pw}" class="text-decoration-none">비밀번호 찾기</a>
-        <a href="#" onclick="goToSignup()" class="text-decoration-none">회원가입</a>
-
-        <script>
-          function goToSignup() {
-            const userId = document.getElementById("us_id").value;
-            const encodedId = encodeURIComponent(userId);
-            window.location.href = "/user/signup?us_id=" + encodedId;
-          }
-        </script>
+        <a th:href="@{/user/signup}" class="text-decoration-none">회원가입</a>
       </div>
 
       <hr class="my-4">

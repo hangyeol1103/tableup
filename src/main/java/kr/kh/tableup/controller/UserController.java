@@ -58,7 +58,9 @@ public class UserController {
 
     /** 회원가입*/
     @GetMapping("/signup")
-    public String signupForm() {
+    public String signupForm(Model model, @RequestParam(value = "us_id", required = false) String us_id) {
+      model.addAttribute("url", "/signup");
+      model.addAttribute("us_id", us_id);
       return "user/signup";
     }
 

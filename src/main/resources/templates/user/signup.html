@@ -14,7 +14,7 @@
     <div class="mb-3">
       <label for="us_id" class="form-label">아이디</label>
       <div class="input-group">
-        <input type="text" id="us_id" name="us_id" class="form-control" required>
+        <input type="text" class="form-control" name="us_id" id="us_id" placeholder="아이디를 입력하세요" th:value="${us_id}" required>
         <button type="button" class="btn btn-outline-secondary" onclick="checkDuplicate('id')">중복확인</button>
       </div>
       <small class="form-text text-muted" id="idResult"></small>

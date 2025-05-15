@@ -1,26 +1,37 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import kr.kh.tableup.model.util.CustomUser;
+import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
+import kr.kh.tableup.model.vo.ResCouponVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
+
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -197,7 +208,7 @@ public class ManagerController {
 		return "/manager/make_menu/";
 	}
 	
-	
+	//메뉴 상세 페이지
 	@GetMapping("/menu/{mn_num}")
 	public String detailMenu(Model model, @PathVariable int mn_num) {
 		MenuVO menu = managerService.getMenu(mn_num);
@@ -306,7 +317,6 @@ public class ManagerController {
 		System.out.println(manager);
 		System.out.println(resdetail);
 
-
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
         return "redirect:/manager/make";
@@ -317,5 +327,94 @@ public class ManagerController {
 		}
 		
 		return "/manager/remake_detail";
+	}
+
+	//매니저 쿠폰 페이지
+	
+	//쿠폰 리스트
+	@GetMapping("/couponlist/{rt_num}")
+	public String couponListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+		System.out.println("couponlist rt_num: " + rt_num);
+		List<ResCouponVO> couponlist = managerService.getCouponList(rt_num);
+		
+		model.addAttribute("couponlist", couponlist);
+		model.addAttribute("rt_num", rt_num);
+		model.addAttribute("manager", manager);
+		return "manager/couponlist";
+	}
+	//매장 소식 페이지
+	//매장 소식 리스트
+	@GetMapping("/newslist/{rt_num}")
+	public String newsListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+		System.out.println("newslist rt_num: " + rt_num);
+		List<ResNewsVO> newslist = managerService.getNewsList(rt_num);
+
+		model.addAttribute("newslist", newslist);
+		model.addAttribute("rt_num", rt_num);
+		model.addAttribute("manager", manager);
+		return "manager/newslist";
+	}
+	//영업 시간 페이지
+	@GetMapping("/opertimelist/{rt_num}")
+	public String OperTimePage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+		System.out.println("opertimelist rt_num: " + rt_num);
+		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
+
+		model.addAttribute("opertimelist", opertimelist);
+		model.addAttribute("rt_num", rt_num);
+		model.addAttribute("manager", manager);
+		return "manager/opertimelist";
+	}
+
+	//예약 가능 시간 페이지
+	//예약 가능 시간 목록(리스트)
+	@GetMapping("/restimelist/{rt_num}")
+	public String ResTimeListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+		System.out.println("restimelist rt_num: " + rt_num);
+		List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
+
+		model.addAttribute("restimelist", restimelist);
+		model.addAttribute("rt_num", rt_num);
+		model.addAttribute("manager", manager);
+		return "manager/restimelist";
+	}
+
+	//예약 시간 등록 페이지
+	@GetMapping("/make_restime")
+	public String makeResTimePage(Model model) {
+		model.addAttribute("url", "/make_restime");
+		return "/manager/make_restime";
+	}
+
+	@PostMapping("/make_restime")
+	public String insertResTime(BusinessHourVO restime,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+		restime.setBh_rt_num(manager.getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(restime);
+		
+		int rtNum = manager.getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    restime.setBh_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+
+		if(managerService.makeResTiem(restime)){
+			System.out.println("bh_start = " + restime.getBh_start());
+			System.out.println("bh_state = " + restime.isBh_state());
+			return "redirect:/manager/restimelist/"+rtNum;
+		}
+
+		return "/manager/make_restime/";
+	}
+
+	//날짜 입력 처리(HH:mm)
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+		dateFormat.setLenient(false);
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
 	}
 }

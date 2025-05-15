@@ -10,12 +10,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.dao.ManagerDAO;
 import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
+import kr.kh.tableup.model.vo.ResCouponVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -197,6 +200,29 @@ public class ManagerService {
 
 	public boolean updateDetail(RestaurantDetailVO resdetail) {
 		return managerDAO.updateDetail(resdetail);
+	}
+
+	public List<ResCouponVO> getCouponList(int rt_num) {
+		return managerDAO.selectCouponList(rt_num);
+	}
+
+	public List<ResNewsVO> getNewsList(int rt_num) {
+			return managerDAO.selectNewsList(rt_num);
+	}
+
+	public List<BusinessHourVO> getResTimeList(int rt_num) {
+		return managerDAO.selectResTimeList(rt_num);
+	}
+
+	public boolean makeResTiem(BusinessHourVO restime) {
+		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
+			return false;
+		}
+		boolean res =managerDAO.insertResTime(restime);
+		if(!res){
+			return false;
+		}
+		return true;
 	}
 
 }

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+	<body>
+		<div th:fragment="fragment">
+			<div class="alert alert-warning text-center mt-4">
+				<h5>⚠ 로그인 필요</h5>
+				<p>이 기능을 사용하려면 먼저 <a th:href="@{/user/login}" class="btn btn-sm btn-outline-primary ms-2">로그인</a> 해주세요.</p>
+			</div>
+		</div>
+</body>
+</html>

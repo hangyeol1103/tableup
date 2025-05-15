@@ -37,4 +37,22 @@
 	<select id="selectUserByEmail" resultType="kr.kh.tableup.model.vo.UserVO">
 		SELECT * FROM user WHERE us_email = #{email}
 	</select>
+
+	<select id="selectReviewByUser" resultType="kr.kh.tableup.model.vo.ReviewVO">
+		SELECT * FROM review 
+		LEFT JOIN user ON us_num = rev_us_num
+		LEFT JOIN restaurant ON rt_num = rev_rt_num
+		WHERE rev_us_num = #{us_num} and rev_state = 0
+
+		
+	</select>
+
+	<select id="selectResByUser" resultType="kr.kh.tableup.model.vo.ReservationVO">
+		SELECT * FROM Reservation 
+		LEFT JOIN user ON us_num = res_us_num
+		LEFT JOIN restaurant ON rt_num = res_rt_num
+		WHERE res_us_num = #{us_num}
+	</select>
+
+
 </mapper>

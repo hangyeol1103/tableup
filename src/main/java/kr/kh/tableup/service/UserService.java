@@ -1,10 +1,14 @@
 package kr.kh.tableup.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import kr.kh.tableup.dao.UserDAO;
+import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.UserVO;
 
 @Service
@@ -99,4 +103,18 @@ public class UserService {
             default -> false;
         };
     }
+
+
+
+    public List<ReviewVO> getReviewByUser(int us_num) {
+      
+        return userDAO.selectReviewByUser(us_num);
+    }
+
+
+
+		public List<ReservationVO> getResByUser(int us_num) {
+			
+      return userDAO.selectResByUser(us_num);
+		}
 }

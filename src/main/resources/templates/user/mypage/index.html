@@ -33,40 +33,37 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<div id="flwrvwTab" class="tab-pane fade">로딩 중...</div>
 		</div>
 
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 		<script>
-			document.querySelectorAll('#mypageTabs a').forEach(tab => {
-				tab.addEventListener('shown.bs.tab', function (e) {
-					const targetId = e.target.getAttribute('href');
-					const url = e.target.dataset.url;
-					// 차후 탭 활성화시 ajax로 요청
-					// 이미 로딩된 탭은 다시 요청하지 않음
-					if (url && !document.querySelector(targetId).dataset.loaded) {
-						fetch(url)
-							.then(res => res.text())
-							.then(html => {
-								document.querySelector(targetId).innerHTML = html;
-								document.querySelector(targetId).dataset.loaded = true;
-							});
-					}
-					/*
-					if (!document.querySelector(targetId).dataset.loaded) {
-						fetch(url)
-							.then(res => res.text())
-							.then(html => {
-								document.querySelector(targetId).innerHTML = html;
-								document.querySelector(targetId).dataset.loaded = true;
-							});
-					}
-							*/
-				});
+			$('#mypageTabs a').on('shown.bs.tab', function () {
+				const tabId = $(this).attr('href');
+				const url = $(this).data('url');
+				const $target = $(tabId);
 
-
-				// 처음 로딩될 탭 강제 트리거
-				if (tab.classList.contains('active')) {
-					tab.dispatchEvent(new Event('shown.bs.tab'));
+				if (!$target.data('loaded')) {
+					$.ajax({
+						url: url,
+						type: 'post',
+						success: function (data) {
+							$target.html(data).data('loaded', true);
+						},
+						error: function () {
+							$target.html('<div class="text-danger">불러오는 데 실패했습니다.</div>');
+						}
+					});
 				}
 			});
+
+			// 첫 번째 탭 자동 로딩
+			$('#mypageTabs a.active').trigger('shown.bs.tab');
 		</script>
+		
+		
+
+
+
+
+
 
 
 	</main>

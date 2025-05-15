@@ -1,5 +1,9 @@
 package kr.kh.tableup.dao;
 
+import java.util.List;
+
+import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.UserVO;
 
 public interface UserDAO {
@@ -14,4 +18,7 @@ public interface UserDAO {
 
 	UserVO selectUserByEmail(String email);
   
+	List<ReviewVO> selectReviewByUser(int us_num);
+
+	List<ReservationVO> selectResByUser(int us_num);
 }

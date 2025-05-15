@@ -13,4 +13,26 @@ public class WebMvcConfig implements WebMvcConfigurer{
 		registry.addResourceHandler("/file/**").addResourceLocations("file:///"+uploadPath);
 		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/");
 	}
+
+	@Override
+	public void addCorsMappings(org.springframework.web.servlet.config.annotation.CorsRegistry registry) {
+		registry.addMapping("/**")
+				.allowedOrigins("http://localhost:8080") 
+				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+				.allowCredentials(true); 
+ 	}
+	/*
+	@Override
+	public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
+		// TODO Auto-generated method stub
+		WebMvcConfigurer.super.addInterceptors(registry);
+		registry.addInterceptor(new kr.kh.tableup.interceptor.UserInterceptor())
+			.addPathPatterns("/**")
+			.excludePathPatterns("/user/login", "/user/signup", "/user/register", "/user/logout", "/user/findId", "/user/findPw");
+		registry.addInterceptor(new kr.kh.tableup.interceptor.ManagerInterceptor())
+			.addPathPatterns("/manager/**")
+			.excludePathPatterns("/manager/login", "/manager/signup", "/manager/register");
+			}
+*/
+
 }

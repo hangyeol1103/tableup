@@ -125,7 +125,10 @@ public class SecurityConfig{
         .clearAuthentication(true)
         .invalidateHttpSession(true)
         .permitAll());  // 로그아웃도 모두 접근 가능
-        return http.build();
+        
+      return http
+        .userDetailsService(userDetailService)    
+        .build();
     }
     
 

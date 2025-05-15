@@ -2,18 +2,27 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/user")
@@ -113,6 +122,49 @@ public class UserController {
         Map<String, Boolean> res = new HashMap<>();
         res.put("duplicate", isDuplicate);
         return res;
-}
+
+    }
+
+  @PostMapping("/mypage/rev")
+  public String reviewList(Model model, Principal principal) {
+      if (principal == null) {
+          return "fragments/loginRequired :: fragment";
+      }
+
+      String username = principal.getName();
+      UserVO user = userService.getUserById(username); 
+      if (user == null) {
+          return "fragments/loginRequired :: fragment";
+      }
+
+      List<ReviewVO> list = userService.getReviewByUser(user.getUs_num());
+      System.out.println("불러온 리스트 : " + list);
+      model.addAttribute("reviews", list);
+      return "user/mypage/sub/revsub";
+  }
+
+  
+  @PostMapping("/mypage/res")
+  public String reservationList(Model model, Principal principal) {
+      if (principal == null) {
+          return "fragments/loginRequired :: fragment";
+      }
+
+      String username = principal.getName();
+      UserVO user = userService.getUserById(username); 
+      if (user == null) {
+          return "fragments/loginRequired :: fragment";
+      }
+
+      List<ReservationVO> list = userService.getResByUser(user.getUs_num());
+      System.out.println("불러온 리스트 : " + list);
+      model.addAttribute("reservations", list);
+      return "user/mypage/sub/ressub";
+  }
+
+
+
+
+
 
 }

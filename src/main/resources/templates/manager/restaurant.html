@@ -57,9 +57,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			</div>
 			<div class="input-group form-group">
 				<div class="form-control col-3">점심 :</div>
-				<div class="form-control" th:text="${restaurant?.rt_price_lunch}+'원'"></div>
+				<div class="form-control" th:text="${#numbers.formatInteger(restaurant?.rt_price_lunch, 3, 'COMMA')} + '원'"></div>
 				<div class="form-control col-3">저녁 :</div>
-				<div class="form-control" th:text="${restaurant?.rt_price_dinner}+'원'"></div>
+				<div class="form-control" th:text="${#numbers.formatInteger(restaurant?.rt_price_dinner, 3, 'COMMA')} + '원'"></div>
 			</div>
 			<div class="input-group form-group">
 				<div class="form-control col-3">휴무일</div>

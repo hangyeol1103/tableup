@@ -225,4 +225,15 @@ public class ManagerService {
 		return true;
 	}
 
+	public boolean remakeResTime(BusinessHourVO restime) {
+		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
+			return false;
+		}
+		boolean res =managerDAO.updateResTime(restime);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+
 }

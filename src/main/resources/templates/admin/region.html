@@ -8,7 +8,47 @@
 </head>
 <body>
   <div layout:fragment="content" class="container mt-4">
-    추가 예정
+    <div class="input-group mb-3 input-group-lg">
+      <span class="input-group-text">지역 추가</span>
+      <input type="text" class="form-control" id="regionName" required>
+    </div>
+  <button type="button" class="btn btn-primary mt-3" id="addBtn">추가</button>
   </div>
+
+<th:block layout:fragment="script">
+<script>
+document.getElementById("addBtn").addEventListener("click", function() {
+  const regionName = document.getElementById("regionName").value.trim();
+  if (!regionName) {
+    alert("지역 이름을 입력하세요.");
+    return;
+  }
+
+  //디버깅
+  console.log("버튼 눌림");
+  console.log("보낼 값:", regionName);
+
+  fetch('/admin/region/insert', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ regionName: regionName })
+  })
+  .then(resp => resp.json())
+  .then(data => {
+    if (data.success) {
+      alert("등록 성공!");
+      location.reload();
+    } else {
+      alert("등록 실패: " + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('에러:', error);
+    alert("요청 중 오류 발생");
+  });
+});
+</script>
 </body>
 </html>

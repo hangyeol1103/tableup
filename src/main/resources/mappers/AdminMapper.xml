@@ -9,4 +9,8 @@
 		SELECT * FROM admin
 		WHERE ad_id = #{username}
 	</select>
+	<insert id="insertRegion" parameterType="String">
+  	INSERT INTO region (reg_main)
+  	VALUES (#{name})
+	</insert>
 </mapper>

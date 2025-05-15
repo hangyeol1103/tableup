@@ -15,4 +15,9 @@ public class AdminService {
 	public boolean insertAdmin(AdminVO admin) {
 		return adminDAO.insertAdmin(admin);
 	}
+
+	public boolean insertRegion(String name) {
+    return adminDAO.insertRegion(name);
+	}
+
 }

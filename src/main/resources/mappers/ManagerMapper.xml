@@ -102,4 +102,25 @@
 	<delete id="deleteMenu">
 		delete from menu where mn_num = #{mn_num}
 	</delete>
+
+	<!-- 매장 상세정보 -->
+	<select id="selectResDetail" resultType="RestaurantDetailVO">
+		select * from restaurantdetail where rd_rt_num=#{rt_num}
+	</select>
+
+	<insert id="insertResDetail" useGeneratedKeys="true" keyProperty="rd_num">
+		insert into restaurantdetail(rd_rt_num, rd_phone, rd_closed_days, rd_info, rd_home, rd_addr)
+		value(#{rd_rt_num},#{rd_phone},#{rd_closed_days},#{rd_info},#{rd_home},#{rd_addr})
+	</insert>
+
+	<update id="updateDetail">
+		update restaurantdetail set
+			rd_phone = #{rd_phone}, 
+			rd_closed_days = #{rd_closed_days}, 
+			rd_info = #{rd_info}, 
+			rd_home = #{rd_home}, 
+			rd_addr = #{rd_addr}
+		where rd_rt_num=#{rd_rt_num}
+	</update>
+	
 </mapper>

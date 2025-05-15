@@ -16,6 +16,7 @@ import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
+import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
@@ -184,6 +185,18 @@ public class ManagerService {
 
 	public boolean deleteMenu(int mn_num) {
 		return managerDAO.deleteMenu(mn_num);
+	}
+
+	public RestaurantDetailVO getResDetail(int rt_num) {
+		return managerDAO.selectResDetail(rt_num);
+	}
+
+	public boolean insertResDetail(RestaurantDetailVO resdetail) {
+		return managerDAO.insertResDetail(resdetail);
+	}
+
+	public boolean updateDetail(RestaurantDetailVO resdetail) {
+		return managerDAO.updateDetail(resdetail);
 	}
 
 }

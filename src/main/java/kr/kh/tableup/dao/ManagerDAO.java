@@ -10,6 +10,7 @@ import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
+import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
@@ -52,6 +53,12 @@ public interface ManagerDAO {
 	MenuTypeVO selectMenuType(int mn_mt_num);
 
 	boolean deleteMenu(int mn_num);
+
+	RestaurantDetailVO selectResDetail(int rt_num);
+
+	boolean insertResDetail(RestaurantDetailVO resdetail);
+
+	boolean updateDetail(RestaurantDetailVO resdetail);
 
 	
 }

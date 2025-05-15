@@ -16,6 +16,7 @@ import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
+import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
@@ -253,5 +254,68 @@ public class ManagerController {
 		return "/manager/remake_menu";
 	}
 	
+	//매장 상세 정보 출력
+	@GetMapping("/restaurantdetail/{rt_num}")
+	public String restaurantDetailPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal RestaurantManagerVO manager) {
+		RestaurantDetailVO resdetail = managerService.getResDetail(rt_num);
+
+		model.addAttribute("manager", manager);
+		model.addAttribute("resdetail", resdetail);
+		return "/manager/restaurantdetail";
+	}
+
+	@GetMapping("/make_detail")
+	public String makeResDetailPage(Model model) {
+		model.addAttribute("url", "/make_detail");
+		return "/manager/make_detail";
+	}
 	
+	@PostMapping("/make_detail")
+	public String insertResDetailPage(RestaurantDetailVO resdetail, @AuthenticationPrincipal RestaurantManagerVO manager ) {
+		int rtNum = manager.getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    resdetail.setRd_rt_num(rtNum);
+		
+		System.out.println(manager);
+		System.out.println(resdetail);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+		if(managerService.insertResDetail(resdetail)){
+			return "redirect:/manager/restaurantdetail/"+ rtNum;
+		}
+		return "redirect:/manager/make_detail";
+	}
+
+	//상세정보 변경 페이지
+	@GetMapping("/remake_detail")
+	public String reMakeDetailPage(Model model, @AuthenticationPrincipal RestaurantManagerVO manager) {
+
+		model.addAttribute("url", "/remake_detail");
+		return "/manager/remake_detail";
+	}
+	
+	@PostMapping("/remake_detail")
+	public String updateDetail(RestaurantDetailVO resdetail, @AuthenticationPrincipal RestaurantManagerVO manager ) {
+		int rtNum = manager.getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    resdetail.setRd_rt_num(rtNum);
+		
+		System.out.println(manager);
+		System.out.println(resdetail);
+
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+
+		if(managerService.updateDetail(resdetail)){
+			return "redirect:/manager/restaurantdetail/"+ rtNum;
+		}
+		
+		return "/manager/remake_detail";
+	}
 }

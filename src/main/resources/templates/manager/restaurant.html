@@ -17,10 +17,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <body>
 	<main layout:fragment="content" class="container">
 		<!-- 매장 정보가 등록이 되어 있으면-->
-		<div>
-			<button type="button" class="btn btn-outline-info col-12 mt-3 mb-3" onclick="location.href='/manager/main'">매장 정보 변경</button>
-		</div>
-		<div th:if="${restaurant != null}">			
+		<div th:if="${restaurant != null}">	
+			<div>
+				<button type="button" class="btn btn-outline-info col-12 mt-3 mb-3" onclick="location.href='/manager/main'">매장 정보 변경</button>
+			</div>		
 			<h2 class="mb-4 fw-bold text-primary"  th:text="${manager.rm_id + '님의 매장'}"></h2>
 
 			<div class="input-group form-group">
@@ -62,12 +62,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				<div class="form-control" th:text="${restaurant?.rt_price_dinner}+'원'"></div>
 			</div>
 			<div class="input-group form-group">
+				<div class="form-control col-3">휴무일</div>
+				<div class="form-control" th:text="${restaurant?.rt_closed_days}"></div>
+			</div>
+			<div class="input-group form-group">
 				<div class="form-control col-3">매장 간단 설명:</div>
 				<div class="form-control" th:text="${restaurant?.rt_description}"></div>
 			</div>
 			<div>
 				<a th:href="@{'/manager/menulist/' + ${restaurant.rt_num}}"class="btn btn-outline-success col-12 mb-3">메뉴 리스트</a>
-				<a th:href="@{'/manager/detaillist/' + ${restaurant.rt_num}}"class="btn btn-outline-success col-12 mb-3">상세정보</a>
+				<a th:href="@{'/manager/restaurantdetail/' + ${restaurant.rt_num}}"class="btn btn-outline-success col-12 mb-3">상세정보</a>
 				<a th:href="@{'/manager/couponlist/' + ${restaurant.rt_num}}"class="btn btn-outline-success col-12 mb-3">쿠폰 관리</a>
 				<a th:href="@{'/manager/newslist/'  + ${restaurant.rt_num}}"class="btn btn-outline-success col-12 mb-3">소식/공지사항 관리</a>
 				<a th:href="@{'/manager/opertimelist/' + ${restaurant.rt_num}}"class="btn btn-outline-success col-12 mb-3">영업시간 관리</a>

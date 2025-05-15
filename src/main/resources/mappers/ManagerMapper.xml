@@ -98,4 +98,8 @@
 	<select id="selectMenuType" resultType="MenuTypeVO">
 		select * from `menutype` where mt_num=#{mn_mt_num}
 	</select>
+
+	<delete id="deleteMenu">
+		delete from menu where mn_num = #{mn_num}
+	</delete>
 </mapper>

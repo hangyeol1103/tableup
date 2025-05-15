@@ -51,5 +51,7 @@ public interface ManagerDAO {
 
 	MenuTypeVO selectMenuType(int mn_mt_num);
 
+	boolean deleteMenu(int mn_num);
+
 	
 }

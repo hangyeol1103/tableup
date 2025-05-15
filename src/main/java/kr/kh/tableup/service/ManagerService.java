@@ -182,4 +182,8 @@ public class ManagerService {
 		}
 	}
 
+	public boolean deleteMenu(int mn_num) {
+		return managerDAO.deleteMenu(mn_num);
+	}
+
 }

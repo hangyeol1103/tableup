@@ -196,7 +196,7 @@ public class ManagerController {
 		return "/manager/make_menu/";
 	}
 	
-
+	
 	@GetMapping("/menu/{mn_num}")
 	public String detailMenu(Model model, @PathVariable int mn_num) {
 		MenuVO menu = managerService.getMenu(mn_num);
@@ -205,6 +205,17 @@ public class ManagerController {
 		model.addAttribute("menutype", menutype);
 		return "/manager/menu";
 	}
+
+	//메뉴 삭제
+	@PostMapping("/menu/delete_menu/{mn_num}")
+	public String deleteMenuPage(@AuthenticationPrincipal RestaurantManagerVO manager, @PathVariable int mn_num) {
+		int rtNum = manager.getRm_rt_num();
+		 if(managerService.deleteMenu(mn_num)) {
+        return "redirect:/manager/menulist/"+rtNum;
+    }
+		return "redirect:/manager/menu?mn_num=" + mn_num;
+	}
+	
 
 	//메뉴 수정 페이지
 	@GetMapping("/remake_menu")

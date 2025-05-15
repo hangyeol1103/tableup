@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout_admin.html}">
+<head>
+  <title layout:fragment="title">관리자 페이지</title>
+</head>
+<body>
+  <div layout:fragment="content" class="container mt-4">
+    <div class="input-group mb-3 input-group-lg">
+      <span class="input-group-text">편의시설 이름</span>
+      <input type="text" class="form-control" id="facilityName" required>
+    </div>
+    <div class="input-group mb-3 input-group-lg">
+      <span class="input-group-text">편의시설 설명</span>
+      <input type="text" class="form-control" id="facilityTitle" required>
+    </div>
+  <button type="button" class="btn btn-primary mt-3" id="addBtn">추가</button>
+
+  <div class="mt-5">
+    <h5>등록된 편의시설 목록</h5>
+    <ul id="facilityList" class="list-group"></ul>
+  </div>
+
+<th:block layout:fragment="script">
+<script>
+document.getElementById("addBtn").addEventListener("click", function() {
+  const facilityName = document.getElementById("facilityName").value.trim();
+  const facilityTitle = document.getElementById("facilityTitle").value.trim();
+
+  if (!facilityName) {
+    alert("태그 타입을 입력하세요.");
+    return;
+  }
+  fetch('/admin/facility/insert', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+    fa_name: facilityName,
+    fa_title: facilityTitle
+  })
+})
+  .then(resp => resp.json())
+  .then(data => {
+
+
+      console.log("서버 응답:", data);
+
+
+    if (data.success) {
+      alert("등록 성공!");
+      location.reload();
+    } else {
+      alert("등록 실패: " + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('에러:', error);
+    alert("요청 중 오류 발생");
+  });
+});
+function loadFacilityList() {
+  fetch("/admin/facility/list")
+    .then((resp) => resp.json())
+    .then((data) => {
+      const facilityBox = document.getElementById("facilityList");
+      facilityBox.innerHTML = "";
+      data.forEach((facility) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.innerHTML =
+          `<strong>(편의시설)</strong> ${facility.fa_name}<br>` +
+          `<strong>(설명)</strong> ${facility.fa_title}`;
+        facilityBox.appendChild(li);
+      });
+    });
+}
+document.addEventListener("DOMContentLoaded", loadFacilityList);
+</script>
+</body>
+</html>

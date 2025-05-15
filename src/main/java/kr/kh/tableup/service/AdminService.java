@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import kr.kh.tableup.dao.AdminDAO;
 import kr.kh.tableup.model.vo.AdminVO;
+import kr.kh.tableup.model.vo.FacilityVO;
 
 @Service
 public class AdminService {
@@ -34,6 +35,11 @@ public class AdminService {
 		return adminDAO.insertTagType(name);
 	}
 
+	public boolean insertFacility(FacilityVO facility) {
+    return adminDAO.insertFacility(facility);
+	}
+
+
 	public List<String> getRegionList() {
     return adminDAO.selectRegionList();
 	}
@@ -49,6 +55,11 @@ public class AdminService {
 	public List<String> getTagTypeList() {
 		return adminDAO.selectTagTypeList();
 	}
+
+	public List<FacilityVO> getFacilityList() {
+    return adminDAO.selectFacilityList();
+	}
+
 
 
 }

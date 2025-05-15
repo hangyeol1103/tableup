@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import kr.kh.tableup.service.AdminService;
 
 import kr.kh.tableup.model.vo.AdminVO;
+import kr.kh.tableup.model.vo.FacilityVO;
 
 
 @Controller
@@ -69,6 +70,11 @@ public class AdminController {
   @GetMapping("/tagtype")
   public String tagTypePage() {
     return "admin/tagtype";
+  }
+
+  @GetMapping("/facility")
+  public String facilityPage() {
+    return "admin/facility";
   }
 
   //지역 및 기타 태그들 추가
@@ -140,7 +146,22 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
+  @PostMapping("/facility/insert")
+  @ResponseBody
+  public Map<String, Object> insertFacility(@RequestBody FacilityVO facility) {
+    Map<String, Object> map = new HashMap<>();
+    if (facility.getFa_name() == null || facility.getFa_title() == null ||
+        facility.getFa_name().trim().isEmpty() || facility.getFa_title().trim().isEmpty()) {
+        map.put("success", false);
+        map.put("message", "입력값 누락");
+        return map;
+    }
 
+    boolean result = adminService.insertFacility(facility);
+    map.put("success", result);
+    map.put("message", result ? "등록 완료" : "등록 실패");
+    return map;
+  }
   
   
   //조회
@@ -164,6 +185,10 @@ public class AdminController {
   public List<String> getTagTypeList() {
     return adminService.getTagTypeList();
   }
-  
+  @GetMapping("/facility/list")
+  @ResponseBody
+  public List<FacilityVO> getFacilityList() {
+    return adminService.getFacilityList();
+  }
   
 }

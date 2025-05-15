@@ -25,6 +25,11 @@
 		INSERT INTO tagtype (tt_name)
 		VALUES (#{name})
 	</insert>
+	<insert id="insertFacility" parameterType="kr.kh.tableup.model.vo.FacilityVO">
+	  INSERT INTO facility (fa_name, fa_title)
+  	VALUES (#{fa_name}, #{fa_title})
+	</insert>
+
 
 
 	<select id="selectRegionList" resultType="String">
@@ -39,5 +44,10 @@
 	<select id="selectTagTypeList" resultType="String">
 		SELECT tt_name FROM tagtype
 	</select>
+	<select id="selectFacilityList" resultType="kr.kh.tableup.model.vo.FacilityVO">
+	  SELECT * FROM facility
+	</select>
+
+
 
 </mapper>

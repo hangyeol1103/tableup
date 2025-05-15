@@ -298,7 +298,7 @@ CREATE TABLE `User` (
 	`us_email`	VARCHAR(50) NOT NULL,
 	`us_nickname`	VARCHAR(30) NOT NULL,
 	`us_sociallogin`	BOOLEAN	NULL,
-	`us_created`	DATETIME NOT NULL,
+	`us_created`	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`us_state`	INT NOT NULL DEFAULT 0
 );
 

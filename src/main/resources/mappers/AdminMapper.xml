@@ -13,9 +13,16 @@
   	INSERT INTO region (reg_main)
   	VALUES (#{name})
 	</insert>
+	<insert id="insertDetailRegion" parameterType="String">
+  	INSERT INTO detailregion (dreg_sub)
+  	VALUES (#{name})
+	</insert>
+
 	<select id="selectRegionList" resultType="String">
     SELECT reg_main FROM region
 	</select>
+	<select id="selectDetailRegionList" resultType="String">
+  	SELECT dreg_sub FROM detailregion
+	</select>
 
-	
 </mapper>

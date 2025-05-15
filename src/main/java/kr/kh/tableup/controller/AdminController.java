@@ -56,6 +56,11 @@ public class AdminController {
     return "admin/region";
   }
 
+  @GetMapping("/detailregion")
+  public String regionDetailPage() {
+    return "admin/detailregion";
+  }
+
   //지역 추가
   @PostMapping("/region/insert")
   @ResponseBody
@@ -74,12 +79,38 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
-
   //지역 조회
   @GetMapping("/region/list")
   @ResponseBody
   public List<String> getRegionList() {
     return adminService.getRegionList();
   }
+
+  //지역상세 추가
+  @PostMapping("/detailregion/insert")
+  @ResponseBody
+  public Map<String, Object> insertDetailRegion(@RequestBody Map<String, String> param) {
+    String name = param.get("detailRegionName");
+    Map<String, Object> map = new HashMap<>();
+
+    if (name == null || name.trim().isEmpty()) {
+        map.put("success", false);
+        map.put("message", "이름이 비어있습니다.");
+        return map;
+    }
+
+    boolean result = adminService.insertDetailRegion(name);
+    map.put("success", result);
+    map.put("message", result ? "등록 완료" : "등록 실패");
+    return map;
+  }
+
+  @GetMapping("/detailregion/list")
+  @ResponseBody
+  public List<String> getDetailRegionList() {
+    return adminService.getDetailRegionList();
+  }
+
+
 
 }

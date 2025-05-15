@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout_admin.html}">
+<head>
+  <title layout:fragment="title">관리자 페이지</title>
+</head>
+<body>
+  <div layout:fragment="content" class="container mt-4">
+    <div class="input-group mb-3 input-group-lg">
+      <span class="input-group-text">지역 상세 추가</span>
+      <input type="text" class="form-control" id="regionName" required>
+    </div>
+  <button type="button" class="btn btn-primary mt-3" id="addBtn">추가</button>
+
+  <div class="mt-5">
+    <h5>등록된 지역 상세 목록</h5>
+    <ul id="regionList" class="list-group"></ul>
+  </div>
+
+<th:block layout:fragment="script">
+<script>
+document.getElementById("addBtn").addEventListener("click", function() {
+  const regionName = document.getElementById("regionName").value.trim();
+  if (!regionName) {
+    alert("지역 이름을 입력하세요.");
+    return;
+  }
+  fetch('/admin/detailregion/insert', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ detailRegionName: regionName })
+  })
+  .then(resp => resp.json())
+  .then(data => {
+    if (data.success) {
+      alert("등록 성공!");
+      location.reload();
+    } else {
+      alert("등록 실패: " + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('에러:', error);
+    alert("요청 중 오류 발생");
+  });
+});
+function loadRegionList() {
+  fetch("/admin/detailregion/list")
+    .then((resp) => resp.json())
+    .then((data) => {
+      const regionBox = document.getElementById("regionList");
+      regionBox.innerHTML = "";
+      data.forEach((region) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.innerText = region;
+        regionBox.appendChild(li);
+      });
+    });
+}
+document.addEventListener("DOMContentLoaded", loadRegionList);
+</script>
+</body>
+</html>

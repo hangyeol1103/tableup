@@ -22,9 +22,18 @@ public class AdminService {
     return adminDAO.insertRegion(name);
 	}
 
+	public boolean insertDetailRegion(String name) {
+		return adminDAO.insertDetailRegion(name);
+	}
+
 	public List<String> getRegionList() {
     return adminDAO.selectRegionList();
-}
+	}
+
+	public List<String> getDetailRegionList() {
+    return adminDAO.selectDetailRegionList();
+	}
+
 
 
 }

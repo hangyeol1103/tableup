@@ -13,12 +13,15 @@ public interface AdminDAO {
 	//로그인
 	AdminVO selectUser(String username);
 
-	//지역 추가
+	//추가
 	boolean insertRegion(@Param("name") String name);
-
-	//지역 출력
-	List<String> selectRegionList();
-
+	boolean insertDetailRegion(@Param("name") String name);
 	
+	//출력
+	List<String> selectRegionList();
+	List<String> selectDetailRegionList();
+
+
+
 
 }

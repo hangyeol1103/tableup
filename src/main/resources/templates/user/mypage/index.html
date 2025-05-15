@@ -14,7 +14,61 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 </head>
 <body>
 	<main layout:fragment="content">
-		<div>마이페이지</div>
+		<div class="text-center mt-4">
+			<h2 th:text="'환영합니다, ' + ${user.us_name} + '님!'">마이페이지</h2>
+			<a th:href="@{/user/info}" class="btn btn-primary mt-2">내 정보</a>
+		</div>
+
+		<ul class="nav nav-tabs mt-4" id="mypageTabs" role="tablist">
+			<li class="nav-item"><a class="nav-link active" href="#resTab" data-bs-toggle="tab" data-url="/user/mypage/res">내 예약</a></li>
+			<li class="nav-item"><a class="nav-link" href="#revTab" data-bs-toggle="tab" data-url="/user/mypage/rev">내 리뷰</a></li>
+			<li class="nav-item"><a class="nav-link" href="#likeShopTab" data-bs-toggle="tab" data-url="/user/mypage/flwrst">찜한 식당</a></li>
+			<li class="nav-item"><a class="nav-link" href="#likeReviewTab" data-bs-toggle="tab" data-url="/user/mypage/flwrvw">찜한 리뷰</a></li>
+		</ul>
+
+		<div class="tab-content p-3 border border-top-0" id="mypageContent">
+			<div id="resTab" class="tab-pane fade show active">로딩 중...</div>
+			<div id="revTab" class="tab-pane fade">로딩 중...</div>
+			<div id="flwrstTab" class="tab-pane fade">로딩 중...</div>
+			<div id="flwrvwTab" class="tab-pane fade">로딩 중...</div>
+		</div>
+
+		<script>
+			document.querySelectorAll('#mypageTabs a').forEach(tab => {
+				tab.addEventListener('shown.bs.tab', function (e) {
+					const targetId = e.target.getAttribute('href');
+					const url = e.target.dataset.url;
+					// 차후 탭 활성화시 ajax로 요청
+					// 이미 로딩된 탭은 다시 요청하지 않음
+					if (url && !document.querySelector(targetId).dataset.loaded) {
+						fetch(url)
+							.then(res => res.text())
+							.then(html => {
+								document.querySelector(targetId).innerHTML = html;
+								document.querySelector(targetId).dataset.loaded = true;
+							});
+					}
+					/*
+					if (!document.querySelector(targetId).dataset.loaded) {
+						fetch(url)
+							.then(res => res.text())
+							.then(html => {
+								document.querySelector(targetId).innerHTML = html;
+								document.querySelector(targetId).dataset.loaded = true;
+							});
+					}
+							*/
+				});
+
+
+				// 처음 로딩될 탭 강제 트리거
+				if (tab.classList.contains('active')) {
+					tab.dispatchEvent(new Event('shown.bs.tab'));
+				}
+			});
+		</script>
+
+
 	</main>
 </body>
 </html>

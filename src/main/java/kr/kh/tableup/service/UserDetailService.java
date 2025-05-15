@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import kr.kh.tableup.dao.UserDAO;
+import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.UserVO;
 
 @Service
@@ -21,9 +22,9 @@ public class UserDetailService implements UserDetailsService{
 			UserVO user = userDAO.selectUser(username);
 			if (user == null) throw new UsernameNotFoundException("사용자 없음");
 			System.out.println("불러온 비밀번호: " + user.getUs_pw());
-			System.out.println("UserDetails.getPassword(): " + user.getPassword());
+			System.out.println("UserDetails.getPassword(): " + user.getUs_pw());
 
-			return user; 
+			return new CustomUser(user); 
 	}
 
 

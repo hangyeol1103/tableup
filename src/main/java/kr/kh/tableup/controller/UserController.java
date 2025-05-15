@@ -1,6 +1,7 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,35 @@ public class UserController {
     private UserService userService;
 
     /** 로그인*/
+    
+
     @GetMapping("/login")
-    public String login(HttpSession session) {
-      session.removeAttribute("loginError");
-      session.removeAttribute("loginId");
+    public String login(Model model, HttpServletRequest request) {
+      String prevUrl = request.getHeader("Referer");
+      System.out.println(prevUrl);
+      if(prevUrl != null && !prevUrl.contains("/user/login")) {		
+        request.getSession().setAttribute("prevUrl", prevUrl);	
+      }
+    
+      Object loginError = request.getSession().getAttribute("loginError");
+      Object loginId = request.getSession().getAttribute("loginId");
+
+
+      model.addAttribute("loginError", loginError);
+      model.addAttribute("loginId", loginId);  
+   
+     
+      if (loginError != null) {
+          request.getSession().removeAttribute("loginError");
+      }
+      if (loginId != null) {
+          request.getSession().removeAttribute("loginId");
+      }
+      
+
+
+      System.out.println(loginId);
+      System.out.println(loginError);
       return "user/login";
     }
 
@@ -36,7 +62,7 @@ public class UserController {
       return "user/signup";
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/signupPost")
     public String signup(@ModelAttribute UserVO user, RedirectAttributes ra) {
       boolean result = userService.registerUser(user);
       ra.addFlashAttribute("msg", result ? "회원가입이 완료되었습니다." : "회원가입에 실패했습니다.");
@@ -74,11 +100,17 @@ public class UserController {
     }
 
     /** 중복 검사 */
-    @GetMapping("/check-duplicate")
+    @PostMapping("/check-duplicate")
     @ResponseBody
-    public Map<String, Boolean> checkDuplicate(
-            @RequestParam String type,
-            @RequestParam String value) {
-        return Map.of("duplicate", userService.isDuplicate(type, value));
-    }
+    public Map<String, Boolean> checkDuplicate(@RequestBody Map<String, String> map) {
+        String type = map.get("type");
+        String value = map.get("value");
+
+        boolean isDuplicate = userService.isDuplicate(type, value);
+
+        Map<String, Boolean> res = new HashMap<>();
+        res.put("duplicate", isDuplicate);
+        return res;
+}
+
 }

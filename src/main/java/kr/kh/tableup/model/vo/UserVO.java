@@ -2,12 +2,11 @@ package kr.kh.tableup.model.vo;
 
 import java.util.Date;
 
-import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Data;
 
 @Data
-public class UserVO implements UserDetails{
+public class UserVO{
   private Integer us_num;
   private String us_id;
   private String us_pw;
@@ -19,38 +18,4 @@ public class UserVO implements UserDetails{
   private Date us_created;
   private int us_state;
 
-  @Override
-  public String getUsername() {
-    return us_id;
-  }
-
-  @Override
-  public String getPassword() {
-    return us_pw;
-  }
-
-  @Override
-  public java.util.Collection<? extends org.springframework.security.core.GrantedAuthority> getAuthorities() {
-    return java.util.Collections.emptyList();
-  }
-
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return us_state == 0;
-  }
 }

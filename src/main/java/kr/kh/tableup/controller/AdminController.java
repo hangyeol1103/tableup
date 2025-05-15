@@ -48,7 +48,7 @@ public class AdminController {
   }
   @GetMapping("/login")
   public String adminLogin() {
-    return "/admin/login";
+    return "admin/login";
   }
 
   @GetMapping("/region")
@@ -61,7 +61,12 @@ public class AdminController {
     return "admin/detailregion";
   }
 
-  //지역 추가
+  @GetMapping("/tag")
+  public String tagPage() {
+    return "admin/tag";
+  }
+
+  //지역 및 기타 태그들 추가
   @PostMapping("/region/insert")
   @ResponseBody
   public Map<String, Object> insertRegion(@RequestBody Map<String, String> param) {
@@ -79,18 +84,27 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
-  //지역 조회
-  @GetMapping("/region/list")
-  @ResponseBody
-  public List<String> getRegionList() {
-    return adminService.getRegionList();
-  }
-
-  //지역상세 추가
   @PostMapping("/detailregion/insert")
   @ResponseBody
   public Map<String, Object> insertDetailRegion(@RequestBody Map<String, String> param) {
     String name = param.get("detailRegionName");
+    Map<String, Object> map = new HashMap<>();
+    
+    if (name == null || name.trim().isEmpty()) {
+      map.put("success", false);
+      map.put("message", "이름이 비어있습니다.");
+      return map;
+    }
+    
+    boolean result = adminService.insertDetailRegion(name);
+    map.put("success", result);
+    map.put("message", result ? "등록 완료" : "등록 실패");
+    return map;
+  }
+  @PostMapping("/tag/insert")
+  @ResponseBody
+  public Map<String, Object> insertTag(@RequestBody Map<String, String> param) {
+    String name = param.get("tagName");
     Map<String, Object> map = new HashMap<>();
 
     if (name == null || name.trim().isEmpty()) {
@@ -99,18 +113,30 @@ public class AdminController {
         return map;
     }
 
-    boolean result = adminService.insertDetailRegion(name);
+    boolean result = adminService.insertTag(name);
     map.put("success", result);
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
 
+  
+  
+  //조회
+  @GetMapping("/region/list")
+  @ResponseBody
+  public List<String> getRegionList() {
+    return adminService.getRegionList();
+  }
   @GetMapping("/detailregion/list")
   @ResponseBody
   public List<String> getDetailRegionList() {
     return adminService.getDetailRegionList();
   }
-
-
-
+  @GetMapping("/tag/list")
+  @ResponseBody
+  public List<String> getTagList() {
+    return adminService.getTagList();
+  }
+  
+  
 }

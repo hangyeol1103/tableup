@@ -17,12 +17,19 @@
   	INSERT INTO detailregion (dreg_sub)
   	VALUES (#{name})
 	</insert>
+	<insert id="insertTag" parameterType="String">
+		INSERT INTO tag (tag_name, tag_tt_num)
+		VALUES (#{name}, 1)
+	</insert>
 
 	<select id="selectRegionList" resultType="String">
-    SELECT reg_main FROM region
+		SELECT reg_main FROM region
 	</select>
 	<select id="selectDetailRegionList" resultType="String">
-  	SELECT dreg_sub FROM detailregion
+		SELECT dreg_sub FROM detailregion
+	</select>
+	<select id="selectTagList" resultType="String">
+		SELECT tag_name FROM tag
 	</select>
 
 </mapper>

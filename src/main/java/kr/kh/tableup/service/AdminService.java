@@ -26,6 +26,10 @@ public class AdminService {
 		return adminDAO.insertDetailRegion(name);
 	}
 
+	public boolean insertTag(String name) {
+		return adminDAO.insertTag(name);
+	}
+
 	public List<String> getRegionList() {
     return adminDAO.selectRegionList();
 	}
@@ -34,6 +38,9 @@ public class AdminService {
     return adminDAO.selectDetailRegionList();
 	}
 
+	public List<String> getTagList() {
+		return adminDAO.selectTagList();
+	}
 
 
 }

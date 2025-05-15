@@ -409,6 +409,35 @@ public class ManagerController {
 
 		return "/manager/make_restime/";
 	}
+	//예약 시간 변경
+	@GetMapping("/remake_restime/{bh_num}")
+	public String reMakeResTimePage(Model model, @AuthenticationPrincipal RestaurantManagerVO manager, @PathVariable int bh_num) {
+
+		model.addAttribute("url", "/remake_restime");
+		return "/manager/remake_restime";
+	}
+	
+	@PostMapping("/remake_restime")
+	public String updateRestime(BusinessHourVO restime,  @AuthenticationPrincipal RestaurantManagerVO manager ) {
+		restime.setBh_rt_num(manager.getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(restime);
+		
+		int rtNum = manager.getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    restime.setBh_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+		if(managerService.remakeResTime(restime)){
+			System.out.println("bh_start = " + restime.getBh_start());
+			System.out.println("bh_state = " + restime.isBh_state());
+			return "redirect:/manager/restimelist/"+rtNum;
+		}
+		return "/manager/remake_restime";
+	}
 
 	//날짜 입력 처리(HH:mm)
 	@InitBinder

@@ -143,5 +143,15 @@
 			(bh_start, bh_end, bh_seat_max, bh_seat_current, bh_table_max, bh_table_current, bh_state, bh_rt_num)
 		value(#{bh_start}, #{bh_end}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
 	</insert>
+
+	<update id="updateResTime">
+		update businesshour set
+			bh_start = #{bh_start}, 
+			bh_end = #{bh_end}, 
+			bh_seat_max = #{bh_seat_max}, 
+			bh_table_max = #{bh_table_max},
+			bh_state = #{bh_state}
+		where bh_rt_num=#{bh_rt_num}
+	</update>
 	
 </mapper>

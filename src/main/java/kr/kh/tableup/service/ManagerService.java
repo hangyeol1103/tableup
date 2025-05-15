@@ -142,6 +142,7 @@ public class ManagerService {
 
 		} catch(Exception e){
 			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
@@ -157,6 +158,28 @@ public class ManagerService {
 
 	public MenuTypeVO getMenuType(int mn_mt_num) {
 		return managerDAO.selectMenuType(mn_mt_num);
+	}
+
+	public boolean updateMenu(MenuVO menu, MultipartFile mn_img2) {
+		if(menu == null){
+			return false;
+		}
+		//메뉴 이미지 작업
+		try{
+			String fileName = mn_img2.getOriginalFilename();
+			if(mn_img2 != null && fileName.length() !=0){
+				String suffix = getSuffix(fileName);
+				String newFileName = menu.getMn_num() + suffix;
+				String menuImage;
+				menuImage = UploadFileUtils.uploadFile(uploadPath, newFileName, mn_img2.getBytes(),"menu");
+				menu.setMn_img(menuImage);
+			}
+			return managerDAO.updateMenu(menu);
+
+		} catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }

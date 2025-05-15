@@ -33,7 +33,8 @@ public class UploadFileUtils {
 
 	}
 	private static void makeDir(String uploadPath, String... paths) {
-			if(new File(paths[paths.length-1]).exists())
+			File fullPath = new File(uploadPath + File.separator + paths[paths.length - 1]);
+			if(fullPath.exists())
 					return;
 			for(String path : paths) {
 					File dirPath = new File(uploadPath + path);

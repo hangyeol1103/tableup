@@ -189,12 +189,11 @@ public class ManagerController {
         return "redirect:/manager/make";
     }
 
-		
 		if(managerService.makeMenu(menu,mn_img2)){
-			return "redirect:/manager/menulist";
+			return "redirect:/manager/menulist/"+rtNum;
 		}
 
-		return "/manager/make_menu";
+		return "/manager/make_menu/";
 	}
 	
 
@@ -206,7 +205,42 @@ public class ManagerController {
 		model.addAttribute("menutype", menutype);
 		return "/manager/menu";
 	}
+
+	//메뉴 수정 페이지
+	@GetMapping("/remake_menu")
+	public String reMakeMenuPage(Model model, @AuthenticationPrincipal RestaurantManagerVO manager, @RequestParam("mn_num") int mn_num) {
+		List<MenuTypeVO> menutype = managerService.getMenuTypeList();
+		MenuVO menu = managerService.getMenu(mn_num);
+		System.out.println(menu);
+
+		model.addAttribute("url", "/remake_menu");
+		model.addAttribute("menutype", menutype);
+		model.addAttribute("menu", menu);
+		return "/manager/remake_menu";
+	}
 	
+	@PostMapping("/remake_menu")
+	public String updateMenu(MenuVO menu, MultipartFile mn_img2,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+		menu.setMn_rt_num(manager.getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(menu);
+		System.out.println(mn_img2.getOriginalFilename());
+		
+		int rtNum = manager.getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    menu.setMn_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+
+		if(managerService.updateMenu(menu,mn_img2)){
+			return "redirect:/manager/menulist/"+rtNum;
+		}
+		
+		return "/manager/remake_menu";
+	}
 	
 	
 }

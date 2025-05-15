@@ -23,11 +23,6 @@ document.getElementById("addBtn").addEventListener("click", function() {
     alert("지역 이름을 입력하세요.");
     return;
   }
-
-  //디버깅
-  console.log("버튼 눌림");
-  console.log("보낼 값:", regionName);
-
   fetch('/admin/region/insert', {
     method: 'POST',
     headers: {

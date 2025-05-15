@@ -34,13 +34,11 @@ public class AdminController {
   public String adminHome() {
     return "admin/admin";
   }
-
   @GetMapping("/signup")
   public String adminSignupForm(Model model) {
     model.addAttribute("url", "/admin/signup");
     return "admin/signup";
   }
-
   @PostMapping("/signup")
   public String adminSignup(AdminVO admin) {
     admin.setAd_pw(passwordEncoder.encode(admin.getAd_pw()));
@@ -56,30 +54,33 @@ public class AdminController {
   public String regionPage() {
     return "admin/region";
   }
-
   @GetMapping("/detailregion")
   public String regionDetailPage() {
     return "admin/detailregion";
   }
-
   @GetMapping("/tag")
   public String tagPage() {
     return "admin/tag";
   }
-
   @GetMapping("/tagtype")
   public String tagTypePage() {
     return "admin/tagtype";
   }
-
   @GetMapping("/facility")
   public String facilityPage() {
     return "admin/facility";
   }
-
   @GetMapping("/menutype")
   public String menuTypePage() {
     return "admin/menutype";
+  }
+  @GetMapping("/foodcategory")
+  public String foodCategoryPage() {
+    return "admin/foodcategory";  
+  }
+  @GetMapping("/detailfoodcategory")
+  public String detailFoodCategoryPage() {
+    return "admin/detailfoodcategory";  
   }
 
   //지역 및 기타 태그들 추가
@@ -100,6 +101,7 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
+
   @PostMapping("/detailregion/insert")
   @ResponseBody
   public Map<String, Object> insertDetailRegion(@RequestBody Map<String, String> param) {
@@ -117,6 +119,7 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
+
   @PostMapping("/tag/insert")
   @ResponseBody
   public Map<String, Object> insertTag(@RequestBody Map<String, String> param) {
@@ -134,6 +137,7 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
+
   @PostMapping("/tagtype/insert")
   @ResponseBody
   public Map<String, Object> insertTagType(@RequestBody Map<String, String> param) {
@@ -151,6 +155,7 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
+
   @PostMapping("/facility/insert")
   @ResponseBody
   public Map<String, Object> insertFacility(@RequestBody FacilityVO facility) {
@@ -181,6 +186,24 @@ public class AdminController {
     }
 
     boolean result = adminService.insertMenuType(name);
+    map.put("success", result);
+    map.put("message", result ? "등록 완료" : "등록 실패");
+    return map;
+  }
+
+  @PostMapping("/foodcategory/insert")
+  @ResponseBody
+  public Map<String, Object> insertFoodCategory(@RequestBody Map<String, String> param) {
+    String name = param.get("foodCategoryName");
+    Map<String, Object> map = new HashMap<>();
+
+    if (name == null || name.trim().isEmpty()) {
+        map.put("success", false);
+        map.put("message", "이름이 비어있습니다.");
+        return map;
+    }
+
+    boolean result = adminService.insertFoodCategory(name);
     map.put("success", result);
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
@@ -217,6 +240,11 @@ public class AdminController {
   @ResponseBody
   public List<String> getMenuTypeList() {
     return adminService.getMenuTypeList();
+  }
+  @GetMapping("/foodcategory/list")
+  @ResponseBody
+  public List<String> getFoodCategoryList() {
+    return adminService.getFoodCategoryList();
   }
   
 }

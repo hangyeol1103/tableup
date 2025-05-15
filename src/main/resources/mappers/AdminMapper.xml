@@ -33,6 +33,10 @@
   	INSERT INTO menutype (MT_NAME)
   	VALUES (#{name})
 	</insert>
+	<insert id="insertFoodCategory" parameterType="String">
+	  INSERT INTO foodcategory (fc_main)
+  	VALUES (#{name})
+	</insert>
 
 
 
@@ -54,7 +58,9 @@
 	<select id="selectMenuTypeList" resultType="String">
 		SELECT mt_name FROM menutype
 	</select>
-
+	<select id="selectFoodCategoryList" resultType="String">
+		SELECT fc_main FROM foodcategory
+	</select>
 
 
 </mapper>

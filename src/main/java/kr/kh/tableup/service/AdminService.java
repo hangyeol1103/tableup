@@ -43,6 +43,10 @@ public class AdminService {
 		return adminDAO.insertMenuType(name);
 	}
 
+	public boolean insertFoodCategory(String name) {
+		return adminDAO.insertFoodCategory(name);
+	}
+
 
 	public List<String> getRegionList() {
     return adminDAO.selectRegionList();
@@ -66,6 +70,10 @@ public class AdminService {
 
 	public List<String> getMenuTypeList() {
 		return adminDAO.selectMenuTypeList();
+	}
+
+	public List<String> getFoodCategoryList() {
+		return adminDAO.selectFoodCategoryList();
 	}
 
 }

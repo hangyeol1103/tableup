@@ -16,21 +16,21 @@
 				</button>
 				<div class="collapse navbar-collapse" id="mynavbar">
 					<ul class="navbar-nav me-auto">
-						<li class="nav-item" sec:authorize="isAuthenticated()">
+						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/main}" th:classappend="${url == '/manager/main' ? 'active' : ''}">매니저페이지</a>
 						</li>
-						<li class="nav-item" sec:authorize="isAuthenticated()">
+						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/restaurant}" th:classappend="${url == '/manager/restaurant' ? 'active' : ''}">매장관리</a>
 						</li>
-						<li class="nav-item" sec:authorize="isAnonymous()">
+						<li class="nav-item" sec:authorize="!hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/login}" th:classappend="${url == '/manager/login' ? 'active' : ''}">로그인</a>
 						</li>
-						<li class="nav-item" sec:authorize="isAuthenticated()">
+						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
 							<form th:action="@{/manager/logout}" method="post">
 								<button class="btn nav-link">로그아웃</button>
 							</form>
 						</li>
-						<li class="nav-item" sec:authorize="isAnonymous()">
+						<li class="nav-item" sec:authorize="!hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/signup}" th:classappend="${url == '/manager/signup' ? 'active' : ''}">회원가입</a>
 						</li>
 						

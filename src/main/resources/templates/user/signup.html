@@ -50,42 +50,66 @@
         <input type="tel" id="us_phone" name="us_phone" class="form-control" required>
         <button type="button" class="btn btn-outline-secondary" onclick="checkDuplicate('phone')">중복확인</button>
       </div>
-      <small class="form-text text-muted" id="phoneResult"></small>
-    </div>
-
-    <button type="submit" class="btn btn-success w-100">회원가입</button>
-  </form>
-</div>
-
-<div layout:fragment="script">
-  <script>
-    const duplicateStatus = { id: true, email: true, phone: true };
-
-    function checkDuplicate(type) {
-      const input = document.getElementById(`us_${type}`);
-      const resultElement = document.getElementById(`${type}Result`);
-      const value = input.value.trim();
-
-      if (!value) {
-        alert(`${type.toUpperCase()}를 입력하세요.`);
-        return;
-      }
-
-      fetch("/user/check-duplicate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, value })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.duplicate) {
-          resultElement.textContent = `이미 사용 중인 ${type === 'id' ? '아이디' : type === 'email' ? '이메일' : '전화번호'}입니다.`;
-          resultElement.style.color = "red";
-          duplicateStatus[type] = true;
-        } else {
-          resultElement.textContent = `사용 가능한 ${type === 'id' ? '아이디' : type === 'email' ? '이메일' : '전화번호'}입니다.`;
-          resultElement.style.color = "green";
-          duplicateStatus[type] = false;
+      <div class="mb-3">
+        <label for="us_name" class="form-label">이름</label>
+        <input type="text" class="form-control" name="us_name" id="us_name" required>
+      </div>
+      <div class="mb-3">
+        <label for="us_nickname" class="form-label">닉네임</label>
+        <input type="text" class="form-control" name="us_nickname" id="us_nickname" required>
+      </div>
+      <div class="form-group">
+        <label for="us_phone">전화번호</label>
+        <div class="input-group">
+            <input type="tel" class="form-control" id="us_phone" name="us_phone" required>
+            <button type="button" class="btn btn-secondary" onclick="checkDuplicate('phone')">중복확인</button>
+        </div>
+        <small id="phoneCheckResult" class="form-text"></small>
+      </div>
+      <button type="submit" class="btn btn-success w-100">가입하기</button>
+    </form>
+  </div>
+  <div layout:fragment="script">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        let idDuplicate = true;
+        let emailDuplicate = true;
+        let phoneDuplicate = true;
+  
+        function checkDuplicate(type) {
+          const value = document.getElementById('us_' + type).value;
+          if (!value) {
+            alert('값을 입력해주세요.');
+            return;
+          }
+          fetch(`/user/check-duplicate?type=${type}&value=${value}`)
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(data => {
+              const resultElement = document.getElementById(type + 'CheckResult');
+              if (data.duplicate) {
+                resultElement.textContent = '이미 사용 중인 ' +
+                  (type === 'id' ? '아이디' :
+                    type === 'phone' ? '전화번호' : '이메일') + '입니다.';
+                resultElement.style.color = 'red';
+                if(type === 'id') idDuplicate = true;
+                if(type === 'email') emailDuplicate = true;
+                if(type === 'phone') phoneDuplicate = true;
+              } else {
+                resultElement.textContent = '사용 가능한 ' +
+                  (type === 'id' ? '아이디' :
+                    type === 'phone' ? '전화번호' : '이메일') + '입니다.';
+                resultElement.style.color = 'green';
+                if(type === 'id') idDuplicate = false;
+                if(type === 'email') emailDuplicate = false;
+                if(type === 'phone') phoneDuplicate = false;
+              }
+            })
+            .catch(error => {
+              alert('중복 확인 중 오류가 발생했습니다.');
+            });
         }
       }).catch(() => {
         alert("중복 확인 중 오류 발생");

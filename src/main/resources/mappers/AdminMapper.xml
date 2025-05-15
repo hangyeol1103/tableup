@@ -9,4 +9,65 @@
 		SELECT * FROM admin
 		WHERE ad_id = #{username}
 	</select>
+	<insert id="insertRegion" parameterType="String">
+  	INSERT INTO region (reg_main)
+  	VALUES (#{name})
+	</insert>
+	<insert id="insertDetailRegion" parameterType="String">
+  	INSERT INTO detailregion (dreg_sub)
+  	VALUES (#{name})
+	</insert>
+	<insert id="insertTag" parameterType="String">
+		INSERT INTO tag (tag_name, tag_tt_num)
+		VALUES (#{name}, 1)
+	</insert>
+	<insert id="insertTagType" parameterType="String">
+		INSERT INTO tagtype (tt_name)
+		VALUES (#{name})
+	</insert>
+	<insert id="insertFacility" parameterType="kr.kh.tableup.model.vo.FacilityVO">
+	  INSERT INTO facility (fa_name, fa_title)
+  	VALUES (#{fa_name}, #{fa_title})
+	</insert>
+	<insert id="insertMenuType" parameterType="String">
+  	INSERT INTO menutype (MT_NAME)
+  	VALUES (#{name})
+	</insert>
+	<insert id="insertFoodCategory" parameterType="String">
+	  INSERT INTO foodcategory (fc_main)
+  	VALUES (#{name})
+	</insert>
+	<insert id="insertDetailFoodCategory" parameterType="String">
+	  INSERT INTO detailfoodcategory (dfc_sub)
+  	VALUES (#{name})
+	</insert>
+
+
+
+	<select id="selectRegionList" resultType="String">
+		SELECT reg_main FROM region
+	</select>
+	<select id="selectDetailRegionList" resultType="String">
+		SELECT dreg_sub FROM detailregion
+	</select>
+	<select id="selectTagList" resultType="String">
+		SELECT tag_name FROM tag
+	</select>
+	<select id="selectTagTypeList" resultType="String">
+		SELECT tt_name FROM tagtype
+	</select>
+	<select id="selectFacilityList" resultType="kr.kh.tableup.model.vo.FacilityVO">
+	  SELECT * FROM facility
+	</select>
+	<select id="selectMenuTypeList" resultType="String">
+		SELECT mt_name FROM menutype
+	</select>
+	<select id="selectFoodCategoryList" resultType="String">
+		SELECT fc_main FROM foodcategory
+	</select>
+	<select id="selectDetailFoodCategoryList" resultType="String">
+		SELECT dfc_sub FROM detailfoodcategory
+	</select>
+
+
 </mapper>

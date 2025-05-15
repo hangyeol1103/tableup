@@ -9,30 +9,30 @@
 <body>
   <div layout:fragment="content" class="container mt-4">
     <div class="input-group mb-3 input-group-lg">
-      <span class="input-group-text">지역 추가</span>
-      <input type="text" class="form-control" id="regionName" required>
+      <span class="input-group-text">태그 추가</span>
+      <input type="text" class="form-control" id="tagName" required>
     </div>
   <button type="button" class="btn btn-primary mt-3" id="addBtn">추가</button>
 
   <div class="mt-5">
-    <h5>등록된 지역 목록</h5>
-    <ul id="regionList" class="list-group"></ul>
+    <h5>등록된 태그 목록</h5>
+    <ul id="tagList" class="list-group"></ul>
   </div>
 
 <th:block layout:fragment="script">
 <script>
 document.getElementById("addBtn").addEventListener("click", function() {
-  const regionName = document.getElementById("regionName").value.trim();
-  if (!regionName) {
-    alert("지역 이름을 입력하세요.");
+  const tagName = document.getElementById("tagName").value.trim();
+  if (!tagName) {
+    alert("태그를 입력하세요.");
     return;
   }
-  fetch('/admin/region/insert', {
+  fetch('/admin/tag/insert', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ regionName: regionName })
+    body: JSON.stringify({ tagName: tagName })
   })
   .then(resp => resp.json())
   .then(data => {
@@ -48,21 +48,21 @@ document.getElementById("addBtn").addEventListener("click", function() {
     alert("요청 중 오류 발생");
   });
 });
-function loadRegionList() {
-  fetch("/admin/region/list")
+function loadTagList() {
+  fetch("/admin/tag/list")
     .then((resp) => resp.json())
     .then((data) => {
-      const regionBox = document.getElementById("regionList");
-      regionBox.innerHTML = "";
-      data.forEach((region) => {
+      const tagBox = document.getElementById("tagList");
+      tagBox.innerHTML = "";
+      data.forEach((tag) => {
         const li = document.createElement("li");
         li.className = "list-group-item";
-        li.innerText = region;
-        regionBox.appendChild(li);
+        li.innerText = tag;
+        tagBox.appendChild(li);
       });
     });
 }
-document.addEventListener("DOMContentLoaded", loadRegionList);
+document.addEventListener("DOMContentLoaded", loadTagList);
 </script>
 </body>
 </html>

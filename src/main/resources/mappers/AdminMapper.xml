@@ -13,4 +13,9 @@
   	INSERT INTO region (reg_main)
   	VALUES (#{name})
 	</insert>
+	<select id="selectRegionList" resultType="String">
+    SELECT reg_main FROM region
+	</select>
+
+	
 </mapper>

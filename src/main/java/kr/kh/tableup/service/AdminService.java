@@ -1,5 +1,7 @@
 package kr.kh.tableup.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,5 +21,10 @@ public class AdminService {
 	public boolean insertRegion(String name) {
     return adminDAO.insertRegion(name);
 	}
+
+	public List<String> getRegionList() {
+    return adminDAO.selectRegionList();
+}
+
 
 }

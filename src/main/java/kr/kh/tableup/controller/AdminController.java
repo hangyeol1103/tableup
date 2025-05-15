@@ -1,6 +1,7 @@
 package kr.kh.tableup.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,13 @@ public class AdminController {
     map.put("success", result);
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
+  }
+
+  //지역 조회
+  @GetMapping("/region/list")
+  @ResponseBody
+  public List<String> getRegionList() {
+    return adminService.getRegionList();
   }
 
 }

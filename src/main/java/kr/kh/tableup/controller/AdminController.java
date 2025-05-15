@@ -77,6 +77,11 @@ public class AdminController {
     return "admin/facility";
   }
 
+  @GetMapping("/menutype")
+  public String menuTypePage() {
+    return "admin/menutype";
+  }
+
   //지역 및 기타 태그들 추가
   @PostMapping("/region/insert")
   @ResponseBody
@@ -162,6 +167,24 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
+
+  @PostMapping("/menutype/insert")
+  @ResponseBody
+  public Map<String, Object> insertMenuType(@RequestBody Map<String, String> param) {
+    String name = param.get("menuTypeName");
+    Map<String, Object> map = new HashMap<>();
+
+    if (name == null || name.trim().isEmpty()) {
+        map.put("success", false);
+        map.put("message", "이름이 비어있습니다.");
+        return map;
+    }
+
+    boolean result = adminService.insertMenuType(name);
+    map.put("success", result);
+    map.put("message", result ? "등록 완료" : "등록 실패");
+    return map;
+  }
   
   
   //조회
@@ -189,6 +212,11 @@ public class AdminController {
   @ResponseBody
   public List<FacilityVO> getFacilityList() {
     return adminService.getFacilityList();
+  }
+  @GetMapping("/menutype/list")
+  @ResponseBody
+  public List<String> getMenuTypeList() {
+    return adminService.getMenuTypeList();
   }
   
 }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout_admin.html}">
+<head>
+  <title layout:fragment="title">관리자 페이지</title>
+</head>
+<body>
+  <div layout:fragment="content" class="container mt-4">
+    <div class="input-group mb-3 input-group-lg">
+      <span class="input-group-text">메뉴 분류 추가</span>
+      <input type="text" class="form-control" id="menuTypeName" required>
+    </div>
+  <button type="button" class="btn btn-primary mt-3" id="addBtn">추가</button>
+
+  <div class="mt-5">
+    <h5>등록된 메뉴 분류 목록</h5>
+    <ul id="menuTypeList" class="list-group"></ul>
+  </div>
+
+<th:block layout:fragment="script">
+<script>
+document.getElementById("addBtn").addEventListener("click", function() {
+  const menuTypeName = document.getElementById("menuTypeName").value.trim();
+  if (!menuTypeName) {
+    alert("메뉴 분류 이름을 입력하세요.");
+    return;
+  }
+  fetch('/admin/menutype/insert', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ menuTypeName: menuTypeName })
+  })
+  .then(resp => resp.json())
+  .then(data => {
+    if (data.success) {
+      alert("등록 성공!");
+      location.reload();
+    } else {
+      alert("등록 실패: " + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('에러:', error);
+    alert("요청 중 오류 발생");
+  });
+});
+function loadmenuTypeList() {
+  fetch("/admin/menutype/list")
+    .then((resp) => resp.json())
+    .then((data) => {
+      const menuTypeBox = document.getElementById("menuTypeList");
+      menuTypeBox.innerHTML = "";
+      data.forEach((menuType) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.innerText = menuType;
+        menuTypeBox.appendChild(li);
+      });
+    });
+}
+document.addEventListener("DOMContentLoaded", loadmenuTypeList);
+</script>
+</body>
+</html>

@@ -29,6 +29,10 @@
 	  INSERT INTO facility (fa_name, fa_title)
   	VALUES (#{fa_name}, #{fa_title})
 	</insert>
+	<insert id="insertMenuType" parameterType="String">
+  	INSERT INTO menutype (MT_NAME)
+  	VALUES (#{name})
+	</insert>
 
 
 
@@ -46,6 +50,9 @@
 	</select>
 	<select id="selectFacilityList" resultType="kr.kh.tableup.model.vo.FacilityVO">
 	  SELECT * FROM facility
+	</select>
+	<select id="selectMenuTypeList" resultType="String">
+		SELECT mt_name FROM menutype
 	</select>
 
 

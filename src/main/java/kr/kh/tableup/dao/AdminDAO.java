@@ -20,6 +20,7 @@ public interface AdminDAO {
 	boolean insertTag(@Param("name") String name);
 	boolean insertTagType(@Param("name") String name);
 	boolean insertFacility(FacilityVO facility);
+	boolean insertMenuType(@Param("name") String name);
 
 
 	
@@ -29,6 +30,7 @@ public interface AdminDAO {
 	List<String> selectTagList();
 	List<String> selectTagTypeList();
 	List<FacilityVO> selectFacilityList();
+	List<String> selectMenuTypeList();
 
 
 }

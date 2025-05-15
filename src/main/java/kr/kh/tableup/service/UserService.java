@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.UserVO;
 
@@ -113,8 +114,22 @@ public class UserService {
 
 
 
-		public List<ReservationVO> getResByUser(int us_num) {
+		public List<ReservationVO> getReservationByUser(int us_num) {
 			
-      return userDAO.selectResByUser(us_num);
+      return userDAO.selectReservationByUser(us_num);
+		}
+
+
+
+    public List<RestaurantVO> getFollowedRestaurant(int us_num) {
+      
+      return userDAO.selectFollowedRestaurant(us_num);
+    }
+
+
+
+		public List<ReviewVO> getFollowedReview(int us_num) {
+			
+      return userDAO.selectFollowedReview(us_num);
 		}
 }

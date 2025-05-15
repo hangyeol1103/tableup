@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
@@ -128,13 +129,13 @@ public class UserController {
   @PostMapping("/mypage/rev")
   public String reviewList(Model model, Principal principal) {
       if (principal == null) {
-          return "fragments/loginRequired :: fragment";
+          return "user/mypage/sub/revsub";
       }
 
       String username = principal.getName();
       UserVO user = userService.getUserById(username); 
       if (user == null) {
-          return "fragments/loginRequired :: fragment";
+          return "user/mypage/sub/revsub";
       }
 
       List<ReviewVO> list = userService.getReviewByUser(user.getUs_num());
@@ -147,22 +148,56 @@ public class UserController {
   @PostMapping("/mypage/res")
   public String reservationList(Model model, Principal principal) {
       if (principal == null) {
-          return "fragments/loginRequired :: fragment";
+          return "user/mypage/sub/ressub";
       }
 
       String username = principal.getName();
       UserVO user = userService.getUserById(username); 
       if (user == null) {
-          return "fragments/loginRequired :: fragment";
+          return "user/mypage/sub/ressub";
       }
 
-      List<ReservationVO> list = userService.getResByUser(user.getUs_num());
+      List<ReservationVO> list = userService.getReservationByUser(user.getUs_num());
       System.out.println("불러온 리스트 : " + list);
       model.addAttribute("reservations", list);
       return "user/mypage/sub/ressub";
   }
 
+  @PostMapping("/mypage/flwrst")
+  public String followRestaurantList(Model model, Principal principal) {
+      if (principal == null) {
+          return "user/mypage/sub/flwrst";
+      }
 
+      String username = principal.getName();
+      UserVO user = userService.getUserById(username); 
+      if (user == null) {
+          return "user/mypage/sub/flwrst";
+      }
+
+      List<RestaurantVO> list = userService.getFollowedRestaurant(user.getUs_num());
+      System.out.println("찜한 리스트 : " + list);
+      model.addAttribute("frestaurants", list);
+      return "user/mypage/sub/flwrst";
+  }
+
+  @PostMapping("/mypage/flwrvw")
+  public String followReviewList(Model model, Principal principal) {
+      if (principal == null) {
+          return "user/mypage/sub/flwrvw";
+      }
+
+      String username = principal.getName();
+      UserVO user = userService.getUserById(username); 
+      if (user == null) {
+          return "user/mypage/sub/flwrvw";
+      }
+
+      List<ReviewVO> list = userService.getFollowedReview(user.getUs_num());
+      System.out.println("찜한 리스트 : " + list);
+      model.addAttribute("freviews", list);
+      return "user/mypage/sub/flwrvw";
+  }
 
 
 

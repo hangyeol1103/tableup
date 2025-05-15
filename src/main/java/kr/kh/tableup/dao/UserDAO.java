@@ -3,6 +3,7 @@ package kr.kh.tableup.dao;
 import java.util.List;
 
 import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.UserVO;
 
@@ -20,5 +21,9 @@ public interface UserDAO {
   
 	List<ReviewVO> selectReviewByUser(int us_num);
 
-	List<ReservationVO> selectResByUser(int us_num);
+	List<ReservationVO> selectReservationByUser(int us_num);
+
+	List<RestaurantVO> selectFollowedRestaurant(Integer us_num);
+
+	List<ReviewVO> selectFollowedReview(Integer us_num);
 }

@@ -17,11 +17,13 @@ public interface AdminDAO {
 	boolean insertRegion(@Param("name") String name);
 	boolean insertDetailRegion(@Param("name") String name);
 	boolean insertTag(@Param("name") String name);
+	boolean insertTagType(@Param("name") String name);
 	
 	//출력
 	List<String> selectRegionList();
 	List<String> selectDetailRegionList();
 	List<String> selectTagList();
+	List<String> selectTagTypeList();
 
 
 

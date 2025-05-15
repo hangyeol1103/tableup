@@ -30,6 +30,10 @@ public class AdminService {
 		return adminDAO.insertTag(name);
 	}
 
+	public boolean insertTagType(String name) {
+		return adminDAO.insertTagType(name);
+	}
+
 	public List<String> getRegionList() {
     return adminDAO.selectRegionList();
 	}
@@ -40,6 +44,10 @@ public class AdminService {
 
 	public List<String> getTagList() {
 		return adminDAO.selectTagList();
+	}
+
+	public List<String> getTagTypeList() {
+		return adminDAO.selectTagTypeList();
 	}
 
 

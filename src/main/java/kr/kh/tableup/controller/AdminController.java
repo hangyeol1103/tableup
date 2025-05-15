@@ -66,6 +66,11 @@ public class AdminController {
     return "admin/tag";
   }
 
+  @GetMapping("/tagtype")
+  public String tagTypePage() {
+    return "admin/tagtype";
+  }
+
   //지역 및 기타 태그들 추가
   @PostMapping("/region/insert")
   @ResponseBody
@@ -118,6 +123,23 @@ public class AdminController {
     map.put("message", result ? "등록 완료" : "등록 실패");
     return map;
   }
+  @PostMapping("/tagtype/insert")
+  @ResponseBody
+  public Map<String, Object> insertTagType(@RequestBody Map<String, String> param) {
+    String name = param.get("tagTypeName");
+    Map<String, Object> map = new HashMap<>();
+
+    if (name == null || name.trim().isEmpty()) {
+        map.put("success", false);
+        map.put("message", "이름이 비어있습니다.");
+        return map;
+    }
+
+    boolean result = adminService.insertTagType(name);
+    map.put("success", result);
+    map.put("message", result ? "등록 완료" : "등록 실패");
+    return map;
+  }
 
   
   
@@ -136,6 +158,11 @@ public class AdminController {
   @ResponseBody
   public List<String> getTagList() {
     return adminService.getTagList();
+  }
+  @GetMapping("/tagtype/list")
+  @ResponseBody
+  public List<String> getTagTypeList() {
+    return adminService.getTagTypeList();
   }
   
   

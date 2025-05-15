@@ -10,32 +10,37 @@
   <div layout:fragment="content" class="container mt-4">
     <div class="input-group mb-3 input-group-lg">
       <span class="input-group-text">태그 추가</span>
-      <input type="text" class="form-control" id="tagName" required>
+      <input type="text" class="form-control" id="tagTypeName" required>
     </div>
   <button type="button" class="btn btn-primary mt-3" id="addBtn">추가</button>
 
   <div class="mt-5">
-    <h5>등록된 태그 목록</h5>
-    <ul id="tagList" class="list-group"></ul>
+    <h5>등록된 태그 타입 목록</h5>
+    <ul id="tagTypeList" class="list-group"></ul>
   </div>
 
 <th:block layout:fragment="script">
 <script>
 document.getElementById("addBtn").addEventListener("click", function() {
-  const tagName = document.getElementById("tagName").value.trim();
-  if (!tagName) {
-    alert("태그를 입력하세요.");
+  const tagTypeName = document.getElementById("tagTypeName").value.trim();
+  if (!tagTypeName) {
+    alert("태그 타입을 입력하세요.");
     return;
   }
-  fetch('/admin/tag/insert', {
+  fetch('/admin/tagtype/insert', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ tagName: tagName })
+    body: JSON.stringify({ tagTypeName: tagTypeName })
   })
   .then(resp => resp.json())
   .then(data => {
+
+
+      console.log("서버 응답:", data);
+
+
     if (data.success) {
       alert("등록 성공!");
       location.reload();
@@ -48,21 +53,21 @@ document.getElementById("addBtn").addEventListener("click", function() {
     alert("요청 중 오류 발생");
   });
 });
-function loadTagList() {
-  fetch("/admin/tag/list")
+function loadTagTypeList() {
+  fetch("/admin/tagtype/list")
     .then((resp) => resp.json())
     .then((data) => {
-      const tagBox = document.getElementById("tagList");
-      tagBox.innerHTML = "";
-      data.forEach((tag) => {
+      const tagTypeBox = document.getElementById("tagTypeList");
+      tagTypeBox.innerHTML = "";
+      data.forEach((tagType) => {
         const li = document.createElement("li");
         li.className = "list-group-item";
-        li.innerText = tag;
-        tagBox.appendChild(li);
+        li.innerText = tagType;
+        tagTypeBox.appendChild(li);
       });
     });
 }
-document.addEventListener("DOMContentLoaded", loadTagList);
+document.addEventListener("DOMContentLoaded", loadTagTypeList);
 </script>
 </body>
 </html>

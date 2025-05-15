@@ -21,6 +21,11 @@
 		INSERT INTO tag (tag_name, tag_tt_num)
 		VALUES (#{name}, 1)
 	</insert>
+	<insert id="insertTagType" parameterType="String">
+		INSERT INTO tagtype (tt_name)
+		VALUES (#{name})
+	</insert>
+
 
 	<select id="selectRegionList" resultType="String">
 		SELECT reg_main FROM region
@@ -30,6 +35,9 @@
 	</select>
 	<select id="selectTagList" resultType="String">
 		SELECT tag_name FROM tag
+	</select>
+	<select id="selectTagTypeList" resultType="String">
+		SELECT tt_name FROM tagtype
 	</select>
 
 </mapper>

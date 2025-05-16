@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
+import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
@@ -68,7 +69,7 @@ public class UserController {
 
     /** 회원가입*/
     @GetMapping("/signup")
-    public String signupForm(Model model, @RequestParam(value = "us_id", required = false) String us_id) {
+    public String signupForm(Model model, @RequestParam(required = false) String us_id) {
       model.addAttribute("url", "/signup");
       model.addAttribute("us_id", us_id);
       return "user/signup";
@@ -198,6 +199,13 @@ public class UserController {
       model.addAttribute("freviews", list);
       return "user/mypage/sub/flwrvw";
   }
+
+  	@GetMapping("/info")
+	public String mypage(Model model, @AuthenticationPrincipal CustomUser customUser) {
+		model.addAttribute("user", customUser.getUser());
+
+        return "user/mypage/info";
+	}
 
 
 

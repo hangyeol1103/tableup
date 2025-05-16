@@ -41,7 +41,7 @@ public class UserService {
     if (id == null || id.isBlank()) {
       return false;
     }
-    return userDAO.selectUser(id) != null;
+    return userDAO.selectUserById(id) != null;
   }
   
   public boolean isPhoneDuplicate(String phone) {
@@ -74,7 +74,12 @@ public class UserService {
       if (us_id == null || us_id.isBlank()) {
           return null;
       }
-      return userDAO.selectUser(us_id);
+      return userDAO.selectUserById(us_id);
+  }
+
+  public UserVO getUserByNum(int us_num) {
+     
+      return userDAO.selectUser(us_num);
   }
 
     /** 회원 정보 수정 */
@@ -98,7 +103,7 @@ public class UserService {
         }
 
         return switch (type) {
-            case "id" -> userDAO.selectUser(value) != null;
+            case "id" -> userDAO.selectUserById(value) != null;
             case "phone" -> userDAO.selectUserByPhone(value) != null;
             case "email" -> userDAO.selectUserByEmail(value) != null;
             default -> false;

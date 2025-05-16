@@ -40,12 +40,19 @@
         <input type="time" class="form-control time-input" name="bd_close" id="bd_close" required>
       </div>
       <div class="mb-3 form-group box">
+        <label for="has_break" class="form-label">브레이크 타임 유무</label>
+        <select class="form-select time-input" id="has_break" required>
+          <option value="true">있음</option>
+          <option value="false">없음</option>
+        </select>
+      </div>
+      <div class="mb-3 form-group box">
         <label for="bd_brstart" class="form-label">브레이크 시작시간</label>
-        <input type="time" class="form-control time-input" name="bd_brstart" id="bd_brstart" required>
+        <input type="time" class="form-control time-input break-time-input" name="bd_brstart" id="bd_brstart" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_brend" class="form-label">브레이크 마감시간</label>
-        <input type="time" class="form-control time-input" name="bd_brend" id="bd_brend" required>
+        <input type="time" class="form-control time-input break-time-input" name="bd_brend" id="bd_brend" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_loam" class="form-label">라스트오더(점심)</label>
@@ -59,22 +66,48 @@
     </form>
 
     <script>
-      $(document).ready(function(){
-        $('#bd_off').change(function(){
-          const isClosed= $(this).val() === 'true';
+      $(document).ready(function () {
 
-          $('.time-input').each(function() {
-            $(this).prop('disabled', isClosed);
-            $(this).prop('required', !isClosed); 
+        function updateTimeInputs() {
+          const isClosed = $('#bd_off').val() === 'true';
+          const hasBreak = $('#has_break').val() === 'true';
+
+          // 공통 시간 입력 필드 (개점, 마감, 라스트오더)
+          const timeFields = ['#bd_open', '#bd_close', '#bd_loam', '#bd_lopm'];
+          // 브레이크 타임 필드
+          const breakFields = ['#bd_brstart', '#bd_brend'];
+
+          // 모든 필드 초기화 및 비활성화/활성화 처리
+          timeFields.forEach(id => {
+            $(id).val(isClosed ? '' : $(id).val()); // 초기화
+            $(id).prop('disabled', isClosed);
+            $(id).prop('required', !isClosed);
           });
-        });
-        $('#bd_off').trigger('change');
+
+          // 브레이크 필드 제어
+          breakFields.forEach(id => {
+            const disable = isClosed || !hasBreak;
+            if (disable) {
+              $(id).val('');
+            }
+            $(id).prop('disabled', disable);
+            $(id).prop('required', !disable);
+          });
+
+          // 브레이크 select도 비활성화
+          $('#has_break').prop('disabled', isClosed);
+        }
+
+        // 이벤트 바인딩
+        $('#bd_off').change(updateTimeInputs);
+        $('#has_break').change(updateTimeInputs);
+
+        // 초기 실행
+        updateTimeInputs();
       });
     </script>
 
+
   </main>
-  
-
-
 </body>
 </html>

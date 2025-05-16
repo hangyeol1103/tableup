@@ -42,7 +42,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<td th:text="${restime.bh_seat_current} ">좌석 점유 수</td>
 					<td th:text="${restime.bh_table_max} ">최대 테이블</td>
 					<td th:text="${restime.bh_table_current} ">테이블 점유 수</td>
-					<td th:text="${restime.bh_state} ">닫힘여부</td>
+					<td th:text="${restime.bh_state != null ? (restime.bh_state ? '닫힘' : '열림') : '-'}">닫힘여부</td>
 					<td class="">
 						<!-- <a th:href="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" class="btn btn-ouline-warning">변경</a> -->
 						<form th:action="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" method="get" style="display:inline;">

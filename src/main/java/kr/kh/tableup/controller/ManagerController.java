@@ -200,6 +200,7 @@ public class ManagerController {
 
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+				System.out.println("매니저 정보가 없습니다.");
         return "redirect:/manager/make";
     }
 

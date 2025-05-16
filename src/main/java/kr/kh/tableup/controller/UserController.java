@@ -1,11 +1,13 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.kh.tableup.model.util.CustomUser;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -238,7 +242,6 @@ public class UserController {
 	}
 
     @GetMapping("/review/insertsub")
-
     public String getRestaurantInfo(@RequestParam("rt_num") int rt_Num, Model model) {
         RestaurantVO restaurant = managerService.getResDetail(rt_Num);
         if (restaurant == null) {
@@ -246,9 +249,57 @@ public class UserController {
         } else {
             model.addAttribute("restaurant", restaurant);
         }
-        return "user/review/insertsub";  // 이 뷰는 fragment 혹은 HTML 일부를 반환
+        return "user/review/insertsub";  // HTML 일부를 반환
     }
 
+
+    @PostMapping("/review/insertPost")
+    public String insertReview(
+        Model model,
+        @ModelAttribute ReviewVO review,
+        Map<String, String> allParams,@RequestParam(required=false) List<MultipartFile> files,@RequestParam(required=false) List<String> fileNames,@RequestParam(required=false) List<String> fileTags,
+        @AuthenticationPrincipal CustomUser user
+    ) {
+        
+        // 사용자 ID 또는 번호를 수동 세팅
+        review.setRev_us_num(user.getUser().getUs_num()); 
+        System.out.println("리뷰 작성자 번호 : " + review.getRev_us_num());
+        if (!userService.insertReview(review)) {
+            model.addAttribute("errorMsg", "빈 내용이 있거나 문제가 생겨 리뷰 저장에 실패했습니다.");
+            model.addAttribute("review", review);
+            return "redirect:user/review/insert";
+        }
+
+
+        // 점수 저장
+        for (Map.Entry<String, String> entry : allParams.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith("score[")) {
+                try {
+                    int rs_st_num = Integer.parseInt(key.substring(6, key.length() - 1));
+                    int rs_score = Integer.parseInt(entry.getValue());
+
+                    if (!userService.insertReviewScore(review, rs_st_num, rs_score)) {
+                        model.addAttribute("errorMsg", "리뷰는 등록됐지만 점수 저장에 실패했습니다.");
+                        return "redirect:/user/review/insert";
+                    }
+                } catch (NumberFormatException e) {
+                    model.addAttribute("errorMsg", "잘못된 점수 형식이 입력되었습니다.");
+                    return "redirect:/user/review/insert";
+                }
+            }
+        }
+
+        // 파일 저장
+        if(!userService.insertFile(review, files, fileNames, fileTags)) {
+            String errorMsg = "리뷰는 등록됐지만 파일 저장에 실패했습니다.";
+            System.out.println(errorMsg);
+            model.addAttribute("errorMsg", errorMsg);
+            return "redirect:/user/review/insert"; // 리뷰 등록 실패
+        }
+
+        return "redirect:/user/review/list";
+    }
 
 
 }

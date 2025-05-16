@@ -3,8 +3,10 @@ package kr.kh.tableup.dao;
 import java.util.List;
 import java.util.Map;
 
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
+import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.UserVO;
@@ -32,4 +34,10 @@ public interface UserDAO {
 	List<ReviewVO> selectFollowedReview(Integer us_num);
 
 	List<ScoreTypeVO> selectScoreTypeList();
+
+	boolean insertReview(ReviewVO review);
+
+	boolean insertReviewScore(ReviewScoreVO reviewScore);
+
+	void insertFile(FileVO fileVO);
 }

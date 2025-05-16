@@ -26,7 +26,7 @@
     <button type="button" class="btn btn-info" onclick="resInfo()">식당 조회</button>
   </div>
   <form th:action="@{/user/review/insertPost}" method="post" enctype="multipart/form-data" id="reviewForm">
-    
+
     <div class="row mb-3">
       <div class="col-md-6">
         <label class="form-label">식당 번호</label>
@@ -34,18 +34,18 @@
       </div>
       <div class="col-md-6">
         <label class="form-label">방문 일자</label>
-        <input type="date" class="form-control" name="rev_visit" required>
+        <input type="date" class="form-control" name="rev_visit" th:value="${review != null} ? ${review.rev_visit}: ''" required>
       </div>
     </div>
 
     <div class="mb-3">
       <label class="form-label">방문 인원</label>
-      <input type="number" class="form-control" name="rev_visitor" min="1" max="99" value="2" required>
+      <input type="number" class="form-control" name="rev_visitor" min="1" max="99" value="2" th:value="${review != null} ? ${review.rev_visitor}: ''" required>
     </div>
 
     <div class="mb-3">
       <label for="rev_content" class="form-label">리뷰 내용</label>
-      <textarea class="form-control" name="rev_content" id="rev_content"></textarea>
+      <textarea class="form-control" name="rev_content" id="rev_content" th:value="${review != null} ? ${review.rev_content}: ''"></textarea>
     </div>
 
     <div class="mb-4">
@@ -62,28 +62,14 @@
       </div>
     </div>
 
-
-
+    <!-- 사진 첨부 영역 -->
     <div class="mb-3">
       <label class="form-label">사진 첨부</label>
-      <div id="file-upload-area">
-        <!-- 첫 입력 셋 -->
-        <div class="file-upload-group mb-2">
-          <input type="file" class="form-control mb-1" name="files" accept="image/*" onchange="addFileInput(this)">
-          <input type="text" class="form-control mb-1" name="fileNames" placeholder="파일 이름을 입력하세요" required>
-          <select class="form-select" name="fileTags" required>
-            <option value="">태그 선택</option>
-            <option value="내부">내부</option>
-            <option value="외부">외부</option>
-            <option value="메뉴판">메뉴판</option>
-            <option value="음식">음식</option>
-            <option value="기타">기타</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-text">사진을 첨부하면 자동으로 입력칸이 추가됩니다.</div>
+      <div id="file-upload-area"></div>
+      <button type="button" class="btn btn-outline-secondary mt-2" onclick="createFileInput()" id="add-file-btn">파일 추가</button>
+      <div class="form-text">사진을 첨부하면 이름과 태그 입력창이 나타납니다.</div>
     </div>
-
+    <!-- 사진 첨부 영역 -->
 
     <div class="d-flex gap-2">
       <button type="submit" class="btn btn-primary">리뷰 작성</button>
@@ -93,7 +79,6 @@
     </div>
   </form>
 
-
   <div class="modal fade" id="resModal" tabindex="-1" aria-labelledby="resModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
@@ -101,21 +86,18 @@
           <h5 class="modal-title" id="resModalLabel">식당 정보</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
         </div>
-        <div class="modal-body" id="resModalBody">
-          <!-- 여기에 insertsub.html 내용이 비동기로 로드됨 -->
-        </div>
+        <div class="modal-body" id="resModalBody"></div>
       </div>
     </div>
   </div>
 
-  <script type="text/javascript">
+  <script>
     function resInfo() {
       const rtNum = document.getElementById("rev_rt_num").value;
       if (!rtNum) {
         alert("식당 번호가 존재하지 않습니다.");
         return;
       }
-
       fetch('/user/review/insertsub?rt_num=' + rtNum)
         .then(response => response.text())
         .then(html => {
@@ -128,46 +110,80 @@
           alert("식당 정보를 불러오지 못했습니다.");
         });
     }
-  </script>
 
-	<script type="text/javascript">
     $(document).ready(function(){
       $('#rev_content').summernote({
-            placeholder: '내용을 입력하세요.',
-            tabsize: 2,
-            height: 400,
-            lang : 'ko-KR'
-          });
+        placeholder: '내용을 입력하세요.',
+        tabsize: 2,
+        height: 400,
+        lang : 'ko-KR'
+      });
     });
-	</script>
-
+  </script>
   <script>
-    function addFileInput(inputElement) {
-      // 사용자가 실제로 파일을 선택한 경우에만
-      if (!inputElement.files || inputElement.files.length === 0) return;
-
+    function createFileInput() {
       const area = document.getElementById("file-upload-area");
+
+      // 파일이 선택되지 않은 그룹이 있는지 확인
+      const incomplete = Array.from(area.querySelectorAll('input[type="file"]'))
+        .some(input => !input.files || input.files.length === 0);
+
+      if (incomplete) {
+        alert("기존에 파일이 선택되지 않은 칸이 있습니다.");
+        return;
+      }
+
       const newGroup = document.createElement("div");
       newGroup.classList.add("file-upload-group", "mb-2");
 
       newGroup.innerHTML = `
-        <input type="file" class="form-control mb-1" name="files" accept="image/*" onchange="addFileInput(this)">
-        <input type="text" class="form-control mb-1" name="fileNames" placeholder="파일 이름을 입력하세요" required>
-        <select class="form-select" name="fileTags" required>
-          <option value="">태그 선택</option>
-          <option value="내부">내부</option>
-          <option value="외부">외부</option>
-          <option value="메뉴판">메뉴판</option>
-          <option value="음식">음식</option>
-          <option value="기타">기타</option>
-        </select>
+        <input type="file" class="form-control mb-1" name="files" accept="image/*" onchange="handleFileSelect(this)">
       `;
 
       area.appendChild(newGroup);
     }
+
+    function handleFileSelect(input) {
+      const parent = input.closest(".file-upload-group");
+
+      // 이미 추가된 경우 방지
+      if (parent.querySelector('input[name="fileNames"]')) return;
+
+      const file = input.files[0];
+      if (!file) return;
+
+      const fileNameInput = document.createElement("input");
+      fileNameInput.type = "text";
+      fileNameInput.className = "form-control mb-1";
+      fileNameInput.name = "fileNames";
+      fileNameInput.placeholder = "파일 이름을 입력하세요";
+      fileNameInput.required = true;
+      fileNameInput.value = file.name;
+
+      const tagSelect = document.createElement("select");
+      tagSelect.className = "form-select mb-1";
+      tagSelect.name = "fileTags";
+      tagSelect.required = true;
+      tagSelect.innerHTML = `
+        <option value="">태그 선택</option>
+        <option value="내부">내부</option>
+        <option value="외부">외부</option>
+        <option value="메뉴판">메뉴판</option>
+        <option value="음식">음식</option>
+        <option value="기타">기타</option>
+      `;
+
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "btn btn-sm btn-danger";
+      delBtn.textContent = "삭제";
+      delBtn.onclick = () => parent.remove();
+
+      parent.appendChild(fileNameInput);
+      parent.appendChild(tagSelect);
+      parent.appendChild(delBtn);
+    }
   </script>
-
-
 </main>
 </body>
 </html>

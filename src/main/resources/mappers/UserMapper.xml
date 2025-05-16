@@ -74,4 +74,59 @@
     FROM ScoreType
 	</select>
 
+	<insert id="insertReview" parameterType="kr.kh.tableup.model.vo.ReviewVO" useGeneratedKeys="true" keyProperty="rev_num">
+		INSERT INTO review (
+			rev_us_num,
+			rev_rt_num,
+			rev_content,
+			rev_created,
+			rev_updated,
+			rev_state,
+			rev_visit,
+			rev_visitor
+		)
+		VALUES (
+			#{rev_us_num},
+			#{rev_rt_num},
+			#{rev_content},
+			now(),
+			now(),
+			0,
+			#{rev_visit},
+			#{rev_visitor}
+		)
+		</insert>
+
+		<insert id ="insertReviewScore" parameterType="kr.kh.tableup.model.vo.ReviewScoreVO">
+		INSERT INTO review_score (
+			rs_rev_num,
+			rs_st_num,
+			rs_score
+		)
+		VALUES (
+			#{rs_rev_num},
+			#{rs_st_num},
+			#{rs_score}
+		)
+		</insert>
+
+		<insert id="insertFile" parameterType="kr.kh.tableup.model.vo.FileVO">
+		INSERT INTO file (
+			file_path,
+			file_name,
+			File_type,
+			File_FOREIGN,
+			file_tag,
+			FILE_RES_NUM
+		)
+		VALUES (
+			#{file_path},
+			#{file_name},
+			#{file_type},
+			#{file_foreign},
+			#{file_tag},
+			#{file_res_num}
+		)
+		</insert>
+
 </mapper>

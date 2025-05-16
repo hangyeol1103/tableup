@@ -1,5 +1,7 @@
 package kr.kh.tableup.model.vo;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,7 +16,7 @@ public class BusinessDateVO {
 	private Date bd_date;
 	
 	private int bd_rt_num;
-	
+
 	private boolean bd_off;
 	@DateTimeFormat(pattern = "HH:mm")
 	private Date bd_open;

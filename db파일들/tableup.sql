@@ -48,15 +48,15 @@ DROP TABLE IF EXISTS `BusinessDate`;
 
 CREATE TABLE `BusinessDate` (
 	`BD_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`BD_DATE`	DATE NOT NULL,
+	`BD_DATE`	DATETIME NOT NULL,
 	`bd_rt_num`	INT	NULL,
 	`BD_OFF`	BOOLEAN NOT NULL,
-	`bd_open`	TIME	NULL,
-	`bd_close`	TIME	NULL,
+	`bd_open`	DATETIME	NULL,
+	`bd_close`	DATETIME	NULL,
 	`bd_brstart`	TIME	NULL,
-	`bd_brend`	TIME	NULL,
-	`bd_loam`	TIME	NULL,
-	`bd_lopm`	TIME	NULL
+	`bd_brend`	DATETIME	NULL,
+	`bd_loam`	DATETIME	NULL,
+	`bd_lopm`	DATETIME	NULL
 );
 
 DROP TABLE IF EXISTS `ResNews`;

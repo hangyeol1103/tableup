@@ -33,6 +33,7 @@ import kr.kh.tableup.service.ManagerService;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -477,7 +478,7 @@ public class ManagerController {
 	}
 
 	@PostMapping("/make_opertime")
-	public String insertOperTime(BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager) {
+	public String insertOperTime( BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager) {
 		opertime.setBd_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
 		System.out.println(opertime);
@@ -525,9 +526,9 @@ public class ManagerController {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
         return "redirect:/manager/make";
     }
-		if(managerService.remakeOperTime(opertime)){
-			return "redirect:/manager/opertimelist/"+rtNum;
-		}
+		// if(managerService.remakeOperTime(opertime)){
+		// 	return "redirect:/manager/opertimelist/"+rtNum;
+		// }
 		return "/manager/remake_opertime";
 	}
 

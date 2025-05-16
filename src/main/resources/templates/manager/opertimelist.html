@@ -34,7 +34,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			</thead>
 			<tbody>
 				<tr th:each="opertime : ${opertimelist}">
-					<td th:text="${opertime.bd_date != null ? #dates.format(opertime.bd_date, 'yyyy년 MM월 dd일') : '-'} ">날짜</td>
+					<td th:text="${opertime.bd_date != null ? #dates.format(opertime.bd_date, 'yyyy-MM-dd') : '-'}">날짜</td>
 					<td th:text="${opertime.bd_off != null ? (opertime.bd_off ? '쉬는날' : '여는날') : '-'}">휴무일 여부</td>
 					<td th:text="${opertime.bd_open != null ? #dates.format(opertime.bd_open, 'HH:mm') : '-'} " >개점 시간</td>
 					<td th:text="${opertime.bd_close != null ? #dates.format(opertime.bd_close, 'HH:mm') : '-'} ">마감 시간</td>

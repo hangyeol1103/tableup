@@ -235,7 +235,7 @@ DROP TABLE IF EXISTS `ReviewScore`;
 
 CREATE TABLE `ReviewScore` (
 	`rs_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`rs_rev_num`	INT	NULL,
+	`rs_rev_num`	INT	NOT NULL,
 	`rs_st_num`	INT	NOT NULL,
 	`rs_score`	INT	NULL
 );
@@ -354,7 +354,7 @@ CREATE TABLE `File` (
     `file_name` VARCHAR(255) NOT NULL,
     `File_type` ENUM('REVIEW', 'RESTAURANTDETAIL', 'MENU') NOT NULL,
     `File_FOREIGN` INT NOT NULL,
-    `file_tag` ENUM('내부', '외부', '메뉴판', '음식', '기타') NOT NULL,
+    `file_tag` ENUM('내부', '외부', '메뉴판', '음식', '기타') NULL,
     `FILE_RES_NUM` INT NOT NULL DEFAULT 0
 );
 

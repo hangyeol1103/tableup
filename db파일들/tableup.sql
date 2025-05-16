@@ -302,6 +302,17 @@ CREATE TABLE `User` (
 	`us_state`	INT NOT NULL DEFAULT 0
 );
 
+DROP TABLE IF EXISTS `UserProfileImage`;
+
+CREATE TABLE `UserProfileImage` (
+  `upi_num` INT PRIMARY KEY AUTO_INCREMENT,
+  `upi_us_num` INT NOT NULL,
+  `upi_file_name` VARCHAR(255) NOT NULL,
+  `upi_file_path` VARCHAR(255),
+  `upi_upload_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`upi_us_num`) REFERENCES `User`(`us_num`) ON DELETE CASCADE
+);
+
 
 DROP TABLE IF EXISTS `BusinessHourTemplate`;
 

@@ -204,6 +204,8 @@ public class UserController {
 	public String mypage(Model model, @AuthenticationPrincipal CustomUser customUser) {
 		model.addAttribute("user", customUser.getUser());
 
+        //model.addAttribute("errorMsg", "에러입니다.");        //post에서 이런식으로 에러 넘기면 될듯
+
         return "user/mypage/info";
 	}
 

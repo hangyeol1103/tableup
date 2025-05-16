@@ -14,12 +14,19 @@ public class BusinessDateVO {
 	private Date bd_date;
 	
 	private int bd_rt_num;
+	
 	private boolean bd_off;
+	@DateTimeFormat(pattern = "HH:mm")
 	private Date bd_open;
+	@DateTimeFormat(pattern = "HH:mm")
 	private Date bd_close;
+	@DateTimeFormat(pattern = "HH:mm")
 	private Date bd_brstart;
+	@DateTimeFormat(pattern = "HH:mm")
 	private Date bd_brend;
+	@DateTimeFormat(pattern = "HH:mm")
 	private Date bd_loam;
+	@DateTimeFormat(pattern = "HH:mm")
 	private Date bd_lopm;
 	
 }

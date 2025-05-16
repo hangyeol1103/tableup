@@ -24,41 +24,41 @@
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_off" class="form-label">휴무일 여부</label>
-         <select class="form-select" name="bd_off" id="bd_off" required>
+         <select th:field="*{bd_off}" class="form-select" name="bd_off" id="bd_off" required>
           <option value="false">여는날</option>
           <option value="true">쉬는날</option>
          </select>
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_open" class="form-label">개점 시간</label>
-        <input type="time" class="form-control time-input" name="bd_open" id="bd_open" required>
+        <input type="time" th:field="*{bd_open}" class="form-control time-input" name="bd_open" id="bd_open">
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_close" class="form-label">마감 시간</label>
-        <input type="time" class="form-control time-input" name="bd_close" id="bd_close" required>
+        <input type="time" th:field="*{bd_close}" class="form-control time-input" name="bd_close" id="bd_close">
       </div>
       <div class="mb-3 form-group box">
         <label for="has_break" class="form-label">브레이크 타임 유무</label>
-        <select class="form-select time-input" id="has_break" required>
+        <select class="form-select time-input" id="has_break">
           <option value="true">있음</option>
           <option value="false">없음</option>
         </select>
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_brstart" class="form-label">브레이크 시작시간</label>
-        <input type="time" class="form-control time-input break-time-input" name="bd_brstart" id="bd_brstart" required>
+        <input type="time" th:field="*{bd_brstart}" class="form-control time-input break-time-input" name="bd_brstart" id="bd_brstart">
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_brend" class="form-label">브레이크 마감시간</label>
-        <input type="time" class="form-control time-input break-time-input" name="bd_brend" id="bd_brend" required>
+        <input type="time" th:field="*{bd_brend}" class="form-control time-input break-time-input" name="bd_brend" id="bd_brend">
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_loam" class="form-label">라스트오더(점심)</label>
-        <input type="time" class="form-control time-input" name="bd_loam" id="bd_loam" required>
+        <input type="time" th:field="*{bd_loam}" class="form-control time-input" name="bd_loam" id="bd_loam">
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_lopm" class="form-label">라스트오더(저녁)</label>
-        <input type="time" class="form-control time-input" name="bd_lopm" id="bd_lopm" required>
+        <input type="time" th:field="*{bd_lopm}" class="form-control time-input" name="bd_lopm" id="bd_lopm">
       </div>
       <button type="submit" class="btn btn-success w-100">영업일자 등록</button>
     </form>

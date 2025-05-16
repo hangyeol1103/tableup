@@ -286,8 +286,10 @@ public class ManagerController {
 	@PostMapping("/make_detail")
 	public String insertResDetailPage(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
 		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    resdetail.setRd_rt_num(rtNum);
+    System.out.println("매니저의 정보: " + manager);
+		System.out.println("매니저의 매장 번호: " + rtNum);
+    resdetail.setRt_num(rtNum);
+		resdetail.setRd_rt_num(rtNum);
 		
 		System.out.println(manager);
 		System.out.println(resdetail);

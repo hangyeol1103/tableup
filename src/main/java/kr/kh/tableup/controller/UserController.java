@@ -21,10 +21,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.UserVO;
+import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.UserService;
 
 @Controller
@@ -33,6 +35,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ManagerService managerService;
 
     /** 로그인*/
     
@@ -218,14 +223,31 @@ public class UserController {
 
         
         List<ScoreTypeVO> scoreTypeList = userService.getScoreType();
-        System.out.println("scoreTypeList: " + scoreTypeList);
+        System.out.println("scoreTypeList: " + scoreTypeList);          
 
 
-        model.addAttribute("rev_rt_num", rt_num);       // 식당 번호
+        if(rt_num != null){
+            model.addAttribute("restaurant", managerService.getResDetail(rt_num)); // 식당 정보
+            model.addAttribute("rev_rt_num", rt_num);       // 식당 번호            (만약 내 리뷰나 식당 페이지에서 넘어올땐 이거 이용해서 식당 번호 띄우기)
+        }else{
+
+        }
         model.addAttribute("scoreTypeList", scoreTypeList);    // 평점 항목
 
         return "user/review/insert";
 	}
+
+    @GetMapping("/review/insertsub")
+
+    public String getRestaurantInfo(@RequestParam("rt_num") int rt_Num, Model model) {
+        RestaurantDetailVO restaurant = managerService.getResDetail(rt_Num);
+        if (restaurant == null) {
+            model.addAttribute("error", "해당 식당 정보를 찾을 수 없습니다.");
+        } else {
+            model.addAttribute("restaurant", restaurant);
+        }
+        return "user/review/insertsub";  // 이 뷰는 fragment 혹은 HTML 일부를 반환
+    }
 
 
 

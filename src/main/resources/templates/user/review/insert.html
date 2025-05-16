@@ -15,7 +15,9 @@
 <body>
 <main layout:fragment="content" class="container mt-5">
   <h2 class="mb-4">리뷰 작성</h2>
-
+  <div class="mt-4 text-end">
+    <button type="button" class="btn btn-info" onclick="resInfo()">식당 정보 보기</button>
+  </div>
   <form th:action="@{/user/review/insertPost}" method="post" enctype="multipart/form-data" id="reviewForm">
     
     <div class="row mb-3">
@@ -68,6 +70,43 @@
       <a th:href="@{/user/review/list}" class="btn btn-outline-dark">리뷰 목록</a>
     </div>
   </form>
+
+
+  <div class="modal fade" id="resModal" tabindex="-1" aria-labelledby="resModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resModalLabel">식당 정보</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body" id="resModalBody">
+          <!-- 여기에 insertsub.html 내용이 비동기로 로드됨 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function resInfo() {
+      const rtNum = document.getElementById("rev_rt_num").value;
+      if (!rtNum) {
+        alert("식당 번호가 존재하지 않습니다.");
+        return;
+      }
+
+      fetch('/user/review/insertsub?rt_num=' + rtNum)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById("resModalBody").innerHTML = html;
+          const modal = new bootstrap.Modal(document.getElementById('resModal'));
+          modal.show();
+        })
+        .catch(error => {
+          console.error("식당 정보를 불러오는 데 실패했습니다:", error);
+          alert("식당 정보를 불러오지 못했습니다.");
+        });
+    }
+  </script>
 </main>
 </body>
 </html>

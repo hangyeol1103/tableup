@@ -14,4 +14,12 @@ public class RestaurantVO {
 	String rt_price_dinner;
 	String rt_accept;
 	String rt_description;
+
+	int rd_num;
+	int rd_rt_num;
+	String rd_phone;
+	String rd_closed_days;
+	String rd_info;
+	String rd_home;
+	String rd_addr;
 }

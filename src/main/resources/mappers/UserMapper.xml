@@ -69,4 +69,9 @@
 		where uf_type = 'REVIEW' and uf_us_num = #{us_num} 
 	</select>
 
+	<select id="selectScoreTypeList" resultType="ScoreTypeVO">
+    SELECT ST_NUM, ST_CATEGORY
+    FROM ScoreType
+	</select>
+
 </mapper>

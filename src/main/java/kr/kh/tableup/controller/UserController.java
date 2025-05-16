@@ -23,6 +23,7 @@ import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
+import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
 
@@ -201,7 +202,7 @@ public class UserController {
   }
 
   	@GetMapping("/info")
-	public String mypage(Model model, @AuthenticationPrincipal CustomUser customUser) {
+	public String myinfo(Model model, @AuthenticationPrincipal CustomUser customUser) {
 		model.addAttribute("user", customUser.getUser());
 
         //model.addAttribute("errorMsg", "에러입니다.");        //post에서 이런식으로 에러 넘기면 될듯
@@ -209,6 +210,22 @@ public class UserController {
         return "user/mypage/info";
 	}
 
+    @GetMapping("/review/insert")
+	public String reviewpage(@RequestParam(required = false) Integer rt_num, Model model, @AuthenticationPrincipal CustomUser customUser) {
+		model.addAttribute("user", customUser.getUser());
+
+        //model.addAttribute("errorMsg", "에러입니다.");        //post에서 이런식으로 에러 넘기면 될듯
+
+        
+        List<ScoreTypeVO> scoreTypeList = userService.getScoreType();
+        System.out.println("scoreTypeList: " + scoreTypeList);
+
+
+        model.addAttribute("rev_rt_num", rt_num);       // 식당 번호
+        model.addAttribute("scoreTypeList", scoreTypeList);    // 평점 항목
+
+        return "user/review/insert";
+	}
 
 
 

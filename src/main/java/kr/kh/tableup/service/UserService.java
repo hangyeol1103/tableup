@@ -1,6 +1,8 @@
 package kr.kh.tableup.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +12,7 @@ import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
+import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.UserVO;
 
 @Service
@@ -137,4 +140,10 @@ public class UserService {
 			
       return userDAO.selectFollowedReview(us_num);
 		}
-}
+
+
+
+    public List<ScoreTypeVO> getScoreType() {
+      return userDAO.selectScoreTypeList();
+    }
+  }

@@ -97,6 +97,7 @@ public class SecurityConfig{
         .securityMatcher("/user/**", "/","/home")
         .csrf(csrf ->csrf.disable())
         .authorizeHttpRequests((requests) -> requests
+        .requestMatchers("/user/review/insert").authenticated()
         .anyRequest().permitAll()  // 그 외 요청은 인증 필요
       )
      

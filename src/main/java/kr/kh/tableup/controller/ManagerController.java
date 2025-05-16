@@ -335,7 +335,6 @@ public class ManagerController {
 	}
 
 	//매니저 쿠폰 페이지
-	
 	//쿠폰 리스트
 	@GetMapping("/couponlist/{rt_num}")
 	public String couponListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
@@ -347,6 +346,37 @@ public class ManagerController {
 		model.addAttribute("manager", manager.getManager());
 		return "manager/couponlist";
 	}
+
+	//쿠폰 등록 페이지
+	@GetMapping("/make_coupon")
+	public String makeCouponPage(Model model) {
+		model.addAttribute("url", "/make_coupon");
+		return "/manager/make_coupon";
+	}
+
+	@PostMapping("/make_coupon")
+	public String insertCoupon(ResCouponVO coupon,  @AuthenticationPrincipal CustomManager manager) {
+		coupon.setRec_rt_num(manager.getManager().getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(coupon);
+		
+		int rtNum = manager.getManager().getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    coupon.setRec_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+				System.out.println("매니저 정보가 없습니다.");
+        return "redirect:/manager/make";
+    }
+
+		if(managerService.makeCoupon(coupon)){
+			return "redirect:/manager/couponlist/"+rtNum;
+		}
+
+		return "/manager/make_coupon/";
+	}
+
 	//매장 소식 페이지
 	//매장 소식 리스트
 	@GetMapping("/newslist/{rt_num}")
@@ -472,7 +502,6 @@ public class ManagerController {
 	@GetMapping("/make_opertime")
 	public String makeOperTimePage(Model model) {
 		
-		model.addAttribute("opertime", new BusinessDateVO());
 		model.addAttribute("url", "/make_opertime");
 		return "/manager/make_opertime";
 	}

@@ -226,6 +226,18 @@ public class ManagerService {
 		return managerDAO.selectCouponList(rt_num);
 	}
 
+	//쿠폰 등록
+	public boolean makeCoupon(ResCouponVO coupon) {
+		if(coupon == null){
+			return false;
+		}
+		boolean res=managerDAO.insertCoupon(coupon);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+
 	//소식 리스트
 	public List<ResNewsVO> getNewsList(int rt_num) {
 			return managerDAO.selectNewsList(rt_num);
@@ -297,6 +309,8 @@ public class ManagerService {
 	public BusinessDateVO getBusinessDate(int bd_num) {
 		return managerDAO.selectBuisnessDate(bd_num);
 	}
+
+	
 
 	
 

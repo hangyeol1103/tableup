@@ -88,5 +88,7 @@ public interface ManagerDAO {
 
 	boolean updateDetail(RestaurantVO resdetail);
 
+	boolean insertCoupon(ResCouponVO coupon);
+
 	
 }

@@ -17,24 +17,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <body>
 	<main layout:fragment="content" class="container">
 		<div>			
-			<h2 class="mb-4 fw-bold text-primary">메뉴 정보</h2>
-
-			<div class="input-group form-group menu-img">
-				<img th:src="@{/file/{nenuImage}(menuImage=${menu.mn_img})}" alt="이미지 없음" width="100%"></img>
-			</div>
+			<h2 class="mb-4 fw-bold text-primary">쿠폰 정보</h2>
 			<div>
-				<h1 th:text="${menu.mn_name}">메뉴 이름</h1>
-				<h3 class="menu-price" th:text="${#numbers.formatInteger(menu.mn_price, 3, 'COMMA')} + '원'"></h3>
 				<div class="input-group form-group">
-					<div class="form-control col-3">메뉴 구분:</div>
+					<div class="form-control col-3">쿠폰 내용</div>
 					<div class="form-control" th:text="${menutype.mt_name}"></div>
 				</div>
 				<div class="input-group form-group">
-					<div class="form-control col-3">메뉴 설명:</div>
+					<div class="form-control col-3">쿠폰 상태</div>
 					<div class="form-control" th:text="${menu.mn_content}"></div>
 				</div>
 				<div class="input-group form-group">
-					<div class="form-control col-3">메뉴 색인:</div>
+					<div class="form-control col-3">쿠폰 기간</div>
 					<div class="form-control" th:text="${menu.mn_div}"></div>
 				</div>
 			</div>

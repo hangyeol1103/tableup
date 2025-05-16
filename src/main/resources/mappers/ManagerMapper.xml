@@ -130,6 +130,11 @@
 		select * from rescoupon where rec_rt_num=#{rt_num}
 	</select>
 
+	<insert id="insertCoupon" useGeneratedKeys="true" keyProperty="rec_num">
+		insert into rescoupon (rec_content, rec_state, rec_period rec_rt_num)
+		value (#{rec_conten},#{rec_state},#{rec_period},#{rec_rt_num})
+	</insert>
+
 	<!-- 소식 -->
 	<select id="selectNewsList" resultType="ResNewsVO">
 		select * from resnews where rn_rt_num=#{rt_num}

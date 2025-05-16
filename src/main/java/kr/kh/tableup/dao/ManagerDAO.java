@@ -84,5 +84,9 @@ public interface ManagerDAO {
 
 	BusinessDateVO selectBuisnessDate(int bd_num);
 
+	boolean insertResDetail(RestaurantVO resdetail);
+
+	boolean updateDetail(RestaurantVO resdetail);
+
 	
 }

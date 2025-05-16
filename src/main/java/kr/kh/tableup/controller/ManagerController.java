@@ -285,7 +285,7 @@ public class ManagerController {
 	}
 	
 	@PostMapping("/make_detail")
-	public String insertResDetailPage(RestaurantDetailVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
+	public String insertResDetailPage(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
 		int rtNum = manager.getManager().getRm_rt_num();
     System.out.println("매니저의 매장 번호: " + rtNum);
     resdetail.setRd_rt_num(rtNum);
@@ -312,7 +312,7 @@ public class ManagerController {
 	}
 	
 	@PostMapping("/remake_detail")
-	public String updateDetail(RestaurantDetailVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
+	public String updateDetail(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
 		int rtNum = manager.getManager().getRm_rt_num();
     System.out.println("매니저의 매장 번호: " + rtNum);
     resdetail.setRd_rt_num(rtNum);
@@ -328,7 +328,7 @@ public class ManagerController {
 		if(managerService.updateDetail(resdetail)){
 			return "redirect:/manager/restaurantdetail/"+ rtNum;
 		}
-		
+		System.out.println("수정 실패");
 		return "/manager/remake_detail";
 	}
 
@@ -469,6 +469,8 @@ public class ManagerController {
 	//영업 일자 등록 페이지
 	@GetMapping("/make_opertime")
 	public String makeOperTimePage(Model model) {
+		
+		model.addAttribute("opertime", new BusinessDateVO());
 		model.addAttribute("url", "/make_opertime");
 		return "/manager/make_opertime";
 	}

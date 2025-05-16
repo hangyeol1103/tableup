@@ -212,12 +212,12 @@ public class ManagerService {
 	}
 
 	//상세 정보 등록하기
-	public boolean insertResDetail(RestaurantDetailVO resdetail) {
+	public boolean insertResDetail(RestaurantVO resdetail) {
 		return managerDAO.insertResDetail(resdetail);
 	}
 
 	//상세 정보 수정하기
-	public boolean updateDetail(RestaurantDetailVO resdetail) {
+	public boolean updateDetail(RestaurantVO resdetail) {
 		return managerDAO.updateDetail(resdetail);
 	}
 

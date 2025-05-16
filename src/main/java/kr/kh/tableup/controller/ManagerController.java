@@ -435,6 +435,7 @@ public class ManagerController {
 		}
 		return "/manager/remake_restime";
 	}
+
 	//예약 가능 시간 삭제
 	@PostMapping("/delete_restime/{bh_num}")
 	public String deleteResTime(@AuthenticationPrincipal CustomManager manager, @PathVariable int bh_num) {
@@ -492,6 +493,39 @@ public class ManagerController {
 		}
 
 		return "/manager/make_opertime/";
+	}
+
+	//영업 일자 변경
+	@GetMapping("/remake_opertime/{bd_num}")
+	public String reMakeOperTimePage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int bd_num) {
+		BusinessDateVO opertime = managerService.getBusinessDate(bd_num);
+    System.out.println(opertime);
+		model.addAttribute("opertime", opertime);
+		model.addAttribute("url", "/remake_opertime");
+		return "/manager/remake_opertime";
+	}
+	
+	@PostMapping("/remake_opertime")
+	public String updateOpertime(BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager ) {
+		opertime.setBd_rt_num(manager.getManager().getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(opertime);
+		
+		int rtNum = manager.getManager().getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    opertime.setBd_rt_num(rtNum);
+		System.out.println("수정할 bh_num = " + opertime.getBd_num());
+
+    
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+		if(managerService.remakeOperTime(opertime)){
+			return "redirect:/manager/opertimelist/"+rtNum;
+		}
+		return "/manager/remake_opertime";
 	}
 
 }

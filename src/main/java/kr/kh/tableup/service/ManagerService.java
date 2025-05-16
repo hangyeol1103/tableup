@@ -294,6 +294,10 @@ public class ManagerService {
 		return true;
 	}
 
+	public BusinessDateVO getBusinessDate(int bd_num) {
+		return managerDAO.selectBuisnessDate(bd_num);
+	}
+
 	
 
 }

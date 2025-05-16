@@ -82,5 +82,7 @@ public interface ManagerDAO {
 
 	boolean insertOperTime(BusinessDateVO opertime);
 
+	BusinessDateVO selectBuisnessDate(int bd_num);
+
 	
 }

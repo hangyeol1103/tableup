@@ -34,20 +34,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			</thead>
 			<tbody>
 				<tr th:each="opertime : ${opertimelist}">
-					<td th:text="${opertime.bd_date} ">날짜</td>
+					<td th:text="${opertime.bd_date != null ? #dates.format(opertime.bd_date, 'yyyy년 MM월 dd일') : '-'} ">날짜</td>
 					<td th:text="${opertime.bd_off != null ? (opertime.bd_off ? '쉬는날' : '여는날') : '-'}">휴무일 여부</td>
-					<td th:text="${opertime.bd_open} ">개점 시간</td>
-					<td th:text="${opertime.bd_close} ">마감 시간</td>
-					<td th:text="${opertime.bd_brstart} ">브레이크 타임(시작)</td>
-					<td th:text="${opertime.bd_brend} ">브레이크 타임(마감)</td>
-					<td th:text="${opertime.bd_loam} ">라스트오더 시간(점심)</td>
-					<td th:text="${opertime.bd_lopm} ">라스트오더 시간(저녁)</td>
+					<td th:text="${opertime.bd_open != null ? #dates.format(opertime.bd_open, 'HH:mm') : '-'} " >개점 시간</td>
+					<td th:text="${opertime.bd_close != null ? #dates.format(opertime.bd_close, 'HH:mm') : '-'} ">마감 시간</td>
+					<td th:text="${opertime.bd_brstart != null ? #dates.format(opertime.bd_brstart, 'HH:mm') : '-'} ">브레이크 타임(시작)</td>
+					<td th:text="${opertime.bd_brend != null ? #dates.format(opertime.bd_brend, 'HH:mm') : '-'} ">브레이크 타임(마감)</td>
+					<td th:text="${opertime.bd_loam != null ? #dates.format(opertime.bd_loam, 'HH:mm') : '-'} ">라스트오더 시간(점심)</td>
+					<td th:text="${opertime.bd_lopm != null ? #dates.format(opertime.bd_lopm, 'HH:mm') : '-'} ">라스트오더 시간(저녁)</td>
 					<!-- 영업 시간 수정버튼 -->
 					<td class="">
 						<form th:action="@{/manager/remake_opertime/{bd_num}(bd_num=${opertime.bd_num})}" method="get" style="display:inline;">
 							<button type="submit" class="btn btn-outline-primary">영업 시간 정보 변경</button>
 						</form>
-						<form th:action="@{/manager/delete_opertime/{bd_num}(bd_num=${restime.bd_num})}" method="post" style="display:inline;">
+						<form th:action="@{/manager/delete_opertime/{bd_num}(bd_num=${opertime.bd_num})}" method="post" style="display:inline;">
 							<button type="submit" class="btn btn-outline-danger">영업 시간 정보 삭제</button>
 						</form>
 					</td>

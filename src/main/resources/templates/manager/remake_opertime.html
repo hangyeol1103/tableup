@@ -16,11 +16,11 @@
   </head>
 <body>
   <main div class="container mt-4"layout:fragment="content" >
-    <h2>영업일자 등록</h2>
-    <form th:action="@{/manager/make_opertime}" method="post" id="signup-form">
+    <h2>영업일자 변경</h2>
+    <form th:action="@{/manager/remake_opertime}" method="post" id="signup-form">
       <div class="mb-3 form-group box">
         <label for="bd_date" class="form-label">영업 날짜</label>
-        <input type="date"  class="form-control" name="bd_date" id="bd_date" required>
+        <input type="date" class="form-control" name="bd_date" id="bd_date" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_off" class="form-label">휴무일 여부</label>
@@ -60,7 +60,7 @@
         <label for="bd_lopm" class="form-label">라스트오더(저녁)</label>
         <input type="time" class="form-control time-input" name="bd_lopm" id="bd_lopm" required>
       </div>
-      <button type="submit" class="btn btn-success w-100">영업일자 등록</button>
+      <button type="submit" class="btn btn-success w-100">영업변경 등록</button>
     </form>
 
     <script>

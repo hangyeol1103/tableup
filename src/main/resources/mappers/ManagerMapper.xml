@@ -176,5 +176,9 @@
 			 #{bd_close}, #{bd_brstart}, #{bd_brend},
 			 #{bd_loam}, #{bd_lopm}, #{bd_rt_num})
 	</insert>
+
+	<select id="selectBuisnessDate" resultType="BusinessDateVO">
+		select * from businessdate where bd_num=#{bd_num}
+	</select>
 	
 </mapper>

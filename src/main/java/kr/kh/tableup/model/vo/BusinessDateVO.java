@@ -10,16 +10,16 @@ import lombok.Data;
 public class BusinessDateVO {
 	private int bd_num;
 	
-	//@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private String bd_date;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date bd_date;
 	
 	private int bd_rt_num;
 	private boolean bd_off;
-	private String bd_open;
-	private String bd_close;
-	private String bd_brstart;
-	private String bd_brend;
-	private String bd_loam;
-	private String bd_lopm;
+	private Date bd_open;
+	private Date bd_close;
+	private Date bd_brstart;
+	private Date bd_brend;
+	private Date bd_loam;
+	private Date bd_lopm;
 	
 }

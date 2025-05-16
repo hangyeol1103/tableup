@@ -131,8 +131,8 @@
 	</select>
 
 	<insert id="insertCoupon" useGeneratedKeys="true" keyProperty="rec_num">
-		insert into rescoupon (rec_content, rec_state, rec_period rec_rt_num)
-		value (#{rec_conten},#{rec_state},#{rec_period},#{rec_rt_num})
+		insert into rescoupon (rec_content, rec_state, rec_period, rec_rt_num)
+		value (#{rec_content},#{rec_state},#{rec_period},#{rec_rt_num})
 	</insert>
 
 	<!-- 소식 -->
@@ -185,5 +185,22 @@
 	<select id="selectBuisnessDate" resultType="BusinessDateVO">
 		select * from businessdate where bd_num=#{bd_num}
 	</select>
+
+	<update id="updateOperTime">
+		update businessdate set
+			bd_date = #{bd_date}, 
+			bd_off = #{bd_off}, 
+			bd_open = #{bd_open}, 
+			bd_close = #{bd_close}, 
+			bd_brstart = #{bd_brstart}, 
+			bd_brend = #{bd_brend}, 
+			bd_loam = #{bd_loam}, 
+			bd_lopm = #{bd_lopm}
+		where bd_num = #{bd_num}
+	</update>
+
+	<delete id="deleteOperTime">
+		delete from businessdate where bd_num =#{bd_num}
+	</delete>
 	
 </mapper>

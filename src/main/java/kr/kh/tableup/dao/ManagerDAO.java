@@ -66,6 +66,8 @@ public interface ManagerDAO {
 
 	List<ResCouponVO> selectCouponList(int rt_num);
 
+	boolean insertCoupon(ResCouponVO coupon);
+
 	List<ResNewsVO> selectNewsList(int rt_num);
 
 	List<BusinessHourVO> selectResTimeList(int rt_num);
@@ -88,7 +90,9 @@ public interface ManagerDAO {
 
 	boolean updateDetail(RestaurantVO resdetail);
 
-	boolean insertCoupon(ResCouponVO coupon);
+	boolean updateOperTime(BusinessDateVO opertime);
+
+	boolean deleteOperTime(int bd_num);
 
 	
 }

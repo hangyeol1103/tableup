@@ -310,6 +310,25 @@ public class ManagerService {
 		return managerDAO.selectBuisnessDate(bd_num);
 	}
 
+	//영업일자 변경
+	public boolean remakeOperTime(BusinessDateVO opertime) {
+	if(opertime==null){
+			return false;
+		}
+		boolean res =managerDAO.updateOperTime(opertime);
+		if(!res){
+			System.out.println("수정 실패");
+			return false;
+		}
+		System.out.println("수정 성공");
+		return true;
+	}
+
+	//영업일자 삭제
+	public boolean deleteOperTime(int bd_num) {
+		return managerDAO.deleteOperTime(bd_num);
+	}
+
 	
 
 	

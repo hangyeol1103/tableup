@@ -13,7 +13,7 @@ public class BusinessDateVO {
 	private int bd_num;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date bd_date;
+	private String bd_date;
 	
 	private int bd_rt_num;
 

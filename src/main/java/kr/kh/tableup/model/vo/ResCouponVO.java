@@ -13,7 +13,7 @@ public class ResCouponVO {
 	boolean rec_state;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	Date rec_period;
+	String rec_period;
 	
 	int rec_rt_num;
 }

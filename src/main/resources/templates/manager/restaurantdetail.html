@@ -24,7 +24,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 	<main layout:fragment="content" class="container">
 		<!-- 매장 정보가 등록이 되어 있으면-->
 		
-		<div th:if="${resdetail != null}">
+		<div th:if="${resdetail.rd_num>0}">
 			<div>
 				<button type="button" class="btn btn-outline-info col-12 mt-3 mb-3" onclick="location.href='/manager/remake_detail'">상세 정보 변경</button>
 			</div>			
@@ -52,7 +52,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
 		</div>
 			<!-- 매장 상세 정보가 등록이 되어 있지 않으면-->
-		<div th:unless="${resdetail != null}">
+		<div th:unless="${resdetail.rd_num>0}">
 			<h3>아직 상세정보를 입력하지 않앗습니다.</h3>
       <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_detail'">상세정보 입력</button>
 		</div>

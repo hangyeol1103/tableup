@@ -272,9 +272,8 @@ public class ManagerController {
 	@GetMapping("/restaurantdetail/{rt_num}")
 	public String restaurantDetailPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
 		RestaurantVO resdetail = managerService.getResDetail(rt_num);
-
+		if(resdetail != null) model.addAttribute("resdetail", resdetail);
 		model.addAttribute("manager", manager.getManager());
-		model.addAttribute("resdetail", resdetail);
 		return "/manager/restaurantdetail";
 	}
 

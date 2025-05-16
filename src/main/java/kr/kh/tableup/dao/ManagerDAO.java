@@ -94,5 +94,11 @@ public interface ManagerDAO {
 
 	boolean deleteOperTime(int bd_num);
 
+	ResCouponVO selectCoupon(int rec_num);
+
+	boolean updateCoupon(ResCouponVO coupon);
+
+	boolean deleteCoupon(int rec_num);
+
 	
 }

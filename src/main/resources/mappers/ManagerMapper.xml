@@ -135,6 +135,18 @@
 		value (#{rec_content},#{rec_state},#{rec_period},#{rec_rt_num})
 	</insert>
 
+	<update id="updateCoupon">
+		update rescoupon set
+			rec_content = #{rec_content}, 
+			rec_state = #{rec_state}, 
+			rec_period = #{rec_period}
+		where rec_num=#{rec_num}
+	</update>
+
+	<delete id="deleteCoupon">
+		delete from rescoupon where rec_num=#{rec_num}
+	</delete>
+
 	<!-- 소식 -->
 	<select id="selectNewsList" resultType="ResNewsVO">
 		select * from resnews where rn_rt_num=#{rt_num}
@@ -202,5 +214,9 @@
 	<delete id="deleteOperTime">
 		delete from businessdate where bd_num =#{bd_num}
 	</delete>
+
+	<select id="selectCoupon" resultType="ResCouponVO">
+		select * from rescoupon where rec_num=#{rec_num}
+	</select>
 	
 </mapper>

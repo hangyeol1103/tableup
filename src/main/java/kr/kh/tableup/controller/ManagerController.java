@@ -377,6 +377,56 @@ public class ManagerController {
 		return "/manager/make_coupon/";
 	}
 
+	//쿠폰 정보 출력 페이지
+	@GetMapping("/coupon/{rec_num}")
+	public String detailCoupon(Model model, @PathVariable int rec_num) {
+		ResCouponVO coupon = managerService.getCoupon(rec_num);
+		model.addAttribute("coupon", coupon);
+		return "/manager/coupon";
+	}
+
+	//쿠폰 수정 페이지
+	@GetMapping("/remake_coupon/{rec_num}")
+	public String reMakeCouponPage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int rec_num) {
+		ResCouponVO coupon = managerService.getCoupon(rec_num);
+    System.out.println(coupon);
+		model.addAttribute("coupon", coupon);
+		model.addAttribute("url", "/remake_coupon");
+		return "/manager/remake_coupon";
+	}
+	
+	@PostMapping("/remake_coupon")
+	public String updateCoupon(ResCouponVO coupon,  @AuthenticationPrincipal CustomManager manager) {
+		coupon.setRec_rt_num(manager.getManager().getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(coupon);
+		
+		int rtNum = manager.getManager().getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    coupon.setRec_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+
+		if(managerService.updateCoupon(coupon)){
+			return "redirect:/manager/couponlist/"+rtNum;
+		}
+		
+		return "/manager/remake_coupon";
+	}
+
+	//쿠폰 삭제
+	@PostMapping("/coupon/delete_coupon/{rec_num}")
+	public String deleteCouponPage(@AuthenticationPrincipal CustomManager manager, @PathVariable int rec_num) {
+		int rtNum = manager.getManager().getRm_rt_num();
+		 if(managerService.deleteCoupon(rec_num)) {
+        return "redirect:/manager/couponlist/"+rtNum;
+    }
+		return "redirect:/manager/coupon?rec_num=" + rec_num;
+	}
+
 	//매장 소식 페이지
 	//매장 소식 리스트
 	@GetMapping("/newslist/{rt_num}")

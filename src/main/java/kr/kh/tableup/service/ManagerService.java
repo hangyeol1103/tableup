@@ -238,6 +238,29 @@ public class ManagerService {
 		return true;
 	}
 
+	//쿠폰 상세 정보
+	public ResCouponVO getCoupon(int rec_num) {
+		return managerDAO.selectCoupon(rec_num);
+	}
+
+	//쿠폰 정보 변경
+	public boolean updateCoupon(ResCouponVO coupon) {
+		System.out.println(coupon);
+		if(coupon == null){
+			return false;
+		}
+		boolean res = managerDAO.updateCoupon(coupon);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+	
+	//쿠폰 정보 삭제
+	public boolean deleteCoupon(int rec_num) {
+		return managerDAO.deleteCoupon(rec_num);
+	}
+
 	//소식 리스트
 	public List<ResNewsVO> getNewsList(int rt_num) {
 			return managerDAO.selectNewsList(rt_num);
@@ -328,6 +351,8 @@ public class ManagerService {
 	public boolean deleteOperTime(int bd_num) {
 		return managerDAO.deleteOperTime(bd_num);
 	}
+
+	
 
 	
 

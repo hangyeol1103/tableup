@@ -17,8 +17,9 @@
   </head>
 <body>
   <main div class="container mt-4"layout:fragment="content" >
-    <h2>쿠폰 등록</h2>
-    <form th:action="@{/manager/make_coupon}" method="post" id="signup-form" >
+    <h2>쿠폰 정보 변경</h2>
+    <form th:action="@{/manager/remake_coupon}" method="post" id="signup-form" >
+      <input type="hidden" name="rec_num" th:value="${coupon.rec_num}" />
       <div class="mb-3 form-group box">
         <label for="rec_content" class="form-label">쿠폰 내용</label>
         <input type="text" class="form-control" name="rec_content" id="rec_content" required>
@@ -34,7 +35,7 @@
         <label for="rec_period" class="form-label">쿠폰 기간</label>
          <input type="text" class="form-control" name="rec_period" id="rec_period" required>
       </div>
-      <button type="submit" class="btn btn-success w-100">쿠폰 등록</button>
+      <button type="submit" class="btn btn-success w-100">쿠폰 변경</button>
     </form>
 
   </main>

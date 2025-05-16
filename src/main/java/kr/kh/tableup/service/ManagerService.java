@@ -36,6 +36,9 @@ public class ManagerService {
   PasswordEncoder passwordEncoder;
 	
 	public boolean insertManager(RestaurantManagerVO rm) {
+		if(rm == null){
+			return false;
+		}
 		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
 		return managerDAO.insertManager(rm);
 	}
@@ -165,6 +168,7 @@ public class ManagerService {
 	}
 
 	public boolean updateMenu(MenuVO menu, MultipartFile mn_img2) {
+		System.out.println(menu);
 		if(menu == null){
 			return false;
 		}
@@ -216,6 +220,7 @@ public class ManagerService {
 
 	public boolean makeResTiem(BusinessHourVO restime) {
 		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
+
 			return false;
 		}
 		boolean res =managerDAO.insertResTime(restime);
@@ -225,15 +230,29 @@ public class ManagerService {
 		return true;
 	}
 
+	public BusinessHourVO getBusinessHour(int bh_num) {
+			return managerDAO.selectBusinessHour(bh_num);
+		}
+
 	public boolean remakeResTime(BusinessHourVO restime) {
+		System.out.println(restime);
 		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
+			System.out.println("수정 실패");
 			return false;
 		}
 		boolean res =managerDAO.updateResTime(restime);
 		if(!res){
+				System.out.println("수정 실패");
 			return false;
 		}
+		System.out.println("수정 성공");
 		return true;
 	}
+
+	public boolean deleteResTime(int bh_num) {
+		return managerDAO.deleteResTime(bh_num);
+	}
+
+	
 
 }

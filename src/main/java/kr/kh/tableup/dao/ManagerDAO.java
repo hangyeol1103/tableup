@@ -71,7 +71,11 @@ public interface ManagerDAO {
 
 	boolean insertResTime(BusinessHourVO restime);
 
+	BusinessHourVO selectBusinessHour(int bh_num);
+
 	boolean updateResTime(BusinessHourVO restime);
+
+	boolean deleteResTime(int bh_num);
 
 	
 }

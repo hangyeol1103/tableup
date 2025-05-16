@@ -144,6 +144,10 @@
 		value(#{bh_start}, #{bh_end}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
 	</insert>
 
+	<select id="selectBusinessHour" resultType="BusinessHourVO">
+		select * from businesshour where bh_num=#{bh_num}
+	</select>
+
 	<update id="updateResTime">
 		update businesshour set
 			bh_start = #{bh_start}, 
@@ -151,7 +155,11 @@
 			bh_seat_max = #{bh_seat_max}, 
 			bh_table_max = #{bh_table_max},
 			bh_state = #{bh_state}
-		where bh_rt_num=#{bh_rt_num}
+		where bh_num=#{bh_num}
 	</update>
+
+	<delete id="deleteResTime">
+		delete from businesshour where bh_num = #{bh_num}
+	</delete>
 	
 </mapper>

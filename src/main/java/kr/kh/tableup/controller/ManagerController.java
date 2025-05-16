@@ -354,17 +354,6 @@ public class ManagerController {
 		model.addAttribute("manager", manager);
 		return "manager/newslist";
 	}
-	//영업 시간 페이지
-	@GetMapping("/opertimelist/{rt_num}")
-	public String OperTimePage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal RestaurantManagerVO manager) {
-		System.out.println("opertimelist rt_num: " + rt_num);
-		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
-
-		model.addAttribute("opertimelist", opertimelist);
-		model.addAttribute("rt_num", rt_num);
-		model.addAttribute("manager", manager);
-		return "manager/opertimelist";
-	}
 
 	//예약 가능 시간 페이지
 	//예약 가능 시간 목록(리스트)
@@ -412,7 +401,9 @@ public class ManagerController {
 	//예약 시간 변경
 	@GetMapping("/remake_restime/{bh_num}")
 	public String reMakeResTimePage(Model model, @AuthenticationPrincipal RestaurantManagerVO manager, @PathVariable int bh_num) {
-
+		BusinessHourVO restime = managerService.getBusinessHour(bh_num);
+    System.out.println(restime);
+		model.addAttribute("restime", restime);
 		model.addAttribute("url", "/remake_restime");
 		return "/manager/remake_restime";
 	}
@@ -423,9 +414,13 @@ public class ManagerController {
 		System.out.println(manager);
 		System.out.println(restime);
 		
+		// 매장 번호, 수정할 예약 시간 번호 설정
 		int rtNum = manager.getRm_rt_num();
     System.out.println("매니저의 매장 번호: " + rtNum);
     restime.setBh_rt_num(rtNum);
+		System.out.println("수정할 bh_num = " + restime.getBh_num());
+
+    
 
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
@@ -438,6 +433,15 @@ public class ManagerController {
 		}
 		return "/manager/remake_restime";
 	}
+	//예약 가능 시간 삭제
+	@PostMapping("/delete_restime/{bh_num}")
+	public String deleteResTime(@AuthenticationPrincipal RestaurantManagerVO manager, @PathVariable int bh_num) {
+		int rtNum = manager.getRm_rt_num();
+		 if(managerService.deleteResTime(bh_num)) {
+        return "redirect:/manager/restimelist/"+rtNum;
+    }
+		return "redirect:/manager/restimelist/"+rtNum;
+	}
 
 	//날짜 입력 처리(HH:mm)
 	@InitBinder
@@ -445,5 +449,17 @@ public class ManagerController {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 		dateFormat.setLenient(false);
 		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+	}
+
+	//영업 시간 페이지
+	@GetMapping("/opertimelist/{rt_num}")
+	public String OperTimePage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal RestaurantManagerVO manager) {
+		System.out.println("opertimelist rt_num: " + rt_num);
+		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
+
+		model.addAttribute("opertimelist", opertimelist);
+		model.addAttribute("rt_num", rt_num);
+		model.addAttribute("manager", manager);
+		return "manager/opertimelist";
 	}
 }

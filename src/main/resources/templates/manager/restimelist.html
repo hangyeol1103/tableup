@@ -44,8 +44,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<td th:text="${restime.bh_table_current} ">테이블 점유 수</td>
 					<td th:text="${restime.bh_state} ">닫힘여부</td>
 					<td class="">
-						<a th:href="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" class="btn btn-ouline-warning">변경</a>
-						<a th:href="@{/manager/delete_restime/{bh_num}(bh_num=${restime.bh_num})}" class="btn btn-ouline-danger">삭제</a>
+						<!-- <a th:href="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" class="btn btn-ouline-warning">변경</a> -->
+						<form th:action="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" method="get" style="display:inline;">
+							<button type="submit" class="btn btn-outline-warning">변경</button>
+						</form>
+						<form th:action="@{/manager/delete_restime/{bh_num}(bh_num=${restime.bh_num})}" method="post" style="display:inline;">
+							<button type="submit" class="btn btn-outline-danger">삭제</button>
+						</form>
 					</td>
 				</tr>
 				<!-- 매장 정보가 등록이 되어 있지 않으면-->

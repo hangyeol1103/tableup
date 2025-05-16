@@ -18,9 +18,14 @@ public class UserDetailService implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    UserVO user = userDAO.selectUser(username);
-    if (user == null) throw new UsernameNotFoundException("사용자 없음");
-    return new CustomUser(user);
+			System.out.println("로그인 시도: " + username); 
+			UserVO user = userDAO.selectUser(username);
+			if (user == null) throw new UsernameNotFoundException("사용자 없음");
+			System.out.println("불러온 비밀번호: " + user.getUs_pw());
+			System.out.println("UserDetails.getPassword(): " + user.getUs_pw());
+
+			return new CustomUser(user); 
 	}
+
 
 }

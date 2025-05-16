@@ -1,38 +1,54 @@
 <!DOCTYPE html>
-<html lang="en"
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
-  layout:decorate="~{layout/layout.html}">
-  <head>
-    <title>회원가입</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </head>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>회원가입</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 <body>
-  <div class="container mt-4" layout:fragment="content">
-    <h2>회원가입</h2>
-    <form th:action="@{/user/signup}" method="post" id="signupForm">
-      <div class="form-group">
-        <label for="us_id">아이디</label>
-        <div class="input-group">
-            <input type="text" class="form-control" id="us_id" name="us_id" required>
-            <button type="button" class="btn btn-secondary" onclick="checkDuplicate('id')">중복확인</button>
-        </div>
-        <small id="idCheckResult" class="form-text"></small>
+<div class="container mt-4" layout:fragment="content">
+  <h2 class="mb-4">회원가입</h2>
+  <form th:action="@{/user/signupPost}" method="post" id="signupForm">
+    <div class="mb-3">
+      <label for="us_id" class="form-label">아이디</label>
+      <div class="input-group">
+        <input type="text" class="form-control" name="us_id" id="us_id" placeholder="아이디를 입력하세요" th:value="${us_id}" required>
+        <button type="button" class="btn btn-outline-secondary" onclick="checkDuplicate('id')">중복확인</button>
       </div>
-      <div class="mb-3">
-        <label for="us_pw" class="form-label">비밀번호</label>
-        <input type="password" class="form-control" name="us_pw" id="us_pw" required>
+      <small class="form-text text-muted" id="idResult"></small>
+    </div>
+
+    <div class="mb-3">
+      <label for="us_pw" class="form-label">비밀번호</label>
+      <input type="password" id="us_pw" name="us_pw" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="us_email" class="form-label">이메일</label>
+      <div class="input-group">
+        <input type="email" id="us_email" name="us_email" class="form-control" required>
+        <button type="button" class="btn btn-outline-secondary" onclick="checkDuplicate('email')">중복확인</button>
       </div>
-      <div class="form-group">
-        <label for="us_email">이메일</label>
-        <div class="input-group">
-            <input type="email" class="form-control" id="us_email" name="us_email" required>
-            <button type="button" class="btn btn-secondary" onclick="checkDuplicate('email')">중복확인</button>
-        </div>
-        <small id="emailCheckResult" class="form-text"></small>
+      <small class="form-text text-muted" id="emailResult"></small>
+    </div>
+
+    <div class="mb-3">
+      <label for="us_name" class="form-label">이름</label>
+      <input type="text" id="us_name" name="us_name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="us_nickname" class="form-label">닉네임</label>
+      <input type="text" id="us_nickname" name="us_nickname" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="us_phone" class="form-label">전화번호</label>
+      <div class="input-group">
+        <input type="tel" id="us_phone" name="us_phone" class="form-control" required>
+        <button type="button" class="btn btn-outline-secondary" onclick="checkDuplicate('phone')">중복확인</button>
       </div>
       <div class="mb-3">
         <label for="us_name" class="form-label">이름</label>
@@ -66,7 +82,7 @@
             alert('값을 입력해주세요.');
             return;
           }
-          fetch(`/check-duplicate?type=${type}&value=${value}`)
+          fetch(`/user/check-duplicate?type=${type}&value=${value}`)
             .then(response => {
               if (!response.ok) throw new Error('Network response was not ok');
               return response.json();
@@ -95,16 +111,18 @@
               alert('중복 확인 중 오류가 발생했습니다.');
             });
         }
-        window.checkDuplicate = checkDuplicate;
-  
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-          if (idDuplicate || emailDuplicate || phoneDuplicate) {
-            alert('중복 항목이 있습니다. 중복확인을 다시 해주세요.');
-            e.preventDefault();
-          }
-        });
+      }).catch(() => {
+        alert("중복 확인 중 오류 발생");
       });
-    </script>
-  </div>
+    
+
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      if (duplicateStatus.id || duplicateStatus.email || duplicateStatus.phone) {
+        alert("중복 확인이 완료되지 않았습니다.");
+        e.preventDefault();
+      }
+    });
+  </script>
+</div>
 </body>
 </html>

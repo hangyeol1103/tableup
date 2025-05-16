@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.UserDAO">
 	<select id="selectUser" resultType="userVO">
-		select * from User where us_id = #{id}
+		select * from User where us_id = #{us_id}
 	</select>
 	<insert id="insertUser">
 		INSERT INTO User (
@@ -37,4 +37,33 @@
 	<select id="selectUserByEmail" resultType="kr.kh.tableup.model.vo.UserVO">
 		SELECT * FROM user WHERE us_email = #{email}
 	</select>
+
+	<select id="selectReviewByUser" resultType="kr.kh.tableup.model.vo.ReviewVO">
+		SELECT * FROM review 
+		LEFT JOIN user ON us_num = rev_us_num
+		LEFT JOIN restaurant ON rt_num = rev_rt_num
+		WHERE rev_us_num = #{us_num} and rev_state = 0
+	</select>
+
+	<select id="selectReservationByUser" resultType="kr.kh.tableup.model.vo.ReservationVO">
+		SELECT * FROM Reservation 
+		LEFT JOIN user ON us_num = res_us_num
+		LEFT JOIN restaurant ON rt_num = res_rt_num
+		WHERE res_us_num = #{us_num}
+	</select>
+
+	<select id="selectFollowedRestaurant" resultType="kr.kh.tableup.model.vo.RestaurantVO">
+		select * from usfollow 
+		join restaurant on uf_foreign = rt_num
+		where uf_type = 'RESTAURANT' and uf_us_num = #{us_num} 
+	</select>
+
+	<select id="selectFollowedReview" resultType="kr.kh.tableup.model.vo.ReviewVO">
+		select * from usfollow 
+		join REVIEW on uf_foreign = rev_num
+		join restaurant on rt_num = rev_rt_num
+		join user on us_num = rev_us_num
+		where uf_type = 'REVIEW' and uf_us_num = #{us_num} 
+	</select>
+
 </mapper>

@@ -159,6 +159,8 @@ INSERT INTO usercoupon(UC_STATE,UC_ReC_NUM,UC_us_num)
 	VALUES (0,1,1);	
     
     
+INSERT INTO usfollow(uf_us_num, uf_TYPE, uf_FOREIGN)
+	VALUES (1,"RESTAURANT", 1),(1,"REVIEW", 1),(1,"RESTAURANT", 2);
 
 
     

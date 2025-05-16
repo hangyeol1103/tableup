@@ -2,10 +2,11 @@ package kr.kh.tableup.model.vo;
 
 import java.util.Date;
 
+
 import lombok.Data;
 
 @Data
-public class UserVO {
+public class UserVO{
   private Integer us_num;
   private String us_id;
   private String us_pw;
@@ -16,4 +17,5 @@ public class UserVO {
   private Boolean us_sociallogin;
   private Date us_created;
   private int us_state;
+
 }

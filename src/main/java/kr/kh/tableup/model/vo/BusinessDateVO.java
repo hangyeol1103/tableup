@@ -2,19 +2,24 @@ package kr.kh.tableup.model.vo;
 
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.Data;
 
 @Data
 public class BusinessDateVO {
-	int bd_num;
-	Date bd_date;
-	int bd_rt_num;
-	boolean bd_off;
-	String bd_open;
-	String bd_close;
-	String bd_brstart;
-	String bd_brend;
-	String bd_loam;
-	String bd_lopm;
+	private int bd_num;
+	
+	//@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private String bd_date;
+	
+	private int bd_rt_num;
+	private boolean bd_off;
+	private String bd_open;
+	private String bd_close;
+	private String bd_brstart;
+	private String bd_brend;
+	private String bd_loam;
+	private String bd_lopm;
 	
 }

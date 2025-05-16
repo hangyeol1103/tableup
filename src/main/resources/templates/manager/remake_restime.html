@@ -20,6 +20,7 @@
   <main div class="container mt-4"layout:fragment="content" >
     <h2>예약시간 변경</h2>
     <form th:action="@{/manager/remake_restime}" method="post" id="signup-form">
+      <input type="hidden" name="bh_num" th:value="${restime.bh_num}" />
       <div class="mb-3 form-group box">
         <label for="bh_start" class="form-label">예약시간(시작)</label>
         <input type="time" class="form-control" name="bh_start" id="bh_start" required>

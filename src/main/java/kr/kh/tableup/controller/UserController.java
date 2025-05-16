@@ -240,7 +240,7 @@ public class UserController {
     @GetMapping("/review/insertsub")
 
     public String getRestaurantInfo(@RequestParam("rt_num") int rt_Num, Model model) {
-        RestaurantDetailVO restaurant = managerService.getResDetail(rt_Num);
+        RestaurantVO restaurant = managerService.getResDetail(rt_Num);
         if (restaurant == null) {
             model.addAttribute("error", "해당 식당 정보를 찾을 수 없습니다.");
         } else {

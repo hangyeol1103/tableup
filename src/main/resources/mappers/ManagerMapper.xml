@@ -104,8 +104,10 @@
 	</delete>
 
 	<!-- 매장 상세정보 -->
-	<select id="selectResDetail" resultType="RestaurantDetailVO">
-		select * from restaurantdetail where rd_rt_num=#{rt_num}
+	<select id="selectResDetail" resultType="RestaurantVO">
+		select * from restaurant 
+		LEFT join restaurantdetail on rd_rt_num = rt_num 
+		where rt_num=#{rt_num}
 	</select>
 
 	<insert id="insertResDetail" useGeneratedKeys="true" keyProperty="rd_num">
@@ -161,5 +163,18 @@
 	<delete id="deleteResTime">
 		delete from businesshour where bh_num = #{bh_num}
 	</delete>
+
+	<select id="selectOperTimeList" resultType="BusinessDateVO">
+		select * from businessdate where bd_rt_num=#{rt_num}
+	</select>
+
+	<insert id="insertOperTime" useGeneratedKeys="true" keyProperty="bd_num">
+		insert into `businessdate`
+			(bd_date, bd_off, bd_open, bd_close, bd_brstart, bd_brend, bd_loam, bd_lopm, bd_rt_num)
+		value
+			(#{bd_date}, #{bd_off}, #{bd_open},
+			 #{bd_close}, #{bd_brstart}, #{bd_brend},
+			 #{bd_loam}, #{bd_lopm}, #{bd_rt_num})
+	</insert>
 	
 </mapper>

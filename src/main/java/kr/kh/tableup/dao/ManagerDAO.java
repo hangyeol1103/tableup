@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -57,7 +58,7 @@ public interface ManagerDAO {
 
 	boolean deleteMenu(int mn_num);
 
-	RestaurantDetailVO selectResDetail(int rt_num);
+	RestaurantVO selectResDetail(int rt_num);
 
 	boolean insertResDetail(RestaurantDetailVO resdetail);
 
@@ -76,6 +77,10 @@ public interface ManagerDAO {
 	boolean updateResTime(BusinessHourVO restime);
 
 	boolean deleteResTime(int bh_num);
+
+	List<BusinessDateVO> selectOperTimeList(int rt_num);
+
+	boolean insertOperTime(BusinessDateVO opertime);
 
 	
 }

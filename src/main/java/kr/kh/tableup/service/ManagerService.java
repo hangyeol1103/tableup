@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.dao.ManagerDAO;
 import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -95,22 +96,26 @@ public class ManagerService {
 			e.printStackTrace();
 		}
 	}
-
+	//음식분류(대분류) 리스트
 	public List<FoodCategoryVO> getFoodCategory() {
 		return managerDAO.selectFoodCategoryList();
 	}
 
+	//지역(대분류) 리스트
 	public List<RegionVO> getRegion() {
 	return managerDAO.selectRegionList();
 	}
 
+	//지역(소분류) 리스트
 	public List<DetailRegionVO> getDetailRegion() {
 		return managerDAO.selectDetailRegionList();
 	}
 
+	//음식(소분류) 리스트
 	public List<DetailFoodCategoryVO> getDetailFood() {
 	return managerDAO.selectDetailFoodList();
 	}
+
 
 	public List<DetailFoodCategoryVO> getDetailByFcNum(int fc_num) {
 		return managerDAO.selectDetailByFcNum(fc_num);
@@ -120,14 +125,17 @@ public class ManagerService {
 		return managerDAO.selectDetailByRegNum(reg_num);
 	}
 
+	//메뉴 리스트
 	public List<MenuVO> getMenuList(int rt_num) {
 		return managerDAO.selectMenuList(rt_num);
 	}
 
+	//메뉴 분류 리스트
 	public List<MenuTypeVO> getMenuTypeList() {
 		return managerDAO.selectMenuTypeList();
 	}
 
+	//메뉴 등록
 	public boolean makeMenu(MenuVO menu, MultipartFile mn_img) {
 		if(menu == null|| mn_img == null|| mn_img.getOriginalFilename().isEmpty()){
 			return false;
@@ -159,14 +167,17 @@ public class ManagerService {
 		return index < 0 ? null : fileName.substring(index);
 	}
 
+	//헤당 메뉴 정보 불러오기
 	public MenuVO getMenu(int mn_num) {
 		return managerDAO.selectMenu(mn_num);
 	}
 
+	//헤당 메뉴분류 정보 불러오기
 	public MenuTypeVO getMenuType(int mn_mt_num) {
 		return managerDAO.selectMenuType(mn_mt_num);
 	}
 
+	//메뉴 정보 변경
 	public boolean updateMenu(MenuVO menu, MultipartFile mn_img2) {
 		System.out.println(menu);
 		if(menu == null){
@@ -189,35 +200,43 @@ public class ManagerService {
 			return false;
 		}
 	}
-
+	
+	//메뉴 정보 삭제
 	public boolean deleteMenu(int mn_num) {
 		return managerDAO.deleteMenu(mn_num);
 	}
 
-	public RestaurantDetailVO getResDetail(int rt_num) {
+	//상세 정보 가져오기
+	public RestaurantVO getResDetail(int rt_num) {
 		return managerDAO.selectResDetail(rt_num);
 	}
 
+	//상세 정보 등록하기
 	public boolean insertResDetail(RestaurantDetailVO resdetail) {
 		return managerDAO.insertResDetail(resdetail);
 	}
 
+	//상세 정보 수정하기
 	public boolean updateDetail(RestaurantDetailVO resdetail) {
 		return managerDAO.updateDetail(resdetail);
 	}
 
+	//쿠폰 리스트
 	public List<ResCouponVO> getCouponList(int rt_num) {
 		return managerDAO.selectCouponList(rt_num);
 	}
 
+	//소식 리스트
 	public List<ResNewsVO> getNewsList(int rt_num) {
 			return managerDAO.selectNewsList(rt_num);
 	}
 
+	//예약 가능 시간 출력
 	public List<BusinessHourVO> getResTimeList(int rt_num) {
 		return managerDAO.selectResTimeList(rt_num);
 	}
 
+	//예약 가능 시간 등록
 	public boolean makeResTiem(BusinessHourVO restime) {
 		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
 
@@ -230,10 +249,12 @@ public class ManagerService {
 		return true;
 	}
 
+	//예약 가능시간 가져오기
 	public BusinessHourVO getBusinessHour(int bh_num) {
 			return managerDAO.selectBusinessHour(bh_num);
 		}
 
+	//예약 가능시간 수정하기
 	public boolean remakeResTime(BusinessHourVO restime) {
 		System.out.println(restime);
 		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
@@ -249,8 +270,28 @@ public class ManagerService {
 		return true;
 	}
 
+	//예약 가능시간 삭제하기
 	public boolean deleteResTime(int bh_num) {
 		return managerDAO.deleteResTime(bh_num);
+	}
+
+	//영업일자 리스트 출력
+	public List<BusinessDateVO> getOperTimeList(int rt_num) {
+		return managerDAO.selectOperTimeList(rt_num);
+	}
+
+	//영업일자 등록
+	public boolean makeOperTime(BusinessDateVO opertime) {
+		if(opertime==null){
+			return false;
+		}
+		boolean res =managerDAO.insertOperTime(opertime);
+		if(!res){
+			System.out.println("등록 실패");
+			return false;
+		}
+		System.out.println("등록 성공");
+		return true;
 	}
 
 	

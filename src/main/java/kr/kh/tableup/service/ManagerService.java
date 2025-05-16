@@ -352,6 +352,34 @@ public class ManagerService {
 		return managerDAO.deleteOperTime(bd_num);
 	}
 
+	//소식/공지사항 등록
+	public boolean makeNews(ResNewsVO news) {
+		if(news == null || news.getRn_content().isEmpty()){
+			return false;
+		}
+		boolean res = managerDAO.insertNews(news);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+	//공지사항 정보 출력
+	public ResNewsVO getNews(int rn_num) {
+		return managerDAO.selectResNews(rn_num);
+	}
+
+	//공지사항 변경 
+	public boolean updateNews(ResNewsVO news) {
+		if(news == null || news.getRn_content().isEmpty()){
+			return false;
+		}
+		boolean res = managerDAO.updateNews(news);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+
 	
 
 	

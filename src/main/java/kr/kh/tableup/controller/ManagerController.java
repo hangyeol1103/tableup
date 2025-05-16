@@ -439,6 +439,85 @@ public class ManagerController {
 		model.addAttribute("manager", manager.getManager());
 		return "manager/newslist";
 	}
+	@GetMapping("/make_news")
+	public String makeNewsPage(Model model) {
+		model.addAttribute("url", "/make_news");
+		return "/manager/make_news";
+	}
+
+	@PostMapping("/make_news")
+	public String insertCoupon(ResNewsVO news,  @AuthenticationPrincipal CustomManager manager) {
+		news.setRn_rt_num(manager.getManager().getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(news);
+		
+		int rtNum = manager.getManager().getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    news.setRn_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+				System.out.println("매니저 정보가 없습니다.");
+        return "redirect:/manager/make";
+    }
+
+		if(managerService.makeNews(news)){
+			return "redirect:/manager/newslist/"+rtNum;
+		}
+
+		return "/manager/make_news/";
+	}
+
+	//소식 정보 출력 페이지
+	@GetMapping("/news/{rn_num}")
+	public String detailNews(Model model, @PathVariable int rn_num) {
+		ResNewsVO news = managerService.getNews(rn_num);
+		model.addAttribute("news", news);
+		return "/manager/news";
+	}
+
+	//소식 수정 페이지
+	@GetMapping("/remake_news/{rn_num}")
+	public String reMakeNewsPage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int rn_num) {
+		ResNewsVO news = managerService.getNews(rn_num);
+    System.out.println(news);
+		model.addAttribute("news", news);
+		model.addAttribute("url", "/remake_news");
+		return "/manager/remake_news";
+	}
+	
+	@PostMapping("/remake_news")
+	public String updateNews(ResNewsVO news,  @AuthenticationPrincipal CustomManager manager) {
+		news.setRn_rt_num(manager.getManager().getRm_rt_num());
+		System.out.println(manager);
+		System.out.println(news);
+		
+		int rtNum = manager.getManager().getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+    news.setRn_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+
+		if(managerService.updateNews(news)){
+			return "redirect:/manager/newslist/"+rtNum;
+		}
+		
+		return "/manager/remake_news";
+	}
+
+	//소식 삭제
+	@PostMapping("/news/delete_news/{rn_num}")
+	public String deleteNewsPage(@AuthenticationPrincipal CustomManager manager, @PathVariable int rn_num) {
+		int rtNum = manager.getManager().getRm_rt_num();
+		 if(managerService.deleteNews(rn_num)) {
+        return "redirect:/manager/newslist/"+rtNum;
+    }
+		return "redirect:/manager/news?rec_num=" + rn_num;
+	}
+
 
 	//예약 가능 시간 페이지
 	//예약 가능 시간 목록(리스트)

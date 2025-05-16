@@ -100,5 +100,11 @@ public interface ManagerDAO {
 
 	boolean deleteCoupon(int rec_num);
 
+	boolean insertNews(ResNewsVO news);
+
+	ResNewsVO selectResNews(int rn_num);
+
+	boolean updateNews(ResNewsVO news);
+
 	
 }

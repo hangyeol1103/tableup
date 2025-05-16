@@ -218,5 +218,20 @@
 	<select id="selectCoupon" resultType="ResCouponVO">
 		select * from rescoupon where rec_num=#{rec_num}
 	</select>
+
+	<insert id="insertNews" useGeneratedKeys="true" keyProperty="rn_num">
+		insert into resnews (rn_content, rn_state, rn_rt_num)
+		value (#{rn_content}, #{rn_state}, #{rn_rt_num})
+	</insert>
+
+	<select id="selectResNews" resultType="ResNewsVO">
+		select * from resnews where rn_num=#{rn_num}
+	</select>
 	
+	<update id="updateNews">
+		update resnews set
+			rn_content = #{rn_content}, 
+			rn_state = #{rn_state}
+		where rn_num=#{rn_num}
+	</update>
 </mapper>

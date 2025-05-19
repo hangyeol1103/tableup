@@ -380,6 +380,10 @@ public class ManagerService {
 		return true;
 	}
 
+	public boolean deleteNews(int rn_num) {
+		return managerDAO.deleteNews(rn_num);
+	}
+
 	
 
 	

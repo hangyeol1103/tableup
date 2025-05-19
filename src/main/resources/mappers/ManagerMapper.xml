@@ -234,4 +234,8 @@
 			rn_state = #{rn_state}
 		where rn_num=#{rn_num}
 	</update>
+
+	<delete id="deleteNews">
+		delete from resnews where rn_num=#{rn_num}
+	</delete>
 </mapper>

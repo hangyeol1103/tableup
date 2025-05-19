@@ -30,7 +30,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			</div>
 			<div>
 				<!-- <button type="button" class="btn btn-outline-warning col-12 mb-3" onclick="location.href='/manager/remake_menu'">메뉴 정보 변경</button> -->
-				<a th:href="@{/manager/remake_news(rn_num=${news.rn_num})}"class="btn btn-outline-warning col-12 mb-3">소식/공지사항 변경</a>
+				<a th:href="@{/manager/remake_news/{rn_num}(rn_num=${news.rn_num})}"class="btn btn-outline-warning col-12 mb-3">소식/공지사항 변경</a>
 				<form th:action="@{/manager/news/delete_news/{rn_num}(rn_num=${news.rn_num})}"  method="post">
 					<button type="submit" class="btn btn-outline-danger col-12 mb-3" onclick="return confirm('정말 삭제하시겠습니까?');">소식/공지사항 삭제</button>
 				</form>

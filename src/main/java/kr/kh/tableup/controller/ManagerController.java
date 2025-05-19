@@ -472,6 +472,7 @@ public class ManagerController {
 	@GetMapping("/news/{rn_num}")
 	public String detailNews(Model model, @PathVariable int rn_num) {
 		ResNewsVO news = managerService.getNews(rn_num);
+		System.out.println(news);
 		model.addAttribute("news", news);
 		return "/manager/news";
 	}

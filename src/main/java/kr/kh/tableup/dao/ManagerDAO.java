@@ -106,5 +106,7 @@ public interface ManagerDAO {
 
 	boolean updateNews(ResNewsVO news);
 
+	boolean deleteNews(int rn_num);
+
 	
 }

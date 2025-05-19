@@ -101,6 +101,7 @@ public class ManagerController {
 		
 		System.out.println(manager.getRm_id());
 		System.out.println(restaurant);
+		System.out.println(manager);
 		
 		model.addAttribute("manager", manager);
 		model.addAttribute("restaurant", restaurant);

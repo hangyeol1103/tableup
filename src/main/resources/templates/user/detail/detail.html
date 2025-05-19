@@ -233,9 +233,8 @@
                 >인원수</label
               >
               <select id="select-people" class="form-select mb-3">
-                <option selected disabled>선택</option>
                 <option value="1">1명</option>
-                <option value="2">2명</option>
+                <option value="2" selected>2명</option>
                 <option value="3">3명</option>
                 <option value="4">4명</option>
                 <option value="5">5명</option>
@@ -305,39 +304,34 @@
         selectTime.innerHTML = ""; // 초기화
 
         const now = new Date();
-        let hour = now.getHours();
-        let minute = now.getMinutes();
 
-        // 현재 기준으로 가장 가까운 "미래" 30분 단위 시간 계산
-        if (minute >= 30) {
-          hour += 1;
-          minute = 0;
-        } else {
-          minute = 30;
-        }
-
-        // 기본 선택값으로 설정할 문자열
-        const closestFutureTime = `${String(hour).padStart(2, "0")}:${String(
-          minute
-        ).padStart(2, "0")}`;
+        // 현재 시간 + 30분을 기준으로 예약 가능 시간 설정
+        const minReservable = new Date(now.getTime() + 30 * 60 * 1000);
+        let firstAvailableSelected = false;
 
         for (let h = 7; h < 31; h++) {
           for (let m of [0, 30]) {
-            let realH = h % 24;
-            let timeStr = `${String(realH).padStart(2, "0")}:${String(
+            const realH = h % 24;
+            const timeStr = `${String(realH).padStart(2, "0")}:${String(
               m
             ).padStart(2, "0")}`;
 
-            const option = document.createElement("option");
-            option.value = timeStr;
-            option.textContent = timeStr;
+            // 시간 비교용 객체
+            const timeObj = new Date(now);
+            timeObj.setHours(realH, m, 0, 0);
 
-            // 현재 시간 이후 중 가장 가까운 시간 선택
-            if (timeStr === closestFutureTime) {
-              option.selected = true;
+            if (timeObj >= minReservable) {
+              const option = document.createElement("option");
+              option.value = timeStr;
+              option.textContent = timeStr;
+
+              if (!firstAvailableSelected) {
+                option.selected = true;
+                firstAvailableSelected = true;
+              }
+
+              selectTime.appendChild(option);
             }
-
-            selectTime.appendChild(option);
           }
         }
       </script>

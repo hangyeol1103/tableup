@@ -205,30 +205,48 @@
             <div class="fw-bold">인터넷 예약</div>
             <div>기다릴 필요 없이 바로 실시간 예약</div>
           </div>
-          <p></p>
-          <input
-            type="text"
-            id="reservation-date"
-            class="form-control"
-            placeholder="날짜 선택"
-          />
+          <!-- ✅ 달력이 이 div 안에 상시 표시됨 -->
+          <div id="reservation-calendar" class="mt-3"></div>
+
+          <!-- 선택한 날짜 보여주고 싶으면 아래 추가 -->
+          <p class="fw-bold text-center mt-2">
+            선택 날짜: <span id="selected-date">없음</span>
+          </p>
 
           <script>
-            flatpickr("#reservation-date", {
-              minDate: "today", // 오늘 이전 날짜 선택 불가
-              defaultDate: "today", // 오늘 날짜 자동 선택
+            flatpickr("#reservation-calendar", {
+              inline: true,
+              minDate: "today",
+              defaultDate: "today",
               dateFormat: "Y-m-d",
-              locale: "ko", // 한글화 (별도 파일 불러오면 완전한 한글화 가능)
+              locale: "ko",
+
+              onReady: function (selectedDates, dateStr, instance) {
+                document.getElementById("selected-date").textContent = dateStr;
+
+                // ✅ 달력 헤더: 년 → 월 순서로 재배치
+                const monthElement = instance.calendarContainer.querySelector(
+                  ".flatpickr-current-month"
+                );
+                if (monthElement) {
+                  const yearInput =
+                    monthElement.querySelector(".numInputWrapper");
+                  const monthSelect = monthElement.querySelector(
+                    ".flatpickr-monthDropdown-months"
+                  );
+
+                  if (yearInput && monthSelect) {
+                    monthElement.insertBefore(yearInput, monthSelect);
+                  }
+                }
+              },
+
+              onChange: function (selectedDates, dateStr) {
+                document.getElementById("selected-date").textContent = dateStr;
+              },
             });
           </script>
 
-          <p class="fw-bold text-center">방문날짜</p>
-          <p class="fw-bold text-center">달력 추가 예정</p>
-          <p></p>
-          <p></p>
-          <p></p>
-          <p></p>
-          <p></p>
           <p class="fw-bold text-center">인원수&nbsp;&nbsp;X명</p>
           <p class="fw-bold text-center">시간&nbsp;&nbsp;00:00</p>
           <button type="button" class="btn btn-warning d-block mx-auto">

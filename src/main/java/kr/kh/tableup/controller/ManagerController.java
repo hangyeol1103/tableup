@@ -58,8 +58,10 @@ public class ManagerController {
 	
 
 	@GetMapping("/main")
-	public String manager(Model model) {
+	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
+		System.out.println(manager);
 		model.addAttribute("url","/main");
+		model.addAttribute("manager", manager);
 		return "manager/main";
 	}
 	

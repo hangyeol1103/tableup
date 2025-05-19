@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -107,6 +108,8 @@ public interface ManagerDAO {
 	boolean updateNews(ResNewsVO news);
 
 	boolean deleteNews(int rn_num);
+
+	List<BusinessHourTemplateVO> selectTemplateList(int rt_num);
 
 	
 }

@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import kr.kh.tableup.dao.ManagerDAO;
 import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -382,6 +383,14 @@ public class ManagerService {
 
 	public boolean deleteNews(int rn_num) {
 		return managerDAO.deleteNews(rn_num);
+	}
+
+	public RestaurantVO getRestaurantByNum(int rt_num) {
+		return managerDAO.selectRestaurant(rt_num);
+	}
+
+	public List<BusinessHourTemplateVO> getTemplateList(int rt_num) {
+		return managerDAO.selectTemplateList(rt_num);
 	}
 
 	

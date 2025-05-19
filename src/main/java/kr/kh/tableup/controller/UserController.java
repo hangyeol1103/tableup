@@ -249,6 +249,12 @@ public class UserController {
         return "user/review/insertsub";  // 이 뷰는 fragment 혹은 HTML 일부를 반환
     }
 
+    @GetMapping("/detail")
+    public String detailPage() {
+      return "user/detail/detail";
+    }
+
+
 
 
 }

@@ -24,6 +24,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -249,7 +251,7 @@ public class UserController {
         } else {
             model.addAttribute("restaurant", restaurant);
         }
-        return "user/review/insertsub";  // HTML 일부를 반환
+        return "user/review/insertsub";  
     }
 
 
@@ -301,5 +303,19 @@ public class UserController {
         return "redirect:/user/review/list";
     }
 
+    @GetMapping("/list")
+    public String list(Model model, @RequestParam(required = false) Integer dreg_num, @RequestParam(required = false) Integer dfc_num) {
+
+        List<RegionVO> regionList = userService.getRegionList();
+        List<FoodCategoryVO> foodList = userService.getFoodCategoryList();
+
+        model.addAttribute("regionList", regionList);
+        model.addAttribute("foodList", foodList);
+
+        
+        //model.addAttribute("param", new FilterParam(regionNum, foodNum)); 
+
+        return "user/list/list"; 
+    }
 
 }

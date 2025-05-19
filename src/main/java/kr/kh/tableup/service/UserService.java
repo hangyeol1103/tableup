@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewScoreVO;
@@ -232,6 +234,20 @@ public class UserService {
 	private String getSuffix(String fileName) {
 		int index = fileName.lastIndexOf(".");
 		return index < 0 ? null : fileName.substring(index);
+	}
+
+
+
+	public List<RegionVO> getRegionList() {
+		
+    return userDAO.selectRegionList();
+	}
+
+
+
+	public List<FoodCategoryVO> getFoodCategoryList() {
+		
+    return userDAO.selectFoodCategoryList();
 	}
 
 

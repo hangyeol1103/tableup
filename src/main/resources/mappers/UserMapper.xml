@@ -129,4 +129,14 @@
 		)
 		</insert>
 
+		<select id="selectRegionList" resultType="kr.kh.tableup.model.vo.RegionVO">
+		SELECT reg_num, reg_main, dreg_num, dreg_sub FROM region
+		RIGHT JOIN detailregion ON reg_num = dreg_reg_num
+		</select>
+
+		<select id="selectFoodCategoryList" resultType="kr.kh.tableup.model.vo.FoodCategoryVO">
+		SELECT fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory
+		RIGHT JOIN detailfoodcategory ON fc_num = dfc_fc_num
+		</select>
+
 </mapper>

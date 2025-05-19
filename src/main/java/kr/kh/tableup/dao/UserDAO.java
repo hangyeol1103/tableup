@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewScoreVO;
@@ -40,4 +42,8 @@ public interface UserDAO {
 	boolean insertReviewScore(ReviewScoreVO reviewScore);
 
 	void insertFile(FileVO fileVO);
+
+	List<RegionVO> selectRegionList();
+
+	List<FoodCategoryVO> selectFoodCategoryList();
 }

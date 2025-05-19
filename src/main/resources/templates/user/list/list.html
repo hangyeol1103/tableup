@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>식당 목록</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<main layout:fragment="content" class="container mt-5">
+  <h2>식당 목록</h2>
+
+  <!-- ✅ 검색 필터 -->
+  <form id="filterForm" class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label class="form-label">지역</label>
+      <select class="form-select" name="dreg_num" id="regionSelect">
+        <option value="">전체</option>
+        <option th:each="region : ${regionList}"
+                th:value="${region.dreg_num}"
+                th:text="${region.dreg_sub}"
+                th:selected="${region.dreg_num == param.dreg_num}"></option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">음식 종류</label>
+      <select class="form-select" name="dfc_num" id="foodSelect">
+        <option value="">전체</option>
+        <option th:each="food : ${foodList}"
+                th:value="${food.dfc_num}"
+                th:text="${food.dfc_sub}"
+                th:selected="${food.dfc_num == param.dfc_num}"></option>
+      </select>
+    </div>
+
+    <div class="col-md-4 d-flex align-items-end">
+      <button type="button" class="btn btn-primary w-100" onclick="loadList()">검색</button>
+    </div>
+  </form>
+
+  <div id="restaurantList">
+    <!-- sub.html -->
+  </div>
+
+  <script>
+    function loadList() {
+      const region = $('#regionSelect').val();
+      const food = $('#foodSelect').val();
+
+      const url = `/restaurant/list/sub?dreg_num=${region}&dfc_num=${food}`;
+
+      $.ajax({
+        url: url,
+        type: 'post',
+        success: function (data) {
+          $('#restaurantList').html(data);
+        },
+        error: function () {
+          $('#restaurantList').html('<div class="text-danger">불러오는 데 실패했습니다.</div>');
+        }
+      });
+    }
+
+    // 페이지 로드시 바로 로드
+    $(document).ready(function() {
+      loadList();
+    });
+  </script>
+</main>
+</body>
+</html>

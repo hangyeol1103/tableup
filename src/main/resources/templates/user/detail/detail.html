@@ -250,12 +250,13 @@
 
               <!-- 시간 선택 -->
               <label for="select-time" class="form-label fw-bold">시간</label>
-              <select id="select-time" class="form-select mb-3">
-                <option selected disabled>선택</option>
-              </select>
+              <select id="select-time" class="form-select mb-3"></select>
             </div>
 
-            <button type="button" class="btn btn-warning btn-lg d-block mx-auto">
+            <button
+              type="button"
+              class="btn btn-warning btn-lg d-block mx-auto"
+            >
               예약하기
             </button>
             <button
@@ -298,6 +299,47 @@
             document.getElementById("selected-date").textContent = dateStr;
           },
         });
+
+        // 시간 선택 반복문
+        const selectTime = document.getElementById("select-time");
+        selectTime.innerHTML = ""; // 초기화
+
+        const now = new Date();
+        let hour = now.getHours();
+        let minute = now.getMinutes();
+
+        // 현재 기준으로 가장 가까운 "미래" 30분 단위 시간 계산
+        if (minute >= 30) {
+          hour += 1;
+          minute = 0;
+        } else {
+          minute = 30;
+        }
+
+        // 기본 선택값으로 설정할 문자열
+        const closestFutureTime = `${String(hour).padStart(2, "0")}:${String(
+          minute
+        ).padStart(2, "0")}`;
+
+        for (let h = 7; h < 31; h++) {
+          for (let m of [0, 30]) {
+            let realH = h % 24;
+            let timeStr = `${String(realH).padStart(2, "0")}:${String(
+              m
+            ).padStart(2, "0")}`;
+
+            const option = document.createElement("option");
+            option.value = timeStr;
+            option.textContent = timeStr;
+
+            // 현재 시간 이후 중 가장 가까운 시간 선택
+            if (timeStr === closestFutureTime) {
+              option.selected = true;
+            }
+
+            selectTime.appendChild(option);
+          }
+        }
       </script>
     </main>
   </body>

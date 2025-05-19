@@ -1,12 +1,15 @@
 package kr.kh.tableup.service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.UploadFileUtils;
@@ -32,13 +35,66 @@ public class UserService {
   @Autowired
     private PasswordEncoder passwordEncoder;
 
+
+
+    public boolean validateUser(UserVO user, RedirectAttributes ra) {
+        // 아이디 중복
+        if (isDuplicate("id", user.getUs_id())) {
+            ra.addFlashAttribute("msg", "이미 사용 중인 아이디입니다.");
+            return false;
+        }
+
+        // 이메일 중복
+        if (isDuplicate("email", user.getUs_email())) {
+            ra.addFlashAttribute("msg", "이미 사용 중인 이메일입니다.");
+            return false;
+        }
+
+        // 전화번호 중복
+        if (isDuplicate("phone", user.getUs_phone())) {
+            ra.addFlashAttribute("msg", "이미 사용 중인 전화번호입니다.");
+            return false;
+        }
+
+        return true;
+    }
+    /** 중복 검사 (ID, 이메일, 전화번호) */
+    public boolean isDuplicate(String type, String value) {
+        if (type == null || value == null) {
+            return false;
+        }
+
+        return switch (type) {
+            case "id" -> userDAO.selectUserById(value) != null;
+            case "phone" -> userDAO.selectUserByPhone(value) != null;
+            case "email" -> userDAO.selectUserByEmail(value) != null;
+            default -> false;
+        };
+    }
+
+    public void insertUser(UserVO user) {
+        // 비밀번호 암호화
+        user.setUs_pw(passwordEncoder.encode(user.getUs_pw()));
+
+        // 닉네임이 없을 경우 랜덤으로 생성
+        if (user.getUs_nickname() == null || user.getUs_nickname().isBlank()) {
+            user.setUs_nickname("user_" + UUID.randomUUID().toString().substring(0, 8));
+        }
+
+        user.setUs_created(new Date());
+        user.setUs_state(0); 
+
+        userDAO.insertUser(user);
+    }
+
+/*
   public boolean insertUser(UserVO user) {
     if(user==null || user.getUs_id() == null || user.getUs_pw() == null) {
       return false;
     }
     return userDAO.insertUser(user);
   }
-
+*/
 
 
   public boolean updateUserInfo(UserVO user) {
@@ -47,7 +103,7 @@ public class UserService {
     }
     return userDAO.updateUserInfo(user) > 0;
   }
-
+/*
   public boolean isIdDuplicate(String id) {
     if (id == null || id.isBlank()) {
       return false;
@@ -69,7 +125,7 @@ public class UserService {
     return userDAO.selectUserByEmail(email) != null;
   }
 
-
+*/
    /** 회원가입*/
   public boolean registerUser(UserVO user) {
     if (user == null || user.getUs_id() == null || user.getUs_pw() == null) {
@@ -107,19 +163,7 @@ public class UserService {
       return userDAO.updateUserInfo(user) > 0;
   }
 
-    /** 중복 검사 (ID, 이메일, 전화번호) */
-    public boolean isDuplicate(String type, String value) {
-        if (type == null || value == null) {
-            return false;
-        }
-
-        return switch (type) {
-            case "id" -> userDAO.selectUserById(value) != null;
-            case "phone" -> userDAO.selectUserByPhone(value) != null;
-            case "email" -> userDAO.selectUserByEmail(value) != null;
-            default -> false;
-        };
-    }
+  
 
 
 

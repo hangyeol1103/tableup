@@ -5,12 +5,17 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
@@ -81,17 +87,45 @@ public class UserController {
 
     /** 회원가입*/
     @GetMapping("/signup")
-    public String signupForm(Model model, @RequestParam(required = false) String us_id) {
-      model.addAttribute("url", "/signup");
-      model.addAttribute("us_id", us_id);
-      return "user/signup";
+    public String signupForm(Model model, @RequestParam(required = false, defaultValue = "false") boolean social, @RequestParam(required = false) String us_id) {
+        model.addAttribute("social", social);
+        model.addAttribute("url", "/signup");
+
+        if (!model.containsAttribute("userVO")) {
+            UserVO user = new UserVO();
+            if (us_id != null) user.setUs_id(us_id);
+            model.addAttribute("userVO", user);
+        }
+        return "user/signup";
     }
 
+
     @PostMapping("/signupPost")
-    public String signup(@ModelAttribute UserVO user, RedirectAttributes ra) {
-      boolean result = userService.registerUser(user);
-      ra.addFlashAttribute("msg", result ? "회원가입이 완료되었습니다." : "회원가입에 실패했습니다.");
-      return "redirect:/user/login";
+    public String signup(@Valid @ModelAttribute("userVO") UserVO user, BindingResult result, RedirectAttributes ra) {
+
+        System.out.println("유효성 검사 오류 수: " + result.getErrorCount());
+
+        if (!user.getUs_pw().equals(user.getUs_pw_check())) {
+            result.rejectValue("us_pw_check", "password.mismatch", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
+
+        if (result.hasErrors()) {
+            String msg = result.getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(" "));
+            ra.addFlashAttribute("msg", msg);
+            ra.addFlashAttribute("userVO", user);
+            return "redirect:/user/signup";
+        }
+
+        boolean dbResult = userService.validateUser(user, ra);
+        if (!dbResult) {
+            ra.addFlashAttribute("userVO", user);
+            return "redirect:/user/signup";
+        }
+
+        userService.insertUser(user);
+        return "redirect:/user/login";
     }
 
     /** 마이페이지 */

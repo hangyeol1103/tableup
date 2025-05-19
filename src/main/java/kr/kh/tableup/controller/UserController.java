@@ -269,7 +269,7 @@ public class UserController {
         if (!userService.insertReview(review)) {
             model.addAttribute("errorMsg", "빈 내용이 있거나 문제가 생겨 리뷰 저장에 실패했습니다.");
             model.addAttribute("review", review);
-            return "redirect:user/review/insert";
+            return "user/review/insert";
         }
 
 
@@ -283,11 +283,11 @@ public class UserController {
 
                     if (!userService.insertReviewScore(review, rs_st_num, rs_score)) {
                         model.addAttribute("errorMsg", "리뷰는 등록됐지만 점수 저장에 실패했습니다.");
-                        return "redirect:/user/review/insert";
+                        return "user/review/insert";
                     }
                 } catch (NumberFormatException e) {
                     model.addAttribute("errorMsg", "잘못된 점수 형식이 입력되었습니다.");
-                    return "redirect:/user/review/insert";
+                    return "user/review/insert";
                 }
             }
         }
@@ -297,10 +297,10 @@ public class UserController {
             String errorMsg = "리뷰는 등록됐지만 파일 저장에 실패했습니다.";
             System.out.println(errorMsg);
             model.addAttribute("errorMsg", errorMsg);
-            return "redirect:/user/review/insert"; // 리뷰 등록 실패
+            return "user/review/insert"; // 리뷰 등록 실패
         }
 
-        return "redirect:/user/review/list";
+        return "user/review/list";
     }
 
     @GetMapping("/list")

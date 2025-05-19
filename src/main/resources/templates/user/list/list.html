@@ -19,7 +19,7 @@
         <option value="">전체</option>
         <option th:each="region : ${regionList}"
                 th:value="${region.dreg_num}"
-                th:text="${region.dreg_sub}"
+                th:text="${region.reg_main + ' : ' + region.dreg_sub}"
                 th:selected="${region.dreg_num == param.dreg_num}"></option>
       </select>
     </div>
@@ -30,7 +30,7 @@
         <option value="">전체</option>
         <option th:each="food : ${foodList}"
                 th:value="${food.dfc_num}"
-                th:text="${food.dfc_sub}"
+                th:text="${food.fc_main + ' : ' + food.dfc_sub}"
                 th:selected="${food.dfc_num == param.dfc_num}"></option>
       </select>
     </div>

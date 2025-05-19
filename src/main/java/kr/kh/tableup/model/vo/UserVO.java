@@ -30,7 +30,7 @@ public class UserVO{
   private String us_name;
 
   @NotBlank(message = "전화번호는 필수입니다.") 
-  @Pattern(regexp="^\\d{3}-\\d{3,4}-\\d{4}$", message="전화번호 형식이 아닙니다.")
+  @Pattern(regexp = "^(01[016789]-\\d{3,4}-\\d{4}|0\\d{1,2}-\\d{3,4}-\\d{4})$", message="전화번호 형식이 아닙니다.")
   private String us_phone;
 
   @NotBlank(message = "이메일은 필수입니다.") 

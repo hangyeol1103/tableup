@@ -92,7 +92,10 @@
                 <span th:text="${restaurant.rt_price_dinner}"></span>원
               </li>
               <li class="list-group-item border-0 d-flex align-items-center">
-                <i class="bi bi-clock me-2 text-secondary"></i> 휴무일 : /
+                <i class="bi bi-clock me-2 text-secondary"></i>
+                휴무일 :&nbsp<span th:text="${restaurant.rt_closed_days}"></span>
+                &nbsp;&nbsp;&nbsp;
+                <i class="bi bi-clock me-2 text-secondary"></i>
                 영업시간 : 오늘 (월) · 17:00 ~ 새벽 02:00
               </li>
               <li class="list-group-item border-0 d-flex align-items-center">

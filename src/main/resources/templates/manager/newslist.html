@@ -34,11 +34,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				</tr>
 				<!-- 매장 정보가 등록이 되어 있지 않으면-->
 					<tr th:if="${newslist.size() == 0}">
-						<td colspan="4" class="text-center">아직 메뉴를 입력하지 않았습니다.</td>
+						<td colspan="2" class="text-center">등록한 소식, 공지사항이 없습니다.</td>
 					</tr>
 			</tbody>
 		</table>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_news'">메뉴등록</button>
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_news'">뉴스등록</button>
 		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 	</main>
 </body>

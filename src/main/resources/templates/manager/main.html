@@ -79,13 +79,23 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 	<main layout:fragment="content">
 		<div class="container my-4">
 			<div class="main-box">
-				<div class="new-reserve" onclick="location.href='/reservation/new'">신규 예약</div>
-				<div class="edit-reserve" onclick="location.href='/reservation/modify'">예약 수정</div>
-				<div class="cancel-reserve" onclick="location.href='/reservation/cancel'">예약 취소</div>
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/reservation/new'|">신규 예약</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">신규 예약</div>
+
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/reservation/modify'|">예약 변경</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">예약 변경</div>
+
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/reservation/cancel'|">예약 취소</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">예약 취소</div>
+
 			</div>
 			<div class="sub-box">
-				<div class="summary-button" onclick="location.href='/summary'">일일 요약</div>
-				<div class="message-button" onclick="location.href='/message'">메시지</div>
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/schedule/manager_schedulelist'|">일정 관리</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">일정 관리</div>
+
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/schedule/daily'|">오늘 일정 요약</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">오늘 일정 요약</div>
+
 			</div>
 		</div>
 	</main>

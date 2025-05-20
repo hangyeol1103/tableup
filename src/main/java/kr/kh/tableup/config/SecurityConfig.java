@@ -38,7 +38,7 @@ public class SecurityConfig{
     @Order(1)
     public SecurityFilterChain managerSecurityFilterChain(HttpSecurity http) throws Exception {
       http
-      .securityMatcher("/manager/**")
+      .securityMatcher("/manager/**", "/schedule/**")
       .authorizeHttpRequests(auth -> auth
           .requestMatchers("/manager/signup", "/manager/register").permitAll()
           .anyRequest().authenticated()

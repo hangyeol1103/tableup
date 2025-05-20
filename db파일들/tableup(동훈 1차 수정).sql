@@ -3,17 +3,6 @@ DROP DATABASE IF EXISTS tableup;
 CREATE DATABASE tableup;
 USE tableup;
 
-
-DROP TABLE IF EXISTS `admin`;
-
-CREATE TABLE `Admin` (
-   ad_num INT AUTO_INCREMENT PRIMARY KEY, 
-   ad_id VARCHAR(20) NOT NULL UNIQUE,
-   ad_pw VARCHAR(255) NOT NULL
-);
-
-
-
 DROP TABLE IF EXISTS `ScoreType`;
 
 CREATE TABLE `ScoreType` (
@@ -25,8 +14,8 @@ DROP TABLE IF EXISTS `BusinessHour`;
 
 CREATE TABLE `BusinessHour` (
 	`bh_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`bh_start`	DATETIME	NOT NULL,
-	`bh_end`	DATETIME	NULL,
+	`bh_start`	TIME	NOT NULL,
+	`bh_end`	TIME	NULL,
 	`bh_seat_MAX`	INT	NULL,
 	`bh_seat_current`	INT	NULL,
 	`bh_table_MAX`	INT	NULL,
@@ -41,22 +30,22 @@ CREATE TABLE `UserCoupon` (
 	`UC_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
 	`UC_STATE`	BOOLEAN NOT NULL,
 	`UC_ReC_NUM`	INT	NOT NULL,
-	`UC_us_num`	INT	NOT NULL
+	`UC_us_num`	INT	NULL
 );
 
 DROP TABLE IF EXISTS `BusinessDate`;
 
 CREATE TABLE `BusinessDate` (
 	`BD_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`BD_DATE`	DATETIME NOT NULL,
+	`BD_DATE`	DATE NOT NULL,
 	`bd_rt_num`	INT	NULL,
 	`BD_OFF`	BOOLEAN NOT NULL,
-	`bd_open`	DATETIME	NULL,
-	`bd_close`	DATETIME	NULL,
+	`bd_open`	TIME	NULL,
+	`bd_close`	TIME	NULL,
 	`bd_brstart`	TIME	NULL,
-	`bd_brend`	DATETIME	NULL,
-	`bd_loam`	DATETIME	NULL,
-	`bd_lopm`	DATETIME	NULL
+	`bd_brend`	TIME	NULL,
+	`bd_loam`	TIME	NULL,
+	`bd_lopm`	TIME	NULL
 );
 
 DROP TABLE IF EXISTS `ResNews`;
@@ -112,7 +101,7 @@ DROP TABLE IF EXISTS `Reservation`;
 
 CREATE TABLE `Reservation` (
 	`res_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`res_us_num`	INT	NOT NULL,
+	`res_us_id`	INT	NULL,
 	`res_rt_num`	INT	NULL,
 	`res_time`	DATETIME NOT NULL,
 	`res_person`	INT NOT NULL,
@@ -183,7 +172,7 @@ DROP TABLE IF EXISTS `UsFollow`;
 
 CREATE TABLE `UsFollow` (
 	`UF_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`uf_us_num`	INT	NOT NULL,
+	`uf_us_num`	INT	NULL,
 	`uf_TYPE`	ENUM('REVIEW', 'RESTAURANT') NOT NULL,
 	`uf_FOREIGN`	INT NOT NULL
 );
@@ -202,7 +191,7 @@ DROP TABLE IF EXISTS `DefaultResTime`;
 
 CREATE TABLE `DefaultResTime` (
 	`DRT_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`drt_rt_num`	INT	NOT NULL UNIQUE,
+	`drt_rt_num`	INT	NULL,
 	`drt_date`		ENUM('월', '화', '수', '목', '금', '토', '일') NOT NULL,
 	`drt_off`		BOOLEAN NOT NULL,
 	`drt_open`	TIME	NULL,
@@ -217,7 +206,7 @@ DROP TABLE IF EXISTS `Sociallogin`;
 
 CREATE TABLE `Sociallogin` (
 	`sl_num`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`sl_us_num`	INT	NOT NULL UNIQUE,
+	`sl_us_no`	INT	NULL,
 	`sl_kakao`	BOOLEAN	NULL,
 	`sl_phone`	BOOLEAN	NULL,
 	`sl_google`	BOOLEAN	NULL
@@ -235,7 +224,7 @@ DROP TABLE IF EXISTS `ReviewScore`;
 
 CREATE TABLE `ReviewScore` (
 	`rs_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`rs_rev_num`	INT	NOT NULL,
+	`rs_rev_num`	INT	NULL,
 	`rs_st_num`	INT	NOT NULL,
 	`rs_score`	INT	NULL
 );
@@ -244,7 +233,7 @@ DROP TABLE IF EXISTS `Review`;
 
 CREATE TABLE `Review` (
 	`rev_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`rev_us_num`	INT	NULL,
+	`rev_us_id`	INT	NULL,
 	`rev_rt_num`	INT	NULL,
 	`rev_content`	LONGTEXT	NULL,
 	`rev_created`	DATETIME  NOT NULL,
@@ -298,19 +287,8 @@ CREATE TABLE `User` (
 	`us_email`	VARCHAR(50) NOT NULL,
 	`us_nickname`	VARCHAR(30) NOT NULL,
 	`us_sociallogin`	BOOLEAN	NULL,
-	`us_created`	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`us_created`	DATETIME NOT NULL,
 	`us_state`	INT NOT NULL DEFAULT 0
-);
-
-DROP TABLE IF EXISTS `UserProfileImage`;
-
-CREATE TABLE `UserProfileImage` (
-  `upi_num` INT PRIMARY KEY AUTO_INCREMENT,
-  `upi_us_num` INT NOT NULL,
-  `upi_file_name` VARCHAR(255) NOT NULL,
-  `upi_file_path` VARCHAR(255),
-  `upi_upload_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`upi_us_num`) REFERENCES `User`(`us_num`) ON DELETE CASCADE
 );
 
 
@@ -349,13 +327,12 @@ CREATE TABLE `TagType` (
 DROP TABLE IF EXISTS `File`;
 
 CREATE TABLE `File` (
-    `file_num` INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    `file_path` VARCHAR(255) NOT NULL,
-    `file_name` VARCHAR(255) NOT NULL,
-    `File_type` ENUM('REVIEW', 'RESTAURANTDETAIL', 'MENU') NOT NULL,
-    `File_FOREIGN` INT NOT NULL,
-    `file_tag` ENUM('내부', '외부', '메뉴판', '음식', '기타') NULL,
-    `FILE_RES_NUM` INT NOT NULL DEFAULT 0
+	`file_num`	INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`file_path`	VARCHAR(255) NOT NULL,
+	`file_name`	VARCHAR(255) NOT NULL,
+	`File_type`	ENUM('REIVEW', 'RestaurantDetail') NOT NULL,
+	`File_FOREIGN`	INT NOT NULL,
+	`file_tag`	ENUM('내부', '외부', '메뉴판', '음식') NOT NULL
 );
 
 ALTER TABLE `BusinessHour` ADD CONSTRAINT `FK_Restaurant_TO_BusinessHour_1` FOREIGN KEY (
@@ -443,7 +420,7 @@ REFERENCES `TagType` (
 );
 
 ALTER TABLE `Reservation` ADD CONSTRAINT `FK_User_TO_Reservation_1` FOREIGN KEY (
-	`res_us_num`
+	`res_us_id`
 )
 REFERENCES `User` (
 	`us_num`
@@ -513,7 +490,7 @@ REFERENCES `Restaurant` (
 );
 
 ALTER TABLE `Sociallogin` ADD CONSTRAINT `FK_User_TO_Sociallogin_1` FOREIGN KEY (
-	`sl_us_num`
+	`sl_us_no`
 )
 REFERENCES `User` (
 	`us_num`
@@ -541,7 +518,7 @@ REFERENCES `ScoreType` (
 );
 
 ALTER TABLE `Review` ADD CONSTRAINT `FK_User_TO_Review_1` FOREIGN KEY (
-	`rev_us_num`
+	`rev_us_id`
 )
 REFERENCES `User` (
 	`us_num`

@@ -1,180 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.UserDAO">
-	<select id="selectUser" resultType="userVO">
-		select * from User where us_num = #{us_num}
-	</select>
-	<select id="selectUserById" resultType="userVO">
-		select * from User where us_id = #{us_id}
-	</select>
-	<insert id="insertUser">
-		INSERT INTO User (
-			us_id,
-			us_pw, 
-			us_name, 
-			us_phone, 
-			us_email, 
-			us_nickname, 
-			us_sociallogin
-		)
-		VALUES (
-			#{us_id}, 
-			#{us_pw}, 
-			#{us_name}, 
-			#{us_phone}, 
-			#{us_email}, 
-			#{us_nickname}, 
-			#{us_sociallogin}
-		)
-	</insert>
-	<update id="updateUserInfo" parameterType="userVO">
-    UPDATE User
-    SET us_nickname = #{us_nickname},
-			us_email = #{us_email},
-			us_phone = #{us_phone}
-    WHERE us_id = #{us_id}
-	</update>
-	<select id="selectUserByPhone" resultType="kr.kh.tableup.model.vo.UserVO">
-		SELECT * FROM user WHERE us_phone = #{phone}
-	</select>
-	<select id="selectUserByEmail" resultType="kr.kh.tableup.model.vo.UserVO">
-		SELECT * FROM user WHERE us_email = #{email}
-	</select>
+	<select id="selectUser" resultType="userVO"> select * from User where us_num = #{us_num} </select>
+	<select id="selectUserById" resultType="userVO"> select * from User where us_id = #{us_id} </select>
+	<insert id="insertUser"> INSERT INTO User ( us_id, us_pw, us_name, us_phone, us_email,
+		us_nickname, us_sociallogin ) VALUES ( #{us_id}, #{us_pw}, #{us_name}, #{us_phone}, #{us_email},
+		#{us_nickname}, #{us_sociallogin} ) </insert>
+	<update id="updateUserInfo" parameterType="userVO"> UPDATE User SET us_nickname = #{us_nickname},
+		us_email = #{us_email}, us_phone = #{us_phone} WHERE us_id = #{us_id} </update>
+	<select id="selectUserByPhone" resultType="kr.kh.tableup.model.vo.UserVO"> SELECT * FROM user
+		WHERE us_phone = #{phone} </select>
+	<select id="selectUserByEmail" resultType="kr.kh.tableup.model.vo.UserVO"> SELECT * FROM user
+		WHERE us_email = #{email} </select>
 
-	<select id="selectReviewByUser" resultType="kr.kh.tableup.model.vo.ReviewVO">
-		SELECT * FROM review 
-		LEFT JOIN user ON us_num = rev_us_num
-		LEFT JOIN restaurant ON rt_num = rev_rt_num
-		WHERE rev_us_num = #{us_num} and rev_state = 0
-	</select>
+	<select id="selectReviewByUser" resultType="kr.kh.tableup.model.vo.ReviewVO"> SELECT * FROM review
+		LEFT JOIN user ON us_num = rev_us_num LEFT JOIN restaurant ON rt_num = rev_rt_num WHERE
+		rev_us_num = #{us_num} and rev_state = 0 </select>
 
-	<select id="selectReservationByUser" resultType="kr.kh.tableup.model.vo.ReservationVO">
-		SELECT * FROM Reservation 
-		LEFT JOIN user ON us_num = res_us_num
-		LEFT JOIN restaurant ON rt_num = res_rt_num
-		WHERE res_us_num = #{us_num}
-	</select>
+	<select id="selectReservationByUser" resultType="kr.kh.tableup.model.vo.ReservationVO"> SELECT *
+		FROM Reservation LEFT JOIN user ON us_num = res_us_num LEFT JOIN restaurant ON rt_num =
+		res_rt_num WHERE res_us_num = #{us_num} </select>
 
-	<select id="selectFollowedRestaurant" resultType="kr.kh.tableup.model.vo.RestaurantVO">
-		select * from usfollow 
-		join restaurant on uf_foreign = rt_num
-		where uf_type = 'RESTAURANT' and uf_us_num = #{us_num} 
-	</select>
+	<select id="selectFollowedRestaurant" resultType="kr.kh.tableup.model.vo.RestaurantVO"> select *
+		from usfollow join restaurant on uf_foreign = rt_num where uf_type = 'RESTAURANT' and uf_us_num
+		= #{us_num} </select>
 
-	<select id="selectFollowedReview" resultType="kr.kh.tableup.model.vo.ReviewVO">
-		select * from usfollow 
-		join REVIEW on uf_foreign = rev_num
-		join restaurant on rt_num = rev_rt_num
-		join user on us_num = rev_us_num
-		where uf_type = 'REVIEW' and uf_us_num = #{us_num} 
-	</select>
+	<select id="selectFollowedReview" resultType="kr.kh.tableup.model.vo.ReviewVO"> select * from
+		usfollow join REVIEW on uf_foreign = rev_num join restaurant on rt_num = rev_rt_num join user on
+		us_num = rev_us_num where uf_type = 'REVIEW' and uf_us_num = #{us_num} </select>
 
-	<select id="selectScoreTypeList" resultType="ScoreTypeVO">
-    SELECT ST_NUM, ST_CATEGORY
-    FROM ScoreType
-	</select>
+	<select id="selectScoreTypeList" resultType="ScoreTypeVO"> SELECT ST_NUM, ST_CATEGORY FROM
+		ScoreType </select>
 
-	<insert id="insertReview" parameterType="kr.kh.tableup.model.vo.ReviewVO" useGeneratedKeys="true" keyProperty="rev_num">
-		INSERT INTO review (
-			rev_us_num,
-			rev_rt_num,
-			rev_content,
-			rev_created,
-			rev_updated,
-			rev_state,
-			rev_visit,
-			rev_visitor
-		)
-		VALUES (
-			#{rev_us_num},
-			#{rev_rt_num},
-			#{rev_content},
-			now(),
-			now(),
-			0,
-			#{rev_visit},
-			#{rev_visitor}
-		)
-		</insert>
+	<insert id="insertReview" parameterType="kr.kh.tableup.model.vo.ReviewVO" useGeneratedKeys="true"
+		keyProperty="rev_num"> INSERT INTO review ( rev_us_num, rev_rt_num, rev_content, rev_created,
+		rev_updated, rev_state, rev_visit, rev_visitor ) VALUES ( #{rev_us_num}, #{rev_rt_num},
+		#{rev_content}, now(), now(), 0, #{rev_visit}, #{rev_visitor} ) </insert>
 
-		<insert id ="insertReviewScore" parameterType="kr.kh.tableup.model.vo.ReviewScoreVO">
-		INSERT INTO review_score (
-			rs_rev_num,
-			rs_st_num,
-			rs_score
-		)
-		VALUES (
-			#{rs_rev_num},
-			#{rs_st_num},
-			#{rs_score}
-		)
-		</insert>
+	<insert id="insertReviewScore" parameterType="kr.kh.tableup.model.vo.ReviewScoreVO"> INSERT INTO
+		review_score ( rs_rev_num, rs_st_num, rs_score ) VALUES ( #{rs_rev_num}, #{rs_st_num},
+		#{rs_score} ) </insert>
 
-		<insert id="insertFile" parameterType="kr.kh.tableup.model.vo.FileVO">
-		INSERT INTO file (
-			file_path,
-			file_name,
-			File_type,
-			File_FOREIGN,
-			file_tag,
-			FILE_RES_NUM
-		)
-		VALUES (
-			#{file_path},
-			#{file_name},
-			#{file_type},
-			#{file_foreign},
-			#{file_tag},
-			#{file_res_num}
-		)
-		</insert>
+	<insert id="insertFile" parameterType="kr.kh.tableup.model.vo.FileVO"> INSERT INTO file (
+		file_path, file_name, File_type, File_FOREIGN, file_tag, FILE_RES_NUM ) VALUES ( #{file_path},
+		#{file_name}, #{file_type}, #{file_foreign}, #{file_tag}, #{file_res_num} ) </insert>
 
-		<select id="selectRegionList" resultType="kr.kh.tableup.model.vo.RegionVO">
-		SELECT reg_num, reg_main, dreg_num, dreg_sub FROM region
-		RIGHT JOIN detailregion ON reg_num = dreg_reg_num
-		</select>
+	<select id="selectRegionList" resultType="kr.kh.tableup.model.vo.RegionVO"> SELECT reg_num,
+		reg_main, dreg_num, dreg_sub FROM region RIGHT JOIN detailregion ON reg_num = dreg_reg_num </select>
 
-		<select id="selectFoodCategoryList" resultType="kr.kh.tableup.model.vo.FoodCategoryVO">
-		SELECT fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory
-		RIGHT JOIN detailfoodcategory ON fc_num = dfc_fc_num
-		</select>
+	<select id="selectFoodCategoryList" resultType="kr.kh.tableup.model.vo.FoodCategoryVO"> SELECT
+		fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory RIGHT JOIN detailfoodcategory ON fc_num =
+		dfc_fc_num </select>
 
-		<select id="selectRestaurantList" resultType="kr.kh.tableup.model.vo.RestaurantVO">
-			select * from Restaurant 
-			left join RestaurantDetail on rt_num = rd_rt_num
-			where rt_accept = "Y" 
-			<if test="cri.rt_dreg_num > 0">
-				and rt_dreg_num = #{cri.rt_dreg_num}
-			</if>
-			<if test="cri.rt_dfc_num > 0">
-				and rt_dfc_num = #{cri.rt_dfc_num}
-			</if>
-			<if test="cri.orderBy == 'test'">
-			ORDER BY ${cri.orderBy}
-			</if>
+	<select id="selectRestaurantList" resultType="kr.kh.tableup.model.vo.RestaurantVO"> select * from
+		Restaurant left join RestaurantDetail on rt_num = rd_rt_num where rt_accept = "Y" <if
+			test="cri.rt_dreg_num > 0"> and rt_dreg_num = #{cri.rt_dreg_num} </if>
+			<if
+			test="cri.rt_dfc_num > 0"> and rt_dfc_num = #{cri.rt_dfc_num} </if>
+			<if
+			test="cri.orderBy == 'test'"> ORDER BY ${cri.orderBy} </if>
 			<if test="cri.orderBy != 'test'">
-			ORDER BY rt_num desc
-			</if>
-			limit #{cri.pageStart}, #{cri.perPageNum}
-		</select>
-		<select id="selectCountRestaurantList" resultType="int">
-			select count(*) from Restaurant where rt_accept = "Y" 
-			<if test="cri.rt_dreg_num > 0">
-				and rt_dreg_num = #{cri.rt_dreg_num}
-			</if>
-			<if test="cri.rt_dfc_num > 0">
-				and rt_dfc_num = #{cri.rt_dfc_num}
-			</if>
-		</select>
-		<select id="selectRestaurantDetail" resultType="RestaurantVO">
-			SELECT 
-				r.*, 
-				rd.rd_phone, rd.rd_info, rd.rd_home, rd.rd_addr
-			FROM restaurant r
-			LEFT JOIN restaurantdetail rd ON r.rt_num = rd.rd_rt_num
-			WHERE r.rt_num = #{rt_num}
-		</select>
-
+		ORDER BY rt_num desc </if> limit #{cri.pageStart}, #{cri.perPageNum} </select>
+	<select id="selectCountRestaurantList" resultType="int"> select count(*) from Restaurant where
+		rt_accept = "Y" <if test="cri.rt_dreg_num > 0"> and rt_dreg_num = #{cri.rt_dreg_num} </if>
+			<if
+			test="cri.rt_dfc_num > 0"> and rt_dfc_num = #{cri.rt_dfc_num} </if>
+	</select>
+	<select id="selectRestaurantDetail" resultType="RestaurantVO"> SELECT r.*, rd.rd_phone,
+		rd.rd_info, rd.rd_home, rd.rd_addr FROM restaurant r LEFT JOIN restaurantdetail rd ON r.rt_num =
+		rd.rd_rt_num WHERE r.rt_num = #{rt_num} </select>
+	<select id="selectFoodCategoryByRestaurant" resultType="FoodCategoryVO"> SELECT fc.* FROM
+		restaurant r JOIN detailfoodcategory dfc ON r.rt_dfc_num = dfc.dfc_num JOIN foodcategory fc ON
+		dfc.dfc_fc_num = fc.fc_num WHERE r.rt_num = #{rt_num} </select>
+		
 
 
 </mapper>

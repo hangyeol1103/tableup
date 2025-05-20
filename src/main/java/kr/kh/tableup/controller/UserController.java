@@ -371,7 +371,11 @@ public class UserController {
   @GetMapping("/list/{rt_num}")
   public String restaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
     RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
+    FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
+
     model.addAttribute("restaurant", restaurant);
+    model.addAttribute("foodCategory", foodCategory);
+
     return "user/detail/detail";
   }
 

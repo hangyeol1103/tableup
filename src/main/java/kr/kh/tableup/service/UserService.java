@@ -296,4 +296,8 @@ public class UserService {
     return userDAO.selectRestaurantDetail(rt_num);
   }
 
+  public FoodCategoryVO getFoodCategoryByRestaurant(int rt_num) {
+    return userDAO.selectFoodCategoryByRestaurant(rt_num);
+  }
+
 }

@@ -55,4 +55,6 @@ public interface UserDAO {
 
 	RestaurantVO selectRestaurantDetail(@Param("rt_num") int rt_num);
 
+	FoodCategoryVO selectFoodCategoryByRestaurant(int rt_num);
+
 }

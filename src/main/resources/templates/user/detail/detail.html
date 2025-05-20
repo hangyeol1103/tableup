@@ -68,7 +68,11 @@
             />
             <ul class="list-group bg-white rounded shadow-sm p-3">
               <li class="list-group-item border-0 ps-3 fw-bold py-0">
-                <span class="text-secondary">대분류 | 소분류 | 태그</span>
+                <span class="text-secondary">
+                  <span th:text="${foodCategory.fc_main}"></span>&nbsp;|
+                  <span th:text="${foodCategory.fc_main}"></span>&nbsp;|
+                  <span th:text="${foodCategory.fc_main}"></span>
+                </span>
               </li>
               <li
                 class="list-group-item border-0 ps-3 fw-bold py-0 fs-5"

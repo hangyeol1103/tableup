@@ -71,7 +71,8 @@
                 <span class="text-secondary">
                   <span th:text="${foodCategory.fc_main}"></span>&nbsp;|
                   <span th:text="${detailFoodCategory.dfc_sub}"></span>&nbsp;|
-                  <span th:text="${tag.tag_name}"></span>
+                  <span th:if="${tag != null}" th:text="${tag.tag_name}">태그</span>
+                  <span th:unless="${tag != null}">태그 없음</span>
                 </span>
               </li>
               <li

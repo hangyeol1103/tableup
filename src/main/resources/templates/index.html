@@ -68,6 +68,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 													class="tab-pane fade"
 													th:id="'tab-' + ${#strings.replace(entry.key, ' ', '')}"
 													role="tabpanel">
+												<a th:href="@{/user/list(dreg_num=0)}" class="btn btn-outline-dark m-1 btn-sm">
+													전체
+												</a>
 												<div th:each="region : ${entry.value}">
 													<a th:href="@{/user/list(dreg_num=${region.dreg_num})}"
 														class="btn btn-outline-secondary m-1 btn-sm"

@@ -8,4 +8,6 @@ public class FacilityVO {
 	String fa_name;
 	String fa_title;
 	String fa_icon;
+
+	String rf_detail; //편의시설 목록의 상세정보
 }

@@ -28,6 +28,7 @@ import jakarta.validation.Valid;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
@@ -372,9 +373,11 @@ public class UserController {
   public String restaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
     RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
-
+    DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
+    
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
+    model.addAttribute("detailFoodCategory", detailFoodCategory);
 
     return "user/detail/detail";
   }

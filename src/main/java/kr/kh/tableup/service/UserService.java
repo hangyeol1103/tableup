@@ -15,6 +15,7 @@ import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.Criteria;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
@@ -298,6 +299,10 @@ public class UserService {
 
   public FoodCategoryVO getFoodCategoryByRestaurant(int rt_num) {
     return userDAO.selectFoodCategoryByRestaurant(rt_num);
+  }
+
+  public DetailFoodCategoryVO getDetailFoodCategoryByRestaurant(int rt_num) {
+    return userDAO.selectDetailFoodCategoryByRestaurant(rt_num);
   }
 
 }

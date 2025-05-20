@@ -72,7 +72,14 @@
 	<select id="selectFoodCategoryByRestaurant" resultType="FoodCategoryVO"> SELECT fc.* FROM
 		restaurant r JOIN detailfoodcategory dfc ON r.rt_dfc_num = dfc.dfc_num JOIN foodcategory fc ON
 		dfc.dfc_fc_num = fc.fc_num WHERE r.rt_num = #{rt_num} </select>
-		
+
+	<select id="selectDetailFoodCategoryByRestaurant" resultType="DetailFoodCategoryVO">
+		SELECT dfc.* 
+		FROM restaurant r 
+		JOIN detailfoodcategory dfc ON r.rt_dfc_num = dfc.dfc_num
+		WHERE r.rt_num = #{rt_num}
+	</select>
+
 
 
 </mapper>

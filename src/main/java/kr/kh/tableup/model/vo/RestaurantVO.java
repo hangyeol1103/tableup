@@ -1,5 +1,7 @@
 package kr.kh.tableup.model.vo;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -23,5 +25,8 @@ public class RestaurantVO {
 	String rd_info;
 	String rd_home;
 	String rd_addr;
+
+	List<TagVO> tagList;
+	List<ReviewVO> reviewList;
 
 }

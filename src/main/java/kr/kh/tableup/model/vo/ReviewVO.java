@@ -1,6 +1,8 @@
 package kr.kh.tableup.model.vo;
 
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -15,6 +17,10 @@ public class ReviewVO {
 	private String rev_visit;
 	private int rev_visitor;
 
+	//작성한 유저(userVO)
 	private String us_name;
+	//연결된 레스토랑(restaurantVO)
 	private String rt_name;
+
+	private List<ReviewScoreVO> scoreList;
 }

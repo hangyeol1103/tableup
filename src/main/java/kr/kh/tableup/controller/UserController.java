@@ -2,6 +2,7 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,15 +25,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
+import kr.kh.tableup.model.vo.TagTypeVO;
+import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.UserService;
@@ -347,12 +352,18 @@ public class UserController {
 
         model.addAttribute("regionList", regionList);
         model.addAttribute("foodList", foodList);
+
         if(dreg_num != null)model.addAttribute("dreg_num", dreg_num);
         if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
 
-        //model.addAttribute("param", new FilterParam(regionNum, foodNum)); 
-
         System.out.println("리스트 호출");
+
+        Map<String, List<TagVO>> tagList = userService.getTagList();
+        List<FacilityVO> facilityList = userService.getFacilityList();
+
+        model.addAttribute("tagList", tagList);
+        model.addAttribute("facilityList", facilityList);
+
         return "user/list/list"; 
     }
 
@@ -371,4 +382,12 @@ public class UserController {
 		return "user/list/sublist";
 	}
 
+    @GetMapping("/review/view")
+    public String allReviews(Model model) {
+        List<ReviewVO> reviewList = userService.getReviewList();
+        model.addAttribute("reviewList", reviewList);
+        System.out.println("리뷰 리스트 : " + reviewList);
+        return "user/review/view";
+    }
+    
 }

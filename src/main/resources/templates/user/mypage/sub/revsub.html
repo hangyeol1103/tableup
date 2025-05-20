@@ -14,20 +14,35 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <body>
 	<main layout:fragment="content">
     
-    <ul class="list-group">
-      <th:block th:if="${#lists.isEmpty(reviews)}">
-        <li class="list-group-item">작성한 리뷰가 없습니다.</li>
-      </th:block>
+  <ul class="list-group">
+    <th:block th:if="${#lists.isEmpty(reviews)}">
+      <li class="list-group-item">작성한 리뷰가 없습니다.</li>
+    </th:block>
 
-      <th:block th:each="r : ${reviews}">
-        <li class="list-group-item">
-          <strong th:text="${r.rev_rt_num}">식당 번호</strong><br>
-          
-          <p th:text="${r.rev_content}">리뷰 내용</p>
-          <small th:text="${#dates.format(r.rev_created, 'yyyy-MM-dd')}">작성일</small>
-        </li>
-      </th:block>
-    </ul>
+    <th:block th:each="r, stat : ${reviews}">
+      <li class="list-group-item">
+        <h5 th:text="${r.rt_name}">식당 이름</h5> <!-- 식당명 -->
+        <p>
+          <strong>작성자:</strong> <span th:text="${r.us_name}">작성자 이름</span><br>
+          <strong>내용:</strong> <span th:text="${r.rev_content}">리뷰 내용</span><br>
+          <strong>작성일:</strong> <small th:text="${#dates.format(r.rev_created, 'yyyy-MM-dd')}">날짜</small>
+        </p>
+        <div>나중에 리뷰내용 지우거나 간략화하고 리뷰 상세 페이지 링크 걸어 놓을 것. 리뷰 첨부파일 개수 띄우기(예상) </div>
+        <div>
+          <ul class="list-unstyled">
+            <th:block th:each="score : ${r.scoreList}">
+                <span th:text="${score.st_category}">항목</span>:
+                <span th:text="${score.rs_score}">점수</span>
+            </th:block>
+            <div th:if="${r.scoreList.isEmpty()}">
+              <span>점수 없음</span>
+            </div>
+          </ul>
+        </div>
+      </li>
+    </th:block>
+  </ul>
+
 
 
 

@@ -1,8 +1,11 @@
 package kr.kh.tableup.service;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.dao.UserDAO;
+import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.Criteria;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
@@ -23,6 +28,7 @@ import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
+import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UserVO;
 
 @Service
@@ -309,6 +315,28 @@ public class UserService {
 		int count = userDAO.selectCountRestaurantList(cri);
 		return new PageMaker(1, cri, count);
 	}
+  
+	public List<ReviewVO> getReviewList() {
+		
+    return userDAO.selectReviewList();
+	}
+  
+  public Map<String, List<TagVO>> getTagList() {
+   
+      List<TagVO> tagList = userDAO.selectTagList();
+    
+      // tt_name 기준 그룹화
+      Map<String, List<TagVO>> tagMap = tagList.stream()
+        .collect(Collectors.groupingBy(TagVO::getTt_name, LinkedHashMap::new, Collectors.toList()));
+    
+      return tagMap;
+  }
+
+	public List<FacilityVO> getFacilityList() {
+		
+      return userDAO.selectFacilityList();
+	}
+
 
 
   }

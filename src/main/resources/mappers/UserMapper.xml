@@ -1,6 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.UserDAO">
+	
+	
+	<!-- ReviewScoreVO + ReviewVO -->
+	<resultMap id="ReviewMap" type="ReviewVO">
+		<!-- ReviewVO -->
+		<id property="rev_num" column="rev_num" />
+		<result property="rev_us_num" column="rev_us_num" />
+		<result property="rev_rt_num" column="rev_rt_num" />
+		<result property="rev_content" column="rev_content" />
+		<result property="rev_created" column="rev_created" />
+		<result property="rev_updated" column="rev_updated" />
+		<result property="rev_state" column="rev_state" />
+		<result property="rev_visit" column="rev_visit" />
+		<result property="rev_visitor" column="rev_visitor" />
+		
+		<!-- 유저와 식당 이름 -->
+		<result property="us_name" column="us_name" />
+		<result property="rt_name" column="rt_name" />
+
+		<!-- ReviewScoreVO 리스트 -->
+		<collection property="scoreList" ofType="ReviewScoreVO">
+			<id property="rs_num" column="rs_num" />
+			<result property="rs_rev_num" column="rs_rev_num" />
+			<result property="rs_st_num" column="rs_st_num" />
+			<result property="rs_score" column="rs_score" />
+			<result property="st_num" column="st_num" />
+			<result property="st_category" column="st_category" />
+		</collection>
+	</resultMap>
+
+	<!-- TagVO -->
+	<resultMap id="TagMap" type="TagVO">
+		<id property="tag_num" column="tag_num"/>
+		<result property="tag_name" column="tag_name"/>
+		<result property="tag_tt_num" column="tag_tt_num"/>
+		<result property="tt_name" column="tt_name"/>
+	</resultMap>
+
+	<!-- restaurantVO -->
+	<resultMap id="RestaurantMap" type="RestaurantVO">
+		<id property="rt_num" column="rt_num"/>
+		<result property="rt_name" column="rt_name"/>
+		<result property="rt_dreg_num" column="rt_dreg_num"/>
+		<result property="rt_dfc_num" column="rt_dfc_num"/>
+		<result property="rt_closed_days" column="rt_closed_days"/>
+		<result property="rt_price_lunch" column="rt_price_lunch"/>
+		<result property="rt_price_dinner" column="rt_price_dinner"/>
+		<result property="rt_accept" column="rt_accept"/>
+		<result property="rt_description" column="rt_description"/>
+		<!-- 디테일 -->
+		<result property="rd_num" column="rd_num"/>
+		<result property="rd_rt_num" column="rd_rt_num"/>
+		<result property="rd_phone" column="rd_phone"/>
+		<result property="rd_closed_days" column="rd_closed_days"/>
+		<result property="rd_info" column="rd_info"/>
+		<result property="rd_home" column="rd_home"/>
+		<result property="rd_addr" column="rd_addr"/>
+		<!-- 태그 리스트 -->
+		<collection property="tagList" resultMap="TagMap"/>
+		<!-- 리뷰 리스트 -->
+		<collection property="reviewList" resultMap="ReviewMap"/>
+	</resultMap>
+
+	<!-- 매장 태그 리스트 -->
+	<select id="selectRestaurantTagList" resultMap="TagMap">
+		SELECT tag.*, tagtype.tt_name
+		FROM restaurant
+		RIGHT JOIN restauranttag USING(rt_num)
+		JOIN tag USING(tag_num)
+		JOIN tagtype ON tag.tag_tt_num = tagtype.tt_num
+		WHERE rt_num = #{rt_num}
+	</select>
+
+	<!-- 특정 식당 리뷰 + 점수 -->
+	<select id="selectReviewListbyNum" resultMap="ReviewMap">
+		SELECT
+			review.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category
+		FROM review
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+		WHERE review.rev_rt_num = #{rt_num}
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
+	</select>
+
+	<select id="selectReviewList" resultMap="ReviewMap">
+		SELECT
+			review.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category
+		FROM review
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
+	</select>
+
+	<!-- 식당 + 디테일 + 태그 + 리뷰 -->
+	<select id="selectRestaurantTagReview" resultMap="RestaurantMap">
+		SELECT 
+			restaurant.*,
+			restaurant_detail.*,
+			tag.*,
+			tagtype.*,
+			review.*,
+			user.us_name
+		FROM restaurant
+		LEFT JOIN restaurant_detail ON restaurant.rt_num = restaurant_detail.rd_rt_num
+		LEFT JOIN restauranttag ON restaurant.rt_num = restauranttag.rt_num
+		LEFT JOIN tag ON restauranttag.tag_num = tag.tag_num
+		LEFT JOIN tagtype ON tag.tag_tt_num = tagtype.tt_num
+		LEFT JOIN review ON restaurant.rt_num = review.rev_rt_num
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		WHERE restaurant.rt_num = #{rt_num}
+	</select>
+
+
+
+
+
+	
+	
+	
+	
 	<select id="selectUser" resultType="userVO">
 		select * from User where us_num = #{us_num}
 	</select>
@@ -41,11 +173,21 @@
 		SELECT * FROM user WHERE us_email = #{email}
 	</select>
 
-	<select id="selectReviewByUser" resultType="kr.kh.tableup.model.vo.ReviewVO">
-		SELECT * FROM review 
-		LEFT JOIN user ON us_num = rev_us_num
-		LEFT JOIN restaurant ON rt_num = rev_rt_num
-		WHERE rev_us_num = #{us_num} and rev_state = 0
+	<select id="selectReviewByUser" resultMap="ReviewMap">
+		SELECT 
+			review.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category
+		FROM review
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+		WHERE review.rev_us_num = #{us_num} 
+			AND review.rev_state = 0
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
 	</select>
 
 	<select id="selectReservationByUser" resultType="kr.kh.tableup.model.vo.ReservationVO">
@@ -166,5 +308,15 @@
 				and rt_dfc_num = #{cri.rt_dfc_num}
 			</if>
 		</select>
+		<select id="selectTagList" resultType="TagVO">
+			SELECT tag.*, tagtype.tt_name 
+			FROM tag
+			LEFT JOIN tagtype ON tag.tag_tt_num = tagtype.tt_num
+		</select>
+		<select id="selectFacilityList" resultType="FacilityVO">
+			SELECT * FROM facility
+		</select>
+
+
 
 </mapper>

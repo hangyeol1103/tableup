@@ -8,5 +8,5 @@ public class TagVO {
 	String tag_name;
 	int tag_tt_num;
 
-	int tt_name;	//해당하는 태그타입(대분류) 이름
+	String tt_name;	//해당하는 태그타입(대분류) 이름
 }

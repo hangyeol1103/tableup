@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.dao.UserDAO;
+import kr.kh.tableup.model.util.Criteria;
+import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
@@ -292,6 +294,20 @@ public class UserService {
 	public List<FoodCategoryVO> getFoodCategoryList() {
 		
     return userDAO.selectFoodCategoryList();
+	}
+  public List<RestaurantVO> getRestaurantList(Criteria cri) {
+    if(cri == null) {
+			return null;
+		}
+		return userDAO.selectRestaurantList(cri);
+  }
+	public PageMaker getPageMaker(Criteria cri) {
+    if(cri == null) {
+			return null;
+		}
+		
+		int count = userDAO.selectCountRestaurantList(cri);
+		return new PageMaker(1, cri, count);
 	}
 
 

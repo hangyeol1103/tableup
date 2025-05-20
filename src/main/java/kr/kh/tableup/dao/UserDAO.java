@@ -1,8 +1,10 @@
 package kr.kh.tableup.dao;
 
 import java.util.List;
-import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
+import kr.kh.tableup.model.util.Criteria;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
@@ -46,4 +48,8 @@ public interface UserDAO {
 	List<RegionVO> selectRegionList();
 
 	List<FoodCategoryVO> selectFoodCategoryList();
+
+	List<RestaurantVO> selectRestaurantList(@Param("cri") Criteria cri);
+
+	int selectCountRestaurantList(@Param("cri") Criteria cri);
 }

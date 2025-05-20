@@ -139,4 +139,32 @@
 		RIGHT JOIN detailfoodcategory ON fc_num = dfc_fc_num
 		</select>
 
+		<select id="selectRestaurantList" resultType="kr.kh.tableup.model.vo.RestaurantVO">
+			select * from Restaurant 
+			left join RestaurantDetail on rt_num = rd_rt_num
+			where rt_accept = "Y" 
+			<if test="cri.rt_dreg_num > 0">
+				and rt_dreg_num = #{cri.rt_dreg_num}
+			</if>
+			<if test="cri.rt_dfc_num > 0">
+				and rt_dfc_num = #{cri.rt_dfc_num}
+			</if>
+			<if test="cri.orderBy == 'test'">
+			ORDER BY ${cri.orderBy}
+			</if>
+			<if test="cri.orderBy != 'test'">
+			ORDER BY rt_num desc
+			</if>
+			limit #{cri.pageStart}, #{cri.perPageNum}
+		</select>
+		<select id="selectCountRestaurantList" resultType="int">
+			select count(*) from Restaurant where rt_accept = "Y" 
+			<if test="cri.rt_dreg_num > 0">
+				and rt_dreg_num = #{cri.rt_dreg_num}
+			</if>
+			<if test="cri.rt_dfc_num > 0">
+				and rt_dfc_num = #{cri.rt_dfc_num}
+			</if>
+		</select>
+
 </mapper>

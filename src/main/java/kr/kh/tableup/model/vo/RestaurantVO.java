@@ -23,4 +23,5 @@ public class RestaurantVO {
 	String rd_info;
 	String rd_home;
 	String rd_addr;
+
 }

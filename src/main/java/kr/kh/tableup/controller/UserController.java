@@ -1,20 +1,16 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,11 +25,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import kr.kh.tableup.model.util.CustomUser;
-import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.util.PageMaker;
+import kr.kh.tableup.model.util.ResCriteria;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
-import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
@@ -345,11 +341,28 @@ public class UserController {
 
         model.addAttribute("regionList", regionList);
         model.addAttribute("foodList", foodList);
+        if(dreg_num != null)model.addAttribute("dreg_num", dreg_num);
+        if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
 
-        
         //model.addAttribute("param", new FilterParam(regionNum, foodNum)); 
 
+        System.out.println("리스트 호출");
         return "user/list/list"; 
     }
+
+    @PostMapping("/list/sub")
+	public String listPost(Model model, @RequestBody ResCriteria cri) {
+		cri.setPerPageNum(2);
+		//num를 서비스에게 주면서 게시판 번호에 맞는 게시글 목록 중 2개를 가져오라고 요청.
+		List<RestaurantVO> list = userService.getRestaurantList(cri);
+		//서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청
+		PageMaker pm = userService.getPageMaker(cri);
+		
+		//가져온 게시글 목록을 화면에 전송
+		model.addAttribute("list", list);
+		model.addAttribute("pm", pm);
+        System.out.println("상세 호출");
+		return "user/list/sublist";
+	}
 
 }

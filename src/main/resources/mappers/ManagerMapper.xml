@@ -130,6 +130,23 @@
 		select * from rescoupon where rec_rt_num=#{rt_num}
 	</select>
 
+	<insert id="insertCoupon" useGeneratedKeys="true" keyProperty="rec_num">
+		insert into rescoupon (rec_content, rec_state, rec_period, rec_rt_num)
+		value (#{rec_content},#{rec_state},#{rec_period},#{rec_rt_num})
+	</insert>
+
+	<update id="updateCoupon">
+		update rescoupon set
+			rec_content = #{rec_content}, 
+			rec_state = #{rec_state}, 
+			rec_period = #{rec_period}
+		where rec_num=#{rec_num}
+	</update>
+
+	<delete id="deleteCoupon">
+		delete from rescoupon where rec_num=#{rec_num}
+	</delete>
+
 	<!-- 소식 -->
 	<select id="selectNewsList" resultType="ResNewsVO">
 		select * from resnews where rn_rt_num=#{rt_num}
@@ -176,5 +193,53 @@
 			 #{bd_close}, #{bd_brstart}, #{bd_brend},
 			 #{bd_loam}, #{bd_lopm}, #{bd_rt_num})
 	</insert>
+
+	<select id="selectBuisnessDate" resultType="BusinessDateVO">
+		select * from businessdate where bd_num=#{bd_num}
+	</select>
+
+	<update id="updateOperTime">
+		update businessdate set
+			bd_date = #{bd_date}, 
+			bd_off = #{bd_off}, 
+			bd_open = #{bd_open}, 
+			bd_close = #{bd_close}, 
+			bd_brstart = #{bd_brstart}, 
+			bd_brend = #{bd_brend}, 
+			bd_loam = #{bd_loam}, 
+			bd_lopm = #{bd_lopm}
+		where bd_num = #{bd_num}
+	</update>
+
+	<delete id="deleteOperTime">
+		delete from businessdate where bd_num =#{bd_num}
+	</delete>
+
+	<select id="selectCoupon" resultType="ResCouponVO">
+		select * from rescoupon where rec_num=#{rec_num}
+	</select>
+
+	<insert id="insertNews" useGeneratedKeys="true" keyProperty="rn_num">
+		insert into resnews (rn_content, rn_state, rn_rt_num)
+		value (#{rn_content}, #{rn_state}, #{rn_rt_num})
+	</insert>
+
+	<select id="selectResNews" resultType="ResNewsVO">
+		select * from resnews where rn_num=#{rn_num}
+	</select>
 	
+	<update id="updateNews">
+		update resnews set
+			rn_content = #{rn_content}, 
+			rn_state = #{rn_state}
+		where rn_num=#{rn_num}
+	</update>
+
+	<delete id="deleteNews">
+		delete from resnews where rn_num=#{rn_num}
+	</delete>
+
+	<select id="selectTemplateList" resultType="BusinessHourTemplateVO">
+		select * from businessHourtemplate where bhd_rt_num = #{rt_num}
+	</select>
 </mapper>

@@ -29,7 +29,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<tbody>
 				<tr th:each="coupon : ${couponlist}">
 					<td>
-						<a th:href="@{/manager/coupon/{rec_num}(rec_num = ${coupon.rec_num})}" th:text="${menu.mn_name}"></a>
+						<a th:href="@{/manager/coupon/{rec_num}(rec_num = ${coupon.rec_num})}" th:text="${coupon.rec_content}"></a>
 					</td>
 					<td th:text="${coupon.rec_state} ">상태</td>
 					<td th:text="${coupon.rec_period}">기간</td>

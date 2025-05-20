@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import kr.kh.tableup.dao.ManagerDAO;
 import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -212,18 +213,53 @@ public class ManagerService {
 	}
 
 	//상세 정보 등록하기
-	public boolean insertResDetail(RestaurantDetailVO resdetail) {
+	public boolean insertResDetail(RestaurantVO resdetail) {
 		return managerDAO.insertResDetail(resdetail);
 	}
 
 	//상세 정보 수정하기
-	public boolean updateDetail(RestaurantDetailVO resdetail) {
+	public boolean updateDetail(RestaurantVO resdetail) {
 		return managerDAO.updateDetail(resdetail);
 	}
 
 	//쿠폰 리스트
 	public List<ResCouponVO> getCouponList(int rt_num) {
 		return managerDAO.selectCouponList(rt_num);
+	}
+
+	//쿠폰 등록
+	public boolean makeCoupon(ResCouponVO coupon) {
+		if(coupon == null){
+			return false;
+		}
+		boolean res=managerDAO.insertCoupon(coupon);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+
+	//쿠폰 상세 정보
+	public ResCouponVO getCoupon(int rec_num) {
+		return managerDAO.selectCoupon(rec_num);
+	}
+
+	//쿠폰 정보 변경
+	public boolean updateCoupon(ResCouponVO coupon) {
+		System.out.println(coupon);
+		if(coupon == null){
+			return false;
+		}
+		boolean res = managerDAO.updateCoupon(coupon);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+	
+	//쿠폰 정보 삭제
+	public boolean deleteCoupon(int rec_num) {
+		return managerDAO.deleteCoupon(rec_num);
 	}
 
 	//소식 리스트
@@ -293,6 +329,73 @@ public class ManagerService {
 		System.out.println("등록 성공");
 		return true;
 	}
+
+	public BusinessDateVO getBusinessDate(int bd_num) {
+		return managerDAO.selectBuisnessDate(bd_num);
+	}
+
+	//영업일자 변경
+	public boolean remakeOperTime(BusinessDateVO opertime) {
+	if(opertime==null){
+			return false;
+		}
+		boolean res =managerDAO.updateOperTime(opertime);
+		if(!res){
+			System.out.println("수정 실패");
+			return false;
+		}
+		System.out.println("수정 성공");
+		return true;
+	}
+
+	//영업일자 삭제
+	public boolean deleteOperTime(int bd_num) {
+		return managerDAO.deleteOperTime(bd_num);
+	}
+
+	//소식/공지사항 등록
+	public boolean makeNews(ResNewsVO news) {
+		if(news == null || news.getRn_content().isEmpty()){
+			return false;
+		}
+		boolean res = managerDAO.insertNews(news);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+	//공지사항 정보 출력
+	public ResNewsVO getNews(int rn_num) {
+		return managerDAO.selectResNews(rn_num);
+	}
+
+	//공지사항 변경 
+	public boolean updateNews(ResNewsVO news) {
+		if(news == null || news.getRn_content().isEmpty()){
+			return false;
+		}
+		boolean res = managerDAO.updateNews(news);
+		if(!res){
+			return false;
+		}
+		return true;
+	}
+
+	public boolean deleteNews(int rn_num) {
+		return managerDAO.deleteNews(rn_num);
+	}
+
+	public RestaurantVO getRestaurantByNum(int rt_num) {
+		return managerDAO.selectRestaurant(rt_num);
+	}
+
+	public List<BusinessHourTemplateVO> getTemplateList(int rt_num) {
+		return managerDAO.selectTemplateList(rt_num);
+	}
+
+	
+
+	
 
 	
 

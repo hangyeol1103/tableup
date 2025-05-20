@@ -182,7 +182,7 @@
 	</delete>
 
 	<select id="selectOperTimeList" resultType="BusinessDateVO">
-		select * from businessdate where bd_rt_num=#{rt_num}
+		select * from businessdate where bd_rt_num=#{rt_num} order by bd_date desc
 	</select>
 
 	<insert id="insertOperTime" useGeneratedKeys="true" keyProperty="bd_num">

@@ -34,11 +34,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             <td th:text="${#dates.format(res.bh_start, 'HH:mm')}">시간</td>
 
             <td th:each="bd : ${opertimelist}">
-                <span th:if="${!bd.bd_off}">
-                    좌석: <span th:text="${res.bh_seat_current}"/> /
-                    테이블: <span th:text="${res.bh_table_current}"/>
+                <span th:if="${!bd.bd_off}" th:each="bhd : ${teplatelist}">
+                    좌석: <span th:text="${bhd.bhd_seat}"/> /
+                    테이블: <span th:text="${bhd.bhd_table}"/>
                 </span>
-                <span th:if="${bd.bd_off}" class="text-danger fw-bold">휴무</span>
+                <span th:if="${bd.bd_off}" class="text-danger fw-bold">쉬는 날</span>
             </td>
         </tr>
         </tbody>
@@ -47,8 +47,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		<!-- 매장 정보가 등록이 되어 있지 않으면-->
 		<div th:unless="${restaurant != null}">
 			<h3>아직 식당정보를 입력하지 않앗습니다.</h3>
-      <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make'">매장등록</button>
 		</div>
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/schedule/make_schetime'">일정등록</button>
 	</main>
 </body>
 </html>

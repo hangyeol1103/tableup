@@ -166,5 +166,15 @@
 				and rt_dfc_num = #{cri.rt_dfc_num}
 			</if>
 		</select>
+		<select id="selectRestaurantDetail" resultType="RestaurantVO">
+			SELECT 
+				r.*, 
+				rd.rd_phone, rd.rd_info, rd.rd_home, rd.rd_addr
+			FROM restaurant r
+			LEFT JOIN restaurantdetail rd ON r.rt_num = rd.rd_rt_num
+			WHERE r.rt_num = #{rt_num}
+		</select>
+
+
 
 </mapper>

@@ -52,4 +52,7 @@ public interface UserDAO {
 	List<RestaurantVO> selectRestaurantList(@Param("cri") Criteria cri);
 
 	int selectCountRestaurantList(@Param("cri") Criteria cri);
+
+	RestaurantVO selectRestaurantDetail(@Param("rt_num") int rt_num);
+
 }

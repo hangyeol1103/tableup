@@ -24,6 +24,7 @@ import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
+import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UserVO;
 
 @Service
@@ -304,5 +305,10 @@ public class UserService {
   public DetailFoodCategoryVO getDetailFoodCategoryByRestaurant(int rt_num) {
     return userDAO.selectDetailFoodCategoryByRestaurant(rt_num);
   }
+
+  public TagVO getTagByRestaurant(int rt_num) {
+    return userDAO.selectTagByRestaurant(rt_num);
+  }
+
 
 }

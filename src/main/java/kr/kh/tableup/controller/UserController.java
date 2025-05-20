@@ -284,6 +284,12 @@ public class UserController {
         return "user/review/insertsub";  
     }
 
+    @GetMapping("/detail")
+    public String detailPage() {
+      return "user/detail/detail";
+    }
+
+
 
     @PostMapping("/review/insertPost")
     public String insertReview(

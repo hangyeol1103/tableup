@@ -166,10 +166,10 @@
 			us_phone = #{us_phone}
     WHERE us_id = #{us_id}
 	</update>
-	<select id="selectUserByPhone" resultType="kr.kh.tableup.model.vo.UserVO">
+	<select id="selectUserByPhone" resultType="UserVO">
 		SELECT * FROM user WHERE us_phone = #{phone}
 	</select>
-	<select id="selectUserByEmail" resultType="kr.kh.tableup.model.vo.UserVO">
+	<select id="selectUserByEmail" resultType="UserVO">
 		SELECT * FROM user WHERE us_email = #{email}
 	</select>
 
@@ -190,20 +190,20 @@
 		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
 	</select>
 
-	<select id="selectReservationByUser" resultType="kr.kh.tableup.model.vo.ReservationVO">
+	<select id="selectReservationByUser" resultType="ReservationVO">
 		SELECT * FROM Reservation 
 		LEFT JOIN user ON us_num = res_us_num
 		LEFT JOIN restaurant ON rt_num = res_rt_num
 		WHERE res_us_num = #{us_num}
 	</select>
 
-	<select id="selectFollowedRestaurant" resultType="kr.kh.tableup.model.vo.RestaurantVO">
+	<select id="selectFollowedRestaurant" resultType="RestaurantVO">
 		select * from usfollow 
 		join restaurant on uf_foreign = rt_num
 		where uf_type = 'RESTAURANT' and uf_us_num = #{us_num} 
 	</select>
 
-	<select id="selectFollowedReview" resultType="kr.kh.tableup.model.vo.ReviewVO">
+	<select id="selectFollowedReview" resultType="ReviewVO">
 		select * from usfollow 
 		join REVIEW on uf_foreign = rev_num
 		join restaurant on rt_num = rev_rt_num
@@ -274,6 +274,7 @@
 		<select id="selectRegionList" resultType="kr.kh.tableup.model.vo.RegionVO">
 		SELECT reg_num, reg_main, dreg_num, dreg_sub FROM region
 		RIGHT JOIN detailregion ON reg_num = dreg_reg_num
+		ORDER BY reg_num, dreg_num
 		</select>
 
 		<select id="selectFoodCategoryList" resultType="kr.kh.tableup.model.vo.FoodCategoryVO">

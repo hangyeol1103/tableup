@@ -294,6 +294,16 @@ public class UserService {
 		
     return userDAO.selectRegionList();
 	}
+  
+	public 	Map<String, List<RegionVO>> getRegionMap() {
+		
+    // reg_main 기준으로 (LinkedHashMap -> 순서 보장)
+		Map<String, List<RegionVO>> regionMap = getRegionList().stream()
+			.collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+
+    return regionMap;
+	}
+  
 
 
 

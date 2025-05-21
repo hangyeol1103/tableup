@@ -66,7 +66,8 @@ INSERT INTO tag(tag_name,TAG_TT_NUM)
     
 -- 편의시설
 INSERT INTO facility(fa_name,fa_title,fa_icon)
-	VALUES('무선인터넷','사용가능한 무선인터넷',null);
+	VALUES('무선인터넷','사용가능한 무선인터넷',null),
+		  ('주차공간','넓은 주차공간',null);
 
 INSERT INTO restaurantfacility(rf_rt_num,rf_fa_num,rf_detail)
 	VALUES(1,1,'와이파이 사용 가능(가게 문의)');

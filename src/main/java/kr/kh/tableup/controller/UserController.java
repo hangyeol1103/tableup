@@ -385,28 +385,4 @@ public class UserController {
     return "user/detail/detail";
   }
 
-  @GetMapping("/reservation/confirm")
-  public String reservationConfirm(
-      @RequestParam String date,
-      @RequestParam String time,
-      @RequestParam int person,
-      Model model) {
-    model.addAttribute("date", date);
-    model.addAttribute("time", time);
-    model.addAttribute("person", person);
-    return "user/reservation/confirm";
-  }
-
-  @PostMapping("/reservation/submit")
-  public String reservationSubmit(
-      @RequestParam String date,
-      @RequestParam String time,
-      @RequestParam int person,
-      @RequestParam(required = false) String request,
-      Principal principal) {
-    // DB 저장 로직: reservation 테이블에 INSERT
-    return "redirect:/"; //임시
-    // return "redirect:/user/mypage";
-  }
-
 }

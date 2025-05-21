@@ -26,11 +26,14 @@
     <main layout:fragment="content">
       <div class="container">
         <h2 class="mt-4">예약 확인</h2>
+        <p>식당명: <span th:text="${restaurant.rt_name}"></span></p>
         <p>예약 날짜: <span th:text="${date}"></span></p>
         <p>예약 시간: <span th:text="${time}"></span></p>
         <p>인원수: <span th:text="${person}"></span></p>
 
+
         <form th:action="@{/user/reservation/submit}" method="post">
+          <input type="hidden" name="rt_num" th:value="${rt_num}" />
           <input type="hidden" name="date" th:value="${date}" />
           <input type="hidden" name="time" th:value="${time}" />
           <input type="hidden" name="person" th:value="${person}" />
@@ -38,9 +41,9 @@
           <label>요청 사항</label>
           <textarea name="request" class="form-control mb-3" rows="3"></textarea>
 
-          <button class="btn btn-primary">예약 확정</button>
+          <button type="submit" class="btn btn-primary">예약 확정</button>
         </form>
       </div>
-    </body>
-  </main>
+    </main>
+  </body>
 </html>

@@ -81,6 +81,7 @@
                 class="list-group-item border-0 ps-3 fw-bold py-0 fs-5"
                 th:text="${restaurant.rt_name}"
               ></li>
+              <input type="hidden" id="rt-num" th:value="${restaurant.rt_num}" />
               <li class="list-group-item border-0 ps-3 fw-bold py-0">
                 ⭐️ 4.7 • 리뷰 123개 >
               </li>
@@ -263,15 +264,13 @@
               <label for="select-time" class="form-label fw-bold">시간</label>
               <select id="select-time" class="form-select mb-3"></select>
             </div>
-
             <button
-  type="button"
-  class="btn btn-warning btn-lg d-block mx-auto"
-  onclick="submitReservation()"
->
-  예약하기
-</button>
-
+              type="button"
+              class="btn btn-warning btn-lg d-block mx-auto"
+              onclick="submitReservation()"
+            >
+              예약하기
+            </button>
             <button
               type="button"
               class="btn btn-secondary btn-lg d-block mx-auto mt-3"
@@ -351,12 +350,15 @@
 
         // 예약하기 URL 이동
         function submitReservation() {
+          const rtNum = document.getElementById("rt-num").value;
           const date = document.getElementById("selected-date").textContent;
           const time = document.getElementById("select-time").value;
           const person = document.getElementById("select-people").value;
-          const url = `/user/reservation/confirm?date=${encodeURIComponent(
+
+          const url = `/user/reservation/confirm?rt_num=${rtNum}&date=${encodeURIComponent(
             date
           )}&time=${encodeURIComponent(time)}&person=${person}`;
+
           location.href = url;
         }
       </script>

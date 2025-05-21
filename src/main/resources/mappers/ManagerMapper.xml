@@ -242,4 +242,34 @@
 	<select id="selectTemplateList" resultType="BusinessHourTemplateVO">
 		select * from businessHourtemplate where bhd_rt_num = #{rt_num}
 	</select>
+
+	<select id="selectFacilityList" resultType="FacilityVO">
+		select * from facility 
+	</select>
+
+	<select id="selectResFacilityList" resultType="RestaurantFacilityVO">
+		select * from restaurantfacility where rf_rt_num=#{rt_num}
+	</select>
+
+	<insert id="insertResFacility" useGeneratedKeys="true" keyProperty="rf_num">
+		insert into restaurantfacility (rf_fa_num, rf_detail, rf_rt_num)
+		value(#{rf_fa_num}, #{rf_detail}, #{rf_rt_num})
+	</insert>
+	
+	<update id="updateResFacility">
+		update restaurantfacility set
+			<if test="rf_fa_num != 0">
+				rf_fa_num = #{rf_fa_num}, 
+			</if>
+			rf_detail=#{rf_detail}
+		where rf_num=#{rf_num}
+	</update>
+
+	<select id="selectResFacility" resultType="RestaurantFacilityVO">
+		select * from restaurantfacility where rf_num=#{rf_num}
+	</select>
+
+	<delete id="deleteResFacility">
+		delete from restaurantfacility where rf_num=#{rf_num}
+	</delete>
 </mapper>

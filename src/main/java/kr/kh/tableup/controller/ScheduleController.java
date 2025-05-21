@@ -49,38 +49,16 @@ public class ScheduleController {
 		else{
 			RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 			List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
-
-			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			for (BusinessDateVO bd : opertimelist) {
-					if (bd.getBd_date() != null && bd.getBd_date().length() >= 10) {
-							String onlyDate = bd.getBd_date().substring(0, 10);
-							bd.setBd_local_date(LocalDate.parse(onlyDate, dateFormatter));
-							System.out.println("bd : "+bd);
-					}
-			}
-			
-			Map<String, BusinessDateVO> businessDateMap = new HashMap<>();
-			for (BusinessDateVO bd : opertimelist) {
-					if (bd.getBd_date() != null && bd.getBd_date().length() >= 10) {
-							String onlyDate = bd.getBd_date().substring(0, 10); // "2025-05-26"
-							bd.setBd_local_date(LocalDate.parse(onlyDate, dateFormatter));
-							businessDateMap.put(onlyDate, bd);
-					}
-			}
-			model.addAttribute("businessDateMap", businessDateMap);
 			
 			List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
-			List<BusinessHourTemplateVO> teplatelist =managerService.getTemplateList(rt_num);
 			//터미널에 필요한 매장 정보 및 세부 정보들 출력
 			System.out.println(restaurant);
 			System.out.println(opertimelist);
 			System.out.println(restimelist);
-			System.out.println(teplatelist);
 
       model.addAttribute("restaurant", restaurant);
       model.addAttribute("opertimelist", opertimelist);
       model.addAttribute("restimelist", restimelist);
-			model.addAttribute("teplatelist",teplatelist);
 		}
 
 		List<LocalDate> dateList= new ArrayList<>();

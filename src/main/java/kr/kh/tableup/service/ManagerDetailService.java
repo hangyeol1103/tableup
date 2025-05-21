@@ -18,12 +18,13 @@ public class ManagerDetailService implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		System.out.println("로그인 시도: " + username);
 		RestaurantManagerVO manager = managerDAO.selectManager(username);
-
 		if (manager == null) {
             throw new UsernameNotFoundException("존재하지 않는 매니저입니다: " + username);
         }
-
+				System.out.println("불러온 비밀번호: " + manager.getRm_pw());
+				System.out.println("UserDetails.getPassword(): " + manager.getRm_pw());
         return new CustomManager(manager);
     }
 

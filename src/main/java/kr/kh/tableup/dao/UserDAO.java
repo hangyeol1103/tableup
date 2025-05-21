@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.Criteria;
 import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
@@ -61,4 +62,13 @@ public interface UserDAO {
 	List<FacilityVO> selectFacilityList();
 
 	List<TagVO> selectTagList();
+	RestaurantVO selectRestaurantDetail(@Param("rt_num") int rt_num);
+
+	FoodCategoryVO selectFoodCategoryByRestaurant(int rt_num);
+
+	DetailFoodCategoryVO selectDetailFoodCategoryByRestaurant(@Param("rt_num") int rt_num);
+
+	TagVO selectTagByRestaurant(@Param("rt_num") int rt_num);
+
+
 }

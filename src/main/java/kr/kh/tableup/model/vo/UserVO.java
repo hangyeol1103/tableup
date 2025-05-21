@@ -46,4 +46,5 @@ public class UserVO{
   
   private int us_state;
 
+
 }

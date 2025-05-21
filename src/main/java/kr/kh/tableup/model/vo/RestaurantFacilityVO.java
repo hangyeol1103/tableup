@@ -6,5 +6,6 @@ import lombok.Data;
 public class RestaurantFacilityVO {
 	int rf_num;
 	int rf_rt_num;
-	int rf_fd_num;
+	int rf_fa_num;
+	String rf_detail;
 }

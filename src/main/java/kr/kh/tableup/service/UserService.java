@@ -310,5 +310,10 @@ public class UserService {
     return userDAO.selectTagByRestaurant(rt_num);
   }
 
+  public String getFacilityDetail(int rt_num) {
+    return userDAO.selectFacilityDetailByRestaurant(rt_num);
+  }
+
+
 
 }

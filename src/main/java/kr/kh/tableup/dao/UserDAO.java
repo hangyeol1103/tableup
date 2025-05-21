@@ -63,5 +63,9 @@ public interface UserDAO {
 
 	TagVO selectTagByRestaurant(@Param("rt_num") int rt_num);
 
+	String selectFacilityDetailByRestaurant(int rt_num);
+
+
+
 
 }

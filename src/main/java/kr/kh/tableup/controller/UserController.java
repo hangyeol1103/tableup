@@ -376,13 +376,13 @@ public class UserController {
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
     TagVO tag = userService.getTagByRestaurant(rt_num);
-
+    String detail = userService.getFacilityDetail(rt_num);
     
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
-
+    model.addAttribute("detail", detail);
 
     return "user/detail/detail";
   }

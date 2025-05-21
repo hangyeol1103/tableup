@@ -10,4 +10,6 @@ public class FileVO {
 	String file_type;
 	String file_foreign;
 	String file_tag;
+	
+	int file_res_num;
 }

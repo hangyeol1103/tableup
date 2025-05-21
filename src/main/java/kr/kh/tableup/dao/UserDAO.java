@@ -2,14 +2,24 @@ package kr.kh.tableup.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
+import kr.kh.tableup.model.util.Criteria;
+import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
+import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
+import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.UserVO;
 
 public interface UserDAO {
 
-  UserVO selectUser(String us_id);
+	UserVO selectUser(int us_num);
+
+  UserVO selectUserById(String us_id);
 
   boolean insertUser(UserVO user);
 
@@ -26,4 +36,20 @@ public interface UserDAO {
 	List<RestaurantVO> selectFollowedRestaurant(Integer us_num);
 
 	List<ReviewVO> selectFollowedReview(Integer us_num);
+
+	List<ScoreTypeVO> selectScoreTypeList();
+
+	boolean insertReview(ReviewVO review);
+
+	boolean insertReviewScore(ReviewScoreVO reviewScore);
+
+	void insertFile(FileVO fileVO);
+
+	List<RegionVO> selectRegionList();
+
+	List<FoodCategoryVO> selectFoodCategoryList();
+
+	List<RestaurantVO> selectRestaurantList(@Param("cri") Criteria cri);
+
+	int selectCountRestaurantList(@Param("cri") Criteria cri);
 }

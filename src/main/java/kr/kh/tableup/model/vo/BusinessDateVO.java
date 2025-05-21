@@ -1,20 +1,46 @@
 package kr.kh.tableup.model.vo;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 
 @Data
 public class BusinessDateVO {
-	int bd_num;
-	Date bd_date;
-	int bd_rt_num;
-	boolean bd_off;
-	String bd_open;
-	String bd_close;
-	String bd_brstart;
-	String bd_brend;
-	String bd_loam;
-	String bd_lopm;
+	private int bd_num;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private String bd_date;
+	
+	private int bd_rt_num;
+
+	private boolean bd_off;
+	@DateTimeFormat(pattern = "HH:mm")
+	private Date bd_open;
+	@DateTimeFormat(pattern = "HH:mm")
+	private Date bd_close;
+	@DateTimeFormat(pattern = "HH:mm")
+	private Date bd_brstart;
+	@DateTimeFormat(pattern = "HH:mm")
+	private Date bd_brend;
+	@DateTimeFormat(pattern = "HH:mm")
+	private Date bd_loam;
+	@DateTimeFormat(pattern = "HH:mm")
+	private Date bd_lopm;
+	
+
+	private LocalDate bd_local_date;
+
+	
+	// public String getBd_date(){
+	// 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	// 	return format.format(bd_open);
+	// }
+
 	
 }

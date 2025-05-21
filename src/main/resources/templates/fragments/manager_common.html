@@ -10,15 +10,15 @@
 	<header th:fragment="header">
 		<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
 			<div class="container-fluid">
-				<a class="navbar-brand" th:href="@{/manager/main}">테이블업</a>
+				<a class="navbar-brand" th:href="@{/manager/main}">매니저</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
 					<span class="navbar-toggler-icon"></span>
 				</button>
 				<div class="collapse navbar-collapse" id="mynavbar">
 					<ul class="navbar-nav me-auto">
-						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
+						<!-- <li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/main}" th:classappend="${url == '/manager/main' ? 'active' : ''}">매니저페이지</a>
-						</li>
+						</li> -->
 						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/restaurant}" th:classappend="${url == '/manager/restaurant' ? 'active' : ''}">매장관리</a>
 						</li>
@@ -35,10 +35,10 @@
 						</li>
 						
 					</ul>
-					<form class="d-flex">
+					<!-- <form class="d-flex">
 						<input class="form-control me-2" type="text" placeholder="Search">
 						<button class="btn btn-primary" type="button">Search</button>
-					</form>
+					</form> -->
 				</div>
 			</div>
 		</nav>

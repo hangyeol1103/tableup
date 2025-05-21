@@ -38,7 +38,7 @@ public class SecurityConfig{
     @Order(1)
     public SecurityFilterChain managerSecurityFilterChain(HttpSecurity http) throws Exception {
       http
-      .securityMatcher("/manager/**")
+      .securityMatcher("/manager/**", "/schedule/**")
       .authorizeHttpRequests(auth -> auth
           .requestMatchers("/manager/signup", "/manager/register").permitAll()
           .anyRequest().authenticated()
@@ -97,6 +97,7 @@ public class SecurityConfig{
         .securityMatcher("/user/**", "/","/home")
         .csrf(csrf ->csrf.disable())
         .authorizeHttpRequests((requests) -> requests
+        .requestMatchers("/user/review/insert").authenticated()
         .anyRequest().permitAll()  // 그 외 요청은 인증 필요
       )
      

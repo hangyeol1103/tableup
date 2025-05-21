@@ -21,33 +21,44 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<table class="table table-bordered table-hover">
 			<thead>
 				<tr>
-					<th>이미지</th>
-					<th>이름</th>
-					<th>가격</th>
-					<th>색인</th>
+					<th>영업날짜</th>
+					<th>휴무일 여부</th>
+					<th>개점 시간</th>
+					<th>마감 시간</th>
+					<th>브레이크 타임(시작)</th>
+					<th>브레이크 타임(마감)</th>
+					<th>라스트오더 시간(점심)</th>
+					<th>라스트오더 시간(저녁)</th>
+					<th>영업 시간 관리</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="menu : ${menulist}">
-					<td>
-						<a style="cursor : pointer;"
-							 th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}">
-							<img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="" style="width:200px" height="200px">
-						</a>
+				<tr th:each="opertime : ${opertimelist}">
+					<td th:text="${opertime.bd_date != null ? #dates.format(opertime.bd_date, 'yyyy-MM-dd') : '-'}">날짜</td>
+					<td th:text="${opertime.bd_off != null ? (opertime.bd_off ? '쉬는날' : '여는날') : '-'}">휴무일 여부</td>
+					<td th:text="${opertime.bd_open != null ? #dates.format(opertime.bd_open, 'HH:mm') : '-'} " >개점 시간</td>
+					<td th:text="${opertime.bd_close != null ? #dates.format(opertime.bd_close, 'HH:mm') : '-'} ">마감 시간</td>
+					<td th:text="${opertime.bd_brstart != null ? #dates.format(opertime.bd_brstart, 'HH:mm') : '-'} ">브레이크 타임(시작)</td>
+					<td th:text="${opertime.bd_brend != null ? #dates.format(opertime.bd_brend, 'HH:mm') : '-'} ">브레이크 타임(마감)</td>
+					<td th:text="${opertime.bd_loam != null ? #dates.format(opertime.bd_loam, 'HH:mm') : '-'} ">라스트오더 시간(점심)</td>
+					<td th:text="${opertime.bd_lopm != null ? #dates.format(opertime.bd_lopm, 'HH:mm') : '-'} ">라스트오더 시간(저녁)</td>
+					<!-- 영업 시간 수정버튼 -->
+					<td class="">
+						<form th:action="@{/manager/remake_opertime/{bd_num}(bd_num=${opertime.bd_num})}" method="get" style="display:inline;">
+							<button type="submit" class="btn btn-outline-primary">영업 시간 정보 변경</button>
+						</form>
+						<form th:action="@{/manager/delete_opertime/{bd_num}(bd_num=${opertime.bd_num})}" method="post" style="display:inline;">
+							<button type="submit" class="btn btn-outline-danger">영업 시간 정보 삭제</button>
+						</form>
 					</td>
-					<td>
-						<a th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}" th:text="${menu.mn_name}"></a>
-					</td>
-					<td th:text="${menu.mn_price} ">가격</td>
-					<td th:text="${menu.mn_div}">색인</td>
 				</tr>
 				<!-- 매장 정보가 등록이 되어 있지 않으면-->
-					<tr th:if="${menulist.size() == 0}">
-						<td colspan="4" class="text-center">아직 메뉴를 입력하지 않았습니다.</td>
+					<tr th:if="${opertimelist.size() == 0}">
+						<td colspan="9" class="text-center">아직 영업 시간및 날짜를 입력하지 않았습니다.</td>
 					</tr>
 			</tbody>
 		</table>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_menu'">메뉴등록</button>
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_opertime'">영업시간 등록</button>
 		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 	</main>
 </body>

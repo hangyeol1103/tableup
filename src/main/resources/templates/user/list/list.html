@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>식당 목록</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<main layout:fragment="content" class="container mt-5">
+  <h2>식당 목록</h2>
+
+  <form id="filterForm" class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label class="form-label">지역</label>
+      <select class="form-select" name="dreg_num" id="regionSelect" onchange="loadList(true)">
+        <option value="0">전체</option>
+        <option th:each="region : ${regionList}"
+                th:value="${region.dreg_num}"
+                th:text="${region.reg_main + ' : ' + region.dreg_sub}"
+                th:selected="${region.dreg_num == dreg_num}"></option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">음식 종류</label>
+      <select class="form-select" name="dfc_num" id="foodSelect" onchange="loadList(true)">
+        <option value="0">전체</option>
+        <option th:each="food : ${foodList}"
+                th:value="${food.dfc_num}"
+                th:text="${food.fc_main + ' : ' + food.dfc_sub}"
+                th:selected="${food.dfc_num == dfc_num}"></option>
+      </select>
+    </div>
+
+    <div class="col-md-4 d-flex align-items-end">
+      <button type="button" class="btn btn-primary w-100" onclick="loadList(true)">검색</button>
+    </div>
+  </form>
+
+
+  <!-- 정렬방식 선택 -->
+  <div class="d-flex justify-content-between mt-3">
+		<select class="form-control col-3 sel-type">
+			<option value="po_num desc">최신순</option>
+			<option value="po_up desc, po_num desc">추천순</option>
+			<option value="po_view desc, po_num desc">조회순</option>
+		</select>
+	</div>
+  <!-- 정렬방식 선택 -->
+
+  <div id="list-container" class="pl-container mt-3 mb-3">
+    <!-- sub.html -->
+  </div>
+
+
+  <script type="text/javascript">
+    let cri = {
+      rt_dfc_num : 0,
+      rt_dreg_num : 0,
+      page : 1,
+      orderBy : "rt_num desc"
+    }
+    /*
+    let data = loadList(cri);
+    $(".pl-container").html(data);
+    */
+
+    //더보기 클릭 이벤트
+    $(document).on("click", ".btn-more", function(e){
+      $(this).remove();
+      cri.page += 1;
+      loadList(false); // 페이지 유지
+    });
+
+    // 정렬 방식 선택
+    $(document).on("change", ".sel-type", function () {
+      console.log("필터 검색 조건:", cri);
+      loadList(true); 
+    });
+
+	
+  
+    function loadList(resetPage = false) {
+      cri.rt_dfc_num = $('#foodSelect').val();
+      cri.rt_dreg_num = $('#regionSelect').val();
+      cri.orderBy = $('.sel-type').val();
+
+      if (resetPage) cri.page = 1;
+
+      $.ajax({
+        async : true,
+        url : "/user/list/sub",
+        type : 'post',
+        data : JSON.stringify(cri), 
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+          if (resetPage) {
+            $(".pl-container").html(data);
+          } else {
+            $(".pl-container").append(data); 
+          }
+        },
+        error: function () {
+          $(".pl-container").html('<div class="text-danger">불러오는 데 실패했습니다.</div>');
+        }
+      });
+    }
+
+
+    
+
+    // 페이지 최초 로드
+    $(document).ready(function() {
+      loadList(true);
+    });
+    
+    function likeRestaurant(rtNum) {
+      alert(rtNum + '번 매장');
+      // 추후 AJAX 찜 처리 연동
+    };
+
+    function openReviewModal(rtNum) {
+      alert(rtNum + '번 매장');
+      // 추후 리뷰 모달 연동
+    };
+
+  </script>
+</main>
+</body>
+</html>

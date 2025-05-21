@@ -1,6 +1,8 @@
 package kr.kh.tableup.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,6 +23,10 @@ public class WebMvcConfig implements WebMvcConfigurer{
 				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 				.allowCredentials(true); 
  	}
+	@Override
+	public Validator getValidator() {
+			return new LocalValidatorFactoryBean();
+	}
 	/*
 	@Override
 	public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {

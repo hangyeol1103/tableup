@@ -28,7 +28,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<th>최대 테이블 수</th>
 					<th>테이블 점유 수</th>
 					<th>닫힘여부</th>
-					<th>관리</th>
+					<th>예약 시간 관리</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -37,15 +37,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 						<a th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}" th:text="${menu.mn_name}"></a>
 					</td> -->
 					<td th:text="${restime.bh_start != null ? #dates.format(restime.bh_start, 'HH:mm') : '-'}">예약시간(시간)</td>
-					<td th:text="${restime.bh_start != null ? #dates.format(restime.bh_end, 'HH:mm') : '-'}">예약시간(끝)</td>
+					<td th:text="${restime.bh_end != null ? #dates.format(restime.bh_end, 'HH:mm') : '-'}">예약시간(끝)</td>
 					<td th:text="${restime.bh_seat_max} ">최대 좌석 수</td>
 					<td th:text="${restime.bh_seat_current} ">좌석 점유 수</td>
 					<td th:text="${restime.bh_table_max} ">최대 테이블</td>
 					<td th:text="${restime.bh_table_current} ">테이블 점유 수</td>
-					<td th:text="${restime.bh_state} ">닫힘여부</td>
+					<td th:text="${restime.bh_state != null ? (restime.bh_state ? '닫힘' : '열림') : '-'}">닫힘여부</td>
 					<td class="">
-						<a th:href="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" class="btn btn-ouline-warning">변경</a>
-						<a th:href="@{/manager/delete_restime/{bh_num}(bh_num=${restime.bh_num})}" class="btn btn-ouline-danger">삭제</a>
+						<!-- <a th:href="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" class="btn btn-ouline-warning">변경</a> -->
+						<form th:action="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" method="get" style="display:inline;">
+							<button type="submit" class="btn btn-outline-warning">변경</button>
+						</form>
+						<form th:action="@{/manager/delete_restime/{bh_num}(bh_num=${restime.bh_num})}" method="post" style="display:inline;">
+							<button type="submit" class="btn btn-outline-danger">삭제</button>
+						</form>
 					</td>
 				</tr>
 				<!-- 매장 정보가 등록이 되어 있지 않으면-->

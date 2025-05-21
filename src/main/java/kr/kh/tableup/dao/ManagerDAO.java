@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -57,7 +59,7 @@ public interface ManagerDAO {
 
 	boolean deleteMenu(int mn_num);
 
-	RestaurantDetailVO selectResDetail(int rt_num);
+	RestaurantVO selectResDetail(int rt_num);
 
 	boolean insertResDetail(RestaurantDetailVO resdetail);
 
@@ -65,13 +67,49 @@ public interface ManagerDAO {
 
 	List<ResCouponVO> selectCouponList(int rt_num);
 
+	boolean insertCoupon(ResCouponVO coupon);
+
 	List<ResNewsVO> selectNewsList(int rt_num);
 
 	List<BusinessHourVO> selectResTimeList(int rt_num);
 
 	boolean insertResTime(BusinessHourVO restime);
 
+	BusinessHourVO selectBusinessHour(int bh_num);
+
 	boolean updateResTime(BusinessHourVO restime);
+
+	boolean deleteResTime(int bh_num);
+
+	List<BusinessDateVO> selectOperTimeList(int rt_num);
+
+	boolean insertOperTime(BusinessDateVO opertime);
+
+	BusinessDateVO selectBuisnessDate(int bd_num);
+
+	boolean insertResDetail(RestaurantVO resdetail);
+
+	boolean updateDetail(RestaurantVO resdetail);
+
+	boolean updateOperTime(BusinessDateVO opertime);
+
+	boolean deleteOperTime(int bd_num);
+
+	ResCouponVO selectCoupon(int rec_num);
+
+	boolean updateCoupon(ResCouponVO coupon);
+
+	boolean deleteCoupon(int rec_num);
+
+	boolean insertNews(ResNewsVO news);
+
+	ResNewsVO selectResNews(int rn_num);
+
+	boolean updateNews(ResNewsVO news);
+
+	boolean deleteNews(int rn_num);
+
+	List<BusinessHourTemplateVO> selectTemplateList(int rt_num);
 
 	
 }

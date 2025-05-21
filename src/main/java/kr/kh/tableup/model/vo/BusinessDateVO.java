@@ -1,5 +1,6 @@
 package kr.kh.tableup.model.vo;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,12 @@ public class BusinessDateVO {
 	
 
 	private LocalDate bd_local_date;
+
+	
+	// public String getBd_date(){
+	// 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	// 	return format.format(bd_open);
+	// }
 
 	
 }

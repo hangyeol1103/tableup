@@ -394,9 +394,4 @@ public class ManagerService {
 	}
 
 	
-
-	
-
-	
-
 }

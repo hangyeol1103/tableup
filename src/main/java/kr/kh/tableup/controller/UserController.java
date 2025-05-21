@@ -370,7 +370,7 @@ public class UserController {
     return "user/list/sublist";
   }
 
-  @GetMapping("/detail/{rt_num}")
+  @GetMapping("/list/detail/{rt_num}")
   public String restaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
     RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);

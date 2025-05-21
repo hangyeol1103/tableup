@@ -13,7 +13,27 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 	<title>테이블업 - 매니저페이지 - 매장 일정 관리</title>
 
 <style>
-
+    .date-button.active {
+      background-color: #0d6efd;
+      color: white;
+    }
+    .time-button.active {
+      background-color: #198754;
+      color: white;
+    }
+    .table-box {
+      width: 80px;
+      height: 80px;
+      border: 2px solid #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 5px;
+      cursor: pointer;
+    }
+    .reserved {
+      background-color: lightgray;
+    }
 </style>
 </head>
 <body>
@@ -21,56 +41,84 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		<!-- 매장 정보가 등록이 되어 있으면-->
 		<h2>매장 일정 관리</h2>
         <div th:if="${restaurant != null}">
-            <table class="table table-bordered text-center align-middle">
-                <thead>
-                    <tr>
-                        <th>시간</th>
-                        <th th:each="date : ${dateList}"
-                            th:text="${#temporals.format(date, 'yyyy년 MM월 dd일 (E)')}">
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                     <tr th:each="time : ${timeList}">
-                        <td th:text="${#temporals.format(time, 'HH:mm')}"></td>
+            <div class="btn-group mb-3" role="group" aria-label="날짜 선택">
+            <button type="button" class="btn btn-outline-primary date-button"
+                    th:each="date : ${dateList}"
+                    th:text="${#temporals.format(date, 'MM/dd (E)')}"
+                    th:data-date="${date}"
+                    onclick="selectDate(this)">
+            </button>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>예약 가능 시간</h5>
+                    <div class="list-group" id="time-list">
+                    
+                    </div>
+                </div>
 
-                        <td th:each="date : ${dateList}"   th:with="key=${#temporals.format(date,'yyyy-MM-dd')}, bd=${businessDateMap[key.toString()]}">
-                            <div th:if="${bd == null}">
-                                <!-- 등록 안된 날짜 -->
-                                <div th:if="${bd == null}">
-                                    <span class="text-secondary">미등록</span>
-                                </div>
-                                <!-- 등록된 날짜 -->
-                                <div th:if="${bd != null}">
-                                    <!-- 쉬는 날 -->
-                                    <div th:if="${bd.bd_off}">
-                                        <span class="text-danger fw-bold">쉬는 날</span>
-                                    </div>
-                                    <!-- 영업일 -->
-                                    <div th:unless="${bd.bd_off}" th:with="
-                                        open=${#dates.format(bd.bd_open, 'HH:mm')},
-                                        close=${#dates.format(bd.bd_close, 'HH:mm')}, 
-                                        brStart=${#dates.format(bd.bd_brstart, 'HH:mm')},
-                                        brEnd=${#dates.format(bd.bd_brend, 'HH:mm')},
-                                        curTime=${#temporals.format(time, 'HH:mm')}">
-                                        <span th:if="${curTime < open or curTime >= close}" class="text-muted">-</span>
-                                        <span th:if="${curTime >= brStart and curTime < brEnd}" class="text-warning">브레이크</span>
-                                        <span th:if="${curTime >= open and curTime < close and (curTime < brStart or curTime >= brEnd)}">      
-                                        </span>
-                                    </div>
-                                    
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                <div class="col-md-9">
+                    <h5>테이블 정보</h5>
+                    <div class="list-group" id="table-info">
+                    
+                    </div>
+                </div>
+            </div>
 		</div>
 		<!-- 매장 정보가 등록이 되어 있지 않으면-->
 		<div th:unless="${restaurant != null}">
 			<h3>아직 식당정보를 입력하지 않앗습니다.</h3>
 		</div>
 		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/schedule/make_schetime'">일정등록</button>
-	</main>
+        <script>
+            const timeList = /*[[${timeList}]]*/ [];
+            const restimeList = /*[[${restimelist}]]*/ [];
+            const tableCount = /*[[${restaurant.rt_max_table}]]*/ 0;
+            const tableCapacity = /*[[${restaurant.rt_max_person}]]*/ 0;
+
+            function selectDate(button) {
+            // 날짜 버튼 활성화
+            document.querySelectorAll('.date-button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // 선택된 날짜에 해당하는 시간대 필터링
+            const selectedDate = button.getAttribute('data-date');
+            const filteredTimes = restimeList
+                .filter(item => item.date === selectedDate)
+                .map(item => item.time);
+
+            // 시간대 목록 업데이트
+            const timeListDiv = document.getElementById('time-list');
+            timeListDiv.innerHTML = '';
+            filteredTimes.forEach(time => {
+                const timeButton = document.createElement('button');
+                timeButton.className = 'list-group-item list-group-item-action time-button';
+                timeButton.textContent = time;
+                timeButton.setAttribute('data-time', time);
+                timeButton.onclick = () => selectTime(timeButton);
+                timeListDiv.appendChild(timeButton);
+            });
+
+            // 테이블 정보 초기화
+            document.getElementById('table-info').innerHTML = '';
+            }
+
+            function selectTime(button) {
+            // 시간대 버튼 활성화
+            document.querySelectorAll('.time-button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // 테이블 정보 표시
+            const tableInfoDiv = document.getElementById('table-info');
+            tableInfoDiv.innerHTML = '';
+            for (let i = 1; i <= tableCount; i++) {
+                const tableBox = document.createElement('div');
+                tableBox.className = 'table-box';
+                tableBox.textContent = `T${i} (${tableCapacity}명)`;
+                tableInfoDiv.appendChild(tableBox);
+            }
+            }
+        </script>
+    </main>
 </body>
 </html>

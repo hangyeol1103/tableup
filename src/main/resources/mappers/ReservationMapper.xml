@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.ReservationDAO">
-	
+
+	<!-- 1. 예약 등록 -->
+	<insert id="insertReservation" parameterType="kr.kh.tableup.model.vo.ReservationVO"> INSERT INTO
+		reservation ( res_us_num, res_rt_num, res_time, res_person, res_request, res_created, res_state
+		) VALUES ( #{res_us_num}, #{res_rt_num}, #{res_time}, #{res_person}, #{res_request}, NOW(),
+		#{res_state} ) </insert>
+
 
 </mapper>

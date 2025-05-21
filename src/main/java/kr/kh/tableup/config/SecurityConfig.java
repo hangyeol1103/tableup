@@ -49,6 +49,16 @@ public class SecurityConfig{
           .defaultSuccessUrl("/manager/main")
           .permitAll()
       )
+      .userDetailsService(managerDetailService)
+      //자동 로그인 처리
+      .rememberMe(rm-> rm
+        .userDetailsService(managerDetailService)//자동 로그인할 때 사용할 userDetailService를 추가
+        .key(rememberMeKey)//키가 변경되면 기존 토큰이 무효처리
+        .rememberMeCookieName("LC")//쿠키 이름
+        .tokenValiditySeconds(60 * 60 * 24 * 100)//유지 기간 : x일
+      )
+
+      //로그아웃 처리
       .logout(logout -> logout
           .logoutUrl("/manager/logout")
           .logoutSuccessUrl("/manager/main")

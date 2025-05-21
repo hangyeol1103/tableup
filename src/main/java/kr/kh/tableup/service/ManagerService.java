@@ -15,6 +15,7 @@ import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -22,6 +23,7 @@ import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
+import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
@@ -391,6 +393,65 @@ public class ManagerService {
 
 	public List<BusinessHourTemplateVO> getTemplateList(int rt_num) {
 		return managerDAO.selectTemplateList(rt_num);
+	}
+
+	//매장 상세정보
+	public List<FacilityVO> getFacilityList() {
+		return managerDAO.selectFacilityList();
+	}
+
+	public List<RestaurantFacilityVO> getResFacilityList(int rt_num) {
+		return managerDAO.selectResFacilityList(rt_num);
+	}
+
+	public boolean makeResFacility(RestaurantFacilityVO resfacility) {
+		if(resfacility == null || resfacility.getRf_fa_num() == 0){
+			return false;
+		}
+		List<RestaurantFacilityVO> dbResFac = managerDAO.selectResFacilityList(resfacility.getRf_rt_num());
+
+		for(RestaurantFacilityVO dbres : dbResFac){
+			if(dbres.getRf_fa_num() == resfacility.getRf_fa_num()){
+				System.out.println("이미 등록한 편의시설입니다.");
+				return false;
+			}
+		}
+
+		boolean res =  managerDAO.insertResFacility(resfacility);
+		if (!res) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean remakeResFacility(RestaurantFacilityVO resfacility) {
+		System.out.println("----------------");
+		System.out.println(resfacility);
+		if(resfacility == null || resfacility.getRf_fa_num() == 0){
+			return false;
+		}
+		List<RestaurantFacilityVO> dbResFac = managerDAO.selectResFacilityList(resfacility.getRf_rt_num());
+
+		for(RestaurantFacilityVO dbres : dbResFac){
+			if(dbres.getRf_fa_num() == resfacility.getRf_fa_num()){
+				resfacility.setRf_fa_num(0);
+			}
+		}
+		System.out.println(resfacility);
+
+		boolean res =  managerDAO.updateResFacility(resfacility);
+		if (!res) {
+			return false;
+		}
+		return true;
+	}
+
+	public RestaurantFacilityVO getResFacility(int rf_num) {
+		return managerDAO.selectResFacility(rf_num);
+	}
+
+	public boolean deleteResFacility(int rf_num) {
+		return managerDAO.deleteResFacility(rf_num);
 	}
 
 	

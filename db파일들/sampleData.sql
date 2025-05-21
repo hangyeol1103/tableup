@@ -52,7 +52,8 @@ INSERT INTO `detailregion` (`dreg_sub`,`dreg_reg_num`) VALUES 	('강남/서초',
                                    
 -- 매장							
 INSERT INTO `restaurant` (rt_name,rt_closed_days,rt_price_lunch,rt_price_dinner,rt_accept,rt_dfc_num,rt_dreg_num,rt_description) 
-	VALUES ("디폴트 매장","화요일","10000","20000","Y",1,1,"테스트용 매장");
+	VALUES ("디폴트 매장","화요일","10000","20000","Y",1,1,"테스트용 매장"),
+		 ("디폴트 매장2","수요일","20000","30000","Y",2,2,"테스트용 매장2");
 
 														                                                        
 -- 태그                                                       

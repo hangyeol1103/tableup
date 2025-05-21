@@ -71,7 +71,9 @@
                 <span class="text-secondary">
                   <span th:text="${foodCategory.fc_main}"></span>&nbsp;|
                   <span th:text="${detailFoodCategory.dfc_sub}"></span>&nbsp;|
-                  <span th:if="${tag != null}" th:text="${tag.tag_name}">태그</span>
+                  <span th:if="${tag != null}" th:text="${tag.tag_name}"
+                    >태그</span
+                  >
                   <span th:unless="${tag != null}">태그 없음</span>
                 </span>
               </li>
@@ -82,8 +84,10 @@
               <li class="list-group-item border-0 ps-3 fw-bold py-0">
                 ⭐️ 4.7 • 리뷰 123개 >
               </li>
-              <li class="list-group-item border-0 ps-3 py-0" th:text="${restaurant.rt_description}">
-              </li>
+              <li
+                class="list-group-item border-0 ps-3 py-0"
+                th:text="${restaurant.rt_description}"
+              ></li>
               <hr class="my-2 border-secondary" />
               <li class="list-group-item border-0 d-flex align-items-center">
                 <i class="bi bi-geo-alt me-2 text-secondary"></i>
@@ -93,12 +97,14 @@
               <li class="list-group-item border-0 d-flex align-items-center">
                 <i class="bi bi-cash-coin me-2 text-secondary"></i>
                 가격 = 점심 :&nbsp;
-                <span th:text="${restaurant.rt_price_lunch}"></span>원 / 저녁 :&nbsp;
-                <span th:text="${restaurant.rt_price_dinner}"></span>원
+                <span th:text="${restaurant.rt_price_lunch}"></span>원 / 저녁
+                :&nbsp; <span th:text="${restaurant.rt_price_dinner}"></span>원
               </li>
               <li class="list-group-item border-0 d-flex align-items-center">
                 <i class="bi bi-clock me-2 text-secondary"></i>
-                휴무일 :&nbsp<span th:text="${restaurant.rt_closed_days}"></span>
+                휴무일 :&nbsp<span
+                  th:text="${restaurant.rt_closed_days}"
+                ></span>
                 &nbsp;&nbsp;&nbsp;
                 <i class="bi bi-clock me-2 text-secondary"></i>
                 영업시간 : 오늘 (월) · 17:00 ~ 새벽 02:00
@@ -244,7 +250,6 @@
                 >인원수</label
               >
               <select id="select-people" class="form-select mb-3">
-                <option value="1">1명</option>
                 <option value="2" selected>2명</option>
                 <option value="3">3명</option>
                 <option value="4">4명</option>
@@ -252,10 +257,6 @@
                 <option value="6">6명</option>
                 <option value="7">7명</option>
                 <option value="8">8명</option>
-                <option value="9">9명</option>
-                <option value="10">10명</option>
-                <option value="11">11명</option>
-                <option value="12">12명</option>
               </select>
 
               <!-- 시간 선택 -->
@@ -264,11 +265,13 @@
             </div>
 
             <button
-              type="button"
-              class="btn btn-warning btn-lg d-block mx-auto"
-            >
-              예약하기
-            </button>
+  type="button"
+  class="btn btn-warning btn-lg d-block mx-auto"
+  onclick="submitReservation()"
+>
+  예약하기
+</button>
+
             <button
               type="button"
               class="btn btn-secondary btn-lg d-block mx-auto mt-3"
@@ -344,6 +347,17 @@
               selectTime.appendChild(option);
             }
           }
+        }
+
+        // 예약하기 URL 이동
+        function submitReservation() {
+          const date = document.getElementById("selected-date").textContent;
+          const time = document.getElementById("select-time").value;
+          const person = document.getElementById("select-people").value;
+          const url = `/user/reservation/confirm?date=${encodeURIComponent(
+            date
+          )}&time=${encodeURIComponent(time)}&person=${person}`;
+          location.href = url;
         }
       </script>
     </main>

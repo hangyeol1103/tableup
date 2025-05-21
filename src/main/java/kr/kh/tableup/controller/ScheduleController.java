@@ -2,6 +2,7 @@ package kr.kh.tableup.controller;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,29 +49,31 @@ public class ScheduleController {
 		else{
 			RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 			List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
-
-			for (BusinessDateVO bd : opertimelist) {
-				String raw = bd.getBd_date();
-				if (raw != null && raw.length() >= 10) {
-						String onlyDate = raw.substring(0, 10); // "2025-05-26"
-						bd.setBd_local_date(LocalDate.parse(onlyDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-				}
-			}
-
+			
 			List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
-			List<BusinessHourTemplateVO> teplatelist =managerService.getTemplateList(rt_num);
 			//터미널에 필요한 매장 정보 및 세부 정보들 출력
 			System.out.println(restaurant);
 			System.out.println(opertimelist);
 			System.out.println(restimelist);
-			System.out.println(teplatelist);
 
       model.addAttribute("restaurant", restaurant);
       model.addAttribute("opertimelist", opertimelist);
       model.addAttribute("restimelist", restimelist);
-			model.addAttribute("teplatelist",teplatelist);
 		}
-		
+
+		List<LocalDate> dateList= new ArrayList<>();
+		LocalDate today = LocalDate.now();
+		for(int i=0;i<7;i++){
+			dateList.add(today.plusDays(i));
+		}
+		List<LocalTime> timeList = new ArrayList<>();
+		LocalTime startTime = LocalTime.of(0, 0);
+    for (int i = 0; i < 48; i++) {
+        timeList.add(startTime.plusMinutes(30 * i));
+    }
+
+		model.addAttribute("dateList", dateList);
+		model.addAttribute("timeList", timeList);
 		model.addAttribute("offset", offset);
 		model.addAttribute("manager", manager);
 		model.addAttribute("url","/manager_schedulelist");

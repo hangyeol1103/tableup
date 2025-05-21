@@ -702,5 +702,14 @@ public class ManagerController {
 		return "redirect:/manager/opertimelist/"+rtNum;
 	}
 
+	//매니저페이지
+	@GetMapping("/managerpage")
+	public String managerPage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		RestaurantManagerVO rm = manager.getManager();
+		model.addAttribute("rm", rm);
+
+		return "/manager/managerpage";
+	}
+	
 
 }

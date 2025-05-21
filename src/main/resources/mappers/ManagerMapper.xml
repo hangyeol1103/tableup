@@ -242,4 +242,5 @@
 	<select id="selectTemplateList" resultType="BusinessHourTemplateVO">
 		select * from businessHourtemplate where bhd_rt_num = #{rt_num}
 	</select>
+
 </mapper>

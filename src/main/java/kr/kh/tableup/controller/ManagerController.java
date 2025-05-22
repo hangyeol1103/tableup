@@ -103,10 +103,10 @@ public class ManagerController {
 		List<RegionVO> region = managerService.getRegion();
 		List<DetailRegionVO> dr = managerService.getDetailRegion();
 		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
-		 if(manager.getRm_rt_num() !=0){
-		 	List<FileVO> fileList = managerService.getFileList(manager.getRm_rt_num());
-		 	model.addAttribute("fileList", fileList);
-		 }
+		
+		List<FileVO> fileList = managerService.getFileList(manager.getRm_rt_num());
+		model.addAttribute("fileList", fileList);
+		
 
 		System.out.println(manager.getRm_id());
 		System.out.println(restaurant);

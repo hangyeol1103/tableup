@@ -122,7 +122,11 @@ public class UserController {
       return "redirect:/user/signup";
     }
 
-    userService.insertUser(user);
+    if(!userService.insertUser(user)){
+        ra.addFlashAttribute("msg", "회원가입에 실패했습니다.");
+        ra.addFlashAttribute("userVO", user);
+        return "redirect:/user/signup";
+    }
     return "redirect:/user/login";
   }
 
@@ -372,7 +376,7 @@ public class UserController {
 
   @PostMapping("/list/sub")
   public String listPost(Model model, @RequestBody ResCriteria cri) {
-    cri.setPerPageNum(2);
+    cri.setPerPageNum(2);   //차후 삭제
     // num를 서비스에게 주면서 게시판 번호에 맞는 게시글 목록 중 2개를 가져오라고 요청.
     List<RestaurantVO> list = userService.getRestaurantList(cri);
     // 서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청

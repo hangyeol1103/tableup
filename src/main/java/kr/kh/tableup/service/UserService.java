@@ -1,5 +1,6 @@
 package kr.kh.tableup.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -279,12 +280,54 @@ public class UserService {
   
 	public 	Map<String, List<RegionVO>> getRegionMap() {
 		
-    // reg_main 기준으로 (LinkedHashMap -> 순서 보장)
-		Map<String, List<RegionVO>> regionMap = getRegionList().stream()
-			.collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+     List<RegionVO> list = getRegionList();
+
+    // 대분류별
+    Map<String, List<RegionVO>> regionMap = list.stream()
+        .collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+
+    // 각 그룹 앞에 "전체" 추가
+    for (Map.Entry<String, List<RegionVO>> entry : regionMap.entrySet()) {
+        RegionVO first = entry.getValue().get(0);
+
+        RegionVO all = new RegionVO();
+        all.setReg_num(first.getReg_num()); // 대분류 번호 그대로
+        all.setReg_main(first.getReg_main());
+        all.setDreg_num(0); // 전체 구분용
+        all.setDreg_sub("전체");
+
+        entry.getValue().add(0, all); // 맨 앞에 삽입
+    }
 
     return regionMap;
+    
 	}
+
+  public List<RegionVO> getRegionListWithWhole() {
+    List<RegionVO> original = getRegionList(); // 기본 목록
+
+    Map<String, List<RegionVO>> grouped = original.stream()
+        .collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+
+    List<RegionVO> result = new ArrayList<>();
+    for (Map.Entry<String, List<RegionVO>> entry : grouped.entrySet()) {
+        String regMain = entry.getKey();
+        List<RegionVO> list = entry.getValue();
+
+        // 첫 RegionVO 하나를 복사해서 "전체"로 만들기
+        RegionVO whole = new RegionVO();
+        whole.setReg_main(regMain);
+        whole.setDreg_sub("전체");
+        whole.setDreg_num(0);
+        whole.setReg_num(list.get(0).getReg_num()); // 대분류 번호 복사
+
+        result.add(whole);      // "서울 전체"
+        result.addAll(list);    // 서울:강남, 서울:관악 ...
+    }
+
+    return result;
+}
+
   
 
   public List<FoodCategoryVO> getFoodCategoryList() {

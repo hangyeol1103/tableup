@@ -237,32 +237,65 @@
 		fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory RIGHT JOIN detailfoodcategory ON fc_num =
 		dfc_fc_num </select>
 
-	<select id="selectRestaurantList" resultType="kr.kh.tableup.model.vo.RestaurantVO"> select * from
-		Restaurant left join RestaurantDetail on rt_num = rd_rt_num where rt_accept = "Y" <if
-			test="cri.rt_dreg_num > 0"> and rt_dreg_num = #{cri.rt_dreg_num} </if>
-			<if
-			test="cri.rt_dfc_num > 0"> and rt_dfc_num = #{cri.rt_dfc_num} </if>
-			<if
-			test="cri.orderBy == 'test'"> ORDER BY ${cri.orderBy} </if>
-			<if test="cri.orderBy != 'test'">
-			ORDER BY rt_num desc
-			</if>
-			limit #{cri.pageStart}, #{cri.perPageNum}
-		</select>
-		<select id="selectCountRestaurantList" resultType="int">
-			select count(*) from Restaurant where rt_accept = "Y" 
-			<if test="cri.rt_dreg_num > 0">
-				and rt_dreg_num = #{cri.rt_dreg_num}
-			</if>
+		<select id="selectRestaurantList" resultType="RestaurantVO">
+			SELECT * 
+			FROM Restaurant r
+			LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num
+			JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num  
+			WHERE r.rt_accept = 'Y'
+			<choose>
+				<when test="cri.rt_dreg_num > 0">
+					AND r.rt_dreg_num = #{cri.rt_dreg_num}
+				</when>
+				<when test="cri.rt_dreg_num == 0 and cri.dreg_reg_num > 0">
+					AND r.rt_dreg_num IN (
+						SELECT dreg_num FROM detailregion WHERE dreg_reg_num = #{cri.dreg_reg_num}
+					)
+				</when>
+			</choose>
 			<if test="cri.rt_dfc_num > 0">
-				and rt_dfc_num = #{cri.rt_dfc_num}
+				AND r.rt_dfc_num = #{cri.rt_dfc_num}
+			</if>
+			<if test="cri.orderBy != null and cri.orderBy != 'test'">
+				ORDER BY ${cri.orderBy}
+			</if>
+			<if test="cri.orderBy == null or cri.orderBy == 'test'">
+				ORDER BY r.rt_num DESC
+			</if>
+			LIMIT #{cri.pageStart}, #{cri.perPageNum}
+		</select>
+
+
+
+		<select id="selectCountRestaurantList" resultType="int">
+			SELECT COUNT(*) FROM Restaurant r
+			LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num
+			JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num  
+			WHERE r.rt_accept = 'Y'
+			<choose>
+				<when test="cri.rt_dreg_num > 0">
+					AND r.rt_dreg_num = #{cri.rt_dreg_num}
+				</when>
+				<when test="cri.rt_dreg_num == 0 and cri.dreg_reg_num > 0">
+					AND r.rt_dreg_num IN (
+						SELECT dreg_num FROM detailregion WHERE dreg_reg_num = #{cri.dreg_reg_num}
+					)
+				</when>
+			</choose>
+			<if test="cri.rt_dfc_num > 0">
+				AND r.rt_dfc_num = #{cri.rt_dfc_num}
 			</if>
 		</select>
+
+
+
+
 		<select id="selectTagList" resultType="TagVO">
 			SELECT tag.*, tagtype.tt_name 
 			FROM tag
 			LEFT JOIN tagtype ON tag.tag_tt_num = tagtype.tt_num
 		</select>
+		
 		<select id="selectFacilityList" resultType="FacilityVO">
 			SELECT * FROM facility
 		</select>
@@ -278,6 +311,7 @@
 		#{rt_num} </select>
 	<select id="selectTagByRestaurant" resultType="TagVO"> SELECT * FROM tag WHERE tag_tt_num =
 		#{rt_num} LIMIT 1 </select>
+
 
 
 </mapper>

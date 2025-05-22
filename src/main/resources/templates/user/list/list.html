@@ -29,8 +29,12 @@
                 <option value="0">전체</option>
                 <option th:each="region : ${regionList}"
                         th:value="${region.dreg_num}"
+                        th:data-dreg-num="${region.dreg_num}"
+                        th:data-reg-num="${region.reg_num}"
                         th:text="${region.reg_main + ' : ' + region.dreg_sub}"
-                        th:selected="${region.dreg_num == dreg_num}"></option>
+                        th:selected="${dreg_num != null and reg_num != null and region.dreg_num == dreg_num and region.reg_num == reg_num}">
+                </option>
+
               </select>
             </div>
             <!-- 음식 종류 선택 -->
@@ -106,6 +110,7 @@
     let cri = {
       rt_dfc_num : 0,
       rt_dreg_num : 0,
+      dreg_reg_num: 0,
       page : 1,
       orderBy : "rt_num desc",
       tagList: [],
@@ -140,23 +145,25 @@
 
     // 목록 불러오기
     function loadList(resetPage = false) {
-      cri.rt_dfc_num = $('#foodSelect').val();
-      cri.rt_dreg_num = $('#regionSelect').val();
+      const selected = $('#regionSelect option:selected');
+      cri.rt_dreg_num = Number(selected.data('dreg-num')) || 0;
+      cri.dreg_reg_num = Number(selected.data('reg-num')) || 0;
+      cri.rt_dfc_num = Number($('#foodSelect').val()) || 0;
       cri.orderBy = $('.sel-type').val();
 
       if (resetPage) cri.page = 1;
 
       $.ajax({
-        async : true,
-        url : "/user/list/sub",
-        type : 'post',
-        data : JSON.stringify(cri), 
+        async: true,
+        url: "/user/list/sub",
+        type: 'post',
+        data: JSON.stringify(cri),
         contentType: "application/json; charset=utf-8",
         success: function (data) {
           if (resetPage) {
             $(".pl-container").html(data);
           } else {
-            $(".pl-container").append(data); 
+            $(".pl-container").append(data);
           }
         },
         error: function () {
@@ -165,8 +172,13 @@
       });
     }
 
+
     // 페이지 최초 로드
-    $(document).ready(function() {
+    $(document).ready(function () {
+      const selected = $('#regionSelect option:selected');
+      cri.rt_dreg_num = Number(selected.data('dreg-num')) || 0;
+      cri.dreg_reg_num = Number(selected.data('reg-num')) || 0;
+      cri.rt_dfc_num = Number($('#foodSelect').val()) || 0;
       loadList(true);
     });
 

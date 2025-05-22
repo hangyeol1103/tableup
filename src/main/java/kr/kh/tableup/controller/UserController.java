@@ -342,24 +342,30 @@ public class UserController {
 
   
     @GetMapping("/list")
-    public String list(Model model, @RequestParam(required = false) Integer dreg_num, @RequestParam(required = false) Integer dfc_num) {
+    public String list(Model model, 
+            @RequestParam(required = false) Integer dreg_num, 
+            @RequestParam(required = false) Integer dfc_num,
+            @RequestParam(required = false) Integer reg_num){
 
-        List<RegionVO> regionList = userService.getRegionList();
+        List<RegionVO> regionList = userService.getRegionListWithWhole();
         List<FoodCategoryVO> foodList = userService.getFoodCategoryList();
 
         model.addAttribute("regionList", regionList);
         model.addAttribute("foodList", foodList);
-
-        if(dreg_num != null)model.addAttribute("dreg_num", dreg_num);
-        if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
-
-        System.out.println("리스트 호출");
 
         Map<String, List<TagVO>> tagList = userService.getTagList();
         List<FacilityVO> facilityList = userService.getFacilityList();
 
         model.addAttribute("tagList", tagList);
         model.addAttribute("facilityList", facilityList);
+
+        if(dreg_num != null)model.addAttribute("dreg_num", dreg_num);
+        if(reg_num != null) model.addAttribute("reg_num", reg_num);
+        if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
+
+        System.out.println("리스트 호출");
+        System.out.println(dreg_num + " " + dfc_num + " " + reg_num); 
+        System.out.println(regionList);
 
         return "user/list/list"; 
     }

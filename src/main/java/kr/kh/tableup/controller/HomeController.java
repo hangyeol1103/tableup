@@ -28,17 +28,19 @@ public class HomeController {
 	public String home(Model model) {
 
 		UserVO user = userService.getUserById("123");
-		System.out.println(user);
+		//System.out.println(user);
 
 		model.addAttribute("sample", user.getUs_name());
 		model.addAttribute("url", "/");
 
 		// 지역
-		Map<String, List<RegionVO>> regionMap = userService.getRegionMap();
+		//Map<String, List<RegionVO>> regionMap = userService.getRegionMap();
+		//model.addAttribute("regionMap", regionMap);
 
 
-		model.addAttribute("regionMap", regionMap);
-
+		List<RegionVO> regionList = userService.getRegionListWithWhole();
+		model.addAttribute("regionList", regionList);
+		//System.out.println(regionList);
 		return "index";
 	}
 

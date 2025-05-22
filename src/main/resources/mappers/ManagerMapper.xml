@@ -283,12 +283,32 @@
 		delete from restaurantfacility where rf_num=#{rf_num}
 	</delete>
 
+	<!-- 매장 대표 이미지 등록 -->
 	<insert id="insertFile" parameterType="kr.kh.tableup.model.vo.FileVO">
 		insert into file(file_path, file_name, file_type, file_foreign, file_tag, file_res_num)
 		value(#{file_path}, #{file_name}, #{file_type}, #{file_foreign}, #{file_tag}, #{file_res_num})
 	</insert>
 
+	<!-- 등록한 매장 대표 이미지 모두 출력 -->
 	<select id="selectFileList" resultType = "FileVO">
 		select * from file where file_res_num = #{rm_rt_num}
 	</select>
+
+	<!-- 매장에 등록된 대표이미지 삭제-->
+	<delete id="deletefile">
+		delete from file where file_res_num = #{rt_num}
+	</delete>
+
+	<update id="updateRestaurant">
+		update restaurant set
+			rt_name = #{rt_name}, 
+			rt_closed_days = #{rt_closed_days}, 
+			rt_price_lunch = #{rt_price_lunch}, 
+			rt_price_dinner = #{rt_price_dinner},
+			rt_dfc_num = #{rt_dfc_num}, 
+			rt_dreg_num = #{rt_dreg_num}, 
+			rt_description = #{rt_description}
+		where
+			rt_num=#{rt_num}
+	</update>
 </mapper>

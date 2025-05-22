@@ -103,6 +103,29 @@ public class ManagerService {
 			e.printStackTrace();
 		}
 	}
+
+	//매장 정보 변경
+	public boolean updateRestaurant(RestaurantVO restaurant, RestaurantManagerVO manager, MultipartFile[] fileList) {
+		System.out.println("수정할 매장 정보 :"+restaurant);
+		System.out.println("매장 매니저 :"+manager);
+		
+		if(restaurant == null || manager == null){
+			System.out.println("수정 실패!");
+			return false;
+		}
+		managerDAO.deletefile(restaurant.getRt_num());
+		//매장 이미지 작업
+		uploadFileList(restaurant.getRt_num(), fileList);
+		
+		//매장 정보 변경작업
+		boolean res =managerDAO.updateRestaurant(restaurant);
+		if(!res){
+			return false;
+		}
+		
+		return true;
+	}
+
 	//음식분류(대분류) 리스트
 	public List<FoodCategoryVO> getFoodCategory() {
 		return managerDAO.selectFoodCategoryList();
@@ -474,6 +497,7 @@ public class ManagerService {
 	public List<FileVO> getFileList(int rm_rt_num) {
 		return managerDAO.selectFileList(rm_rt_num);
 	}
+
 
 	
 

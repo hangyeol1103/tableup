@@ -176,6 +176,43 @@ public class ManagerController {
 		}
 		return "redirect:/manager/make";
 	}
+
+	//매장 정보 수정
+	@GetMapping("/remake")
+	public String remakePage(Model model,@AuthenticationPrincipal CustomManager manager) {
+		List<FoodCategoryVO> foodcategory = managerService.getFoodCategory();
+		List<RegionVO> region = managerService.getRegion();
+		List<DetailRegionVO> dr = managerService.getDetailRegion();
+		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
+
+		RestaurantVO restaurant = managerService.getResDetail(manager.getManager().getRm_rt_num());
+		System.out.println(restaurant);
+
+		System.out.println(region);
+		System.out.println(dr);
+		System.out.println(foodcategory);
+		System.out.println(dfc);
+
+		model.addAttribute("url", "/remake");
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("foodcategory", foodcategory);
+		model.addAttribute("region", region);
+		model.addAttribute("dr", dr);
+		model.addAttribute("dfc", dfc);
+		return "/manager/remake";
+	}
+
+	@PostMapping("/remake")
+	public String updatePage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
+													 @AuthenticationPrincipal CustomManager manager ) {
+		System.out.println(manager);
+		System.out.println("수정할 매장 정보 :"+restaurant);
+
+		if(managerService.updateRestaurant(restaurant, manager.getManager(), fileList)){
+			return "redirect:/manager/restaurant";
+		}
+		return "redirect:/manager/remake";
+	}
 	
 	//메뉴 리스트 출력
 	@GetMapping("/menulist/{rt_num}")

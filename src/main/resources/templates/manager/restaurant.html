@@ -25,7 +25,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		<!-- 매장 정보가 등록이 되어 있으면-->
 		<div th:if="${restaurant != null}">	
 			<div>
-				<button type="button" class="btn btn-outline-info col-12 mt-3 mb-3" onclick="location.href='/manager'">매장 정보 변경</button>
+				<button type="button" class="btn btn-outline-info col-12 mt-3 mb-3" onclick="location.href='/manager/remake'">매장 정보 변경</button>
 			</div>		
 			<h2 class="mb-4 fw-bold text-primary"  th:text="${manager.rm_id + '님의 매장'}"></h2>
 

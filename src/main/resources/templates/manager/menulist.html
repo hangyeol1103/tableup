@@ -38,7 +38,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<td>
 						<a th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}" th:text="${menu.mn_name}"></a>
 					</td>
-					<td th:text="${menu.mn_price} ">가격</td>
+					<td th:text="${#numbers.formatInteger(menu.mn_price, 3, 'COMMA')}">가격</td>
 					<td th:text="${menu.mn_div}">색인</td>
 				</tr>
 				<!-- 매장 정보가 등록이 되어 있지 않으면-->

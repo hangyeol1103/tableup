@@ -242,24 +242,29 @@
 		<!-- LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num -->
 		<!-- JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num   -->
 		WHERE r.rt_accept = 'Y'
-		<if test="tagList != null and tagList.size()> 0">
+
+		<if test="tagList != null and tagList.size() > 0">
+			<bind name="tagSize" value="tagList != null ? @java.lang.Integer@valueOf(tagList.size()) : 0"/>
 			AND r.rt_num IN (
 				SELECT rt_num FROM restauranttag WHERE tag_num IN
 					<foreach item="tag" collection="tagList" open="(" separator="," close=")">
 						#{tag}
 					</foreach>
-				GROUP BY rt_num HAVING COUNT(DISTINCT tag) = #{tagList.size}
+				GROUP BY rt_num HAVING COUNT(DISTINCT tag_num) = #{tagSize}
 			)
 		</if>
+
 		<if test="facilityList != null and facilityList.size() > 0">
+			<bind name="facSize" value="facilityList != null ? @java.lang.Integer@valueOf(facilityList.size()) : 0"/>
 			AND r.rt_num IN (
 				SELECT rf_rt_num FROM restaurantfacility WHERE rf_fa_num IN
 					<foreach item="fac" collection="facilityList" open="(" separator="," close=")">
 						#{fac}
 					</foreach>
-				GROUP BY rf_rt_num HAVING COUNT(DISTINCT fac) = #{facilityList.size}
+				GROUP BY rf_rt_num HAVING COUNT(DISTINCT rf_fa_num) = #{facSize}
 			)
 		</if>
+
 		<choose>
 			<when test="rt_dreg_num > 0">
 				AND r.rt_dreg_num = #{rt_dreg_num}
@@ -299,24 +304,29 @@
 		<!-- LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num -->
 		<!-- JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num   -->
 		WHERE r.rt_accept = 'Y'
+
 		<if test="tagList != null and tagList.size() > 0">
+			<bind name="tagSize" value="tagList != null ? @java.lang.Integer@valueOf(tagList.size()) : 0"/>
 			AND r.rt_num IN (
 				SELECT rt_num FROM restauranttag WHERE tag_num IN
 					<foreach item="tag" collection="tagList" open="(" separator="," close=")">
 						#{tag}
 					</foreach>
-				GROUP BY rt_num HAVING COUNT(DISTINCT tag) = #{tagList.size}
+				GROUP BY rt_num HAVING COUNT(DISTINCT tag_num) = #{tagSize}
 			)
 		</if>
+
 		<if test="facilityList != null and facilityList.size() > 0">
+			<bind name="facSize" value="facilityList != null ? @java.lang.Integer@valueOf(facilityList.size()) : 0"/>
 			AND r.rt_num IN (
 				SELECT rf_rt_num FROM restaurantfacility WHERE rf_fa_num IN
 					<foreach item="fac" collection="facilityList" open="(" separator="," close=")">
 						#{fac}
 					</foreach>
-				GROUP BY rf_rt_num HAVING COUNT(DISTINCT fac) = #{facilityList.size}
+				GROUP BY rf_rt_num HAVING COUNT(DISTINCT rf_fa_num) = #{facSize}
 			)
 		</if>
+
 		<choose>
 			<when test="rt_dreg_num > 0">
 				AND r.rt_dreg_num = #{rt_dreg_num}

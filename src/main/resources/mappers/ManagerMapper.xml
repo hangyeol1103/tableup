@@ -2,6 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.ManagerDAO">
 
+	<resultMap id="FileVOtMap" type="kr.kh.tableup.model.vo.FileVO">
+    <result column="file_num" property="file_num"/>
+    <result column="file_path" property="file_path"/>
+    <result column="file_name" property="file_name"/>
+    <result column="file_type" property="file_type"/>
+    <result column="file_foreign" property="file_foreign"/>
+    <result column="file_tag" property="file_tag" jdbcType="VARCHAR"/>
+    <result column="file_res_num" property="file_res_num"/>
+</resultMap>
+
 	<insert id="insertManager">
 		insert into restaurantmanager (rm_id, rm_pw, rm_email, rm_name, rm_phone, rm_business)
 		values (#{rm_id},#{rm_pw},#{rm_email},#{rm_name},#{rm_phone},#{rm_business})
@@ -272,4 +282,13 @@
 	<delete id="deleteResFacility">
 		delete from restaurantfacility where rf_num=#{rf_num}
 	</delete>
+
+	<insert id="insertFile" parameterType="kr.kh.tableup.model.vo.FileVO">
+		insert into file(file_path, file_name, file_type, file_foreign, file_tag, file_res_num)
+		value(#{file_path}, #{file_name}, #{file_type}, #{file_foreign}, #{file_tag}, #{file_res_num})
+	</insert>
+
+	<select id="selectFileList" resultMap = "FileVOtMap">
+		select * from file where file_res_num = #{rm_rt_num}
+	</select>
 </mapper>

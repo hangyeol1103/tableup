@@ -10,6 +10,7 @@ import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -124,6 +125,10 @@ public interface ManagerDAO {
 	RestaurantFacilityVO selectResFacility(int rf_num);
 
 	boolean deleteResFacility(int rf_num);
+
+	void insertFile(FileVO fileVO);
+
+	List<FileVO> selectFileList(int rm_rt_num);
 
 	
 }

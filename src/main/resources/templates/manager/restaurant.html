@@ -35,9 +35,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			</div>
 			<div class="input-group form-group">
 				<div class="form-control col-3">대표 이미지</div>
-				<div>
-					
-				</div>
+				<img  th:each="file : ${fileList}"
+							th:src="@{/file/{menuImage}(menuImage=${menu.mn_img})}" alt="이미지 없음" width="100%" ></img>		
 			</div>
 			<div class="input-group form-group">
 				<div class="form-control col-3">지역:</div>

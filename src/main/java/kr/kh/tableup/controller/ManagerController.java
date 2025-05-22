@@ -20,6 +20,7 @@ import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -59,10 +60,10 @@ public class ManagerController {
 
 	
 
-	@GetMapping("/main")
+	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
 		System.out.println(manager);
-		model.addAttribute("url","/main");
+		// model.addAttribute("url","/main");
 		model.addAttribute("manager", manager);
 		return "manager/main";
 	}
@@ -92,7 +93,7 @@ public class ManagerController {
 		String loginId = principal.getName();
 		
 		if (!loginId.equals(rm_id)) {
-			return "redirect:/manager/main";
+			return "redirect:/manager";
 	}
 		RestaurantManagerVO manager = managerService.getManagerId(loginId);
 		//해당 매니저의 매장 외래키를 가져옴
@@ -102,13 +103,15 @@ public class ManagerController {
 		List<RegionVO> region = managerService.getRegion();
 		List<DetailRegionVO> dr = managerService.getDetailRegion();
 		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
-		
+		// List<FileVO> fileList = managerService.getFileList(manager.getRm_rt_num());
+
 		System.out.println(manager.getRm_id());
 		System.out.println(restaurant);
 		System.out.println(manager);
 		
 		model.addAttribute("manager", manager);
 		model.addAttribute("restaurant", restaurant);
+		// model.addAttribute("fileList", fileList);
 		
 		model.addAttribute("foodcategory", foodcategory);
 		model.addAttribute("region", region);

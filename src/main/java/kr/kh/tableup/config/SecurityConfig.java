@@ -46,7 +46,7 @@ public class SecurityConfig{
       .formLogin(form -> form
           .loginPage("/manager/login")
           .loginProcessingUrl("/manager/login")
-          .defaultSuccessUrl("/manager/main")
+          .defaultSuccessUrl("/manager/")
           .permitAll()
       )
       .userDetailsService(managerDetailService)
@@ -61,7 +61,7 @@ public class SecurityConfig{
       //로그아웃 처리
       .logout(logout -> logout
           .logoutUrl("/manager/logout")
-          .logoutSuccessUrl("/manager/main")
+          .logoutSuccessUrl("/manager/")
           .permitAll()
       )
         .userDetailsService(managerDetailService);

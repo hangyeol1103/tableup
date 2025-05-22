@@ -32,7 +32,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<td>
 						<a style="cursor : pointer;"
 							 th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}">
-							<img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="" style="width:200px" height="200px">
+							<img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="이미지 없음" style="width:200px" height="200px">
 						</a>
 					</td>
 					<td>

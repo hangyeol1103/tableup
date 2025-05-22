@@ -95,9 +95,9 @@ public class ManagerService {
 		String fi_ori_name=file.getOriginalFilename();
 		try{
 			//파일 업로드
-			String file_name=UploadFileUtils.uploadFile(uploadPath, fi_ori_name, file.getBytes());
+			String uploadfilename=UploadFileUtils.uploadFile(uploadPath, fi_ori_name, file.getBytes());
 			
-			FileVO fileVO =new FileVO(file_name, fi_ori_name , "RESTAURANTDETAIL", String.valueOf(rt_num), "내부", rt_num);
+			FileVO fileVO =new FileVO(uploadfilename, fi_ori_name , "RESTAURANTDETAIL", String.valueOf(rt_num), "내부", rt_num);
 			managerDAO.insertFile(fileVO);
 		}catch(Exception e){
 			e.printStackTrace();

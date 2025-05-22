@@ -3,12 +3,12 @@
 <mapper namespace="kr.kh.tableup.dao.ManagerDAO">
 
 	<resultMap id="FileVOtMap" type="kr.kh.tableup.model.vo.FileVO">
-    <result column="file_num" property="file_num"/>
+    <id column="file_num" property="file_num"/>
     <result column="file_path" property="file_path"/>
     <result column="file_name" property="file_name"/>
     <result column="file_type" property="file_type"/>
     <result column="file_foreign" property="file_foreign"/>
-    <result column="file_tag" property="file_tag" jdbcType="VARCHAR"/>
+    <result column="file_tag" property="file_tag" />
     <result column="file_res_num" property="file_res_num"/>
 </resultMap>
 
@@ -288,7 +288,7 @@
 		value(#{file_path}, #{file_name}, #{file_type}, #{file_foreign}, #{file_tag}, #{file_res_num})
 	</insert>
 
-	<select id="selectFileList" resultMap = "FileVOtMap">
+	<select id="selectFileList" resultType = "FileVO">
 		select * from file where file_res_num = #{rm_rt_num}
 	</select>
 </mapper>

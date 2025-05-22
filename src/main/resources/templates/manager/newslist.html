@@ -30,7 +30,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<td>
 						<a th:href="@{/manager/news/{rn_num}(rn_num = ${news.rn_num})}" th:text="${news.rn_content}"></a>
 					</td>
-					<td th:text="${news.rn_state} ">상태</td>
+					<td th:text="${news.rn_state != null ?(news.rn_state ? '공개' : '비공개'):'-'} ">상태</td>
 				</tr>
 				<!-- 매장 정보가 등록이 되어 있지 않으면-->
 					<tr th:if="${newslist.size() == 0}">

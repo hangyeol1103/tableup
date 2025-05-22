@@ -319,7 +319,51 @@ public class UserService {
     }
     return userDAO.selectRestaurantList(cri);
   }
+  
+/* public List<RestaurantVO> getRestaurantList(Criteria cri) {
+    if (cri == null) return null;
 
+    Map<String, Object> criMap = new HashMap<>();
+    criMap.put("cri", cri);
+    criMap.put("tagList", cri instanceof ResCriteria resCri ? new ArrayList<>(resCri.getTagList()) : null);
+    criMap.put("facilityList", cri instanceof ResCriteria resCri ? new ArrayList<>(resCri.getTagList()) : null);
+    criMap.put("rt_dreg_num", cri instanceof ResCriteria resCri ? resCri.getRt_dreg_num() : null);
+    criMap.put("dreg_reg_num", cri instanceof ResCriteria resCri ? resCri.getDreg_reg_num() : null);
+    criMap.put("rt_dfc_num", cri instanceof ResCriteria resCri ?  resCri.getRt_dfc_num() : null);
+    criMap.put("orderBy", cri instanceof ResCriteria resCri ? resCri.getOrderby() : null);
+    criMap.put("pageStart", cri instanceof ResCriteria resCri ? resCri.getPageStart() : null);
+    criMap.put("perPageNum", cri instanceof ResCriteria resCri ? resCri.getPerPageNum() : null);
+
+    return userDAO.selectRestaurantList(criMap);
+  }*/
+/*
+  public PageMaker getPageMaker(Criteria cri) {
+    if (cri == null) return null;
+
+    Map<String, Object> criMap = new HashMap<>();
+    criMap.put("cri", cri);
+    criMap.put("tagList", cri instanceof ResCriteria resCri ? new ArrayList<>(resCri.getTagList()) : null);
+    criMap.put("facilityList", cri instanceof ResCriteria resCri ? new ArrayList<>(resCri.getTagList()) : null);
+    criMap.put("rt_dreg_num", cri instanceof ResCriteria resCri ? resCri.getRt_dreg_num() : null);
+    criMap.put("dreg_reg_num", cri instanceof ResCriteria resCri ? resCri.getDreg_reg_num() : null);
+    criMap.put("rt_dfc_num", cri instanceof ResCriteria resCri ?  resCri.getRt_dfc_num() : null);
+    criMap.put("orderBy", cri instanceof ResCriteria resCri ? resCri.getOrderBy() : null);
+    criMap.put("pageStart", cri instanceof ResCriteria resCri ? resCri.getPageStart() : null);
+    criMap.put("perPageNum", cri instanceof ResCriteria resCri ? resCri.getPerPageNum() : null);
+
+    int count = userDAO.selectCountRestaurantList(criMap);
+    return new PageMaker(1, cri, count);
+  }
+*/
+
+  	public PageMaker getPageMaker(Criteria cri) {
+    if(cri == null) {
+			return null;
+		}
+		
+		int count = userDAO.selectCountRestaurantList(cri);
+		return new PageMaker(1, cri, count);
+	}
 
   public RestaurantVO getRestaurantDetail(int rt_num) {
     return userDAO.selectRestaurantDetail(rt_num);
@@ -336,14 +380,7 @@ public class UserService {
   public TagVO getTagByRestaurant(int rt_num) {
     return userDAO.selectTagByRestaurant(rt_num);
   }
-	public PageMaker getPageMaker(Criteria cri) {
-    if(cri == null) {
-			return null;
-		}
-		
-		int count = userDAO.selectCountRestaurantList(cri);
-		return new PageMaker(1, cri, count);
-	}
+
   
 	public List<ReviewVO> getReviewList() {
 		

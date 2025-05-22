@@ -1,6 +1,7 @@
 package kr.kh.tableup.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -53,9 +54,12 @@ public interface UserDAO {
 
 	List<FoodCategoryVO> selectFoodCategoryList();
 
-	List<RestaurantVO> selectRestaurantList(@Param("cri") Criteria cri);
+	List<RestaurantVO> selectRestaurantList(Criteria cri);
+	int selectCountRestaurantList(Criteria cri);
+	// List<RestaurantVO> selectRestaurantList(Map<String, Object> map);
+	// int selectCountRestaurantList(Map<String, Object> map);
 
-	int selectCountRestaurantList(@Param("cri") Criteria cri);
+
 
 	List<ReviewVO> selectReviewList();
 

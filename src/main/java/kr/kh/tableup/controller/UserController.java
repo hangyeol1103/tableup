@@ -378,7 +378,14 @@ public class UserController {
   public String listPost(Model model, @RequestBody ResCriteria cri) {
     cri.setPerPageNum(2);   //차후 삭제
     // num를 서비스에게 주면서 게시판 번호에 맞는 게시글 목록 중 2개를 가져오라고 요청.
+    //System.out.println(cri);
+    //System.out.println("태그: " + cri.getTagList());
+    //System.out.println("시설: " + cri.getFacilityList());
+    System.out.println(cri.getPriceType());
+    System.out.println(cri.getMinPrice());
+    System.out.println(cri.getMaxPrice());
     List<RestaurantVO> list = userService.getRestaurantList(cri);
+    //System.out.println(list);
     // 서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청
     PageMaker pm = userService.getPageMaker(cri);
 

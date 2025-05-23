@@ -115,6 +115,7 @@ CREATE TABLE `Reservation` (
 	`res_us_num`	INT	NOT NULL,
 	`res_rt_num`	INT	NULL,
 	`res_time`	DATETIME NOT NULL,
+    `res_end_time`	DATETIME NOT NULL,
 	`res_person`	INT NOT NULL,
 	`res_request`	TEXT NOT NULL,
 	`res_created`	DATETIME NOT NULL,

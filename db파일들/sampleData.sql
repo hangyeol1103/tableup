@@ -71,6 +71,8 @@ INSERT INTO facility(fa_name,fa_title,fa_icon)
 INSERT INTO restaurantfacility(rf_rt_num,rf_fa_num,rf_detail)
 	VALUES(1,1,'와이파이 사용 가능(가게 문의)');
 
+INSERT INTO restauranttag(rt_num,tag_num)
+	VALUES(1,1),(1,2);
 
 -- 샘플 점주 m123 123
 INSERT INTO restaurantmanager (

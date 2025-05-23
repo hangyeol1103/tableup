@@ -214,55 +214,191 @@
 	<select id="selectScoreTypeList" resultType="ScoreTypeVO"> SELECT ST_NUM, ST_CATEGORY FROM
 		ScoreType </select>
 
-	<insert id="insertReview" parameterType="kr.kh.tableup.model.vo.ReviewVO" useGeneratedKeys="true"
+	<insert id="insertReview" parameterType="ReviewVO" useGeneratedKeys="true"
 		keyProperty="rev_num"> INSERT INTO review ( rev_us_num, rev_rt_num, rev_content, rev_created,
 		rev_updated, rev_state, rev_visit, rev_visitor ) VALUES ( #{rev_us_num}, #{rev_rt_num},
 		#{rev_content}, now(), now(), 0, #{rev_visit}, #{rev_visitor} ) </insert>
 
-	<insert id="insertReviewScore" parameterType="kr.kh.tableup.model.vo.ReviewScoreVO"> INSERT INTO
-		review_score ( rs_rev_num, rs_st_num, rs_score ) VALUES ( #{rs_rev_num}, #{rs_st_num},
+	<insert id="insertReviewScore" parameterType="ReviewScoreVO"> INSERT INTO
+		reviewscore ( rs_rev_num, rs_st_num, rs_score ) VALUES ( #{rs_rev_num}, #{rs_st_num},
 		#{rs_score} ) </insert>
 
-	<insert id="insertFile" parameterType="kr.kh.tableup.model.vo.FileVO"> INSERT INTO file (
+	<insert id="insertFile" parameterType="FileVO"> INSERT INTO file (
 		file_path, file_name, File_type, File_FOREIGN, file_tag, FILE_RES_NUM ) VALUES ( #{file_path},
 		#{file_name}, #{file_type}, #{file_foreign}, #{file_tag}, #{file_res_num} ) </insert>
 
-		<select id="selectRegionList" resultType="kr.kh.tableup.model.vo.RegionVO">
+		<select id="selectRegionList" resultType="RegionVO">
 		SELECT reg_num, reg_main, dreg_num, dreg_sub FROM region
 		RIGHT JOIN detailregion ON reg_num = dreg_reg_num
 		ORDER BY reg_num, dreg_num
 		</select>
 
-	<select id="selectFoodCategoryList" resultType="kr.kh.tableup.model.vo.FoodCategoryVO"> SELECT
+	<select id="selectFoodCategoryList" resultType="FoodCategoryVO"> SELECT
 		fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory RIGHT JOIN detailfoodcategory ON fc_num =
 		dfc_fc_num </select>
 
-	<select id="selectRestaurantList" resultType="kr.kh.tableup.model.vo.RestaurantVO"> select * from
-		Restaurant left join RestaurantDetail on rt_num = rd_rt_num where rt_accept = "Y" <if
-			test="cri.rt_dreg_num > 0"> and rt_dreg_num = #{cri.rt_dreg_num} </if>
-			<if
-			test="cri.rt_dfc_num > 0"> and rt_dfc_num = #{cri.rt_dfc_num} </if>
-			<if
-			test="cri.orderBy == 'test'"> ORDER BY ${cri.orderBy} </if>
-			<if test="cri.orderBy != 'test'">
-			ORDER BY rt_num desc
-			</if>
-			limit #{cri.pageStart}, #{cri.perPageNum}
-		</select>
-		<select id="selectCountRestaurantList" resultType="int">
-			select count(*) from Restaurant where rt_accept = "Y" 
-			<if test="cri.rt_dreg_num > 0">
-				and rt_dreg_num = #{cri.rt_dreg_num}
-			</if>
-			<if test="cri.rt_dfc_num > 0">
-				and rt_dfc_num = #{cri.rt_dfc_num}
-			</if>
-		</select>
+	<select id="selectRestaurantList" resultType="RestaurantVO">
+		SELECT * FROM Restaurant r
+		<!-- LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num -->
+		<!-- JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num   -->
+		WHERE r.rt_accept = 'Y'
+
+		<if test="tagList != null and tagList.size() > 0">
+			<bind name="tagSize" value="tagList != null ? @Integer@valueOf(tagList.size()) : 0"/>
+			AND r.rt_num IN (
+				SELECT rt_num FROM restauranttag WHERE tag_num IN
+					<foreach item="tag" collection="tagList" open="(" separator="," close=")">
+						#{tag}
+					</foreach>
+				GROUP BY rt_num HAVING COUNT(DISTINCT tag_num) = #{tagSize}
+			)
+		</if>
+
+		<if test="facilityList != null and facilityList.size() > 0">
+			<bind name="facSize" value="facilityList != null ? @Integer@valueOf(facilityList.size()) : 0"/>
+			AND r.rt_num IN (
+				SELECT rf_rt_num FROM restaurantfacility WHERE rf_fa_num IN
+					<foreach item="fac" collection="facilityList" open="(" separator="," close=")">
+						#{fac}
+					</foreach>
+				GROUP BY rf_rt_num HAVING COUNT(DISTINCT rf_fa_num) = #{facSize}
+			)
+		</if>
+
+		<choose>
+			<when test="rt_dreg_num > 0">
+				AND r.rt_dreg_num = #{rt_dreg_num}
+			</when>
+			<when test="rt_dreg_num == 0 and dreg_reg_num > 0">
+				AND r.rt_dreg_num IN (
+					SELECT dreg_num FROM detailregion WHERE dreg_reg_num = #{dreg_reg_num}
+				)
+			</when>
+		</choose>
+		<if test="rt_dfc_num > 0">
+			AND r.rt_dfc_num = #{rt_dfc_num}
+		</if>
+
+		<if test="minPrice != null and maxPrice != null and priceType != null">
+			<choose>
+				<when test="priceType == 'lunch'">
+					AND CAST(REPLACE(r.rt_price_lunch, ',', '') AS UNSIGNED) BETWEEN #{minPrice} AND #{maxPrice}
+				</when>
+				<when test="priceType == 'dinner'">
+					AND CAST(REPLACE(r.rt_price_dinner, ',', '') AS UNSIGNED) BETWEEN #{minPrice} AND #{maxPrice}
+				</when>
+			</choose>
+		</if>
+
+		<choose>
+			<when test="orderBy == 'avg'">
+				ORDER BY (
+					SELECT IFNULL(AVG(rs.rs_score), 0)
+					FROM review rev
+					JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
+					WHERE rev.rev_rt_num = r.rt_num
+				) ASC
+			</when>
+
+			<when test="orderBy == 'reservation'">
+				ORDER BY (
+					SELECT COUNT(*)
+					FROM reservation res
+					WHERE res.res_rt_num = r.rt_num
+				) DESC
+			</when>
+
+			<when test="orderBy == 'reviewCount'">
+				ORDER BY (
+					SELECT COUNT(*)
+					FROM review rev
+					WHERE rev.rev_rt_num = r.rt_num
+				) DESC
+			</when>
+
+			<when test="orderBy != null">
+				ORDER BY (
+					SELECT IFNULL(AVG(rs.rs_score), 0)
+					FROM review rev
+					JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
+					WHERE rs.rs_st_num = #{orderBy} AND rev.rev_rt_num = r.rt_num
+				) DESC
+			</when>
+
+			<otherwise>
+				ORDER BY r.rt_num DESC
+			</otherwise>
+		</choose>
+
+
+		LIMIT #{pageStart}, #{perPageNum}
+	</select>
+
+	<select id="selectCountRestaurantList" resultType="int">
+		SELECT COUNT(*) FROM Restaurant r
+		<!-- LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num -->
+		<!-- JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num   -->
+		WHERE r.rt_accept = 'Y'
+
+		<if test="tagList != null and tagList.size() > 0">
+			<bind name="tagSize" value="tagList != null ? @Integer@valueOf(tagList.size()) : 0"/>
+			AND r.rt_num IN (
+				SELECT rt_num FROM restauranttag WHERE tag_num IN
+					<foreach item="tag" collection="tagList" open="(" separator="," close=")">
+						#{tag}
+					</foreach>
+				GROUP BY rt_num HAVING COUNT(DISTINCT tag_num) = #{tagSize}
+			)
+		</if>
+
+		<if test="facilityList != null and facilityList.size() > 0">
+			<bind name="facSize" value="facilityList != null ? @Integer@valueOf(facilityList.size()) : 0"/>
+			AND r.rt_num IN (
+				SELECT rf_rt_num FROM restaurantfacility WHERE rf_fa_num IN
+					<foreach item="fac" collection="facilityList" open="(" separator="," close=")">
+						#{fac}
+					</foreach>
+				GROUP BY rf_rt_num HAVING COUNT(DISTINCT rf_fa_num) = #{facSize}
+			)
+		</if>
+
+		<choose>
+			<when test="rt_dreg_num > 0">
+				AND r.rt_dreg_num = #{rt_dreg_num}
+			</when>
+			<when test="rt_dreg_num == 0 and dreg_reg_num > 0">
+				AND r.rt_dreg_num IN (
+					SELECT dreg_num FROM detailregion WHERE dreg_reg_num = #{dreg_reg_num}
+				)
+			</when>
+		</choose>
+		<if test="rt_dfc_num > 0">
+			AND r.rt_dfc_num = #{rt_dfc_num}
+		</if>
+
+		<if test="minPrice != null and maxPrice != null and priceType != null">
+			<choose>
+				<when test="priceType == 'lunch'">
+					AND CAST(REPLACE(r.rt_price_lunch, ',', '') AS UNSIGNED) BETWEEN #{minPrice} AND #{maxPrice}
+				</when>
+				<when test="priceType == 'dinner'">
+					AND CAST(REPLACE(r.rt_price_dinner, ',', '') AS UNSIGNED) BETWEEN #{minPrice} AND #{maxPrice}
+				</when>
+			</choose>
+		</if>
+
+	</select>
+
+
+
+
+
 		<select id="selectTagList" resultType="TagVO">
 			SELECT tag.*, tagtype.tt_name 
 			FROM tag
 			LEFT JOIN tagtype ON tag.tag_tt_num = tagtype.tt_num
 		</select>
+		
 		<select id="selectFacilityList" resultType="FacilityVO">
 			SELECT * FROM facility
 		</select>
@@ -278,6 +414,7 @@
 		#{rt_num} </select>
 	<select id="selectTagByRestaurant" resultType="TagVO"> SELECT * FROM tag WHERE tag_tt_num =
 		#{rt_num} LIMIT 1 </select>
+
 
 
 </mapper>

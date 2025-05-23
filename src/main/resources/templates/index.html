@@ -16,17 +16,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 	<main layout:fragment="content">
 		<style>
 			.main-container {
-				width: 700px;
+				/* width: 700px; */
+				max-width: 100%; width: 100%; padding: 1rem;
 				/* height: 700px; */
 				margin: 0 auto;
 				background: #f5f5f5; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 4px 0;
 			}
 		</style>
 
-<div class="container mt-4">
-	<div class="main-container">
-  <!-- 상단 지역 선택 버튼 -->
-		<button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#regionModal">
+		<div class="container mt-4">
+			<div class="main-container">
+			<!-- 상단 지역 선택 버튼 -->
+				<button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#regionModal">
 					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#aaa" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:middle;">
 						<circle cx="12" cy="10" r="3"/>
 						<path d="M12 2C8 2 5 5.5 5 9.5c0 5.5 7 12.5 7 12.5s7-7 7-12.5C19 5.5 16 2 12 2z"/>
@@ -56,147 +57,210 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">제주</button>
 									</div>
 								</div>
+								
 								<div class="row">
 
-									<!-- 좌측: 대분류 지역 -->
+
+									<!-- 대분류 -->
 									<div class="col-4">
 										<ul class="list-group">
 											<li class="list-group-item active">지역 선택</li>
-											<li th:each="entry : ${regionMap}" class="list-group-item"
-													th:attr="data-bs-toggle='tab'"
-													th:href="'#tab-' + ${#strings.replace(entry.key, ' ', '')}"
-													role="tab"
-													th:text="${entry.key}">
+											<li class="list-group-item region-btn" data-dreg="0" data-reg="0" style="cursor: pointer;">
+												전국
+											</li>
+											<li th:each="region : ${regionList}"
+												th:if="${region.dreg_sub == '전체'}"
+												class="list-group-item region-tab"
+												th:attr="data-bs-toggle='tab'"
+												th:data-target-tab="${'tab-' + #strings.replace(region.reg_main, ' ', '')}"
+												th:text="${region.reg_main}">
 											</li>
 										</ul>
 									</div>
 
-									<!-- 우측: 소분류 지역 -->
+									<!-- 소분류 -->
 									<div class="col-8">
-										<div class="tab-content">
-											<div th:each="entry : ${regionMap}"
-													class="tab-pane fade"
-													th:id="'tab-' + ${#strings.replace(entry.key, ' ', '')}"
-													role="tabpanel">
-												<a th:href="@{/user/list(dreg_num=0)}" class="btn btn-outline-dark m-1 btn-sm">
-													전체
-												</a>
-												<div th:each="region : ${entry.value}">
-													<a th:href="@{/user/list(dreg_num=${region.dreg_num})}"
-														class="btn btn-outline-secondary m-1 btn-sm"
-														th:text="${region.dreg_sub}">지역</a>
-												</div>
+										<div class="tab-content p-3">
+											<div th:each="parent : ${regionList}"
+												th:if="${parent.dreg_sub == '전체'}"
+												class="tab-pane fade"
+												th:id="${'tab-' + #strings.replace(parent.reg_main, ' ', '')}">
+
+												<!-- 전체 버튼 -->
+												<button type="button"
+													class="btn btn-outline-dark m-1 btn-sm region-btn"
+													th:attr="data-dreg=0, data-reg=${parent.reg_num}">전체</button>
+
+												<!-- 소분류 -->
+												<button th:each="child : ${regionList}"
+													th:if="${child.reg_main == parent.reg_main and child.dreg_sub != '전체' and child.dreg_num != 0}"
+													type="button"
+													class="btn btn-outline-secondary m-1 btn-sm region-btn"
+													th:attr="data-dreg=${child.dreg_num}, data-reg=${child.reg_num}"
+													th:text="${child.dreg_sub}"></button>
+													
 											</div>
 										</div>
 									</div>
+
 
 								</div>
 							</div>
 
 							<div class="modal-footer">
+								<button type="button" class="btn btn-outline-secondary">초기화</button>
+								<button type="button" class="btn btn-primary" disabled>관심지역 설정 완료</button>
 								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<!-- 여기에 나머지 홈 콘텐츠 삽입 가능 -->
+						<!-- 여기에 나머지 홈 콘텐츠 삽입 가능 -->
 
-			</div>
+					</div>
 
 
-	<!-- Carousel -->
-	<div id="demo" class="carousel slide mt-1" data-bs-ride="carousel">
+			<!-- Carousel -->
+			<div id="demo" class="carousel slide mt-1" data-bs-ride="carousel">
+				
+				<!-- Indicators/dots -->
+				<div class="carousel-indicators">
+					<button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+					<button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+					<button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+					<button type="button" data-bs-target="#demo" data-bs-slide-to="3"></button>
+				</div>
+			
+				<!-- The slideshow/carousel -->
+				<div class="carousel-inner">
+					<div class="carousel-item active">
+						<img src="/img/index/index1.jpg" alt="Los Angeles" class="d-block" style="width:100%">
+					</div>
+					<div class="carousel-item">
+						<img src="/img/index/index2.jpg" alt="Chicago" class="d-block" style="width:100%">
+					</div>
+					<div class="carousel-item">
+						<img src="/img/index/index3.jpg" alt="New York" class="d-block" style="width:100%">
+					</div>
+					<div class="carousel-item">
+						<img src="/img/index/index4.jpg" alt="4" class="d-block" style="width:100%">
+					</div>
+				</div>
+				
+				<!-- Left and right controls/icons -->
+				<button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+					<span class="carousel-control-prev-icon"></span>
+				</button>
+				<button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+					<span class="carousel-control-next-icon"></span>
+				</button>
+				</div>
+
+
+				<div class="container mt-4">
+					<h4 class="fw-bold mb-3">요리 테마별 탐색</h4>
+					<div class="d-flex gap-4">
+						<div class="text-center">
+							<img src="img/index/Cuisine/China.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">한식</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/China.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">중식</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/japan.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">일식</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/America.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">양식</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/Italia.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">이탈리아 요리</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/France.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">프랑스 요리</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="container mt-4">
+					<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
+					<div class="d-flex gap-4">
+						<div class="text-center">
+							<img src="img/index/Cuisine/Sushi.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">스시</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">예시</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">예시</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">예시</div>
+						</div>
+						<div class="text-center">
+							<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<div class="mt-2">예시</div>
+						</div>
+					</div>
+				</div>
 		
-		<!-- Indicators/dots -->
-  	<div class="carousel-indicators">
-			<button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-			<button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-			<button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
-			<button type="button" data-bs-target="#demo" data-bs-slide-to="3"></button>
-		</div>
-  
-  	<!-- The slideshow/carousel -->
-		<div class="carousel-inner">
-			<div class="carousel-item active">
-				<img src="/img/index/index1.jpg" alt="Los Angeles" class="d-block" style="width:100%">
 			</div>
-			<div class="carousel-item">
-				<img src="/img/index/index2.jpg" alt="Chicago" class="d-block" style="width:100%">
-			</div>
-			<div class="carousel-item">
-				<img src="/img/index/index3.jpg" alt="New York" class="d-block" style="width:100%">
-			</div>
-			<div class="carousel-item">
-				<img src="/img/index/index4.jpg" alt="4" class="d-block" style="width:100%">
-			</div>
-		</div>
-		
-		<!-- Left and right controls/icons -->
-		<button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
-			<span class="carousel-control-prev-icon"></span>
-		</button>
-		<button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
-			<span class="carousel-control-next-icon"></span>
-		</button>
-		</div>
 
 
-		<div class="container mt-4">
-			<h4 class="fw-bold mb-3">요리 테마별 탐색</h4>
-			<div class="d-flex gap-4">
-				<div class="text-center">
-					<img src="img/index/Cuisine/China.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">한식</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/China.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">중식</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/japan.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">일식</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/America.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">양식</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/Italia.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">이탈리아 요리</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/France.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">프랑스 요리</div>
-				</div>
-			</div>
-		</div>
 
-		<div class="container mt-4">
-			<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
-			<div class="d-flex gap-4">
-				<div class="text-center">
-					<img src="img/index/Cuisine/Sushi.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">스시</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">예시</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">예시</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">예시</div>
-				</div>
-				<div class="text-center">
-					<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-					<div class="mt-2">예시</div>
-				</div>
-			</div>
-		</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	const regionButtons = document.querySelectorAll(".region-btn");
+
+	regionButtons.forEach(btn => {
+		btn.addEventListener("click", function () {
+			const dreg = this.getAttribute("data-dreg");
+			const reg = this.getAttribute("data-reg");
+
+			// 필요 시 Ajax 전환 가능
+			const url = `/user/list?dreg_num=${dreg}&reg_num=${reg}`;
+			window.location.href = url;
+		});
+	});
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	const tabs = document.querySelectorAll(".region-tab");
+
+	tabs.forEach(tab => {
+		tab.addEventListener("click", function () {
+			const targetId = this.getAttribute("data-target-tab");
+			const allTabs = document.querySelectorAll(".tab-pane");
+
+			allTabs.forEach(t => t.classList.remove("show", "active"));
+
+			const targetTab = document.getElementById(targetId);
+			if (targetTab) {
+				targetTab.classList.add("show", "active");
+			}
+		});
+	});
+});
+</script>
+
+
+
+
+
+
 		
 	</main>
 </body>

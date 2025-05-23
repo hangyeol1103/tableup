@@ -6,9 +6,48 @@
   <meta charset="UTF-8">
   <title>식당 목록</title>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <style>
+    .range-slider-container {
+      position: relative;
+      height: 40px;
+      margin-top: 10px;
+    }
+
+    .range-slider-container input[type="range"] {
+      position: absolute;
+      width: 100%;
+      pointer-events: none;
+      top: 0;
+      -webkit-appearance: none;
+      background: transparent;
+    }
+
+    .range-slider-container input[type="range"]::-webkit-slider-thumb {
+      pointer-events: all;
+      background: #0d6efd;
+      border: none;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      -webkit-appearance: none;
+    }
+
+    .price-range-label {
+      margin-top: 8px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+
+
+  </style>
+
+
 </head>
 <body>
 <main layout:fragment="content" class="container mt-5">
+
   <h2 class="">식당 목록</h2>
 
   <!-- 전체 레이아웃 -->
@@ -29,8 +68,12 @@
                 <option value="0">전체</option>
                 <option th:each="region : ${regionList}"
                         th:value="${region.dreg_num}"
+                        th:data-dreg-num="${region.dreg_num}"
+                        th:data-reg-num="${region.reg_num}"
                         th:text="${region.reg_main + ' : ' + region.dreg_sub}"
-                        th:selected="${region.dreg_num == dreg_num}"></option>
+                        th:selected="${dreg_num != null and reg_num != null and region.dreg_num == dreg_num and region.reg_num == reg_num}">
+                </option>
+
               </select>
             </div>
             <!-- 음식 종류 선택 -->
@@ -53,6 +96,35 @@
         <div class="card mb-4">
           <div class="card-header fw-bold">상세 조건</div>
           <div class="card-body">
+
+          <div class="fw-bold mb-2">가격대</div>
+          <div class="mb-2">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="priceType" id="lunchRadio" value="lunch" checked>
+              <label class="form-check-label" for="lunchRadio">점심</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="priceType" id="dinnerRadio" value="dinner">
+              <label class="form-check-label" for="dinnerRadio">저녁</label>
+            </div>
+          </div>
+
+          <div class="range-slider-container mb-2">
+            <input type="range" id="minPrice" min="0" max="300000" step="1000" value="0">
+            <input type="range" id="maxPrice" min="0" max="300000" step="1000" value="50000">
+          </div>
+
+          <div class="row gx-2 mt-2 align-items-center">
+            <div class="col">
+              <input type="number" class="form-control" id="minPriceInput" value="0" min="0" max="300000" step="1000">
+            </div>
+            <div class="col-auto fw-bold">~</div>
+            <div class="col">
+              <input type="number" class="form-control" id="maxPriceInput" value="50000" min="0" max="300000" step="1000">
+            </div>
+          </div>
+
+
 
             <!-- 태그 필터 -->
             <div th:each="entry : ${tagList}" class="mb-3">
@@ -87,10 +159,15 @@
     <section class="col-md-9">
       <!-- 정렬 선택 -->
       <div class="d-flex justify-content-end mb-3">
-        <select class="form-control col-3 sel-type w-auto">
-          <option value="po_num desc">별점순</option>
-          <option value="po_up desc, po_num desc">추천순</option>
-          <option value="po_view desc, po_num desc">조회순</option>
+        <select class="form-control sel-type">
+          <option value="default">기본 정렬</option>
+          <option value="reservation">예약 많은 순</option>
+          <option value="reviewCount">리뷰 많은 순</option>
+          <option value="avg">전체 평점순(일단 테스트용으로 얘만 역순)</option>
+          <option th:each="scoreType : ${scoreTypeList}"
+                  th:value="${scoreType.st_num}"
+                  th:text="${scoreType.st_category + ' 점수순'}">
+          </option>
         </select>
       </div>
 
@@ -106,10 +183,14 @@
     let cri = {
       rt_dfc_num : 0,
       rt_dreg_num : 0,
+      dreg_reg_num: 0,
       page : 1,
       orderBy : "rt_num desc",
       tagList: [],
-      facilityList: []
+      facilityList: [],
+      priceType: "lunch",
+      minPrice: null,
+      maxPrice: null
     }
 
     // 더보기 클릭 이벤트
@@ -128,35 +209,44 @@
     // 상세 조건 필터 적용
     function applyDetailedFilter() {
       cri.tagList = $(".tag-check:checked").map(function () {
-        return $(this).val();
+        //return { tag_num : parseInt($(this).val()) };
+        return parseInt($(this).val());
       }).get();
 
       cri.facilityList = $(".facility-check:checked").map(function () {
-        return $(this).val();
+        //return { rf_fa_num : parseInt($(this).val()) };
+        return parseInt($(this).val());
       }).get();
+
+      cri.priceType = $('input[name="priceType"]:checked').val();
+
+      cri.minPrice = Number($('#minPrice').val());
+      cri.maxPrice = Number($('#maxPrice').val());
 
       loadList(true);
     }
 
     // 목록 불러오기
     function loadList(resetPage = false) {
-      cri.rt_dfc_num = $('#foodSelect').val();
-      cri.rt_dreg_num = $('#regionSelect').val();
+      const selected = $('#regionSelect option:selected');
+      cri.rt_dreg_num = Number(selected.data('dreg-num')) || 0;
+      cri.dreg_reg_num = Number(selected.data('reg-num')) || 0;
+      cri.rt_dfc_num = Number($('#foodSelect').val()) || 0;
       cri.orderBy = $('.sel-type').val();
 
       if (resetPage) cri.page = 1;
 
       $.ajax({
-        async : true,
-        url : "/user/list/sub",
-        type : 'post',
-        data : JSON.stringify(cri), 
+        async: true,
+        url: "/user/list/sub",
+        type: 'post',
+        data: JSON.stringify(cri),
         contentType: "application/json; charset=utf-8",
         success: function (data) {
           if (resetPage) {
             $(".pl-container").html(data);
           } else {
-            $(".pl-container").append(data); 
+            $(".pl-container").append(data);
           }
         },
         error: function () {
@@ -165,8 +255,13 @@
       });
     }
 
-    // 페이지 최초 로드
-    $(document).ready(function() {
+
+    // 처음 실행
+    $(document).ready(function () {
+      const selected = $('#regionSelect option:selected');
+      cri.rt_dreg_num = Number(selected.data('dreg-num')) || 0;
+      cri.dreg_reg_num = Number(selected.data('reg-num')) || 0;
+      cri.rt_dfc_num = Number($('#foodSelect').val()) || 0;
       loadList(true);
     });
 
@@ -179,6 +274,67 @@
       alert(rtNum + '번 매장');
       // 추후 리뷰 모달 연동
     }
+  </script>
+
+
+  <script>
+    const minInput = document.getElementById("minPrice");
+    const maxInput = document.getElementById("maxPrice");
+    const minField = document.getElementById("minPriceInput");
+    const maxField = document.getElementById("maxPriceInput");
+
+    const gap = 2000;
+
+    function syncSliderFromInput() {
+      let minVal = parseInt(minField.value);
+      let maxVal = parseInt(maxField.value);
+
+      if (isNaN(minVal)) minVal = 0;
+      if (isNaN(maxVal)) maxVal = 0;
+
+      // 충돌 방지
+      if (maxVal - minVal < gap) {
+        if (event.target === minField) {
+          minVal = maxVal - gap;
+          minField.value = minVal;
+        } else {
+          maxVal = minVal + gap;
+          maxField.value = maxVal;
+        }
+      }
+
+      minInput.value = minVal;
+      maxInput.value = maxVal;
+    }
+
+    function syncInputFromSlider() {
+      const minVal = parseInt(minInput.value);
+      const maxVal = parseInt(maxInput.value);
+
+      minField.value = minVal;
+      maxField.value = maxVal;
+    }
+
+    minInput.addEventListener("input", function () {
+      syncInputFromSlider();
+    });
+
+    maxInput.addEventListener("input", function () {
+      syncInputFromSlider();
+    });
+
+    minField.addEventListener("input", function () {
+      syncSliderFromInput();
+    });
+
+    maxField.addEventListener("input", function () {
+      syncSliderFromInput();
+    });
+
+    // 초기화
+    syncInputFromSlider();
+
+    syncSliderFromInput();
   </script>
 </main>
 

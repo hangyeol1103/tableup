@@ -1,10 +1,6 @@
 package kr.kh.tableup.service;
 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,21 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.dao.UserDAO;
-import kr.kh.tableup.model.util.Criteria;
-import kr.kh.tableup.model.util.PageMaker;
-import kr.kh.tableup.model.util.UploadFileUtils;
-import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
-import kr.kh.tableup.model.vo.FacilityVO;
-import kr.kh.tableup.model.vo.FileVO;
-import kr.kh.tableup.model.vo.FoodCategoryVO;
-import kr.kh.tableup.model.vo.RegionVO;
-import kr.kh.tableup.model.vo.ReservationVO;
-import kr.kh.tableup.model.vo.RestaurantVO;
-import kr.kh.tableup.model.vo.ReviewScoreVO;
-import kr.kh.tableup.model.vo.ReviewVO;
-import kr.kh.tableup.model.vo.ScoreTypeVO;
-import kr.kh.tableup.model.vo.TagVO;
-import kr.kh.tableup.model.vo.UserVO;
+
+import kr.kh.tableup.model.util.*;
+import kr.kh.tableup.model.vo.*;
 
 @Service
 public class UserService {
@@ -43,34 +27,44 @@ public class UserService {
   @Autowired
   private PasswordEncoder passwordEncoder;
 
-  public boolean validateUser(UserVO user, RedirectAttributes ra) {
-    // 아이디 중복
+
+    /** 중복 검사 (ID, 이메일, 전화번호) */
+    public boolean validateUser(UserVO user, RedirectAttributes re) {
     if (isDuplicate("id", user.getUs_id())) {
-      ra.addFlashAttribute("msg", "이미 사용 중인 아이디입니다.");
+      re.addFlashAttribute("msg", "이미 사용 중인 아이디입니다.");
       return false;
     }
-
-    // 이메일 중복
     if (isDuplicate("email", user.getUs_email())) {
-      ra.addFlashAttribute("msg", "이미 사용 중인 이메일입니다.");
+      re.addFlashAttribute("msg", "이미 사용 중인 이메일입니다.");
       return false;
     }
-
-    // 전화번호 중복
     if (isDuplicate("phone", user.getUs_phone())) {
-      ra.addFlashAttribute("msg", "이미 사용 중인 전화번호입니다.");
+      re.addFlashAttribute("msg", "이미 사용 중인 전화번호입니다.");
       return false;
     }
-
     return true;
   }
 
-  /** 중복 검사 (ID, 이메일, 전화번호) */
-  public boolean isDuplicate(String type, String value) {
-    if (type == null || value == null) {
+
+  public boolean validateUser2(UserVO user, RedirectAttributes re) {
+    if (userDAO.selectUserById(user.getUs_id())!=null) {
+      re.addFlashAttribute("msg", "이미 사용 중인 아이디입니다.");
       return false;
     }
+    if (userDAO.selectUserByPhone(user.getUs_email())!=null) {
+      re.addFlashAttribute("msg", "이미 사용 중인 이메일입니다.");
+      return false;
+    }
+    if (userDAO.selectUserByEmail(user.getUs_phone())!=null) {
+      re.addFlashAttribute("msg", "이미 사용 중인 전화번호입니다.");
+      return false;
+    }
+    return true;
+  }
 
+  
+  public boolean isDuplicate(String type, String value) {
+    if (type == null || value == null) return false;
     return switch (type) {
       case "id" -> userDAO.selectUserById(value) != null;
       case "phone" -> userDAO.selectUserByPhone(value) != null;
@@ -79,11 +73,9 @@ public class UserService {
     };
   }
 
-  public void insertUser(UserVO user) {
-    // 비밀번호 암호화
+  public boolean insertUser(UserVO user) {
     user.setUs_pw(passwordEncoder.encode(user.getUs_pw()));
-
-    // 닉네임이 없을 경우 랜덤으로 생성
+    // 닉네임이 없을 경우
     if (user.getUs_nickname() == null || user.getUs_nickname().isBlank()) {
       user.setUs_nickname("user_" + UUID.randomUUID().toString().substring(0, 8));
     }
@@ -91,7 +83,7 @@ public class UserService {
     user.setUs_created(new Date());
     user.setUs_state(0);
 
-    userDAO.insertUser(user);
+    return userDAO.insertUser(user);
   }
 
   /*
@@ -135,19 +127,15 @@ public class UserService {
    */
   /** 회원가입 */
   public boolean registerUser(UserVO user) {
-    if (user == null || user.getUs_id() == null || user.getUs_pw() == null) {
-      return false;
-    }
-
+    if (user == null || user.getUs_id() == null || user.getUs_pw() == null) return false;
     user.setUs_pw(passwordEncoder.encode(user.getUs_pw()));
+
     return userDAO.insertUser(user);
   }
 
   /** 회원 정보 조회 */
   public UserVO getUserById(String us_id) {
-    if (us_id == null || us_id.isBlank()) {
-      return null;
-    }
+    if (us_id == null || us_id.isBlank()) return null;
     return userDAO.selectUserById(us_id);
   }
 
@@ -158,9 +146,7 @@ public class UserService {
 
   /** 회원 정보 수정 */
   public boolean updateUser(UserVO user) {
-    if (user == null || user.getUs_id() == null) {
-      return false;
-    }
+    if (user == null || user.getUs_id() == null) return false;
 
     // 비밀번호 입력이 있을 경우만 변경
     if (user.getUs_pw() != null && !user.getUs_pw().isBlank()) {
@@ -205,9 +191,7 @@ public class UserService {
   }
 
   public boolean insertReviewScore(ReviewVO review, int rs_st_num, int rs_score) {
-    if (review == null || review.getRev_num() < 1 || rs_st_num < 1 || rs_score < 1 || rs_score > 5) {
-      return false;
-    }
+    if (review == null || review.getRev_num() < 1 || rs_st_num < 1 || rs_score < 1 || rs_score > 5) return false;
 
     ReviewScoreVO reviewScore = new ReviewScoreVO();
     reviewScore.setRs_rev_num(review.getRev_num());
@@ -217,21 +201,16 @@ public class UserService {
   }
 
   public boolean insertFile(ReviewVO review, List<MultipartFile> files, List<String> fileNames, List<String> fileTags) {
-    if (review == null || files == null)
-      return false;
-    if (files.size() != fileNames.size() || files.size() != fileTags.size())
-      return false;
-    if (review.getRev_num() < 1)
-      return false;
+    if (review == null || files == null) return false;
+    if (files.size() != fileNames.size() || files.size() != fileTags.size()) return false;
+    if (review.getRev_num() < 1) return false;
 
     for (int i = 0; i < files.size(); i++) {
       MultipartFile file = files.get(i);
       String inputFileName = fileNames.get(i);
       String fileTag = fileTags.get(i);
 
-      if (file == null || file.isEmpty()) {
-        return false;
-      }
+      if (file == null || file.isEmpty()) return false;
 
       try {
         // 파일 확장자 추출
@@ -279,12 +258,54 @@ public class UserService {
   
 	public 	Map<String, List<RegionVO>> getRegionMap() {
 		
-    // reg_main 기준으로 (LinkedHashMap -> 순서 보장)
-		Map<String, List<RegionVO>> regionMap = getRegionList().stream()
-			.collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+     List<RegionVO> list = getRegionList();
+
+    // 대분류별
+    Map<String, List<RegionVO>> regionMap = list.stream()
+        .collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+
+    // 각 그룹 앞에 "전체" 추가
+    for (Map.Entry<String, List<RegionVO>> entry : regionMap.entrySet()) {
+        RegionVO first = entry.getValue().get(0);
+
+        RegionVO all = new RegionVO();
+        all.setReg_num(first.getReg_num()); // 대분류 번호 그대로
+        all.setReg_main(first.getReg_main());
+        all.setDreg_num(0); // 전체 구분용
+        all.setDreg_sub("전체");
+
+        entry.getValue().add(0, all); // 맨 앞에 삽입
+    }
 
     return regionMap;
-	}
+    
+	} //이게 잘안돼서 밑에걸로
+
+  public List<RegionVO> getRegionListWithWhole() {
+    List<RegionVO> original = getRegionList(); // 기본 목록
+
+    Map<String, List<RegionVO>> grouped = original.stream()
+        .collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+
+    List<RegionVO> result = new ArrayList<>();
+    for (Map.Entry<String, List<RegionVO>> entry : grouped.entrySet()) {
+        String regMain = entry.getKey();
+        List<RegionVO> list = entry.getValue();
+
+        // 첫 RegionVO 하나를 복사해서 "전체"로 만들기
+        RegionVO whole = new RegionVO();
+        whole.setReg_main(regMain);
+        whole.setDreg_sub("전체");
+        whole.setDreg_num(0);
+        whole.setReg_num(list.get(0).getReg_num()); // 대분류 번호 복사
+
+        result.add(whole);      // "서울 전체"
+        result.addAll(list);    // 서울:강남, 서울:관악 ...
+    }
+
+    return result;
+}
+
   
 
   public List<FoodCategoryVO> getFoodCategoryList() {
@@ -296,9 +317,55 @@ public class UserService {
     if (cri == null) {
       return null;
     }
+
+    
     return userDAO.selectRestaurantList(cri);
   }
+  
+/* public List<RestaurantVO> getRestaurantList(Criteria cri) {
+    if (cri == null) return null;
 
+    Map<String, Object> criMap = new HashMap<>();
+    criMap.put("cri", cri);
+    criMap.put("tagList", cri instanceof ResCriteria resCri ? new ArrayList<>(resCri.getTagList()) : null);
+    criMap.put("facilityList", cri instanceof ResCriteria resCri ? new ArrayList<>(resCri.getTagList()) : null);
+    criMap.put("rt_dreg_num", cri instanceof ResCriteria resCri ? resCri.getRt_dreg_num() : null);
+    criMap.put("dreg_reg_num", cri instanceof ResCriteria resCri ? resCri.getDreg_reg_num() : null);
+    criMap.put("rt_dfc_num", cri instanceof ResCriteria resCri ?  resCri.getRt_dfc_num() : null);
+    criMap.put("orderBy", cri instanceof ResCriteria resCri ? resCri.getOrderby() : null);
+    criMap.put("pageStart", cri instanceof ResCriteria resCri ? resCri.getPageStart() : null);
+    criMap.put("perPageNum", cri instanceof ResCriteria resCri ? resCri.getPerPageNum() : null);
+
+    return userDAO.selectRestaurantList(criMap);
+  }*/
+/*
+  public PageMaker getPageMaker(Criteria cri) {
+    if (cri == null) return null;
+
+    Map<String, Object> criMap = new HashMap<>();
+    criMap.put("cri", cri);
+    criMap.put("tagList", cri instanceof ResCriteria resCri ? new ArrayList<>(resCri.getTagList()) : null);
+    criMap.put("facilityList", cri instanceof ResCriteria resCri ? new ArrayList<>(resCri.getTagList()) : null);
+    criMap.put("rt_dreg_num", cri instanceof ResCriteria resCri ? resCri.getRt_dreg_num() : null);
+    criMap.put("dreg_reg_num", cri instanceof ResCriteria resCri ? resCri.getDreg_reg_num() : null);
+    criMap.put("rt_dfc_num", cri instanceof ResCriteria resCri ?  resCri.getRt_dfc_num() : null);
+    criMap.put("orderBy", cri instanceof ResCriteria resCri ? resCri.getOrderBy() : null);
+    criMap.put("pageStart", cri instanceof ResCriteria resCri ? resCri.getPageStart() : null);
+    criMap.put("perPageNum", cri instanceof ResCriteria resCri ? resCri.getPerPageNum() : null);
+
+    int count = userDAO.selectCountRestaurantList(criMap);
+    return new PageMaker(1, cri, count);
+  }
+*/
+
+  	public PageMaker getPageMaker(Criteria cri) {
+    if(cri == null) {
+			return null;
+		}
+		
+		int count = userDAO.selectCountRestaurantList(cri);
+		return new PageMaker(1, cri, count);
+	}
 
   public RestaurantVO getRestaurantDetail(int rt_num) {
     return userDAO.selectRestaurantDetail(rt_num);
@@ -315,14 +382,7 @@ public class UserService {
   public TagVO getTagByRestaurant(int rt_num) {
     return userDAO.selectTagByRestaurant(rt_num);
   }
-	public PageMaker getPageMaker(Criteria cri) {
-    if(cri == null) {
-			return null;
-		}
-		
-		int count = userDAO.selectCountRestaurantList(cri);
-		return new PageMaker(1, cri, count);
-	}
+
   
 	public List<ReviewVO> getReviewList() {
 		
@@ -344,6 +404,12 @@ public class UserService {
 		
       return userDAO.selectFacilityList();
 	}
+
+
+  public List<ScoreTypeVO> getScoreTypeList() {
+
+    return userDAO.selectScoreTypeList();
+  }
 
 
 

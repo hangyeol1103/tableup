@@ -13,4 +13,5 @@ public class ReviewScoreVO {
 	private int st_num;           // ST_NUM int AI PK
 	private String st_category;   // ST_CATEGORY varchar(50)
 
+	private int rt_num;	//매장번호
 }

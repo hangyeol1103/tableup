@@ -311,4 +311,16 @@
 		where
 			rt_num=#{rt_num}
 	</update>
+
+	<!-- 쿠폰 기간 만료 및 지났을 경우 비공개 전환 -->
+	<select id="getExpiredCoupons" resultType="ResCouponVO">
+		select * from rescoupon where rec_period = #{now}
+	</select>
+
+	<update id="updateCouponState">
+		update rescoupon set
+			rec_state = #{rec_state}
+		where rec_period =#{rec_period} 
+	</update>
+	
 </mapper>

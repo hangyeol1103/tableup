@@ -1,5 +1,6 @@
 package kr.kh.tableup.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -496,6 +497,14 @@ public class ManagerService {
 
 	public List<FileVO> getFileList(int rm_rt_num) {
 		return managerDAO.selectFileList(rm_rt_num);
+	}
+
+	public void expireOldCoupons() {
+		List<ResCouponVO> expired =managerDAO.getExpiredCoupons(LocalDate.now());
+		for(ResCouponVO c: expired){
+			c.setRec_state(false);
+			managerDAO.updateCouponState(c);
+		}
 	}
 
 

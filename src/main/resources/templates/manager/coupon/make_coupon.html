@@ -18,7 +18,7 @@
 <body>
   <main div class="container mt-4"layout:fragment="content" >
     <h2>쿠폰 등록</h2>
-    <form th:action="@{/manager/make_coupon}" method="post" id="signup-form" >
+    <form th:action="@{/manager/coupon/make_coupon}" method="post" id="signup-form" >
       <div class="mb-3 form-group box">
         <label for="rec_content" class="form-label">쿠폰 내용</label>
         <input type="text" class="form-control" name="rec_content" id="rec_content" required>
@@ -32,13 +32,23 @@
       </div>
       <div class="mb-3 form-group box">
         <label for="rec_period" class="form-label">쿠폰 기간</label>
-         <input type="text" class="form-control" name="rec_period" id="rec_period" required>
+        <input type="text" class="form-control" name="rec_period" id="rec_period" required>
       </div>
       <button type="submit" class="btn btn-success w-100">쿠폰 등록</button>
     </form>
 
   </main>
-  
+  <script>
+    const today =new Date();
+    today.setDate(today.getDate()+7);
+    const yyyy=today.getFullYear();
+    const MM=String(today.getMonth() + 1).padStart(2, '0');
+    const dd=String(today.getDate()).padStart(2, '0');
+    const minDate=`${yyyy}-${MM}-${dd}`;
+
+    //최소 날짜 설정
+    document.getElementById("rec_period").setAttribute("min", minDate);
+  </script>
 
 
 </body>

@@ -159,10 +159,15 @@
     <section class="col-md-9">
       <!-- 정렬 선택 -->
       <div class="d-flex justify-content-end mb-3">
-        <select class="form-control col-3 sel-type w-auto">
-          <option value="po_num desc">별점순</option>
-          <option value="po_up desc, po_num desc">총점순</option>
-          <option value="po_view desc, po_num desc">청결도</option>
+        <select class="form-control sel-type">
+          <option value="default">기본 정렬</option>
+          <option value="reservation">예약 많은 순</option>
+          <option value="reviewCount">리뷰 많은 순</option>
+          <option value="avg">전체 평점순(일단 테스트용으로 얘만 역순)</option>
+          <option th:each="scoreType : ${scoreTypeList}"
+                  th:value="${scoreType.st_num}"
+                  th:text="${scoreType.st_category + ' 점수순'}">
+          </option>
         </select>
       </div>
 

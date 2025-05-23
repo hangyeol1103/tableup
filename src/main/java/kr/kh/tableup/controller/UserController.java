@@ -354,22 +354,27 @@ public class UserController {
         List<RegionVO> regionList = userService.getRegionListWithWhole();
         List<FoodCategoryVO> foodList = userService.getFoodCategoryList();
 
-        model.addAttribute("regionList", regionList);
-        model.addAttribute("foodList", foodList);
-
         Map<String, List<TagVO>> tagList = userService.getTagList();
         List<FacilityVO> facilityList = userService.getFacilityList();
 
+        List<ScoreTypeVO> scoreTypeList = userService.getScoreTypeList();
+
+        model.addAttribute("regionList", regionList);
+        model.addAttribute("foodList", foodList);
+
         model.addAttribute("tagList", tagList);
         model.addAttribute("facilityList", facilityList);
+
+        model.addAttribute("scoreTypeList", scoreTypeList);
 
         if(dreg_num != null)model.addAttribute("dreg_num", dreg_num);
         if(reg_num != null) model.addAttribute("reg_num", reg_num);
         if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
 
         System.out.println("리스트 호출");
-        System.out.println(dreg_num + " " + dfc_num + " " + reg_num); 
-        System.out.println(regionList);
+        //System.out.println(dreg_num + " " + dfc_num + " " + reg_num); 
+        //System.out.println(regionList);
+        //System.out.println(scoreTypeList);
 
         return "user/list/list"; 
     }
@@ -379,11 +384,12 @@ public class UserController {
     cri.setPerPageNum(2);   //차후 삭제
     // num를 서비스에게 주면서 게시판 번호에 맞는 게시글 목록 중 2개를 가져오라고 요청.
     System.out.println(cri);
-    System.out.println("태그: " + cri.getTagList());
-    System.out.println("시설: " + cri.getFacilityList());
-    System.out.println(cri.getPriceType());
-    System.out.println(cri.getMinPrice());
-    System.out.println(cri.getMaxPrice());
+    // System.out.println("태그: " + cri.getTagList());
+    // System.out.println("시설: " + cri.getFacilityList());
+    // System.out.println(cri.getPriceType());
+    // System.out.println(cri.getMinPrice());
+    // System.out.println(cri.getMaxPrice());
+    // System.out.println(cri.getOrderBy());
     List<RestaurantVO> list = userService.getRestaurantList(cri);
     //System.out.println(list);
     // 서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청
@@ -392,7 +398,7 @@ public class UserController {
     // 가져온 게시글 목록을 화면에 전송
     model.addAttribute("list", list);
     model.addAttribute("pm", pm);
-    System.out.println("상세 호출");
+    // System.out.println("상세 호출");
     return "user/list/sublist";
   }
 

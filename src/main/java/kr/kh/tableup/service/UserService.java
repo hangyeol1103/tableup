@@ -317,6 +317,8 @@ public class UserService {
     if (cri == null) {
       return null;
     }
+
+    
     return userDAO.selectRestaurantList(cri);
   }
   
@@ -402,6 +404,12 @@ public class UserService {
 		
       return userDAO.selectFacilityList();
 	}
+
+
+  public List<ScoreTypeVO> getScoreTypeList() {
+
+    return userDAO.selectScoreTypeList();
+  }
 
 
 

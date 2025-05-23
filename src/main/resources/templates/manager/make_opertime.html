@@ -1,111 +1,212 @@
 <!DOCTYPE html>
-<html lang="en"
+<html lang="ko"
   xmlns:th="http://www.thymeleaf.org"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
   layout:decorate="~{layout/manager_layout.html}">
-  <head>
-    <title>Bootstrap Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-   
-
-    
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <title>영업일자 달력 등록</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style>
+    .calendar-cell {
+      width: 120px;
+      height: 100px;
+      border: 1px solid #ccc;
+      margin: 5px;
+      padding: 5px;
+      display: inline-block;
+      vertical-align: top;
+      position: relative;
+    }
+    .calendar-row {
+      display: flex;
+    }
+    .calendar-month {
+      margin-bottom: 2rem;
+    }
+    .drop-content {
+      background: #f8f9fa;
+      min-height: 40px;
+      font-size: 0.85em;
+      margin-top: 5px;
+    }
+    .sample-card {
+      border: 1px solid #aaa;
+      background-color: #f0f0f0;
+      padding: 8px;
+      margin-bottom: 5px;
+      cursor: grab;
+    }
+    .delete-btn {
+      float: right;
+      color: red;
+      cursor: pointer;
+    }
+    .calendar-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
 <body>
-  <main div class="container mt-4"layout:fragment="content" >
-    <h2>영업일자 등록</h2>
-    <form th:action="@{/manager/make_opertime}" method="post" id="signup-form">
-      <div class="mb-3 form-group box">
-        <label for="bd_date" class="form-label">영업 날짜</label>
-        <input type="type"  class="form-control"  id="bd_date" name="bd_date" required>
-      </div>
-      <div class="mb-3 form-group box">
-        <label for="bd_off" class="form-label">휴무일 여부</label>
-         <select class="form-select"  id="bd_off" name="bd_off" required>
-          <option value="false">여는날</option>
-          <option value="true">쉬는날</option>
-         </select>
-      </div>
-      <div class="mb-3 form-group box">
-        <label for="bd_open" class="form-label">개점 시간</label>
-        <input type="time" class="form-control time-input"  id="bd_open" name="bd_open">
-      </div>
-      <div class="mb-3 form-group box">
-        <label for="bd_close" class="form-label">마감 시간</label>
-        <input type="time" class="form-control time-input" id="bd_close" name="bd_close">
-      </div>
-      <div class="mb-3 form-group box">
-        <label for="has_break" class="form-label">브레이크 타임 유무</label>
-        <select class="form-select time-input" id="has_break">
-          <option value="true">있음</option>
-          <option value="false">없음</option>
-        </select>
-      </div>
-      <div class="mb-3 form-group box">
-        <label for="bd_brstart" class="form-label">브레이크 시작시간</label>
-        <input type="time" class="form-control time-input break-time-input"  id="bd_brstart" name="bd_brstart">
-      </div>
-      <div class="mb-3 form-group box">
-        <label for="bd_brend" class="form-label">브레이크 마감시간</label>
-        <input type="time" class="form-control time-input break-time-input"  id="bd_brend" name="bd_brend">
-      </div>
-      <div class="mb-3 form-group box">
-        <label for="bd_loam" class="form-label">라스트오더(점심)</label>
-        <input type="time" class="form-control time-input"  id="bd_loam" name="bd_loam">
-      </div>
-      <div class="mb-3 form-group box">
-        <label for="bd_lopm" class="form-label">라스트오더(저녁)</label>
-        <input type="time" class="form-control time-input"  id="bd_lopm" name="bd_lopm">
-      </div>
-      <button type="submit" class="btn btn-success w-100">영업일자 등록</button>
-    </form>
+<main class="container mt-4" layout:fragment="content">
+  <h2>샘플 영업일자 목록</h2>
+  <button type="button" class="btn btn-secondary mb-3" id="openSampleBtn">샘플 추가</button>
+  <div id="sampleCardContainer" class="mb-4"></div>
 
-    <script>
-      $(document).ready(function () {
+  <h3>영업일자 달력</h3>
+  <div class="calendar-navigation">
+    <button id="prevMonth" class="btn btn-outline-primary">이전달</button>
+    <span id="calendarTitle" class="fw-bold"></span>
+    <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
+  </div>
+  <div id="calendar"></div>
 
-        function updateTimeInputs() {
-          const isClosed = $('#bd_off').val() === 'true';
-          const hasBreak = $('#has_break').val() === 'true';
+  <button id="submitCalendar" class="btn btn-success w-100 mt-3">등록하기</button>
 
-          // 공통 시간 입력 필드 (개점, 마감, 라스트오더)
-          const timeFields = ['#bd_open', '#bd_close', '#bd_loam', '#bd_lopm'];
-          // 브레이크 타임 필드
-          const breakFields = ['#bd_brstart', '#bd_brend'];
+  <script>
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
 
-          // 모든 필드 초기화 및 비활성화/활성화 처리
-          timeFields.forEach(id => {
-            $(id).val(isClosed ? '' : $(id).val()); // 초기화
-            $(id).prop('disabled', isClosed);
-            $(id).prop('required', !isClosed);
-          });
+    function renderCalendar(year, month) {
+      $('#calendar').empty();
+      const container = $('<div class="calendar-month"></div>');
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDay = new Date(year, month, 1).getDay();
 
-          // 브레이크 필드 제어
-          breakFields.forEach(id => {
-            const disable = isClosed || !hasBreak;
-            if (disable) {
-              $(id).val('');
-            }
-            $(id).prop('disabled', disable);
-            $(id).prop('required', !disable);
-          });
+      $('#calendarTitle').text(`${year}년 ${month + 1}월`);
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      let row = $('<div class="calendar-row"></div>');
+      weekdays.forEach(day => row.append(`<div class="calendar-cell"><strong>${day}</strong></div>`));
+      container.append(row);
 
-          // 브레이크 select도 비활성화
-          $('#has_break').prop('disabled', isClosed);
+      row = $('<div class="calendar-row"></div>');
+      for (let i = 0; i < firstDay; i++) row.append('<div class="calendar-cell"></div>');
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        row.append(`
+          <div class="calendar-cell" data-date="${dateStr}" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <strong>${i}</strong>
+            <div class="drop-content"></div>
+          </div>
+        `);
+        if ((firstDay + i) % 7 === 0) {
+          container.append(row);
+          row = $('<div class="calendar-row"></div>');
         }
+      }
+      container.append(row);
+      $('#calendar').append(container);
+    }
 
-        // 이벤트 바인딩
-        $('#bd_off').change(updateTimeInputs);
-        $('#has_break').change(updateTimeInputs);
-
-        // 초기 실행
-        updateTimeInputs();
+    function loadSamples() {
+      const cookies = document.cookie.split('; ');
+      $('#sampleCardContainer').empty();
+      cookies.forEach(cookie => {
+        const [name, value] = cookie.split('=');
+        if (name.includes('_sample_')) {
+          const decoded = decodeURIComponent(value);
+          const sample = JSON.parse(decoded);
+          const card = $(`
+            <div class="sample-card" draggable="true" data-sample='${decoded}'>
+              <span class="delete-btn">&times;</span>
+              <strong>개점:</strong> ${sample.bd_open || '-'}, <strong>마감:</strong> ${sample.bd_close || '-'}
+            </div>`);
+          card.on('dragstart', function (e) {
+            e.originalEvent.dataTransfer.setData('text/plain', JSON.stringify(sample));
+          });
+          card.find('.delete-btn').click(() => {
+            document.cookie = `${name}=; path=/; max-age=0;`;
+            card.remove();
+          });
+          $('#sampleCardContainer').append(card);
+        }
       });
-    </script>
+    }
 
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
 
-  </main>
+    function drop(ev) {
+      ev.preventDefault();
+      const data = ev.dataTransfer.getData("text/plain");
+      const sample = JSON.parse(data);
+      const date = $(ev.target).closest('[data-date]').data('date');
+      $(ev.target).closest('.calendar-cell').find('.drop-content').html(
+        `<div><strong>${sample.bd_open || '-'}~${sample.bd_close || '-'}</strong><br>📅 ${date}</div>`
+      ).data('sample', sample);
+    }
+
+    $('#submitCalendar').click(() => {
+      const resultList = [];
+      $('.calendar-cell').each(function () {
+        const sample = $(this).find('.drop-content').data('sample');
+        const date = $(this).data('date');
+        if (sample) {
+          const cleaned = { ...sample, bd_date: date };
+          console.log(cleaned);
+          Object.keys(cleaned).forEach(k => {
+            if (cleaned[k] === '') cleaned[k] = null;
+          });
+          
+          resultList.push(cleaned);
+        }
+      });
+      
+      console.log("보낼 데이터:", JSON.stringify(resultList));
+      $.ajax({
+        url : '/manager/make_opertime_list', 
+        type : 'post', 
+        data : JSON.stringify(resultList), 
+        contentType : "application/json; charset=utf-8",
+        // headers: {"Accept": "application/json"},  
+        // xhrFields: { withCredentials: true },
+        success: (data) => alert(data),
+        error: (xhr) => {
+          console.error("서버 응답 오류:", xhr.responseText)
+          // console.log(xhr)
+        }
+      });
+    });
+
+    $('#openSampleBtn').click(() => {
+      const width = 600;
+      const height = 500;
+      const left = (screen.width - width) / 2;
+      const top = (screen.height - height) / 2;
+      window.open('/manager/make_opertime_sub', '샘플등록', `width=${width},height=${height},left=${left},top=${top}`);
+    });
+
+    $('#prevMonth').click(() => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    $('#nextMonth').click(() => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    $(document).ready(() => {
+      renderCalendar(currentYear, currentMonth);
+      loadSamples();
+    });
+
+  </script>
+</main>
 </body>
 </html>

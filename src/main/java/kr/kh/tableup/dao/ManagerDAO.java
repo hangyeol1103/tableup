@@ -88,6 +88,8 @@ public interface ManagerDAO {
 
 	boolean insertOperTime(BusinessDateVO opertime);
 
+	boolean insertOperTimestamp(BusinessDateVO oper);
+
 	BusinessDateVO selectBuisnessDate(int bd_num);
 
 	boolean insertResDetail(RestaurantVO resdetail);
@@ -133,6 +135,8 @@ public interface ManagerDAO {
 	void deletefile(int rt_num);
 
 	boolean updateRestaurant(RestaurantVO restaurant);
+
+
 
 	
 }

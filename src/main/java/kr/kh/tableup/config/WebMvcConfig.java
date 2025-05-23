@@ -22,13 +22,13 @@ public class WebMvcConfig implements WebMvcConfigurer{
 		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/");
 	}
 
-	@Override
-	public void addCorsMappings(org.springframework.web.servlet.config.annotation.CorsRegistry registry) {
-		registry.addMapping("/**")
-				.allowedOrigins("http://localhost:8080") 
-				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-				.allowCredentials(true); 
- 	}
+	// @Override
+	// public void addCorsMappings(org.springframework.web.servlet.config.annotation.CorsRegistry registry) {
+	// 	registry.addMapping("/**")
+	// 			.allowedOrigins("http://localhost:8080") 
+	// 			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+	// 			.allowCredentials(true); 
+ 	// }
 	@Override
 	public Validator getValidator() {
 			return new LocalValidatorFactoryBean();

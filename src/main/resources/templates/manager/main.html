@@ -79,11 +79,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 	<main layout:fragment="content">
 		<div class="container my-4">
 			<div class="main-box">
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/reservation/new'|">신규 예약</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">신규 예약</div>
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/restaurant'|">매장관리</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">매장관리</div>
 
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/reservation/modify'|">예약 변경</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">예약 변경</div>
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/reservation/modify'|">예약 관리</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">예약 관리</div>
 
         <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/reservation/cancel'|">예약 취소</div>
         <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">예약 취소</div>

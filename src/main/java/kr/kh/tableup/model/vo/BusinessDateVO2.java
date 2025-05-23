@@ -2,12 +2,12 @@ package kr.kh.tableup.model.vo;
 
 import java.sql.Timestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class BusinessDateVO {
+@NoArgsConstructor
+public class BusinessDateVO2 {
 
 	private int bd_num;
 
@@ -35,34 +35,28 @@ public class BusinessDateVO {
 	
 
 		// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-	@JsonIgnore
 	private Timestamp  bd_open_ts;
 
 	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-	@JsonIgnore
 	private Timestamp  bd_close_ts;
 
 	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-	@JsonIgnore
 	private Timestamp  bd_brstart_ts;
 
 	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-	@JsonIgnore
 	private Timestamp  bd_brend_ts;
 
 	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-	@JsonIgnore
 	private Timestamp  bd_loam_ts;
 
 	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-	@JsonIgnore
 	private Timestamp  bd_lopm_ts;
 
 
 
 /////////////////////////////////////////////
 
-	@JsonIgnore
+
 	private String  bd_local_date;
 
 	

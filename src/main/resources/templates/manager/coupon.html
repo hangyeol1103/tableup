@@ -25,7 +25,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				</div>
 				<div class="input-group form-group">
 					<div class="form-control col-3">쿠폰 상태:</div>
-					<div class="form-control" th:text="${coupon.rec_state}"></div>
+					<div class="form-control" th:text="${coupon.rec_state!= null ?(coupon.rec_state ? '공개' : '비공개'):'-'}"></div>
 				</div>
 				<div class="input-group form-group">
 					<div class="form-control col-3">쿠폰 기간:</div>

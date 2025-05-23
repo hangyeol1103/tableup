@@ -19,6 +19,8 @@ import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -26,6 +28,7 @@ import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
+import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
@@ -58,10 +61,10 @@ public class ManagerController {
 
 	
 
-	@GetMapping("/main")
+	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
 		System.out.println(manager);
-		model.addAttribute("url","/main");
+		// model.addAttribute("url","/main");
 		model.addAttribute("manager", manager);
 		return "manager/main";
 	}
@@ -91,7 +94,7 @@ public class ManagerController {
 		String loginId = principal.getName();
 		
 		if (!loginId.equals(rm_id)) {
-			return "redirect:/manager/main";
+			return "redirect:/manager";
 	}
 		RestaurantManagerVO manager = managerService.getManagerId(loginId);
 		//해당 매니저의 매장 외래키를 가져옴
@@ -102,12 +105,17 @@ public class ManagerController {
 		List<DetailRegionVO> dr = managerService.getDetailRegion();
 		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
 		
+		List<FileVO> fileList = managerService.getFileList(manager.getRm_rt_num());
+		model.addAttribute("fileList", fileList);
+		
+
 		System.out.println(manager.getRm_id());
 		System.out.println(restaurant);
 		System.out.println(manager);
 		
 		model.addAttribute("manager", manager);
 		model.addAttribute("restaurant", restaurant);
+		
 		
 		model.addAttribute("foodcategory", foodcategory);
 		model.addAttribute("region", region);
@@ -168,6 +176,43 @@ public class ManagerController {
 			return "redirect:/manager/restaurant";
 		}
 		return "redirect:/manager/make";
+	}
+
+	//매장 정보 수정
+	@GetMapping("/remake")
+	public String remakePage(Model model,@AuthenticationPrincipal CustomManager manager) {
+		List<FoodCategoryVO> foodcategory = managerService.getFoodCategory();
+		List<RegionVO> region = managerService.getRegion();
+		List<DetailRegionVO> dr = managerService.getDetailRegion();
+		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
+
+		RestaurantVO restaurant = managerService.getResDetail(manager.getManager().getRm_rt_num());
+		System.out.println(restaurant);
+
+		System.out.println(region);
+		System.out.println(dr);
+		System.out.println(foodcategory);
+		System.out.println(dfc);
+
+		model.addAttribute("url", "/remake");
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("foodcategory", foodcategory);
+		model.addAttribute("region", region);
+		model.addAttribute("dr", dr);
+		model.addAttribute("dfc", dfc);
+		return "/manager/remake";
+	}
+
+	@PostMapping("/remake")
+	public String updatePage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
+													 @AuthenticationPrincipal CustomManager manager ) {
+		System.out.println(manager);
+		System.out.println("수정할 매장 정보 :"+restaurant);
+
+		if(managerService.updateRestaurant(restaurant, manager.getManager(), fileList)){
+			return "redirect:/manager/restaurant";
+		}
+		return "redirect:/manager/remake";
 	}
 	
 	//메뉴 리스트 출력
@@ -729,5 +774,96 @@ public class ManagerController {
 		return "manager/main";
 	}
 	
+	//매장 편의시설 목록 페이지
+	@GetMapping("/resfacilitylist/{rt_num}")
+	public String facilityListPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
+		System.out.println("resfacilitylist rt_num: " + rt_num);
+		List<FacilityVO> facility = managerService.getFacilityList();
+		List<RestaurantFacilityVO> facilitylist = managerService.getResFacilityList(rt_num);
+
+		System.out.println("등록된 편의 시설 : "+facility);
+		model.addAttribute("rt_num", rt_num);
+		model.addAttribute("facility", facility);
+		model.addAttribute("facilitylist", facilitylist);
+		model.addAttribute("manager", manager.getManager());
+		return "manager/resfacilitylist";
+	}
+
+	//매장 편의시설 등록 페이지
+	@GetMapping("/make_resfacility")
+	public String makeResFacilityPage(Model model) {
+		List<FacilityVO> facility = managerService.getFacilityList();
+
+		model.addAttribute("facility", facility);
+		model.addAttribute("url", "/make_resfacility");
+		return "/manager/make_resfacility";
+	}
+
+	@PostMapping("/make_resfacility")
+	public String insertResFacility(RestaurantFacilityVO resfacility,  @AuthenticationPrincipal CustomManager manager) {
+		resfacility.setRf_rt_num(manager.getManager().getRm_rt_num());
+		System.out.println(manager.getManager());
+		System.out.println(resfacility);
+		
+		int rtNum = manager.getManager().getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+  	resfacility.setRf_rt_num(rtNum);
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+
+		if(managerService.makeResFacility(resfacility)){
+			return "redirect:/manager/resfacilitylist/"+rtNum;
+		}
+
+		return "/manager/make_resfacility";
+	}
+
+	//편의시설 정보 변경
+	@GetMapping("/remake_resfacility/{rf_num}")
+	public String reMakeResFacilityPage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int rf_num) {
+		RestaurantFacilityVO resfacility = managerService.getResFacility(rf_num);
+		List<FacilityVO> facility = managerService.getFacilityList();
+		System.out.println(resfacility);
+		
+		model.addAttribute("facility", facility);
+		model.addAttribute("resfacility", resfacility);
+		model.addAttribute("url", "/remake_resfacility");
+		return "/manager/remake_resfacility";
+	}
+	
+	@PostMapping("/remake_resfacility")
+	public String updateResFacility(RestaurantFacilityVO resfacility,  @AuthenticationPrincipal CustomManager manager ) {
+		resfacility.setRf_rt_num(manager.getManager().getRm_rt_num());
+		System.out.println(manager.getManager());
+		System.out.println(resfacility);
+		
+		int rtNum = manager.getManager().getRm_rt_num();
+    System.out.println("매니저의 매장 번호: " + rtNum);
+		System.out.println("-------------------------");
+  	//resfacility.setRf_rt_num(rtNum);
+		System.out.println("수정할 rf_num = " + resfacility.getRf_num());
+
+    if (rtNum <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+        return "redirect:/manager/make";
+    }
+		 if(managerService.remakeResFacility(resfacility)){
+		 	return "redirect:/manager/resfacilitylist/"+rtNum;
+		 }
+		return "/manager/remake_resfacility";
+	}
+
+	@PostMapping("/delete_resfacility/{rf_num}")
+	public String deleteResFacility(@AuthenticationPrincipal CustomManager manager, @PathVariable int rf_num) {
+		int rtNum = manager.getManager().getRm_rt_num();
+		 if(managerService.deleteResFacility(rf_num)) {
+        return "redirect:/manager/resfacilitylist/"+rtNum;
+    }
+		return "redirect:/manager/resfacilitylist/"+rtNum;
+	}
+
 
 }

@@ -17,7 +17,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <body>
 	<main layout:fragment="content" class="container">
 		<!-- 쿠폰(매니저) 정보가 등록이 되어 있으면-->
-			<h1>메뉴 목록</h1>
+			<h1>쿠폰 목록</h1>
 			<table class="table table-bordered table-hover">
 			<thead>
 				<tr>
@@ -31,7 +31,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<td>
 						<a th:href="@{/manager/coupon/{rec_num}(rec_num = ${coupon.rec_num})}" th:text="${coupon.rec_content}"></a>
 					</td>
-					<td th:text="${coupon.rec_state} ">상태</td>
+					<td th:text="${coupon.rec_state != null ?(coupon.rec_state ? '공개' : '비공개'):'-'} ">상태</td>
 					<td th:text="${coupon.rec_period}">기간</td>
 				</tr>
 				<!-- 쿠폰 정보가 등록이 되어 있지 않으면-->

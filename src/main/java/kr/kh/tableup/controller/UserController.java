@@ -2,6 +2,7 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,15 +26,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
+import kr.kh.tableup.model.vo.TagTypeVO;
+import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.UserService;
@@ -41,334 +48,381 @@ import kr.kh.tableup.service.UserService;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+  @Autowired
+  private UserService userService;
 
-    @Autowired
-    private ManagerService managerService;
+  @Autowired
+  private ManagerService managerService;
 
-    /** 로그인*/
-    
+  /** 로그인 */
 
-    @GetMapping("/login")
-    public String login(Model model, HttpServletRequest request) {
-      String prevUrl = request.getHeader("Referer");
-      System.out.println(prevUrl);
-      if(prevUrl != null && !prevUrl.contains("/user/login")) {		
-        request.getSession().setAttribute("prevUrl", prevUrl);	
-      }
-    
-      Object loginError = request.getSession().getAttribute("loginError");
-      Object loginId = request.getSession().getAttribute("loginId");
-
-
-      model.addAttribute("loginError", loginError);
-      model.addAttribute("loginId", loginId);  
-   
-     
-      if (loginError != null) {
-          request.getSession().removeAttribute("loginError");
-      }
-      if (loginId != null) {
-          request.getSession().removeAttribute("loginId");
-      }
-      
-
-
-      System.out.println(loginId);
-      System.out.println(loginError);
-      return "user/login";
+  @GetMapping("/login")
+  public String login(Model model, HttpServletRequest request) {
+    String prevUrl = request.getHeader("Referer");
+    System.out.println(prevUrl);
+    if (prevUrl != null && !prevUrl.contains("/user/login")) {
+      request.getSession().setAttribute("prevUrl", prevUrl);
     }
 
+    Object loginError = request.getSession().getAttribute("loginError");
+    Object loginId = request.getSession().getAttribute("loginId");
 
-    /** 회원가입*/
-    @GetMapping("/signup")
-    public String signupForm(Model model, @RequestParam(required = false, defaultValue = "false") boolean social, @RequestParam(required = false) String us_id) {
-        model.addAttribute("social", social);
-        model.addAttribute("url", "/signup");
+    model.addAttribute("loginError", loginError);
+    model.addAttribute("loginId", loginId);
 
-        if (!model.containsAttribute("userVO")) {
-            UserVO user = new UserVO();
-            if (us_id != null) user.setUs_id(us_id);
-            model.addAttribute("userVO", user);
-        }
-        return "user/signup";
+    if (loginError != null) {
+      request.getSession().removeAttribute("loginError");
+    }
+    if (loginId != null) {
+      request.getSession().removeAttribute("loginId");
     }
 
+    System.out.println(loginId);
+    System.out.println(loginError);
+    return "user/login";
+  }
 
-    @PostMapping("/signupPost")
-    public String signup(@Valid @ModelAttribute("userVO") UserVO user, BindingResult result, RedirectAttributes ra) {
+  /** 회원가입 */
+  @GetMapping("/signup")
+  public String signupForm(Model model, @RequestParam(required = false, defaultValue = "false") boolean social,
+      @RequestParam(required = false) String us_id) {
+    model.addAttribute("social", social);
+    model.addAttribute("url", "/signup");
 
-        System.out.println("유효성 검사 오류 수: " + result.getErrorCount());
+    if (!model.containsAttribute("userVO")) {
+      UserVO user = new UserVO();
+      if (us_id != null)
+        user.setUs_id(us_id);
+      model.addAttribute("userVO", user);
+    }
+    return "user/signup";
+  }
 
-        if (!user.getUs_pw().equals(user.getUs_pw_check())) {
-            result.rejectValue("us_pw_check", "password.mismatch", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-        }
+  @PostMapping("/signupPost")
+  public String signup(@Valid @ModelAttribute("userVO") UserVO user, BindingResult result, RedirectAttributes ra) {
 
-        if (result.hasErrors()) {
-            String msg = result.getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining(" "));
-            ra.addFlashAttribute("msg", msg);
-            ra.addFlashAttribute("userVO", user);
-            return "redirect:/user/signup";
-        }
+    System.out.println("유효성 검사 오류 수: " + result.getErrorCount());
 
-        boolean dbResult = userService.validateUser(user, ra);
-        if (!dbResult) {
-            ra.addFlashAttribute("userVO", user);
-            return "redirect:/user/signup";
-        }
-
-        userService.insertUser(user);
-        return "redirect:/user/login";
+    if (!user.getUs_pw().equals(user.getUs_pw_check())) {
+      result.rejectValue("us_pw_check", "password.mismatch", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
     }
 
-    /** 마이페이지 */
-    @GetMapping("/mypage")
-    public String mypage(Model model, Principal principal) {
-        if (principal == null) return "user/mypage/indexnot";
-
-        UserVO user = userService.getUserById(principal.getName());
-        model.addAttribute("user", user);
-        return "user/mypage/index";
+    if (result.hasErrors()) {
+      String msg = result.getFieldErrors().stream()
+          .map(FieldError::getDefaultMessage)
+          .collect(Collectors.joining(" "));
+      ra.addFlashAttribute("msg", msg);
+      ra.addFlashAttribute("userVO", user);
+      return "redirect:/user/signup";
     }
 
-    @GetMapping("/edit")
-    public String editForm(Model model, Principal principal) {
-        if (principal == null) return "redirect:/user/login";
-
-        UserVO user = userService.getUserById(principal.getName());
-        model.addAttribute("user", user);
-        return "user/edit";
+    boolean dbResult = userService.validateUser(user, ra);
+    if (!dbResult) {
+      ra.addFlashAttribute("userVO", user);
+      return "redirect:/user/signup";
     }
 
-    @PostMapping("/edit")
-    public String edit(@ModelAttribute UserVO user, Principal principal, RedirectAttributes ra) {
-        if (principal == null) return "redirect:/user/login";
-
-        user.setUs_id(principal.getName()); // ID 보안
-        boolean result = userService.updateUser(user);
-
-        ra.addFlashAttribute("msg", result ? "회원정보가 수정되었습니다." : "수정에 실패했습니다.");
-        return "redirect:/user/mypage";
+    if(!userService.insertUser(user)){
+        ra.addFlashAttribute("msg", "회원가입에 실패했습니다.");
+        ra.addFlashAttribute("userVO", user);
+        return "redirect:/user/signup";
     }
+    return "redirect:/user/login";
+  }
 
-    /** 중복 검사 */
-    @PostMapping("/check-duplicate")
-    @ResponseBody
-    public Map<String, Boolean> checkDuplicate(@RequestBody Map<String, String> map) {
-        String type = map.get("type");
-        String value = map.get("value");
+  /** 마이페이지 */
+  @GetMapping("/mypage")
+  public String mypage(Model model, Principal principal) {
+    if (principal == null)
+      return "user/mypage/indexnot";
 
-        boolean isDuplicate = userService.isDuplicate(type, value);
+    UserVO user = userService.getUserById(principal.getName());
+    model.addAttribute("user", user);
+    return "user/mypage/index";
+  }
 
-        Map<String, Boolean> res = new HashMap<>();
-        res.put("duplicate", isDuplicate);
-        return res;
+  @GetMapping("/edit")
+  public String editForm(Model model, Principal principal) {
+    if (principal == null)
+      return "redirect:/user/login";
 
-    }
+    UserVO user = userService.getUserById(principal.getName());
+    model.addAttribute("user", user);
+    return "user/edit";
+  }
+
+  @PostMapping("/edit")
+  public String edit(@ModelAttribute UserVO user, Principal principal, RedirectAttributes ra) {
+    if (principal == null)
+      return "redirect:/user/login";
+
+    user.setUs_id(principal.getName()); // ID 보안
+    boolean result = userService.updateUser(user);
+
+    ra.addFlashAttribute("msg", result ? "회원정보가 수정되었습니다." : "수정에 실패했습니다.");
+    return "redirect:/user/mypage";
+  }
+
+  /** 중복 검사 */
+  @PostMapping("/check-duplicate")
+  @ResponseBody
+  public Map<String, Boolean> checkDuplicate(@RequestBody Map<String, String> map) {
+    String type = map.get("type");
+    String value = map.get("value");
+
+    boolean isDuplicate = userService.isDuplicate(type, value);
+
+    Map<String, Boolean> res = new HashMap<>();
+    res.put("duplicate", isDuplicate);
+    return res;
+
+  }
 
   @PostMapping("/mypage/rev")
   public String reviewList(Model model, Principal principal) {
-      if (principal == null) {
-          return "user/mypage/sub/revsub";
-      }
-
-      String username = principal.getName();
-      UserVO user = userService.getUserById(username); 
-      if (user == null) {
-          return "user/mypage/sub/revsub";
-      }
-
-      List<ReviewVO> list = userService.getReviewByUser(user.getUs_num());
-      System.out.println("불러온 리스트 : " + list);
-      model.addAttribute("reviews", list);
+    if (principal == null) {
       return "user/mypage/sub/revsub";
+    }
+
+    String username = principal.getName();
+    UserVO user = userService.getUserById(username);
+    if (user == null) {
+      return "user/mypage/sub/revsub";
+    }
+
+    List<ReviewVO> list = userService.getReviewByUser(user.getUs_num());
+    System.out.println("불러온 리스트 : " + list);
+    model.addAttribute("reviews", list);
+    return "user/mypage/sub/revsub";
   }
 
-  
   @PostMapping("/mypage/res")
   public String reservationList(Model model, Principal principal) {
-      if (principal == null) {
-          return "user/mypage/sub/ressub";
-      }
-
-      String username = principal.getName();
-      UserVO user = userService.getUserById(username); 
-      if (user == null) {
-          return "user/mypage/sub/ressub";
-      }
-
-      List<ReservationVO> list = userService.getReservationByUser(user.getUs_num());
-      System.out.println("불러온 리스트 : " + list);
-      model.addAttribute("reservations", list);
+    if (principal == null) {
       return "user/mypage/sub/ressub";
+    }
+
+    String username = principal.getName();
+    UserVO user = userService.getUserById(username);
+    if (user == null) {
+      return "user/mypage/sub/ressub";
+    }
+
+    List<ReservationVO> list = userService.getReservationByUser(user.getUs_num());
+    System.out.println("불러온 리스트 : " + list);
+    model.addAttribute("reservations", list);
+    return "user/mypage/sub/ressub";
   }
 
   @PostMapping("/mypage/flwrst")
   public String followRestaurantList(Model model, Principal principal) {
-      if (principal == null) {
-          return "user/mypage/sub/flwrst";
-      }
-
-      String username = principal.getName();
-      UserVO user = userService.getUserById(username); 
-      if (user == null) {
-          return "user/mypage/sub/flwrst";
-      }
-
-      List<RestaurantVO> list = userService.getFollowedRestaurant(user.getUs_num());
-      System.out.println("찜한 리스트 : " + list);
-      model.addAttribute("frestaurants", list);
+    if (principal == null) {
       return "user/mypage/sub/flwrst";
+    }
+
+    String username = principal.getName();
+    UserVO user = userService.getUserById(username);
+    if (user == null) {
+      return "user/mypage/sub/flwrst";
+    }
+
+    List<RestaurantVO> list = userService.getFollowedRestaurant(user.getUs_num());
+    System.out.println("찜한 리스트 : " + list);
+    model.addAttribute("frestaurants", list);
+    return "user/mypage/sub/flwrst";
   }
 
   @PostMapping("/mypage/flwrvw")
   public String followReviewList(Model model, Principal principal) {
-      if (principal == null) {
-          return "user/mypage/sub/flwrvw";
-      }
-
-      String username = principal.getName();
-      UserVO user = userService.getUserById(username); 
-      if (user == null) {
-          return "user/mypage/sub/flwrvw";
-      }
-
-      List<ReviewVO> list = userService.getFollowedReview(user.getUs_num());
-      System.out.println("찜한 리스트 : " + list);
-      model.addAttribute("freviews", list);
+    if (principal == null) {
       return "user/mypage/sub/flwrvw";
+    }
+
+    String username = principal.getName();
+    UserVO user = userService.getUserById(username);
+    if (user == null) {
+      return "user/mypage/sub/flwrvw";
+    }
+
+    List<ReviewVO> list = userService.getFollowedReview(user.getUs_num());
+    System.out.println("찜한 리스트 : " + list);
+    model.addAttribute("freviews", list);
+    return "user/mypage/sub/flwrvw";
   }
 
-  	@GetMapping("/info")
-	public String myinfo(Model model, @AuthenticationPrincipal CustomUser customUser) {
-		model.addAttribute("user", customUser.getUser());
+  @GetMapping("/info")
+  public String myinfo(Model model, @AuthenticationPrincipal CustomUser customUser) {
+    model.addAttribute("user", customUser.getUser());
 
-        //model.addAttribute("errorMsg", "에러입니다.");        //post에서 이런식으로 에러 넘기면 될듯
+    // model.addAttribute("errorMsg", "에러입니다."); //post에서 이런식으로 에러 넘기면 될듯
 
-        return "user/mypage/info";
-	}
+    return "user/mypage/info";
+  }
 
-    @GetMapping("/review/insert")
-	public String reviewpage(@RequestParam(required = false) Integer rt_num, Model model, @AuthenticationPrincipal CustomUser customUser) {
-		model.addAttribute("user", customUser.getUser());
+  @GetMapping("/review/insert")
+  public String reviewpage(@RequestParam(required = false) Integer rt_num, Model model,
+      @AuthenticationPrincipal CustomUser customUser) {
+    model.addAttribute("user", customUser.getUser());
 
-        //model.addAttribute("errorMsg", "에러입니다.");        //post에서 이런식으로 에러 넘기면 될듯
+    // model.addAttribute("errorMsg", "에러입니다."); //post에서 이런식으로 에러 넘기면 될듯
 
-        
-        List<ScoreTypeVO> scoreTypeList = userService.getScoreType();
-        System.out.println("scoreTypeList: " + scoreTypeList);          
+    List<ScoreTypeVO> scoreTypeList = userService.getScoreType();
+    System.out.println("scoreTypeList: " + scoreTypeList);
 
+    if (rt_num != null) {
+      model.addAttribute("restaurant", managerService.getResDetail(rt_num)); // 식당 정보
+      model.addAttribute("rev_rt_num", rt_num); // 식당 번호 (만약 내 리뷰나 식당 페이지에서 넘어올땐 이거 이용해서 식당 번호 띄우기)
+    } else {
 
-        if(rt_num != null){
-            model.addAttribute("restaurant", managerService.getResDetail(rt_num)); // 식당 정보
-            model.addAttribute("rev_rt_num", rt_num);       // 식당 번호            (만약 내 리뷰나 식당 페이지에서 넘어올땐 이거 이용해서 식당 번호 띄우기)
-        }else{
+    }
+    model.addAttribute("scoreTypeList", scoreTypeList); // 평점 항목
 
-        }
-        model.addAttribute("scoreTypeList", scoreTypeList);    // 평점 항목
+    return "user/review/insert";
+  }
 
-        return "user/review/insert";
-	}
+  @GetMapping("/review/insertsub")
+  public String getRestaurantInfo(@RequestParam("rt_num") int rt_Num, Model model) {
+    RestaurantVO restaurant = managerService.getResDetail(rt_Num);
+    if (restaurant == null) {
+      model.addAttribute("error", "해당 식당 정보를 찾을 수 없습니다.");
+    } else {
+      model.addAttribute("restaurant", restaurant);
+    }
+    return "user/review/insertsub";
+  }
 
-    @GetMapping("/review/insertsub")
-    public String getRestaurantInfo(@RequestParam("rt_num") int rt_Num, Model model) {
-        RestaurantVO restaurant = managerService.getResDetail(rt_Num);
-        if (restaurant == null) {
-            model.addAttribute("error", "해당 식당 정보를 찾을 수 없습니다.");
-        } else {
-            model.addAttribute("restaurant", restaurant);
-        }
-        return "user/review/insertsub";  
+  @GetMapping("/detail")
+  public String detailPage() {
+    return "user/detail/detail";
+  }
+
+  @PostMapping("/review/insertPost")
+  public String insertReview(
+      Model model,
+      @ModelAttribute ReviewVO review,
+      Map<String, String> allParams, @RequestParam(required = false) List<MultipartFile> files,
+      @RequestParam(required = false) List<String> fileNames, @RequestParam(required = false) List<String> fileTags,
+      @AuthenticationPrincipal CustomUser user) {
+
+    // 사용자 ID 또는 번호를 수동 세팅
+    review.setRev_us_num(user.getUser().getUs_num());
+    System.out.println("리뷰 작성자 번호 : " + review.getRev_us_num());
+    if (!userService.insertReview(review)) {
+      model.addAttribute("errorMsg", "빈 내용이 있거나 문제가 생겨 리뷰 저장에 실패했습니다.");
+      model.addAttribute("review", review);
+      return "user/review/insert";
     }
 
-    @GetMapping("/detail")
-    public String detailPage() {
-      return "user/detail/detail";
-    }
+    // 점수 저장
+    for (Map.Entry<String, String> entry : allParams.entrySet()) {
+      String key = entry.getKey();
+      if (key.startsWith("score[")) {
+        try {
+          int rs_st_num = Integer.parseInt(key.substring(6, key.length() - 1));
+          int rs_score = Integer.parseInt(entry.getValue());
 
-
-
-    @PostMapping("/review/insertPost")
-    public String insertReview(
-        Model model,
-        @ModelAttribute ReviewVO review,
-        Map<String, String> allParams,@RequestParam(required=false) List<MultipartFile> files,@RequestParam(required=false) List<String> fileNames,@RequestParam(required=false) List<String> fileTags,
-        @AuthenticationPrincipal CustomUser user
-    ) {
-        
-        // 사용자 ID 또는 번호를 수동 세팅
-        review.setRev_us_num(user.getUser().getUs_num()); 
-        System.out.println("리뷰 작성자 번호 : " + review.getRev_us_num());
-        if (!userService.insertReview(review)) {
-            model.addAttribute("errorMsg", "빈 내용이 있거나 문제가 생겨 리뷰 저장에 실패했습니다.");
-            model.addAttribute("review", review);
+          if (!userService.insertReviewScore(review, rs_st_num, rs_score)) {
+            model.addAttribute("errorMsg", "리뷰는 등록됐지만 점수 저장에 실패했습니다.");
             return "user/review/insert";
+          }
+        } catch (NumberFormatException e) {
+          model.addAttribute("errorMsg", "잘못된 점수 형식이 입력되었습니다.");
+          return "user/review/insert";
         }
-
-
-        // 점수 저장
-        for (Map.Entry<String, String> entry : allParams.entrySet()) {
-            String key = entry.getKey();
-            if (key.startsWith("score[")) {
-                try {
-                    int rs_st_num = Integer.parseInt(key.substring(6, key.length() - 1));
-                    int rs_score = Integer.parseInt(entry.getValue());
-
-                    if (!userService.insertReviewScore(review, rs_st_num, rs_score)) {
-                        model.addAttribute("errorMsg", "리뷰는 등록됐지만 점수 저장에 실패했습니다.");
-                        return "user/review/insert";
-                    }
-                } catch (NumberFormatException e) {
-                    model.addAttribute("errorMsg", "잘못된 점수 형식이 입력되었습니다.");
-                    return "user/review/insert";
-                }
-            }
-        }
-
-        // 파일 저장
-        if(!userService.insertFile(review, files, fileNames, fileTags)) {
-            String errorMsg = "리뷰는 등록됐지만 파일 저장에 실패했습니다.";
-            System.out.println(errorMsg);
-            model.addAttribute("errorMsg", errorMsg);
-            return "user/review/insert"; // 리뷰 등록 실패
-        }
-
-        return "user/review/list";
+      }
     }
 
-    @GetMapping("/list")
-    public String list(Model model, @RequestParam(required = false) Integer dreg_num, @RequestParam(required = false) Integer dfc_num) {
+    // 파일 저장
+    if (!userService.insertFile(review, files, fileNames, fileTags)) {
+      String errorMsg = "리뷰는 등록됐지만 파일 저장에 실패했습니다.";
+      System.out.println(errorMsg);
+      model.addAttribute("errorMsg", errorMsg);
+      return "user/review/insert"; // 리뷰 등록 실패
+    }
 
-        List<RegionVO> regionList = userService.getRegionList();
+    return "user/review/list";
+  }
+
+
+  
+    @GetMapping("/list")
+    public String list(Model model, 
+            @RequestParam(required = false) Integer dreg_num, 
+            @RequestParam(required = false) Integer dfc_num,
+            @RequestParam(required = false) Integer reg_num){
+
+        List<RegionVO> regionList = userService.getRegionListWithWhole();
         List<FoodCategoryVO> foodList = userService.getFoodCategoryList();
+
+        Map<String, List<TagVO>> tagList = userService.getTagList();
+        List<FacilityVO> facilityList = userService.getFacilityList();
+
+        List<ScoreTypeVO> scoreTypeList = userService.getScoreTypeList();
 
         model.addAttribute("regionList", regionList);
         model.addAttribute("foodList", foodList);
+
+        model.addAttribute("tagList", tagList);
+        model.addAttribute("facilityList", facilityList);
+
+        model.addAttribute("scoreTypeList", scoreTypeList);
+
         if(dreg_num != null)model.addAttribute("dreg_num", dreg_num);
+        if(reg_num != null) model.addAttribute("reg_num", reg_num);
         if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
 
-        //model.addAttribute("param", new FilterParam(regionNum, foodNum)); 
-
         System.out.println("리스트 호출");
+        //System.out.println(dreg_num + " " + dfc_num + " " + reg_num); 
+        //System.out.println(regionList);
+        //System.out.println(scoreTypeList);
+
         return "user/list/list"; 
     }
 
-    @PostMapping("/list/sub")
-	public String listPost(Model model, @RequestBody ResCriteria cri) {
-		cri.setPerPageNum(2);
-		//num를 서비스에게 주면서 게시판 번호에 맞는 게시글 목록 중 2개를 가져오라고 요청.
-		List<RestaurantVO> list = userService.getRestaurantList(cri);
-		//서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청
-		PageMaker pm = userService.getPageMaker(cri);
-		
-		//가져온 게시글 목록을 화면에 전송
-		model.addAttribute("list", list);
-		model.addAttribute("pm", pm);
-        System.out.println("상세 호출");
-		return "user/list/sublist";
-	}
+  @PostMapping("/list/sub")
+  public String listPost(Model model, @RequestBody ResCriteria cri) {
+    cri.setPerPageNum(2);   //차후 삭제
+    // num를 서비스에게 주면서 게시판 번호에 맞는 게시글 목록 중 2개를 가져오라고 요청.
+    System.out.println(cri);
+    // System.out.println("태그: " + cri.getTagList());
+    // System.out.println("시설: " + cri.getFacilityList());
+    // System.out.println(cri.getPriceType());
+    // System.out.println(cri.getMinPrice());
+    // System.out.println(cri.getMaxPrice());
+    // System.out.println(cri.getOrderBy());
+    List<RestaurantVO> list = userService.getRestaurantList(cri);
+    //System.out.println(list);
+    // 서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청
+    PageMaker pm = userService.getPageMaker(cri);
 
+    // 가져온 게시글 목록을 화면에 전송
+    model.addAttribute("list", list);
+    model.addAttribute("pm", pm);
+    // System.out.println("상세 호출");
+    return "user/list/sublist";
+  }
+
+  @GetMapping("/list/detail/{rt_num}")
+  public String restaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
+    RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
+    FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
+    DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
+    TagVO tag = userService.getTagByRestaurant(rt_num);
+
+    model.addAttribute("restaurant", restaurant);
+    model.addAttribute("foodCategory", foodCategory);
+    model.addAttribute("detailFoodCategory", detailFoodCategory);
+    model.addAttribute("tag", tag);
+
+    return "user/detail/detail";
+  }
+
+    @GetMapping("/review/view")
+    public String allReviews(Model model) {
+        List<ReviewVO> reviewList = userService.getReviewList();
+        model.addAttribute("reviewList", reviewList);
+        System.out.println("리뷰 리스트 : " + reviewList);
+        return "user/review/view";
+    }
+    
 }

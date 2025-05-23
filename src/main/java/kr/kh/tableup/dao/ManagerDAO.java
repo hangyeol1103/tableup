@@ -9,6 +9,8 @@ import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -16,6 +18,7 @@ import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
+import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
@@ -112,6 +115,25 @@ public interface ManagerDAO {
 	List<BusinessHourTemplateVO> selectTemplateList(int rt_num);
 
 	int updateManagerInfo(RestaurantManagerVO rm);
+	List<FacilityVO> selectFacilityList();
+
+	List<RestaurantFacilityVO> selectResFacilityList(int rt_num);
+
+	boolean insertResFacility(RestaurantFacilityVO resfacility);
+
+	boolean updateResFacility(RestaurantFacilityVO resfacility);
+
+	RestaurantFacilityVO selectResFacility(int rf_num);
+
+	boolean deleteResFacility(int rf_num);
+
+	void insertFile(FileVO fileVO);
+
+	List<FileVO> selectFileList(int rm_rt_num);
+
+	void deletefile(int rt_num);
+
+	boolean updateRestaurant(RestaurantVO restaurant);
 
 	
 }

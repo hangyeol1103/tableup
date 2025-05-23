@@ -52,7 +52,8 @@ INSERT INTO `detailregion` (`dreg_sub`,`dreg_reg_num`) VALUES 	('강남/서초',
                                    
 -- 매장							
 INSERT INTO `restaurant` (rt_name,rt_closed_days,rt_price_lunch,rt_price_dinner,rt_accept,rt_dfc_num,rt_dreg_num,rt_description) 
-	VALUES ("디폴트 매장","화요일","10000","20000","Y",1,1,"테스트용 매장");
+	VALUES ("디폴트 매장","화요일","10000","20000","Y",1,1,"테스트용 매장"),
+		 ("디폴트 매장2","수요일","20000","30000","Y",2,2,"테스트용 매장2");
 
 														                                                        
 -- 태그                                                       
@@ -70,6 +71,8 @@ INSERT INTO facility(fa_name,fa_title,fa_icon)
 INSERT INTO restaurantfacility(rf_rt_num,rf_fa_num,rf_detail)
 	VALUES(1,1,'와이파이 사용 가능(가게 문의)');
 
+INSERT INTO restauranttag(rt_num,tag_num)
+	VALUES(1,1),(1,2);
 
 -- 샘플 점주 m123 123
 INSERT INTO restaurantmanager (

@@ -1,6 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.UserDAO">
+	
+	
+	<!-- ReviewScoreVO + ReviewVO -->
+	<resultMap id="ReviewMap" type="ReviewVO">
+		<!-- ReviewVO -->
+		<id property="rev_num" column="rev_num" />
+		<result property="rev_us_num" column="rev_us_num" />
+		<result property="rev_rt_num" column="rev_rt_num" />
+		<result property="rev_content" column="rev_content" />
+		<result property="rev_created" column="rev_created" />
+		<result property="rev_updated" column="rev_updated" />
+		<result property="rev_state" column="rev_state" />
+		<result property="rev_visit" column="rev_visit" />
+		<result property="rev_visitor" column="rev_visitor" />
+		
+		<!-- 유저와 식당 이름 -->
+		<result property="us_name" column="us_name" />
+		<result property="rt_name" column="rt_name" />
+
+		<!-- ReviewScoreVO 리스트 -->
+		<collection property="scoreList" ofType="ReviewScoreVO">
+			<id property="rs_num" column="rs_num" />
+			<result property="rs_rev_num" column="rs_rev_num" />
+			<result property="rs_st_num" column="rs_st_num" />
+			<result property="rs_score" column="rs_score" />
+			<result property="st_num" column="st_num" />
+			<result property="st_category" column="st_category" />
+		</collection>
+	</resultMap>
+
+	<!-- TagVO -->
+	<resultMap id="TagMap" type="TagVO">
+		<id property="tag_num" column="tag_num"/>
+		<result property="tag_name" column="tag_name"/>
+		<result property="tag_tt_num" column="tag_tt_num"/>
+		<result property="tt_name" column="tt_name"/>
+	</resultMap>
+
+	<!-- restaurantVO -->
+	<resultMap id="RestaurantMap" type="RestaurantVO">
+		<id property="rt_num" column="rt_num"/>
+		<result property="rt_name" column="rt_name"/>
+		<result property="rt_dreg_num" column="rt_dreg_num"/>
+		<result property="rt_dfc_num" column="rt_dfc_num"/>
+		<result property="rt_closed_days" column="rt_closed_days"/>
+		<result property="rt_price_lunch" column="rt_price_lunch"/>
+		<result property="rt_price_dinner" column="rt_price_dinner"/>
+		<result property="rt_accept" column="rt_accept"/>
+		<result property="rt_description" column="rt_description"/>
+		<!-- 디테일 -->
+		<result property="rd_num" column="rd_num"/>
+		<result property="rd_rt_num" column="rd_rt_num"/>
+		<result property="rd_phone" column="rd_phone"/>
+		<result property="rd_closed_days" column="rd_closed_days"/>
+		<result property="rd_info" column="rd_info"/>
+		<result property="rd_home" column="rd_home"/>
+		<result property="rd_addr" column="rd_addr"/>
+		<!-- 태그 리스트 -->
+		<collection property="tagList" resultMap="TagMap"/>
+		<!-- 리뷰 리스트 -->
+		<collection property="reviewList" resultMap="ReviewMap"/>
+	</resultMap>
+
+	<!-- 매장 태그 리스트 -->
+	<select id="selectRestaurantTagList" resultMap="TagMap">
+		SELECT tag.*, tagtype.tt_name
+		FROM restaurant
+		RIGHT JOIN restauranttag USING(rt_num)
+		JOIN tag USING(tag_num)
+		JOIN tagtype ON tag.tag_tt_num = tagtype.tt_num
+		WHERE rt_num = #{rt_num}
+	</select>
+
+	<!-- 특정 식당 리뷰 + 점수 -->
+	<select id="selectReviewListbyNum" resultMap="ReviewMap">
+		SELECT
+			review.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category
+		FROM review
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+		WHERE review.rev_rt_num = #{rt_num}
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
+	</select>
+
+	<select id="selectReviewList" resultMap="ReviewMap">
+		SELECT
+			review.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category
+		FROM review
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
+	</select>
+
+	<!-- 식당 + 디테일 + 태그 + 리뷰 -->
+	<select id="selectRestaurantTagReview" resultMap="RestaurantMap">
+		SELECT 
+			restaurant.*,
+			restaurant_detail.*,
+			tag.*,
+			tagtype.*,
+			review.*,
+			user.us_name
+		FROM restaurant
+		LEFT JOIN restaurant_detail ON restaurant.rt_num = restaurant_detail.rd_rt_num
+		LEFT JOIN restauranttag ON restaurant.rt_num = restauranttag.rt_num
+		LEFT JOIN tag ON restauranttag.tag_num = tag.tag_num
+		LEFT JOIN tagtype ON tag.tag_tt_num = tagtype.tt_num
+		LEFT JOIN review ON restaurant.rt_num = review.rev_rt_num
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		WHERE restaurant.rt_num = #{rt_num}
+	</select>
+
+
+
+
+
+	
+	
+	
+	
 	<select id="selectUser" resultType="userVO">
 		select * from User where us_num = #{us_num}
 	</select>
@@ -34,34 +166,44 @@
 			us_phone = #{us_phone}
     WHERE us_id = #{us_id}
 	</update>
-	<select id="selectUserByPhone" resultType="kr.kh.tableup.model.vo.UserVO">
+	<select id="selectUserByPhone" resultType="UserVO">
 		SELECT * FROM user WHERE us_phone = #{phone}
 	</select>
-	<select id="selectUserByEmail" resultType="kr.kh.tableup.model.vo.UserVO">
+	<select id="selectUserByEmail" resultType="UserVO">
 		SELECT * FROM user WHERE us_email = #{email}
 	</select>
 
-	<select id="selectReviewByUser" resultType="kr.kh.tableup.model.vo.ReviewVO">
-		SELECT * FROM review 
-		LEFT JOIN user ON us_num = rev_us_num
-		LEFT JOIN restaurant ON rt_num = rev_rt_num
-		WHERE rev_us_num = #{us_num} and rev_state = 0
+	<select id="selectReviewByUser" resultMap="ReviewMap">
+		SELECT 
+			review.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category
+		FROM review
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+		WHERE review.rev_us_num = #{us_num} 
+			AND review.rev_state = 0
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
 	</select>
 
-	<select id="selectReservationByUser" resultType="kr.kh.tableup.model.vo.ReservationVO">
+	<select id="selectReservationByUser" resultType="ReservationVO">
 		SELECT * FROM Reservation 
 		LEFT JOIN user ON us_num = res_us_num
 		LEFT JOIN restaurant ON rt_num = res_rt_num
 		WHERE res_us_num = #{us_num}
 	</select>
 
-	<select id="selectFollowedRestaurant" resultType="kr.kh.tableup.model.vo.RestaurantVO">
+	<select id="selectFollowedRestaurant" resultType="RestaurantVO">
 		select * from usfollow 
 		join restaurant on uf_foreign = rt_num
 		where uf_type = 'RESTAURANT' and uf_us_num = #{us_num} 
 	</select>
 
-	<select id="selectFollowedReview" resultType="kr.kh.tableup.model.vo.ReviewVO">
+	<select id="selectFollowedReview" resultType="ReviewVO">
 		select * from usfollow 
 		join REVIEW on uf_foreign = rev_num
 		join restaurant on rt_num = rev_rt_num
@@ -69,102 +211,210 @@
 		where uf_type = 'REVIEW' and uf_us_num = #{us_num} 
 	</select>
 
-	<select id="selectScoreTypeList" resultType="ScoreTypeVO">
-    SELECT ST_NUM, ST_CATEGORY
-    FROM ScoreType
-	</select>
+	<select id="selectScoreTypeList" resultType="ScoreTypeVO"> SELECT ST_NUM, ST_CATEGORY FROM
+		ScoreType </select>
 
-	<insert id="insertReview" parameterType="kr.kh.tableup.model.vo.ReviewVO" useGeneratedKeys="true" keyProperty="rev_num">
-		INSERT INTO review (
-			rev_us_num,
-			rev_rt_num,
-			rev_content,
-			rev_created,
-			rev_updated,
-			rev_state,
-			rev_visit,
-			rev_visitor
-		)
-		VALUES (
-			#{rev_us_num},
-			#{rev_rt_num},
-			#{rev_content},
-			now(),
-			now(),
-			0,
-			#{rev_visit},
-			#{rev_visitor}
-		)
-		</insert>
+	<insert id="insertReview" parameterType="ReviewVO" useGeneratedKeys="true"
+		keyProperty="rev_num"> INSERT INTO review ( rev_us_num, rev_rt_num, rev_content, rev_created,
+		rev_updated, rev_state, rev_visit, rev_visitor ) VALUES ( #{rev_us_num}, #{rev_rt_num},
+		#{rev_content}, now(), now(), 0, #{rev_visit}, #{rev_visitor} ) </insert>
 
-		<insert id ="insertReviewScore" parameterType="kr.kh.tableup.model.vo.ReviewScoreVO">
-		INSERT INTO review_score (
-			rs_rev_num,
-			rs_st_num,
-			rs_score
-		)
-		VALUES (
-			#{rs_rev_num},
-			#{rs_st_num},
-			#{rs_score}
-		)
-		</insert>
+	<insert id="insertReviewScore" parameterType="ReviewScoreVO"> INSERT INTO
+		reviewscore ( rs_rev_num, rs_st_num, rs_score ) VALUES ( #{rs_rev_num}, #{rs_st_num},
+		#{rs_score} ) </insert>
 
-		<insert id="insertFile" parameterType="kr.kh.tableup.model.vo.FileVO">
-		INSERT INTO file (
-			file_path,
-			file_name,
-			File_type,
-			File_FOREIGN,
-			file_tag,
-			FILE_RES_NUM
-		)
-		VALUES (
-			#{file_path},
-			#{file_name},
-			#{file_type},
-			#{file_foreign},
-			#{file_tag},
-			#{file_res_num}
-		)
-		</insert>
+	<insert id="insertFile" parameterType="FileVO"> INSERT INTO file (
+		file_path, file_name, File_type, File_FOREIGN, file_tag, FILE_RES_NUM ) VALUES ( #{file_path},
+		#{file_name}, #{file_type}, #{file_foreign}, #{file_tag}, #{file_res_num} ) </insert>
 
-		<select id="selectRegionList" resultType="kr.kh.tableup.model.vo.RegionVO">
+		<select id="selectRegionList" resultType="RegionVO">
 		SELECT reg_num, reg_main, dreg_num, dreg_sub FROM region
 		RIGHT JOIN detailregion ON reg_num = dreg_reg_num
+		ORDER BY reg_num, dreg_num
 		</select>
 
-		<select id="selectFoodCategoryList" resultType="kr.kh.tableup.model.vo.FoodCategoryVO">
-		SELECT fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory
-		RIGHT JOIN detailfoodcategory ON fc_num = dfc_fc_num
+	<select id="selectFoodCategoryList" resultType="FoodCategoryVO"> SELECT
+		fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory RIGHT JOIN detailfoodcategory ON fc_num =
+		dfc_fc_num </select>
+
+	<select id="selectRestaurantList" resultType="RestaurantVO">
+		SELECT * FROM Restaurant r
+		<!-- LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num -->
+		<!-- JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num   -->
+		WHERE r.rt_accept = 'Y'
+
+		<if test="tagList != null and tagList.size() > 0">
+			<bind name="tagSize" value="tagList != null ? @Integer@valueOf(tagList.size()) : 0"/>
+			AND r.rt_num IN (
+				SELECT rt_num FROM restauranttag WHERE tag_num IN
+					<foreach item="tag" collection="tagList" open="(" separator="," close=")">
+						#{tag}
+					</foreach>
+				GROUP BY rt_num HAVING COUNT(DISTINCT tag_num) = #{tagSize}
+			)
+		</if>
+
+		<if test="facilityList != null and facilityList.size() > 0">
+			<bind name="facSize" value="facilityList != null ? @Integer@valueOf(facilityList.size()) : 0"/>
+			AND r.rt_num IN (
+				SELECT rf_rt_num FROM restaurantfacility WHERE rf_fa_num IN
+					<foreach item="fac" collection="facilityList" open="(" separator="," close=")">
+						#{fac}
+					</foreach>
+				GROUP BY rf_rt_num HAVING COUNT(DISTINCT rf_fa_num) = #{facSize}
+			)
+		</if>
+
+		<choose>
+			<when test="rt_dreg_num > 0">
+				AND r.rt_dreg_num = #{rt_dreg_num}
+			</when>
+			<when test="rt_dreg_num == 0 and dreg_reg_num > 0">
+				AND r.rt_dreg_num IN (
+					SELECT dreg_num FROM detailregion WHERE dreg_reg_num = #{dreg_reg_num}
+				)
+			</when>
+		</choose>
+		<if test="rt_dfc_num > 0">
+			AND r.rt_dfc_num = #{rt_dfc_num}
+		</if>
+
+		<if test="minPrice != null and maxPrice != null and priceType != null">
+			<choose>
+				<when test="priceType == 'lunch'">
+					AND CAST(REPLACE(r.rt_price_lunch, ',', '') AS UNSIGNED) BETWEEN #{minPrice} AND #{maxPrice}
+				</when>
+				<when test="priceType == 'dinner'">
+					AND CAST(REPLACE(r.rt_price_dinner, ',', '') AS UNSIGNED) BETWEEN #{minPrice} AND #{maxPrice}
+				</when>
+			</choose>
+		</if>
+
+		<choose>
+			<when test="orderBy == 'avg'">
+				ORDER BY (
+					SELECT IFNULL(AVG(rs.rs_score), 0)
+					FROM review rev
+					JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
+					WHERE rev.rev_rt_num = r.rt_num
+				) ASC
+			</when>
+
+			<when test="orderBy == 'reservation'">
+				ORDER BY (
+					SELECT COUNT(*)
+					FROM reservation res
+					WHERE res.res_rt_num = r.rt_num
+				) DESC
+			</when>
+
+			<when test="orderBy == 'reviewCount'">
+				ORDER BY (
+					SELECT COUNT(*)
+					FROM review rev
+					WHERE rev.rev_rt_num = r.rt_num
+				) DESC
+			</when>
+
+			<when test="orderBy != null">
+				ORDER BY (
+					SELECT IFNULL(AVG(rs.rs_score), 0)
+					FROM review rev
+					JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
+					WHERE rs.rs_st_num = #{orderBy} AND rev.rev_rt_num = r.rt_num
+				) DESC
+			</when>
+
+			<otherwise>
+				ORDER BY r.rt_num DESC
+			</otherwise>
+		</choose>
+
+
+		LIMIT #{pageStart}, #{perPageNum}
+	</select>
+
+	<select id="selectCountRestaurantList" resultType="int">
+		SELECT COUNT(*) FROM Restaurant r
+		<!-- LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num -->
+		<!-- JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num   -->
+		WHERE r.rt_accept = 'Y'
+
+		<if test="tagList != null and tagList.size() > 0">
+			<bind name="tagSize" value="tagList != null ? @Integer@valueOf(tagList.size()) : 0"/>
+			AND r.rt_num IN (
+				SELECT rt_num FROM restauranttag WHERE tag_num IN
+					<foreach item="tag" collection="tagList" open="(" separator="," close=")">
+						#{tag}
+					</foreach>
+				GROUP BY rt_num HAVING COUNT(DISTINCT tag_num) = #{tagSize}
+			)
+		</if>
+
+		<if test="facilityList != null and facilityList.size() > 0">
+			<bind name="facSize" value="facilityList != null ? @Integer@valueOf(facilityList.size()) : 0"/>
+			AND r.rt_num IN (
+				SELECT rf_rt_num FROM restaurantfacility WHERE rf_fa_num IN
+					<foreach item="fac" collection="facilityList" open="(" separator="," close=")">
+						#{fac}
+					</foreach>
+				GROUP BY rf_rt_num HAVING COUNT(DISTINCT rf_fa_num) = #{facSize}
+			)
+		</if>
+
+		<choose>
+			<when test="rt_dreg_num > 0">
+				AND r.rt_dreg_num = #{rt_dreg_num}
+			</when>
+			<when test="rt_dreg_num == 0 and dreg_reg_num > 0">
+				AND r.rt_dreg_num IN (
+					SELECT dreg_num FROM detailregion WHERE dreg_reg_num = #{dreg_reg_num}
+				)
+			</when>
+		</choose>
+		<if test="rt_dfc_num > 0">
+			AND r.rt_dfc_num = #{rt_dfc_num}
+		</if>
+
+		<if test="minPrice != null and maxPrice != null and priceType != null">
+			<choose>
+				<when test="priceType == 'lunch'">
+					AND CAST(REPLACE(r.rt_price_lunch, ',', '') AS UNSIGNED) BETWEEN #{minPrice} AND #{maxPrice}
+				</when>
+				<when test="priceType == 'dinner'">
+					AND CAST(REPLACE(r.rt_price_dinner, ',', '') AS UNSIGNED) BETWEEN #{minPrice} AND #{maxPrice}
+				</when>
+			</choose>
+		</if>
+
+	</select>
+
+
+
+
+
+		<select id="selectTagList" resultType="TagVO">
+			SELECT tag.*, tagtype.tt_name 
+			FROM tag
+			LEFT JOIN tagtype ON tag.tag_tt_num = tagtype.tt_num
+		</select>
+		
+		<select id="selectFacilityList" resultType="FacilityVO">
+			SELECT * FROM facility
 		</select>
 
-		<select id="selectRestaurantList" resultType="kr.kh.tableup.model.vo.RestaurantVO">
-			select * from Restaurant 
-			left join RestaurantDetail on rt_num = rd_rt_num
-			where rt_accept = "Y" 
-			<if test="cri.rt_dreg_num > 0">
-				and rt_dreg_num = #{cri.rt_dreg_num}
-			</if>
-			<if test="cri.rt_dfc_num > 0">
-				and rt_dfc_num = #{cri.rt_dfc_num}
-			</if>
-			<if test="cri.orderBy == 'test'">
-			ORDER BY ${cri.orderBy}
-			</if>
-			<if test="cri.orderBy != 'test'">
-			ORDER BY rt_num desc
-			</if>
-			limit #{cri.pageStart}, #{cri.perPageNum}
-		</select>
-		<select id="selectCountRestaurantList" resultType="int">
-			select count(*) from Restaurant where rt_accept = "Y" 
-			<if test="cri.rt_dreg_num > 0">
-				and rt_dreg_num = #{cri.rt_dreg_num}
-			</if>
-			<if test="cri.rt_dfc_num > 0">
-				and rt_dfc_num = #{cri.rt_dfc_num}
-			</if>
-		</select>
+	<select id="selectRestaurantDetail" resultType="RestaurantVO"> SELECT r.*, rd.rd_phone,
+		rd.rd_info, rd.rd_home, rd.rd_addr FROM restaurant r LEFT JOIN restaurantdetail rd ON r.rt_num =
+		rd.rd_rt_num WHERE r.rt_num = #{rt_num} </select>
+	<select id="selectFoodCategoryByRestaurant" resultType="FoodCategoryVO"> SELECT fc.* FROM
+		restaurant r JOIN detailfoodcategory dfc ON r.rt_dfc_num = dfc.dfc_num JOIN foodcategory fc ON
+		dfc.dfc_fc_num = fc.fc_num WHERE r.rt_num = #{rt_num} </select>
+	<select id="selectDetailFoodCategoryByRestaurant" resultType="DetailFoodCategoryVO"> SELECT dfc.*
+		FROM restaurant r JOIN detailfoodcategory dfc ON r.rt_dfc_num = dfc.dfc_num WHERE r.rt_num =
+		#{rt_num} </select>
+	<select id="selectTagByRestaurant" resultType="TagVO"> SELECT * FROM tag WHERE tag_tt_num =
+		#{rt_num} LIMIT 1 </select>
+
+
 
 </mapper>

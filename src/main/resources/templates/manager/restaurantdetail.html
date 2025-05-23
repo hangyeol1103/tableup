@@ -47,7 +47,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			</div>
 			<div class="input-group form-group">
 				<div class="form-control col-3">안내 및 주의사항:</div>
-				<div class="form-control" th:text="${resdetail.rd_info}"></div>
+				<div class="form-control" th:utext="${resdetail.rd_info}"></div>
 			</div>
 
 		</div>

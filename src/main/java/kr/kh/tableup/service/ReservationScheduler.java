@@ -29,7 +29,7 @@ public class ReservationScheduler {
 
 
     /** 매 5분마다 예약 만료 처리 */
-    @Scheduled(cron = "0 */5 * * * *") // 
+    @Scheduled(cron = "0 */5 * * * *")
     public void updateExpiredReservations() {
         List<ReservationVO> expiredList = reservationDAO.selectExpiredReservations(LocalDateTime.now());
 

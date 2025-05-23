@@ -34,24 +34,9 @@ public class ReservationService {
 			List<BusinessHourVO> bhList = reservationDAO.selectOverlapHours(
 				res.getRes_rt_num(), res.getRes_time(), res.getRes_end_time());
 
-
-				System.out.println("예약 요청 시간대: " + res.getRes_time() + " ~ " + res.getRes_end_time());
-				System.out.println("조회된 시간대 수: " + bhList.size());
-
 		// 좌석 누적 갱신
 		for (BusinessHourVO bh : bhList) {
 			int updated = bh.getBh_seat_current() + res.getRes_person();
-
-
-
-			System.out.println("겹치는 시간대 bh_num: " + bh.getBh_num());
-			System.out.println("좌석 증가 전: " + bh.getBh_seat_current());
-			System.out.println("좌석 증가 후: " + updated);
-
-
-
-
-
 			businessHourDAO.updateCurrentSeat(bh.getBh_num(), updated);
 		}
 

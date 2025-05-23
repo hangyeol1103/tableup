@@ -19,6 +19,6 @@ public class BusinessHourVO {
 	int bh_seat_current;
 	int bh_table_max;
 	int bh_table_current;
-	int bh_state;
+	boolean bh_state;
 	int bh_rt_num;
 }

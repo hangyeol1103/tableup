@@ -31,6 +31,17 @@
 			AND bh_start &lt; #{resEnd}
 			AND bh_end &gt; #{resStart}
 	</select>
+	<!-- 이미 종료된 예약 가져오기 -->
+	<select id="selectExpiredReservations" parameterType="java.time.LocalDateTime" resultType="kr.kh.tableup.model.vo.ReservationVO">
+    SELECT * FROM reservation
+    WHERE res_end_time &lt; #{now} AND res_state = 0
+	</select>
+	<!-- 예약 완료 처리 -->
+	<update id="updateReservationState">
+    UPDATE reservation
+    SET res_state = #{state}
+    WHERE res_num = #{res_num}
+	</update>
 
-
+	
 </mapper>

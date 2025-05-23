@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -712,9 +713,20 @@ public class ManagerController {
 	}
 	
 	@PostMapping("/managerpage")
-	public String PostmanagerPage() {
-		
-		return "/manager/managerpage";
+	public String PostmanagerPage(Model model, @AuthenticationPrincipal CustomManager manager, RestaurantManagerVO rm) {
+		RestaurantManagerVO currentManager = manager.getManager();
+
+		if(!currentManager.getRm_id().equals(rm.getRm_id())){
+			return "redirect:/manager/managerpage";
+		}
+
+		managerService.updateManagerInfo(rm);
+
+		currentManager.setRm_email(rm.getRm_email());
+		currentManager.setRm_name(rm.getRm_name());
+		currentManager.setRm_phone(rm.getRm_phone());
+
+		return "manager/main";
 	}
 	
 

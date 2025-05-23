@@ -111,5 +111,7 @@ public interface ManagerDAO {
 
 	List<BusinessHourTemplateVO> selectTemplateList(int rt_num);
 
+	int updateManagerInfo(RestaurantManagerVO rm);
+
 	
 }

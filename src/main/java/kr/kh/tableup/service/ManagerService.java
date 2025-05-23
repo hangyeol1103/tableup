@@ -16,6 +16,7 @@ import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -65,7 +66,7 @@ public class ManagerService {
 			return false;
 		}
 		//매장 이미지 작업
-		//uploadFileList(restaurant.getRt_num(), fileList);
+		uploadFileList(restaurant.getRt_num(), fileList);
 		
 		//매장 정보 등록후 점주에게 매장 정보 부여
 		boolean res1 =managerDAO.updateManagerRtNum(manager.getRm_num(),restaurant.getRt_num());
@@ -93,12 +94,38 @@ public class ManagerService {
 		}
 		String fi_ori_name=file.getOriginalFilename();
 		try{
-			//String fi_name=UploadFileUtils.uploadFile(uploadPath, fi_ori_name, file.getBytes());
-
+			//파일 업로드
+			String uploadfilename=UploadFileUtils.uploadFile(uploadPath, fi_ori_name, file.getBytes());
+			
+			FileVO fileVO =new FileVO(uploadfilename, fi_ori_name , "RESTAURANTDETAIL", String.valueOf(rt_num), "내부", rt_num);
+			managerDAO.insertFile(fileVO);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
+
+	//매장 정보 변경
+	public boolean updateRestaurant(RestaurantVO restaurant, RestaurantManagerVO manager, MultipartFile[] fileList) {
+		System.out.println("수정할 매장 정보 :"+restaurant);
+		System.out.println("매장 매니저 :"+manager);
+		
+		if(restaurant == null || manager == null){
+			System.out.println("수정 실패!");
+			return false;
+		}
+		managerDAO.deletefile(restaurant.getRt_num());
+		//매장 이미지 작업
+		uploadFileList(restaurant.getRt_num(), fileList);
+		
+		//매장 정보 변경작업
+		boolean res =managerDAO.updateRestaurant(restaurant);
+		if(!res){
+			return false;
+		}
+		
+		return true;
+	}
+
 	//음식분류(대분류) 리스트
 	public List<FoodCategoryVO> getFoodCategory() {
 		return managerDAO.selectFoodCategoryList();
@@ -153,9 +180,21 @@ public class ManagerService {
 		String suffix = getSuffix(fileName);
 		String newFileName = menu.getMn_num() + suffix;
 		String menuImage;
+		
+		System.out.println("-----------------");
+		System.out.println("fileName : " + fileName);
+		System.out.println(" suffix : " + suffix);
+		System.out.println("newFileName : " + newFileName);
+		System.out.println("-----------------");
 		try{
 			menuImage = UploadFileUtils.uploadFile(uploadPath, newFileName, mn_img.getBytes(),"menu");
+			
+			System.out.println("-----------------");
+			System.out.println("menuImage : " + menuImage);
+			System.out.println("-----------------");
+			
 			menu.setMn_img(menuImage);
+			System.out.println("menu : " + menu);
 			managerDAO.updateMenu(menu);
 
 		} catch(Exception e){
@@ -189,6 +228,7 @@ public class ManagerService {
 		//메뉴 이미지 작업
 		try{
 			String fileName = mn_img2.getOriginalFilename();
+			System.out.println(fileName);
 			if(mn_img2 != null && fileName.length() !=0){
 				String suffix = getSuffix(fileName);
 				String newFileName = menu.getMn_num() + suffix;
@@ -453,6 +493,11 @@ public class ManagerService {
 	public boolean deleteResFacility(int rf_num) {
 		return managerDAO.deleteResFacility(rf_num);
 	}
+
+	public List<FileVO> getFileList(int rm_rt_num) {
+		return managerDAO.selectFileList(rm_rt_num);
+	}
+
 
 	
 }

@@ -20,7 +20,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<h2 class="mb-4 fw-bold text-primary">메뉴 정보</h2>
 
 			<div class="input-group form-group menu-img">
-				<img th:src="@{/file/{nenuImage}(menuImage=${menu.mn_img})}" alt="이미지 없음" width="100%"></img>
+				<img th:src="@{/file/{menuImage}(menuImage=${menu.mn_img})}" alt="이미지 없음" width="100%" ></img>
 			</div>
 			<div>
 				<h1 th:text="${menu.mn_name}">메뉴 이름</h1>

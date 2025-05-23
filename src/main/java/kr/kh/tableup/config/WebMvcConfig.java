@@ -1,11 +1,17 @@
 package kr.kh.tableup.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+@EnableWebMvc
+@Configuration
+@ComponentScan(basePackages = "kr.kh.tableup") 
 public class WebMvcConfig implements WebMvcConfigurer{
 	
 	@Value("${spring.path.upload}")

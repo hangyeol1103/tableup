@@ -227,13 +227,13 @@ public class UserService {
         String uploadFileName = UploadFileUtils.uploadFile(uploadPath, newFileName, file.getBytes(), "review");
 
         // DB에 넣을 FileVO 생성
-        FileVO fileVO = new FileVO();
-        fileVO.setFile_name(inputFileName); // 사용자가 입력한 이름
-        fileVO.setFile_path(uploadFileName); // 서버 저장 경로
-        fileVO.setFile_type("REVIEW");
-        fileVO.setFile_foreign(String.valueOf(review.getRev_num()));
-        fileVO.setFile_tag(fileTag);
-        fileVO.setFile_res_num(review.getRev_rt_num());
+        FileVO fileVO = new FileVO(uploadFileName, inputFileName, "REVIEW", String.valueOf(review.getRev_num()), fileTag, review.getRev_rt_num());
+        // fileVO.setFile_name(inputFileName); // 사용자가 입력한 이름
+        // fileVO.setFile_path(uploadFileName); // 서버 저장 경로
+        // fileVO.setFile_type("REVIEW");
+        // fileVO.setFile_foreign(review.getRev_num());
+        // fileVO.setFile_tag(fileTag);
+        // fileVO.setFile_res_num(review.getRev_rt_num());
 
         userDAO.insertFile(fileVO);
 

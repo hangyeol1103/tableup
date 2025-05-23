@@ -33,6 +33,74 @@
       #calendar-wrapper .flatpickr-calendar.inline {
         display: inline-block;
       }
+      .tab-container {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: center;
+      }
+
+      .nav-tabs {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        gap: 0;
+      }
+
+      .tab-item:not(:first-child) {
+        margin-left: -10px; /* 각 탭이 앞의 탭과 겹치게 */
+      }
+
+      .tab-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        
+        padding: 1.25rem 2.5rem;        /* 상하 1rem, 좌우 2rem → 박스 크기 키움 */
+        font-size: 1.1rem;           /* 글씨 크기 키움 */
+        font-weight: bold;
+        border-radius: 8px;
+
+        background-color: #faf9f6;
+        color: #4a4a4a;
+        text-decoration: none;
+        border-radius: 6px;
+        width: 100%;
+        height: 100%;
+
+        position: relative;
+        z-index: 1;
+        transition: z-index 0.3s;
+      }
+
+      .tab-item {
+        min-width: 160px;
+        min-height: 70px;
+        position: relative;
+      }
+
+      .tab-link.active {
+        background-color: #7a7154;
+        color: #ffffff;
+      }
+
+      .badge {
+        display: inline-block;
+        background-color: #e8e6dd;
+        color: #4a4a4a;
+        border-radius: 12px;
+        padding: 0.1rem 0.5rem;
+        font-size: 0.75rem;
+        margin-left: 0.3rem;
+      }
+
+      .tab-link:hover,
+      .tab-link.active {
+        z-index: 2; /* 활성/호버된 탭을 앞에 보이게 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
     </style>
   </head>
 
@@ -51,6 +119,29 @@
         <div class="col-1 border">10</div>
         <div class="col-1 border">11</div>
         <div class="col-1 border">12</div>
+      </div>
+
+      <div class="tab-container col-11 offset-1">
+        <ul class="nav-tabs">
+          <li class="tab-item">
+            <a class="tab-link active" href="#">개요</a>
+          </li>
+          <li class="tab-item">
+            <a class="tab-link" href="#">좌석</a>
+          </li>
+            <li class="tab-item"><a class="tab-link" href="#">메뉴・코스</a>
+          </li>
+          <li class="tab-item">
+            <a class="tab-link" href="#">리뷰 사진
+            <span class="badge">1834</span></a>
+          </li>
+          <li class="tab-item">
+            <a class="tab-link" href="#">리뷰 / 평가
+            <span class="badge">74</span></a>
+          </li>
+            <li class="tab-item"><a class="tab-link" href="#">지도</a>
+          </li>
+        </ul>
       </div>
 
       <div class="row">
@@ -362,6 +453,17 @@
           location.href = url;
         }
       </script>
+
+      <script>
+        document.querySelectorAll('.tab-link').forEach(tab => {
+          tab.addEventListener('click', function (e) {
+            e.preventDefault(); // 기본 링크 이동 방지
+            document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+      </script>
+
     </main>
   </body>
 </html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	<header th:fragment="header">
+		<nav class="tnb">
+		<a href="/search?tabMode=single&amp;searchMode=ribbonType&amp;location=&amp;ribbonType=&amp;feature=" class="btn-tnb-estimation">
+			블루리본 평가하기
+			<div class="ribbon-right">
+				<div class="ribbon-arrow ribbon-top"></div>
+				<div class="ribbon-arrow ribbon-bottom"></div>
+			</div>
+		</a>
+
+		<div class="tnb-hamburger">
+			<div id="btn-tnb-hamburger" class="tnb-hamburger-container">
+				<div class="topLine"></div>
+				<div class="middleLine"></div>
+				<div class="bottomLine"></div>
+			</div>
+		</div>
+
+		<div class="tnb-title">
+			<a class="wrapper-tnb-logo" href="/">
+				<span class="tnb-text-since-m">SINCE 2005</span>
+				<img id="img-logo" class="img-responsive" src="/assets/image/text-blue-ribbon.svg">
+				<span class="tnb-text-since hidden-xs">SINCE 2005</span>
+			</a>
+		</div>
+		<div class="tnb-shop clearfix">
+			<div class="dropdown dropdown-tnb-account">
+				<a id="anchor-tnb-account" class="display-table" data-target="#" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+					<div class="display-table-cell vertical-middle">
+						<i class="icon-ep-user"></i>
+					</div>
+				</a>
+			</div>
+			<div class="dropdown-basket-menu">
+				<ul class="dropdown-menu" aria-labelledby="anchor-tnb-account">
+					<li class="basket-menu"><span class="cart-empty">장바구니가 비어 있습니다.</span></li>
+
+					<li class="basket-menu"><a href="/products/books"><i class="icon-shop-book"></i>블루리본 서적 구매</a></li>
+					<li class="basket-menu"><a href="/cart"><i class="icon-shop-cart2"></i>장바구니</a></li>
+					<li class="basket-menu"><a href="/order"><i class="icon-shop-order"></i>주문 내역</a></li>
+
+					<li class="basket-menu"><a href="/join"><i class="icon-shop-account"></i>회원가입</a></li>
+					<li class="basket-menu"><a href="/login"><i class="icon-shop-account"></i>로그인</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	</header>	
+		<footer th:fragment="footer" class="py-4 bg-white border-top text-center">
+			<div class="container">
+				<div class="row">
+					<div class="col-12 col-md">
+						<small class="d-block mb-3 text-body-secondary">Copyright ⓒ tablemate Corp.</small>
+					</div>
+				</div>
+			</div>
+		</footer>
+</body>
+</html>

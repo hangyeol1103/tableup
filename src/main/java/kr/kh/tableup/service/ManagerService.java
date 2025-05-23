@@ -370,6 +370,8 @@ public class ManagerService {
 			return false;
 		}
 		System.out.println("등록 성공");
+
+		//
 		return true;
 	}
 
@@ -509,4 +511,9 @@ public class ManagerService {
 
 
 	
+
+	
+
+	
+
 }

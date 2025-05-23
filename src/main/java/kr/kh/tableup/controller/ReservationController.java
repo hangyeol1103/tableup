@@ -86,10 +86,14 @@ public class ReservationController {
 			return "redirect:/";
 		}
 
+		LocalDateTime resEndTime = resTime.plusHours(2);
+
+
 		ReservationVO res = new ReservationVO();
 		res.setRes_us_num(user.getUs_num());
 		res.setRes_rt_num(rt_num);
 		res.setRes_time(resTime);
+		res.setRes_end_time(resEndTime);
 		res.setRes_person(person);
 		res.setRes_request(request);
 		res.setRes_created(LocalDateTime.now());

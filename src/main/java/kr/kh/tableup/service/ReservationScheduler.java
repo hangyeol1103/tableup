@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
@@ -21,8 +22,14 @@ public class ReservationScheduler {
     @Autowired
     BusinessHourDAO businessHourDAO;
 
-    /** ⏱️ 매 5분마다 예약 만료 처리 */
-    @Scheduled(cron = "0 */5 * * * *") // 5분마다 실행
+		@PostConstruct
+		public void runOnceOnStartup() {
+			updateExpiredReservations(); // 서버 시작 시 한 번 실행
+		}
+
+
+    /** 매 5분마다 예약 만료 처리 */
+    @Scheduled(cron = "0 */5 * * * *") // 
     public void updateExpiredReservations() {
         List<ReservationVO> expiredList = reservationDAO.selectExpiredReservations(LocalDateTime.now());
 

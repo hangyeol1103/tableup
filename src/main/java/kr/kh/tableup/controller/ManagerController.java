@@ -711,5 +711,11 @@ public class ManagerController {
 		return "/manager/managerpage";
 	}
 	
+	@PostMapping("/managerpage")
+	public String PostmanagerPage() {
+		
+		return "/manager/managerpage";
+	}
+	
 
 }

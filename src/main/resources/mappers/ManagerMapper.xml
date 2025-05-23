@@ -259,6 +259,7 @@
 			rm_name = #{rm_name},
 			rm_phone = #{rm_phone}
 		where rm_num = #{rm_num}
+	</update>
 	<select id="selectFacilityList" resultType="FacilityVO">
 		select * from facility 
 	</select>

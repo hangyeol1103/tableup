@@ -88,6 +88,11 @@ public class ReservationController {
 
 		LocalDateTime resEndTime = resTime.plusHours(2);
 
+		boolean available = reservationService.isReservationAvailable(rt_num, resTime, resEndTime, person);
+		if (!available) {
+			ra.addFlashAttribute("msg", "해당 시간대 좌석이 부족합니다.");
+			return "redirect:/";
+		}
 
 		ReservationVO res = new ReservationVO();
 		res.setRes_us_num(user.getUs_num());
@@ -108,5 +113,7 @@ public class ReservationController {
 		ra.addFlashAttribute("msg", "예약이 완료되었습니다.");
 		return "redirect:/";
 	}
+
+
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.ReservationDAO">
-	<!-- 1. 예약 등록 -->
+	<!-- 예약 등록 -->
 	<insert id="insertReservation" parameterType="kr.kh.tableup.model.vo.ReservationVO">
 		INSERT INTO reservation (
 			res_us_num,
@@ -23,4 +23,14 @@
 			#{res_state}
 		)
 	</insert>
+	<!-- 예약 가능 검증 -->
+	<select id="selectOverlapHours"
+					resultType="kr.kh.tableup.model.vo.BusinessHourVO">
+		SELECT * FROM BusinessHour
+		WHERE bh_rt_num = #{rt_num}
+			AND bh_start &lt; #{resEnd}
+			AND bh_end &gt; #{resStart}
+	</select>
+
+
 </mapper>

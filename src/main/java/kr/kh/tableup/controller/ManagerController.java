@@ -700,7 +700,7 @@ public class ManagerController {
 
 
 	@PostMapping("/make_opertime")
-	public String insertOperTime(@RequestBody BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager) {
+	public String insertOperTime(BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager) {
 		opertime.setBd_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
 		System.out.println(opertime);

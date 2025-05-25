@@ -424,5 +424,11 @@ public class UserController {
         System.out.println("리뷰 리스트 : " + reviewList);
         return "user/review/view";
     }
+
+    @GetMapping("/list/detail/outline")
+    public String outline() {
+        return "user/detail/outline";
+    }
+    
     
 }

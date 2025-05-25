@@ -124,7 +124,7 @@
       <div class="tab-container col-11 offset-1">
         <ul class="nav-tabs">
           <li class="tab-item">
-            <a class="tab-link active" href="#">개요</a>
+            <a class="tab-link active" th:href="@{/user/list/detail/outline}">개요</a>
           </li>
           <li class="tab-item">
             <a class="tab-link" href="#">좌석</a>
@@ -457,7 +457,6 @@
       <script>
         document.querySelectorAll('.tab-link').forEach(tab => {
           tab.addEventListener('click', function (e) {
-            e.preventDefault(); // 기본 링크 이동 방지
             document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
           });

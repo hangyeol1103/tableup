@@ -56,4 +56,8 @@ public class ReservationService {
 		return true;
 	}
 
+	public List<ReservationVO> getReservation(int rt_num) {
+		return reservationDAO.selectReservationList(rt_num);
+	}
+
 }

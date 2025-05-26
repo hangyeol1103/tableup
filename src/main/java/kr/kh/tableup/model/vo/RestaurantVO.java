@@ -17,6 +17,9 @@ public class RestaurantVO {
 	String rt_accept;
 	String rt_description;
 
+	int rt_max_table;
+	int rt_max_person;
+
 	//디테일
 	int rd_num;
 	int rd_rt_num;

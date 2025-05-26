@@ -3,11 +3,14 @@ package kr.kh.tableup.controller;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +19,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
 import kr.kh.tableup.dao.UserDAO;
+import kr.kh.tableup.model.util.CustomManager;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.UserVO;
@@ -114,6 +119,18 @@ public class ReservationController {
 		return "redirect:/";
 	}
 
+	@GetMapping("/manager_reservation/{rt_num}")
+	public String getMethodName(Model model,  @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
+		rt_num= manager.getManager().getRm_rt_num();
+		List<ReservationVO> reservationList = reservationService.getReservation(rt_num);
+		List<BusinessHourVO> restimeList = managerService.getResTimeList(rt_num);
+		
+
+		model.addAttribute("reservationList", reservationList);
+		model.addAttribute("restimeList", restimeList);
+		return "/reservation/manager_reservation";
+	}
+	
 
 
 }

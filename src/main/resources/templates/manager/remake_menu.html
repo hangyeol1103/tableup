@@ -21,11 +21,11 @@
       <input type="hidden" name="mn_num" th:value="${menu.mn_num}" />
       <div class="mb-3 form-group box">
         <label for="mn_name" class="form-label">메뉴이름</label>
-        <input type="text" class="form-control" name="mn_name" id="mn_name" required>
+        <input type="text" class="form-control" name="mn_name" id="mn_name" required th:value="${menu.mn_name}">
       </div>
 			<div class="mb-3 form-group box">
         <label for="mt_num" class="form-label">메뉴분류</label>
-        <select class="form-select" id="mn_mt_num" name="mn_mt_num" required>
+        <select class="form-select" id="mn_mt_num" name="mn_mt_num" required  th:value="${menu.mn_mt_num}">
           <option value="">분류선택</option>
           <th:block th:each="menutype : ${menutype}">
             <option th:value="${menutype.mt_num}" th:text="${menutype.mt_name}"></option>
@@ -34,19 +34,19 @@
       </div>
       <div class="mb-3 form-group box">
         <label for="mn_img" class="form-label">메뉴사진</label>
-        <input type="file" class="form-control" name="mn_img2" id="mn_img2" required>
+        <input type="file" class="form-control" name="mn_img2" id="mn_img2" th:value="${menu.mn_img}">
       </div>
 			<div class="mb-3 form-group box">
         <label for="mn_price" class="form-label">메뉴가격</label>
-        <input type="text" class="form-control" name="mn_price" id="mn_price" required>
+        <input type="text" class="form-control" name="mn_price" id="mn_price" required th:value="${menu.mn_price}">
       </div>
 			<div class="mb-3 form-group box">
         <label for="mn_content" class="form-label">메뉴설명</label>
-        <input type="text" class="form-control" name="mn_content" id="mn_content" required>
+        <input type="text" class="form-control" name="mn_content" id="mn_content" required th:value="${menu.mn_content}">
       </div>
       <div class="mb-3 form-group box">
         <label for="mn_div" class="form-label">메뉴색인</label>
-        <input type="text" class="form-control" name="mn_div" id="mn_div" required>
+        <input type="text" class="form-control" name="mn_div" id="mn_div" required th:value="${menu.mn_div}">
       </div>
       <button type="submit" class="btn btn-success w-100">정보 변경하기</button>
     </form>

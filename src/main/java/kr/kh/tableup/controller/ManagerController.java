@@ -363,13 +363,16 @@ public class ManagerController {
 	//상세정보 변경 페이지
 	@GetMapping("/remake_detail")
 	public String reMakeDetailPage(Model model, @AuthenticationPrincipal CustomManager manager) {
-
+		int rt_num = manager.getManager().getRm_rt_num();
+		RestaurantVO resdetail = managerService.getResDetail(rt_num);
+		
+		model.addAttribute("resdetail", resdetail);
 		model.addAttribute("url", "/remake_detail");
 		return "/manager/remake_detail";
 	}
 	
 	@PostMapping("/remake_detail")
-	public String updateDetail(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
+	public String updateDetail(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
     System.out.println("매니저의 매장 번호: " + rtNum);
     resdetail.setRd_rt_num(rtNum);

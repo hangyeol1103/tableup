@@ -22,18 +22,18 @@
       <input type="hidden" name="rec_num" th:value="${coupon.rec_num}" />
       <div class="mb-3 form-group box">
         <label for="rec_content" class="form-label">쿠폰 내용</label>
-        <input type="text" class="form-control" name="rec_content" id="rec_content" required>
+        <input type="text" class="form-control" name="rec_content" id="rec_content" th:value="${coupon.rec_content}" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="rec_state" class="form-label">쿠폰 상태</label>
-        <select class="form-select" name="rec_state" id="rec_state" required>
+        <select class="form-select" name="rec_state" id="rec_state" th:value="${coupon.rec_state}" required>
          <option value="true">공개</option>
          <option value="false">비공개</option>
         </select>
       </div>
       <div class="mb-3 form-group box">
         <label for="rec_period" class="form-label">쿠폰 기간</label>
-         <input type="text" class="form-control" name="rec_period" id="rec_period" required>
+         <input type="text" class="form-control" name="rec_period" id="rec_period" th:value="${coupon.rec_period}" required>
       </div>
       <button type="submit" class="btn btn-success w-100">쿠폰 변경</button>
     </form>

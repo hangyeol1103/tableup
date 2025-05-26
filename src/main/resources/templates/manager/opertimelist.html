@@ -34,12 +34,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				<tr th:each="opertime : ${opertimelist}">
 					<td th:text="${opertime.bd_date != null ? opertime.bd_date : '-'}">날짜</td>
 					<td th:text="${opertime.bd_off != null ? (opertime.bd_off ? '쉬는날' : '여는날') : '-'}">휴무일 여부</td>
-					<td th:text="${opertime.bd_open != null ? #dates.format(opertime.bd_open, 'HH:mm') : '-'} " >개점 시간</td>
+					<!-- <td th:text="${opertime.bd_open != null ? #dates.format(opertime.bd_open, 'HH:mm') : '-'} " >개점 시간</td>
 					<td th:text="${opertime.bd_close != null ? #dates.format(opertime.bd_close, 'HH:mm') : '-'} ">마감 시간</td>
 					<td th:text="${opertime.bd_brstart != null ? #dates.format(opertime.bd_brstart, 'HH:mm') : '-'} ">브레이크 타임(시작)</td>
 					<td th:text="${opertime.bd_brend != null ? #dates.format(opertime.bd_brend, 'HH:mm') : '-'} ">브레이크 타임(마감)</td>
 					<td th:text="${opertime.bd_loam != null ? #dates.format(opertime.bd_loam, 'HH:mm') : '-'} ">라스트오더 시간(점심)</td>
-					<td th:text="${opertime.bd_lopm != null ? #dates.format(opertime.bd_lopm, 'HH:mm') : '-'} ">라스트오더 시간(저녁)</td>
+					<td th:text="${opertime.bd_lopm != null ? #dates.format(opertime.bd_lopm, 'HH:mm') : '-'} ">라스트오더 시간(저녁)</td> -->
+
+					<td th:text="${opertime.bd_open != null ? opertime.bd_open : '-'}">개점 시간</td>
+					<td th:text="${opertime.bd_close != null ? opertime.bd_close : '-'}">마감 시간</td>
+					<td th:text="${opertime.bd_brstart != null ? opertime.bd_brstart : '-'}">브레이크 타임(시작)</td>
+					<td th:text="${opertime.bd_brend != null ? opertime.bd_brend : '-'}">브레이크 타임(마감)</td>
+					<td th:text="${opertime.bd_loam != null ? opertime.bd_loam : '-'}">라스트오더 시간(점심)</td>
+					<td th:text="${opertime.bd_lopm != null ? opertime.bd_lopm : '-'}">라스트오더 시간(저녁)</td>
+
 					<!-- 영업 시간 수정버튼 -->
 					<td class="">
 						<form th:action="@{/manager/remake_opertime/{bd_num}(bd_num=${opertime.bd_num})}" method="get" style="display:inline;">

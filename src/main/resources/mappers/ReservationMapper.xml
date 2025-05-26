@@ -7,7 +7,7 @@
 			res_us_num,
 			res_rt_num,
 			res_time,
-			res_end_time,
+			<!-- res_end_time, -->
 			res_person,
 			res_request,
 			res_created,
@@ -16,7 +16,7 @@
 			#{res_us_num},
 			#{res_rt_num},
 			#{res_time},
-			#{res_end_time},
+			<!-- #{res_end_time}, -->
 			#{res_person},
 			#{res_request},
 			NOW(),
@@ -34,7 +34,7 @@
 	<!-- 이미 종료된 예약 가져오기 -->
 	<select id="selectExpiredReservations" parameterType="java.time.LocalDateTime" resultType="kr.kh.tableup.model.vo.ReservationVO">
     SELECT * FROM reservation
-    WHERE res_end_time &lt; #{now} AND res_state = 0
+    WHERE <!--res_end_time--> DATE_ADD(res_time, INTERVAL 1 HOUR)  &lt; #{now} AND res_state = 0
 	</select>
 	<!-- 예약 완료 처리 -->
 	<update id="updateReservationState">

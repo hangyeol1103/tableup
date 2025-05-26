@@ -35,6 +35,7 @@ import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
@@ -404,31 +405,54 @@ public class UserController {
 
   @GetMapping("/list/detail/{rt_num}")
   public String restaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
+    // RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
+    // FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
+    // DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
+    // TagVO tag = userService.getTagByRestaurant(rt_num);
+
+    // model.addAttribute("restaurant", restaurant);
+    // model.addAttribute("foodCategory", foodCategory);
+    // model.addAttribute("detailFoodCategory", detailFoodCategory);
+    // model.addAttribute("tag", tag);
+
+    return "user/detail/detail";
+  }
+
+  
+
+  @GetMapping("/review/view")
+  public String allReviews(Model model) {
+      List<ReviewVO> reviewList = userService.getReviewList();
+      model.addAttribute("reviewList", reviewList);
+      System.out.println("리뷰 리스트 : " + reviewList);
+      return "user/review/view";
+  }
+  
+  @GetMapping("/list/detail/outline")
+  public String outline() {
+      return "user/detail/outline";
+  }
+  @PostMapping("/list/news/{rt_num}")
+  public String postrestaurantDetail(@PathVariable("rt_num") int rt_num) {
+    System.out.println(rt_num);
+    return "user/detail/news";
+  }
+  @PostMapping("/list/home/{rt_num}")
+  public String listHome(@PathVariable("rt_num") int rt_num, Model model) {
     RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
     TagVO tag = userService.getTagByRestaurant(rt_num);
+    FacilityVO facility = userService.getFacilityByRestaurant(rt_num);
+    RestaurantFacilityVO restaurantFacility = userService.getRestaurantFacilityByRestaurant(rt_num);
 
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
-
-    return "user/detail/detail";
+    model.addAttribute("facility", facility);
+    model.addAttribute("restaurantFacility", restaurantFacility);
+    return "user/detail/home";
   }
-
-    @GetMapping("/review/view")
-    public String allReviews(Model model) {
-        List<ReviewVO> reviewList = userService.getReviewList();
-        model.addAttribute("reviewList", reviewList);
-        System.out.println("리뷰 리스트 : " + reviewList);
-        return "user/review/view";
-    }
-
-    @GetMapping("/list/detail/outline")
-    public String outline() {
-        return "user/detail/outline";
-    }
-    
-    
+  
 }

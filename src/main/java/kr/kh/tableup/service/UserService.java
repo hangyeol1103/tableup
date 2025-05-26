@@ -412,5 +412,15 @@ public class UserService {
   }
 
 
+	public FacilityVO getFacilityByRestaurant(int rt_num) {
+		return userDAO.selectFacilityByRestaurant(rt_num);
+	}
+
+
+  public RestaurantFacilityVO getRestaurantFacilityByRestaurant(int rt_num) {
+    return userDAO.selectRestaurantFacilityByRestaurant(rt_num);
+  }
+
+
 
 }

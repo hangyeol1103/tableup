@@ -22,7 +22,6 @@ import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
-import kr.kh.tableup.model.vo.PaymentVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
@@ -46,6 +45,23 @@ public class ManagerService {
 		if(rm == null){
 			return false;
 		}
+		List<RestaurantManagerVO> dbManager = managerDAO.selectManagerList();
+
+		for(RestaurantManagerVO db: dbManager){
+			// 아이디 중복 체크
+			if(db.getRm_id().equals(rm.getRm_id())){
+				return false;
+			}
+			// 사업자 번호 중복 체크
+			if(db.getRm_business().equals(rm.getRm_business())){
+				return false;
+			}
+			// 전화 번호 중복 체크
+			if(db.getRm_phone().equals(rm.getRm_phone())){
+				return false;
+			}
+		}
+
 		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
 		return managerDAO.insertManager(rm);
 	}

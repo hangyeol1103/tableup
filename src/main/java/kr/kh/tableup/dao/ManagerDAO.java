@@ -15,7 +15,6 @@ import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
-import kr.kh.tableup.model.vo.PaymentVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
@@ -25,6 +24,8 @@ import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
 public interface ManagerDAO {
+	
+	List<RestaurantManagerVO> selectManagerList();
 
 	boolean insertManager(RestaurantManagerVO rm);
 
@@ -141,6 +142,7 @@ public interface ManagerDAO {
 	List<ResCouponVO> getExpiredCoupons(LocalDate now);
 
 	void updateCouponState(ResCouponVO c);
+
 
 	
 }

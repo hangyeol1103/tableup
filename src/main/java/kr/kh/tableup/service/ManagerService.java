@@ -390,7 +390,7 @@ public class ManagerService {
 			return false;
 		}
 
-		return managerDAO.insertOperTimestamp(oper);
+		return managerDAO.insertOperTimeStamp(oper);
 		}
 
 	private Timestamp toTimestamp(String date, String time) {

@@ -733,10 +733,10 @@ public class ManagerController {
 	@PostMapping("/make_opertime_list")
 	@ResponseBody
 	public String insertOperTimeList(
-		//@RequestBody List<BusinessDateVO> operList
+		@RequestBody List<BusinessDateVO> operList
 			/*, @AuthenticationPrincipal CustomManager manager*/
 	) {
-			List<BusinessDateVO> operList = new ArrayList<>();
+			// List<BusinessDateVO> operList = new ArrayList<>();
 			System.out.println("ajax 수신");
 			/*if (manager == null || manager.getManager() == null) {
 					return "로그인 정보가 없습니다.";

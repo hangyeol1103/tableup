@@ -174,13 +174,20 @@ public class ManagerController {
 	//매장 정보 수정
 	@GetMapping("/remake")
 	public String remakePage(Model model,@AuthenticationPrincipal CustomManager manager) {
+		if (manager.getManager().getRm_rt_num() <= 0) {
+        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+				System.out.println("매니저 정보가 없습니다.");
+        return "redirect:/manager/make";
+    }
 		List<FoodCategoryVO> foodcategory = managerService.getFoodCategory();
 		List<RegionVO> region = managerService.getRegion();
 		List<DetailRegionVO> dr = managerService.getDetailRegion();
 		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
+		List<FileVO> fileList = managerService.getFileList(manager.getManager().getRm_rt_num());
 
 		RestaurantVO restaurant = managerService.getResDetail(manager.getManager().getRm_rt_num());
 		System.out.println(restaurant);
+
 
 		// System.out.println(region);
 		// System.out.println(dr);
@@ -193,6 +200,7 @@ public class ManagerController {
 		model.addAttribute("region", region);
 		model.addAttribute("detailRegionList", dr);
 		model.addAttribute("detailFoodList", dfc);
+		model.addAttribute("fileList", fileList);
 		return "/manager/remake";
 	}
 
@@ -233,7 +241,16 @@ public class ManagerController {
 
 	//메뉴 등록 페이지
 	@GetMapping("/make_menu")
-	public String makeMenuPage(Model model) {
+	public String makeMenuPage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/";
+		}
+
+		if (manager.getManager().getRm_rt_num() <= 0) {
+			// 매장 정보가 없는 매니저 → 매장 등록 페이지로
+			System.out.println("매니저 정보가 없습니다.");
+			return "redirect:/manager/make";
+    }
 		List<MenuTypeVO> menutype = managerService.getMenuTypeList();
 		
 		model.addAttribute("url", "/make_menu");

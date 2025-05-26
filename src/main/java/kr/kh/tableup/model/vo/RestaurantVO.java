@@ -21,8 +21,8 @@ public class RestaurantVO {
 	int rt_max_person;
 
 	//디테일
-	int rd_num;
-	int rd_rt_num;
+	Integer  rd_num;
+	Integer  rd_rt_num;
 	String rd_phone;
 	String rd_closed_days;
 	String rd_info;

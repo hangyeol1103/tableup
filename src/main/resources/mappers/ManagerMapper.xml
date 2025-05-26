@@ -14,7 +14,7 @@
 
 
 	<resultMap id="resDetailMap" type="RestaurantVO">
-		<!-- restaurant 테이블 -->
+		<!-- restaurant -->
 		<result column="rt_num" property="rt_num"/>
 		<result column="rt_name" property="rt_name"/>
 		<result column="rt_dreg_num" property="rt_dreg_num"/>
@@ -27,7 +27,7 @@
 		<result column="rt_max_table" property="rt_max_table"/>
 		<result column="rt_max_person" property="rt_max_person"/>
 
-		<!-- restaurantdetail 테이블 -->
+		<!-- restaurantdetail -->
 		<result column="rd_num" property="rd_num"/>
 		<result column="rd_rt_num" property="rd_rt_num"/>
 		<result column="rd_phone" property="rd_phone"/>
@@ -36,10 +36,8 @@
 		<result column="rd_home" property="rd_home"/>
 		<result column="rd_addr" property="rd_addr"/>
 
-		<!-- detailregion 테이블에서 join한 컬럼 -->
 		<result column="dreg_reg_num" property="reg_num"/>
 
-		<!-- detailfoodcategory 테이블에서 join한 컬럼 -->
 		<result column="dfc_fc_num" property="fc_num"/>
 	</resultMap>
 
@@ -146,7 +144,7 @@
 	<!-- 매장 상세정보 -->
 	<select id="selectResDetail" resultMap="resDetailMap">
 		SELECT restaurant.*, restaurantdetail.*,
-			detailregion.dreg_reg_num AS reg_num, detailfoodcategory.dfc_fc_num AS fc_num
+			detailregion.dreg_reg_num, detailfoodcategory.dfc_fc_num
 		FROM restaurant
 		LEFT JOIN detailregion ON restaurant.rt_dreg_num = dreg_num
 		LEFT JOIN detailfoodcategory ON restaurant.rt_dfc_num = dfc_num

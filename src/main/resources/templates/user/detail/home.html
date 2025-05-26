@@ -175,17 +175,10 @@
       <h5 class="fw-bold">편의시설</h5>
       <div class="section-body">
         <div class="restaurant-features mb-20">
-          <span th:each="facility : ${restaurantFacility}" class="icon-crop-box">
-            <img src="/resources/static/img/facility/facility.jpg" th:alt="${facility.rf_detail}" style="top: -220px; left: -257px;">
+          <span th:each="facility : ${facilityList}" class="icon-crop-box">
+            <img src="/resources/static/img/facility/facility.jpg" th:alt="${facility.rf_detail != null ? facility.rf_detail : '편의시설'}" 
+            style="top: -220px; left: -257px;"/>
           </span>
-          <div class="icon-crop-box">
-            <img src="/resources/static/img/facility/facility.jpg" th:alt="${facility.rf_detail}" style="top: -413px; left: -432px;">
-          </div>
-          <span class="feature-item"></span>
-          <span class="feature-item"></span>
-          <span class="feature-item"></span>
-          <span class="feature-item"></span>
-          <span class="feature-item"></span>
         </div>
       </div>
     </div>

@@ -75,9 +75,9 @@ public interface UserDAO {
 
 	TagVO selectTagByRestaurant(@Param("rt_num") int rt_num);
 
-	FacilityVO selectFacilityByRestaurant(@Param("rt_num") int rt_num);
+	List<FacilityVO> selectByFacilityList(@Param("rt_num") int rt_num);
 
-	RestaurantFacilityVO selectRestaurantFacilityByRestaurant(@Param("rt_num") int rt_num);
+	List<RestaurantFacilityVO> selectRestaurantFacilityList(@Param("rt_num") int rt_num);
 
 
 }

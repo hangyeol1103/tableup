@@ -411,14 +411,13 @@ public class UserService {
     return userDAO.selectScoreTypeList();
   }
 
+  public List<FacilityVO> getFacilityList(int rt_num) {
+    return userDAO.selectByFacilityList(rt_num);
+  }
 
-	public FacilityVO getFacilityByRestaurant(int rt_num) {
-		return userDAO.selectFacilityByRestaurant(rt_num);
-	}
 
-
-  public RestaurantFacilityVO getRestaurantFacilityByRestaurant(int rt_num) {
-    return userDAO.selectRestaurantFacilityByRestaurant(rt_num);
+  public List<RestaurantFacilityVO> getRestaurantFacilityList(int rt_num) {
+    return userDAO.selectRestaurantFacilityList(rt_num);
   }
 
 

@@ -415,10 +415,10 @@
 	<select id="selectTagByRestaurant" resultType="TagVO"> SELECT * FROM tag WHERE tag_tt_num =
 		#{rt_num} LIMIT 1 </select>
 	
-	<select id="selectFacilityByRestaurant" resultType="FacilityVO">
+	<select id="selectByFacilityList" resultType="FacilityVO">
 		select * from restaurantfacility join facility on fa_num = rf_fa_num where rf_rt_num = #{rt_num}
 	</select>
-	<select id="selectRestaurantFacilityByRestaurant" resultType="RestaurantFacilityVO">
+	<select id="selectRestaurantFacilityList" resultType="RestaurantFacilityVO">
 		select * from restaurantfacility where rf_rt_num = #{rt_num}
 	</select>
 

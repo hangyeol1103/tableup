@@ -443,15 +443,15 @@ public class UserController {
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
     TagVO tag = userService.getTagByRestaurant(rt_num);
-    FacilityVO facility = userService.getFacilityByRestaurant(rt_num);
-    RestaurantFacilityVO restaurantFacility = userService.getRestaurantFacilityByRestaurant(rt_num);
+    List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
+    List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
 
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
-    model.addAttribute("facility", facility);
-    model.addAttribute("restaurantFacility", restaurantFacility);
+    model.addAttribute("facilityList", facilityList);
+    model.addAttribute("restaurantFacilityList", restaurantFacilityList);
     return "user/detail/home";
   }
   

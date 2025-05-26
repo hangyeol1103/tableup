@@ -46,15 +46,15 @@ public class HomeController {
 		return "index";
 	}
 
-	@GetMapping("/test")
+	@GetMapping("/test_orive_young")
 	public String test1(Model model) {
 		UserVO user = userService.getUserById("123");
 
 		model.addAttribute("sample", user.getUs_name());
-		model.addAttribute("url", "/test");
+		model.addAttribute("url", "/test_orive_young");
 		List<RegionVO> regionList = userService.getRegionListWithWhole();
 		model.addAttribute("regionList", regionList);
-		return "/test";
+		return "/test_orive_young";
 	}
 	
 

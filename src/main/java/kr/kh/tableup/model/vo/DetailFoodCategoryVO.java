@@ -1,8 +1,10 @@
 package kr.kh.tableup.model.vo;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class DetailFoodCategoryVO {
 	int dfc_num;
 	String dfc_sub;

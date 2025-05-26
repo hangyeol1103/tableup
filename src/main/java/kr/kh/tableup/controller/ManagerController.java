@@ -182,17 +182,17 @@ public class ManagerController {
 		RestaurantVO restaurant = managerService.getResDetail(manager.getManager().getRm_rt_num());
 		System.out.println(restaurant);
 
-		System.out.println(region);
-		System.out.println(dr);
-		System.out.println(foodcategory);
-		System.out.println(dfc);
+		// System.out.println(region);
+		// System.out.println(dr);
+		// System.out.println(foodcategory);
+		// System.out.println(dfc);
 
 		model.addAttribute("url", "/remake");
 		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("foodcategory", foodcategory);
 		model.addAttribute("region", region);
-		model.addAttribute("dr", dr);
-		model.addAttribute("dfc", dfc);
+		model.addAttribute("detailRegionList", dr);
+		model.addAttribute("detailFoodList", dfc);
 		return "/manager/remake";
 	}
 

@@ -29,6 +29,9 @@ public class RestaurantVO {
 	String rd_home;
 	String rd_addr;
 
+	int reg_num;
+	int fc_num;
+
 	List<TagVO> tagList;
 	List<ReviewVO> reviewList;
 

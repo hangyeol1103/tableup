@@ -32,7 +32,7 @@
         <select class="form-select" id="reg_num" name="reg_num"  required>
           <option value="">지역 선택</option>
           <th:block th:each="rg : ${region}">
-            <option th:value="${rg.reg_num}" th:text="${rg.reg_main}" th:selected="${rg.reg_num==restaurant.reg_num}"></option>
+            <option th:value="${rg.reg_num}" th:text="${rg.reg_main}" th:selected="${rg.reg_num==restaurant.rt_dreg_num}"></option>
           </th:block>
         </select>
       </div>
@@ -40,17 +40,7 @@
         <label for="dreg_reg_num" class="form-label">상세지역</label>
         <select class="form-select" id="dreg_reg_num" name="rt_dreg_num" required>
           <option value="">상세지역 선택</option>
-          <th:block th:each="dr : ${detailRegionList}">
-            <option 
-              th:value="${dr.dreg_num}" 
-              th:text="${dr.dreg_sub}"
-              th:data-reg-num="${dr.dreg_reg_num}"
-              th:attr="hidden=${restaurant != null and dr.dreg_reg_num != restaurant.reg_num}"
-              th:selected="${dr.dreg_num == restaurant.rt_dreg_num}">
-            </option>
-          </th:block>
         </select>
-
       </div>
 
 			<div class="mb-3 form-group box">
@@ -58,7 +48,7 @@
         <select class="form-select" id="fc_num" name="fc_num" required>
           <option value="">장르 선택</option>
           <th:block th:each="fc : ${foodcategory}">
-            <option th:value="${fc.fc_num}" th:text="${fc.fc_main}" th:selected="${fc.fc_num==restaurant.fc_num}"></option>
+            <option th:value="${fc.fc_num}" th:text="${fc.fc_main}"></option>
           </th:block>
         </select> 
       </div>
@@ -66,18 +56,8 @@
         <label for="dfc_fc_num" class="form-label">대표음식 선택</label>
         <select class="form-select" id="dfc_fc_num" name="rt_dfc_num" required>
           <option value="">대표음식</option>
-          <th:block th:each="dfc : ${detailFoodList}">
-            <option 
-              th:value="${dfc.dfc_num}" 
-              th:text="${dfc.dfc_sub}"
-              th:data-fc-num="${dfc.dfc_fc_num}"
-              th:attr="hidden=${restaurant != null and dfc.dfc_fc_num != restaurant.rt_dfc_num}"
-              th:selected="${dfc.dfc_num == restaurant.rt_dfc_num}">
-            </option>
-          </th:block>
         </select>
       </div>
-
 
 			<div class="mb-3 form-group box">
         <label for="rt_closed_days" class="form-label">휴점일</label>
@@ -104,7 +84,7 @@
       <button type="submit" class="btn btn-success w-100">매장 정보 변경하기</button>
     </form>
 
-    <script javascript="text/javascript">
+    <script>
       $(document).ready(function(){
         $('#rt_description').summernote({
           placeholder: '매장 설명을 입력하세요.',
@@ -116,26 +96,38 @@
 
     <!--상세지역(ex.강남, 서초, 동작, ....) 선택 스크립트-->
     <script>
-     $(document).ready(function () {
-      $('#reg_num').on('change', function () {
-        const selectedRegNum = $(this).val();
-        const $detailOptions = $('#dreg_reg_num option');
+      $(document).ready(function () {
+        $('#reg_num').on('change', function () {
+          
+          const selectedRegNum = $(this).val();
+          const $drSelect = $('#dreg_reg_num');       
 
-        $detailOptions.each(function () {
-          const optionRegNum = $(this).data('reg-num');
-          if (!optionRegNum) return; // 첫 번째 안내문 옵션은 제외
-          if (optionRegNum == selectedRegNum) {
-            $(this).show();
-          } else {
-            $(this).hide();
-          }
+          $drSelect.empty();
+          $drSelect.append('<option value="">상세지역을 선택하세요.</option>');
+
+          if (!selectedRegNum) return;
+
+          // Ajax 요청
+          $.ajax({
+            async : false,
+            url: '/manager/get-detailregion',
+            method: 'get',
+            data: { regNum: selectedRegNum },
+            success: function (data) {
+              console.log($('#dreg_reg_num').val());
+              data.forEach(function (dr) {
+                const option = $('<option></option>')
+                  .val(dr.dreg_num)
+                  .text(dr.dreg_sub);
+                $drSelect.append(option);
+              });
+            },
+            error: function () {
+              alert('상세지역을 가져오는데 실패하였습니다.');
+            }
+          });
         });
       });
-
-      // 페이지 로드 시 초기 선택된 지역에 맞게 필터링
-      $('#reg_num').trigger('change');
-    });
-
     </script>
 
     <!--대표음식(ex.스테이크, 회, 돈가츠, ....) 선택 스크립트-->
@@ -143,24 +135,35 @@
       $(document).ready(function () {
         $('#fc_num').on('change', function () {
           const selectedFcNum = $(this).val();
-          const $detailOptions = $('#dfc_fc_num option');
+          const $dfcSelect = $('#dfc_fc_num');       
 
-          $detailOptions.each(function () {
-            const optionFcNum = $(this).data('fc-num');
-            if (!optionFcNum) return; // 안내문 제외
-            if (optionFcNum == selectedFcNum) {
-              $(this).show();
-            } else {
-              $(this).hide().prop('selected', false);
+          $dfcSelect.empty();
+          $dfcSelect.append('<option value="">대표음식을 선택하세요.</option>');
+
+          if (!selectedFcNum) return;
+
+          // Ajax 요청
+          $.ajax({
+            async : true,
+            url: '/manager/get-detail',
+            method: 'get',
+            data: { fcNum: selectedFcNum },
+            success: function (data) {
+              console.log($('#dfc_fc_num').val());
+              data.forEach(function (dfc) {
+                const option = $('<option></option>')
+                  .val(dfc.dfc_num)
+                  .text(dfc.dfc_sub);
+                $dfcSelect.append(option);
+              });
+            },
+            error: function () {
+              alert('대표음식을 가져오는데 실패하였습니다.');
             }
           });
         });
-
-        // 페이지 로드시 초기 필터링
-        $('#fc_num').trigger('change');
       });
     </script>
-
   </main>
   
 

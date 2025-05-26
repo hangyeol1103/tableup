@@ -72,7 +72,7 @@ public class ReservationController {
 
 		if (principal == null) {
 			ra.addFlashAttribute("msg", "로그인이 필요합니다.");
-			return "redirect:/login";
+			return "redirect:/user/login";
 		}
 
 		String loginId = principal.getName();

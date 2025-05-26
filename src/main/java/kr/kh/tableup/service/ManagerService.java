@@ -226,6 +226,16 @@ public class ManagerService {
 		if(menu == null){
 			return false;
 		}
+
+		if(mn_img2.isEmpty()){
+			MenuVO dbMenu = managerDAO.selectMenu(menu.getMn_num());
+			if(dbMenu == null){
+				return false;
+			}
+			menu.setMn_img(dbMenu.getMn_img()); // 기존 이미지 유지
+			return managerDAO.updateMenu(menu);
+		}else{
+
 		//메뉴 이미지 작업
 		try{
 			String fileName = mn_img2.getOriginalFilename();
@@ -237,12 +247,14 @@ public class ManagerService {
 				menuImage = UploadFileUtils.uploadFile(uploadPath, newFileName, mn_img2.getBytes(),"menu");
 				menu.setMn_img(menuImage);
 			}
+
 			return managerDAO.updateMenu(menu);
 
 		} catch(Exception e){
 			e.printStackTrace();
 			return false;
 		}
+	}
 	}
 	
 	//메뉴 정보 삭제

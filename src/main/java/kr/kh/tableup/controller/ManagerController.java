@@ -220,6 +220,17 @@ public class ManagerController {
 	//메뉴 리스트 출력
 	@GetMapping("/menulist/{rt_num}")
 	public String menuListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
+
+
+		
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/";
+		}
+
+		if(rt_num != manager.getManager().getRm_rt_num()){
+			return "redirect:/manager/opertimelist/"+manager.getManager().getRm_rt_num();
+		}
+
 		System.out.println("menulist rt_num: " + rt_num);
 		List<MenuVO> menulist = managerService.getMenuList(rt_num);
 		model.addAttribute("menulist", menulist);
@@ -323,6 +334,17 @@ public class ManagerController {
 	//매장 상세 정보 출력
 	@GetMapping("/restaurantdetail/{rt_num}")
 	public String restaurantDetailPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
+
+
+		
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/";
+		}
+
+		if(rt_num != manager.getManager().getRm_rt_num()){
+			return "redirect:/manager/opertimelist/"+manager.getManager().getRm_rt_num();
+		}
+
 		RestaurantVO resdetail = managerService.getResDetail(rt_num);
 		if(resdetail != null) model.addAttribute("resdetail", resdetail);
 		model.addAttribute("manager", manager.getManager());
@@ -395,6 +417,18 @@ public class ManagerController {
 	//쿠폰 리스트
 	@GetMapping("/coupon/couponlist/{rt_num}")
 	public String couponListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
+
+
+		
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/";
+		}
+
+		if(rt_num != manager.getManager().getRm_rt_num()){
+			return "redirect:/manager/opertimelist/"+manager.getManager().getRm_rt_num();
+		}
+
+
 		System.out.println("couponlist rt_num: " + rt_num);
 		List<ResCouponVO> couponlist = managerService.getCouponList(rt_num);
 		
@@ -488,6 +522,17 @@ public class ManagerController {
 	//매장 소식 리스트
 	@GetMapping("/newslist/{rt_num}")
 	public String newsListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
+
+
+		
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/";
+		}
+
+		if(rt_num != manager.getManager().getRm_rt_num()){
+			return "redirect:/manager/opertimelist/"+manager.getManager().getRm_rt_num();
+		}
+
 		System.out.println("newslist rt_num: " + rt_num);
 		List<ResNewsVO> newslist = managerService.getNewsList(rt_num);
 
@@ -582,7 +627,18 @@ public class ManagerController {
 	@GetMapping("/restimelist/{rt_num}")
 	public String ResTimeListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
 		System.out.println("restimelist rt_num: " + rt_num);
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/";
+		}
+
+		if(rt_num != manager.getManager().getRm_rt_num()){
+			return "redirect:/manager/restimelist/"+manager.getManager().getRm_rt_num();
+		}
+
+
 		List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
+
+
 
 		model.addAttribute("restimelist", restimelist);
 		model.addAttribute("rt_num", rt_num);
@@ -676,6 +732,16 @@ public class ManagerController {
 	//영업 일자 페이지
 	@GetMapping("/opertimelist/{rt_num}")
 	public String OperTimePage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
+
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/";
+		}
+
+		if(rt_num != manager.getManager().getRm_rt_num()){
+			return "redirect:/manager/opertimelist/"+manager.getManager().getRm_rt_num();
+		}
+
+
 		System.out.println("opertimelist rt_num: " + rt_num);
 		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
 
@@ -817,6 +883,17 @@ public class ManagerController {
 	//매장 편의시설 목록 페이지
 	@GetMapping("/resfacilitylist/{rt_num}")
 	public String facilityListPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
+		
+		
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/";
+		}
+
+		if(rt_num != manager.getManager().getRm_rt_num()){
+			return "redirect:/manager/opertimelist/"+manager.getManager().getRm_rt_num();
+		}
+		
+		
 		System.out.println("resfacilitylist rt_num: " + rt_num);
 		List<FacilityVO> facility = managerService.getFacilityList();
 		List<RestaurantFacilityVO> facilitylist = managerService.getResFacilityList(rt_num);

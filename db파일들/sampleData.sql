@@ -173,6 +173,9 @@ INSERT INTO usercoupon(UC_STATE,UC_ReC_NUM,UC_us_num)
 INSERT INTO usfollow(uf_us_num, uf_TYPE, uf_FOREIGN)
 	VALUES (1,"RESTAURANT", 1),(1,"REVIEW", 1),(1,"RESTAURANT", 2);
 
+-- 결제내역 입력
+INSERT INTO `Payment`(pay_res_num, pay_method, pay_amount, pay_status,pay_time) 
+	VALUES(1,"card", 30000, "Y", 2025-05-16);
 
     
 

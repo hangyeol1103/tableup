@@ -17,7 +17,7 @@
 <body>
   <main div class="container mt-4"layout:fragment="content" >
     <h2 class="mb-4 fw-bold">메뉴 정보 변경</h2>
-    <form th:action="@{/manager/remake_menu}" method="post" id="signup-form" enctype="multipart/form-data">
+    <form th:action="@{/manager/menu/remake_menu}" method="post" id="signup-form" enctype="multipart/form-data">
       <input type="hidden" name="mn_num" th:value="${menu.mn_num}" />
       <div class="mb-3 form-group box">
         <label for="mn_name" class="form-label">메뉴이름</label>

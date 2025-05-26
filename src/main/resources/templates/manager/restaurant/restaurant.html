@@ -89,12 +89,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
       <!-- 하단 기능 버튼들 -->
       <div class="card-footer d-flex flex-wrap gap-2 justify-content-center">
-        <a class="btn btn-outline-primary" th:href="@{'/manager/menulist/' + ${restaurant.rt_num}}"><i class="bi bi-card-list"></i> 메뉴</a>
-        <a class="btn btn-outline-primary" th:href="@{'/manager/restaurantdetail/' + ${restaurant.rt_num}}"><i class="bi bi-info-circle"></i> 상세정보</a>
-        <a class="btn btn-outline-primary" th:href="@{'/manager/newslist/' + ${restaurant.rt_num}}"><i class="bi bi-megaphone"></i> 공지</a>
-        <a class="btn btn-outline-primary" th:href="@{'/manager/opertimelist/' + ${restaurant.rt_num}}"><i class="bi bi-clock"></i> 영업시간</a>
-        <a class="btn btn-outline-primary" th:href="@{'/manager/restimelist/' + ${restaurant.rt_num}}"><i class="bi bi-calendar-check"></i> 예약시간</a>
-        <a class="btn btn-outline-primary" th:href="@{'/manager/resfacilitylist/' + ${restaurant.rt_num}}"><i class="bi bi-shop"></i> 편의시설</a>
+        <a class="btn btn-outline-primary" th:href="@{'/manager/menu/menulist/' + ${restaurant.rt_num}}"><i class="bi bi-card-list"></i> 메뉴</a>
+        <a class="btn btn-outline-primary" th:href="@{'/manager/detail/restaurantdetail/' + ${restaurant.rt_num}}"><i class="bi bi-info-circle"></i> 상세정보</a>
+        <a class="btn btn-outline-primary" th:href="@{'/manager/news/newslist/' + ${restaurant.rt_num}}"><i class="bi bi-megaphone"></i> 공지</a>
+        <a class="btn btn-outline-primary" th:href="@{'/manager/opertime/opertimelist/' + ${restaurant.rt_num}}"><i class="bi bi-clock"></i> 영업시간</a>
+        <a class="btn btn-outline-primary" th:href="@{'/manager/restime/restimelist/' + ${restaurant.rt_num}}"><i class="bi bi-calendar-check"></i> 예약시간</a>
+        <a class="btn btn-outline-primary" th:href="@{'/manager/resfacility/resfacilitylist/' + ${restaurant.rt_num}}"><i class="bi bi-shop"></i> 편의시설</a>
         <a class="btn btn-outline-primary" th:href="@{'/manager/coupon/couponlist/' + ${restaurant.rt_num}}"><i class="bi bi-ticket-perforated"></i> 쿠폰</a>
       </div>
     </div>

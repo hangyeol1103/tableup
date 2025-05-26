@@ -17,7 +17,7 @@
 <body>
   <main div class="container mt-4"layout:fragment="content" >
     <h2>영업일자 변경</h2>
-    <form th:action="@{/manager/remake_opertime}" method="post" id="signup-form">
+    <form th:action="@{/manager/opertime/remake_opertime}" method="post" id="signup-form">
       <input type="hidden" name="bd_num" th:value="${opertime.bd_num}" />
       <div class="mb-3 form-group box">
         <label for="bd_date" class="form-label">영업 날짜</label>

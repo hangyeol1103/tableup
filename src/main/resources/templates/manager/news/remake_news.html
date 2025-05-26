@@ -15,7 +15,7 @@
 <body>
   <main div class="container mt-4"layout:fragment="content" >
     <h2>소식/공지사항 변경</h2>
-    <form th:action="@{/manager/remake_news}" method="post" id="signup-form" >
+    <form th:action="@{/manager/news/remake_news}" method="post" id="signup-form" >
        <input type="hidden" name="rn_num" th:value="${news.rn_num}" />
 
     <div class="mb-3 form-group box">

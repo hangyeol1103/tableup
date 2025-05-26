@@ -16,33 +16,32 @@
   </head>
 <body>
   <main div class="container mt-4"layout:fragment="content" >
-    <h2>예약시간 변경</h2>
-    <form th:action="@{/manager/remake_restime}" method="post" id="signup-form">
-      <input type="hidden" name="bh_num" th:value="${restime.bh_num}" />
+    <h2>예약시간 등록</h2>
+    <form th:action="@{/manager/restime/make_restime}" method="post" id="signup-form">
       <div class="mb-3 form-group box">
         <label for="bh_start" class="form-label">예약시간(시작)</label>
-        <input type="datetime-local" class="form-control" name="bh_start" id="bh_start" th:value="${restime.bh_start}" required >
+        <input type="datetime-local" class="form-control" name="bh_start" id="bh_start" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bh_end" class="form-label">예약시간(끝)</label>
-        <input type="datetime-local" class="form-control" name="bh_end" id="bh_end" th:value="${restime.bh_end}" required>
+        <input type="datetime-local" class="form-control" name="bh_end" id="bh_end" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bh_seat_max" class="form-label">최대 좌석 수</label>
-        <input type="text" class="form-control" name="bh_seat_max" id="bh_seat_max" th:value="${restime.bh_seat_max}" required>
+        <input type="text" class="form-control" name="bh_seat_max" id="bh_seat_max" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bh_table_max" class="form-label">최대 테이블 수</label>
-        <input type="text" class="form-control" name="bh_table_max" id="bh_table_max" th:value="${restime.bh_table_max}" required>
+        <input type="text" class="form-control" name="bh_table_max" id="bh_table_max" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bh_state" class="form-label">임의 닫힘 여부</label>
-         <select class="form-select" name="bh_state" id="bh_state" th:value="${restime.bh_state}" required>
+         <select class="form-select" name="bh_state" id="bh_state" required>
           <option value="false">열림</option>
           <option value="true">닫힘</option>
          </select>
       </div>
-      <button type="submit" class="btn btn-success w-100">예약시간 변경하기</button>
+      <button type="submit" class="btn btn-success w-100">예약시간 등록</button>
     </form>
   </main>
 </body>

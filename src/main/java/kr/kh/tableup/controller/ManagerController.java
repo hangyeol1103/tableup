@@ -30,11 +30,13 @@ import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
+import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
+import kr.kh.tableup.service.ReservationService;
 
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +62,9 @@ public class ManagerController {
 	
 	@Autowired
 	ManagerService managerService;
+
+	@Autowired
+	ReservationService reservationService;
 
 	
 
@@ -899,5 +904,17 @@ public class ManagerController {
 		return "redirect:/manager/resfacilitylist/"+rtNum;
 	}
 
+	@GetMapping("/reservation")
+	public String reservateion(Model model) {
+		
+		return "/manager/reservation";
+	}
+	@PostMapping("/reservation/date")
+	public String getMethodName(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {
+		List<ReservationVO> reservations = reservationService.getReservationList(customManager, date);
+		model.addAttribute("date", date);
+		model.addAttribute("reservations",reservations);
+		return "/manager/reservation_date";
+	}
 	
 }

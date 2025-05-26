@@ -19,5 +19,6 @@ public interface ReservationDAO {
   	                                      @Param("resEnd") LocalDateTime resEnd);
 
 	List<ReservationVO> selectExpiredReservations(LocalDateTime now);
+	List<ReservationVO> selectReservationList(int rt_num, String date);
 
 }

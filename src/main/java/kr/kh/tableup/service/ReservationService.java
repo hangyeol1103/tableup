@@ -1,6 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
+import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantManagerVO;
 
 @Service
 public class ReservationService {
@@ -54,6 +57,16 @@ public class ReservationService {
 		}
 
 		return true;
+	}
+
+	public List<ReservationVO> getReservationList(CustomManager customManager, String date) {
+		//매니저 로그인이 아닌 경우
+		if(customManager == null){
+			return null;
+		}
+		RestaurantManagerVO rm = customManager.getManager();
+		
+		return reservationDAO.selectReservationList(rm.getRm_rt_num(), date);
 	}
 
 }

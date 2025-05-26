@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.ReservationDAO">
+
+	<resultMap id="ReservationMap" type="ReservationVO">
+    <id property="res_num" column="res_num" />
+    <result property="res_us_num" column="res_us_num" />
+    <result property="res_rt_num" column="res_rt_num" />
+    <result property="res_time" column="res_time" />
+    <result property="res_end_time" column="res_end_time" />
+    <result property="res_person" column="res_person" />
+    <result property="res_request" column="res_request" />
+    <result property="res_created" column="res_created" />
+    <result property="res_state" column="res_state" />
+		<association property="user" javaType="UserVO">
+			<id property="us_num" column="us_num"/>
+			<result property="us_name" column="us_name"/>
+			<result property="us_phone" column="us_phone"/>
+			<result property="us_id" column="us_id"/>
+		</association>
+	</resultMap>
+
+
 	<!-- 예약 등록 -->
 	<insert id="insertReservation" parameterType="kr.kh.tableup.model.vo.ReservationVO">
 		INSERT INTO reservation (
@@ -42,6 +62,12 @@
     SET res_state = #{state}
     WHERE res_num = #{res_num}
 	</update>
-
+	<!-- 지정된 날짜에 맞는 예약 정보 및 회원 정보 가져오는 쿼리 -->
+	<select id="selectReservationList" resultMap="ReservationMap">
+		select * from reservation
+		join user on us_num = res_us_num
+		where res_rt_num = #{rt_num} and res_time like concat(#{date}, '%')
+		order by res_time
+	</select>
 	
 </mapper>

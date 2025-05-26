@@ -92,9 +92,9 @@ public class ManagerController {
 	@PostMapping("/signup")
 	public String postMethodName(RestaurantManagerVO rm) {
 		if(managerService.insertManager(rm)){
-			return "redirect:/manager/signup";
+			return "redirect:/manager/login";
 		}
-		return "redirect:/manager/login";
+		return "redirect:/manager/signup";
 	}
 	
 	@GetMapping("/restaurant/{rm_id}")

@@ -412,5 +412,10 @@ public class UserService {
   }
 
 
+  public UserVO selectUserById(String loginId) {
+    return userDAO.selectUserById(loginId);
+  }
+
+
 
 }

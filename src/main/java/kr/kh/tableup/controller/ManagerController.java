@@ -95,9 +95,10 @@ public class ManagerController {
 	public String restaurantPage(@PathVariable("rm_id") String rm_id,Model model, Principal principal) {
 		String loginId = principal.getName();
 		
+		
 		if (!loginId.equals(rm_id)) {
 			return "redirect:/manager";
-	}
+		}
 		RestaurantManagerVO manager = managerService.getManagerId(loginId);
 		//해당 매니저의 매장 외래키를 가져옴
 		int rm_num=manager.getRm_num();

@@ -26,6 +26,7 @@ import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.ReservationService;
+import kr.kh.tableup.service.UserService;
 
 @Controller
 @RequestMapping("/user/reservation")
@@ -35,27 +36,17 @@ public class ReservationController {
 	ManagerService managerService;
 
 	@Autowired
-	UserDAO userDAO;
-
-	@Autowired
-	ReservationDAO reservationDAO;
+	UserService userService;
 
 	@Autowired
 	ReservationService reservationService;
 
-	@Autowired
-	RestaurantDAO restaurantDAO;
 
 
 	@GetMapping("/confirm")
-	public String reservationConfirm(
-			@RequestParam int rt_num,
-			@RequestParam String date,
-			@RequestParam String time,
-			@RequestParam int person,
-			Model model) {
-
-		RestaurantVO restaurant = restaurantDAO.selectRestaurantByNum(rt_num);
+	public String reservationConfirm(@RequestParam int rt_num, @RequestParam String date, @RequestParam String time,
+																	 @RequestParam int person, Model model) {
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 
 		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("rt_num", rt_num);
@@ -66,23 +57,14 @@ public class ReservationController {
 	}
 
 	@PostMapping("/submit")
-	public String reservationSubmit(
-			@RequestParam int rt_num,
-			@RequestParam String date,
-			@RequestParam String time,
-			@RequestParam int person,
-			@RequestParam(required = false) String request,
-			Principal principal,
-			RedirectAttributes ra) {
-
+	public String reservationSubmit(@RequestParam int rt_num, @RequestParam String date, @RequestParam String time,
+																	@RequestParam int person, @RequestParam(required = false) String request, Principal principal, RedirectAttributes ra) {
 		if (principal == null) {
 			ra.addFlashAttribute("msg", "로그인이 필요합니다.");
-			return "redirect:/login";
+			return "redirect:/user/login";
 		}
-
 		String loginId = principal.getName();
-		UserVO user = userDAO.selectUserById(loginId);
-
+		UserVO user = userService.selectUserById(loginId);
 		LocalDateTime resTime;
 		try {
 			resTime = LocalDateTime.parse(date + " " + time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
@@ -118,19 +100,5 @@ public class ReservationController {
 		ra.addFlashAttribute("msg", "예약이 완료되었습니다.");
 		return "redirect:/";
 	}
-
-	@GetMapping("/manager_reservation/{rt_num}")
-	public String getMethodName(Model model,  @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
-		rt_num= manager.getManager().getRm_rt_num();
-		List<ReservationVO> reservationList = reservationService.getReservation(rt_num);
-		List<BusinessHourVO> restimeList = managerService.getResTimeList(rt_num);
-		
-
-		model.addAttribute("reservationList", reservationList);
-		model.addAttribute("restimeList", restimeList);
-		return "/reservation/manager_reservation";
-	}
 	
-
-
 }

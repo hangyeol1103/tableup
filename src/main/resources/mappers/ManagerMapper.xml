@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.ManagerDAO">
 
-	<resultMap id="FileVOtMap" type="kr.kh.tableup.model.vo.FileVO">
+	<resultMap id="FileVOtMap" type="FileVO">
     <id column="file_num" property="file_num"/>
     <result column="file_path" property="file_path"/>
     <result column="file_name" property="file_name"/>
@@ -83,22 +83,21 @@
 	</insert>
 
 	<update id="updateMenu">
-		update `menu` set	
-						mn_name=#{mn_name},
-						<choose>
-							<when test="mn_img == null">
-								mn_img=mn_img,
-							</when>
-							<otherwise>
-								mn_img=#{mn_img},
-							</otherwise>
-						</choose>
-						mn_price=#{mn_price},
-						mn_content=#{mn_content},
-						mn_mt_num=#{mn_mt_num},
-						mn_rt_num=#{mn_rt_num},
-						mn_div=#{mn_div}
-	where mn_num=#{mn_num}
+		update `menu` set mn_name=#{mn_name},
+			<choose>
+				<when test="mn_img == null">
+					mn_img=mn_img,
+				</when>
+				<otherwise>
+					mn_img=#{mn_img},
+				</otherwise>
+			</choose>
+		mn_price=#{mn_price},
+		mn_content=#{mn_content},
+		mn_mt_num=#{mn_mt_num},
+		mn_rt_num=#{mn_rt_num},
+		mn_div=#{mn_div}
+		where mn_num=#{mn_num}
 	</update>
 
 	<select id="selectMenu" resultType="MenuVO">
@@ -202,6 +201,15 @@
 			(#{bd_date}, #{bd_off}, #{bd_open},
 			 #{bd_close}, #{bd_brstart}, #{bd_brend},
 			 #{bd_loam}, #{bd_lopm}, #{bd_rt_num})
+	</insert>
+	
+	<insert id="insertOperTimeStamp" useGeneratedKeys="true" keyProperty="bd_num">
+		insert into `businessdate`
+			(bd_date, bd_off, bd_open, bd_close, bd_brstart, bd_brend, bd_loam, bd_lopm, bd_rt_num)
+		value
+			(#{bd_date}, #{bd_off}, #{bd_open_ts},
+			 #{bd_close_ts}, #{bd_brstart_ts}, #{bd_brend_ts},
+			 #{bd_loam_ts}, #{bd_lopm_ts}, #{bd_rt_num})
 	</insert>
 
 	<select id="selectBuisnessDate" resultType="BusinessDateVO">

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+  layout:decorate="~{layout/manager_layout.html}">
+  <head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+   
+
+    
+  </head>
+<body>
+  <main div class="container mt-4"layout:fragment="content" >
+    <h2>영업일자 등록</h2>
+    <form th:action="@{/manager/make_opertime}" method="post" id="signup-form">
+      <div class="mb-3 form-group box">
+        <label for="bd_date" class="form-label">영업 날짜</label>
+        <input type="date"  class="form-control"  id="bd_date" name="bd_date" required>
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bd_off" class="form-label">휴무일 여부</label>
+         <select class="form-select"  id="bd_off" name="bd_off" required>
+          <option value="false">여는날</option>
+          <option value="true">쉬는날</option>
+         </select>
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bd_open" class="form-label">개점 시간</label>
+        <input type="time" class="form-control time-input"  id="bd_open" name="bd_open">
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bd_close" class="form-label">마감 시간</label>
+        <input type="time" class="form-control time-input" id="bd_close" name="bd_close">
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="has_break" class="form-label">브레이크 타임 유무</label>
+        <select class="form-select time-input" id="has_break" name="has_break">
+          <option value="true">있음</option>
+          <option value="false">없음</option>
+        </select>
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bd_brstart" class="form-label">브레이크 시작시간</label>
+        <input type="time" class="form-control time-input break-time-input"  id="bd_brstart" name="bd_brstart">
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bd_brend" class="form-label">브레이크 마감시간</label>
+        <input type="time" class="form-control time-input break-time-input"  id="bd_brend" name="bd_brend">
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bd_loam" class="form-label">라스트오더(점심)</label>
+        <input type="time" class="form-control time-input"  id="bd_loam" name="bd_loam">
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bd_lopm" class="form-label">라스트오더(저녁)</label>
+        <input type="time" class="form-control time-input"  id="bd_lopm" name="bd_lopm">
+      </div>
+      <button type="submit" class="btn btn-success w-100">영업일자 등록</button>
+    </form>
+
+    <script>
+      $(document).ready(function () {
+
+        function updateTimeInputs() {
+          const isClosed = $('#bd_off').val() === 'true';
+          const hasBreak = $('#has_break').val() === 'true';
+
+          // 공통 시간 입력 필드 (개점, 마감, 라스트오더)
+          const timeFields = ['#bd_open', '#bd_close', '#bd_loam', '#bd_lopm'];
+          // 브레이크 타임 필드
+          const breakFields = ['#bd_brstart', '#bd_brend'];
+
+          // 모든 필드 초기화 및 비활성화/활성화 처리
+          timeFields.forEach(id => {
+            $(id).val(isClosed ? '' : $(id).val()); // 초기화
+            $(id).prop('disabled', isClosed);
+            $(id).prop('required', !isClosed);
+          });
+
+          // 브레이크 필드 제어
+          breakFields.forEach(id => {
+            const disable = isClosed || !hasBreak;
+            if (disable) {
+              $(id).val('');
+            }
+            $(id).prop('disabled', disable);
+            $(id).prop('required', !disable);
+          });
+
+          // 브레이크 select도 비활성화
+          $('#has_break').prop('disabled', isClosed);
+        }
+
+        // 이벤트 바인딩
+        $('#bd_off').change(updateTimeInputs);
+        $('#has_break').change(updateTimeInputs);
+
+        // 초기 실행
+        updateTimeInputs();
+      });
+    </script>
+
+
+  </main>
+</body>
+</html>

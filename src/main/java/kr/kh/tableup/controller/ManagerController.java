@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import org.springframework.ui.Model;
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessDateVO2;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -684,8 +687,20 @@ public class ManagerController {
 		return "/manager/make_opertime";
 	}
 
+
+	@GetMapping("/make_opertime_sub") 
+	public String makeOperTimeSubPage(Model model,  @AuthenticationPrincipal CustomManager manager) {
+		if(manager.getManager().getRm_id() == null) {
+			return "/manager/login";
+		}
+		model.addAttribute("managerId", manager.getManager().getRm_id());
+		model.addAttribute("url", "/make_opertime_sub");
+		return "/manager/make_opertime_sub";
+	}
+
+
 	@PostMapping("/make_opertime")
-	public String insertOperTime( BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager) {
+	public String insertOperTime(BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager) {
 		opertime.setBd_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
 		System.out.println(opertime);
@@ -695,16 +710,53 @@ public class ManagerController {
     opertime.setBd_rt_num(rtNum);
 
     if (rtNum <= 0) {
+				
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
         return "redirect:/manager/make";
     }
 
 		if(managerService.makeOperTime(opertime)){
+			System.out.println("bd_date = " + opertime.getBd_date());
 			return "redirect:/manager/opertimelist/"+rtNum;
 		}
 
-		return "/manager/make_opertime/";
+		return "/manager/make_opertime";
 	}
+
+
+	@PostMapping("/make_opertime_list")
+	@ResponseBody
+	public String insertOperTimeList(
+		//@RequestBody List<BusinessDateVO> operList
+			/*, @AuthenticationPrincipal CustomManager manager*/
+	) {
+			List<BusinessDateVO> operList = new ArrayList<>();
+			System.out.println("ajax 수신");
+			/*if (manager == null || manager.getManager() == null) {
+					return "로그인 정보가 없습니다.";
+			}*/
+			if (operList == null || operList.isEmpty()) {
+					return "등록할 영업일자가 없습니다.";
+			}
+			System.out.println("opertimelist: " + operList);
+			
+
+			//int rtNum = manager.getManager().getRm_rt_num();
+			int rtNum = 1;
+			int result = 0;
+			for (BusinessDateVO oper : operList) {
+					oper.setBd_rt_num(rtNum); 
+					if (oper.getBd_date() == null || oper.getBd_open() == null || oper.getBd_close() == null) {
+							continue; 
+					}
+
+					managerService.makeOperTime(oper); // insert 로직 호출
+					result++;
+			}
+
+			return "등록 성공" + result + "건";
+	}
+
 
 	//영업 일자 변경
 	@GetMapping("/remake_opertime/{bd_num}")
@@ -847,5 +899,5 @@ public class ManagerController {
 		return "redirect:/manager/resfacilitylist/"+rtNum;
 	}
 
-
+	
 }

@@ -1,6 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
-import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -359,21 +359,33 @@ public class ManagerService {
 		return managerDAO.selectOperTimeList(rt_num);
 	}
 
-	//영업일자 등록
-	public boolean makeOperTime(BusinessDateVO opertime) {
-		if(opertime==null){
-			return false;
-		}
-		boolean res =managerDAO.insertOperTime(opertime);
-		if(!res){
-			System.out.println("등록 실패");
-			return false;
-		}
-		System.out.println("등록 성공");
+	// 영업일자 등록
+	public boolean makeOperTime(BusinessDateVO oper) {
+		if (oper == null) return false;
+		System.out.println("영업일자 등록 : " + oper);
+		try {
+			// 날짜 + 시간 조합 (시간이 null이면 변환하지 않음)
+			String baseDate = oper.getBd_date(); // yyyy-MM-dd
 
-		//
-		return true;
+			oper.setBd_open_ts(toTimestamp(baseDate, oper.getBd_open()));
+			oper.setBd_close_ts(toTimestamp(baseDate, oper.getBd_close()));
+			oper.setBd_brstart_ts(toTimestamp(baseDate, oper.getBd_brstart()));
+			oper.setBd_brend_ts(toTimestamp(baseDate, oper.getBd_brend()));
+			oper.setBd_loam_ts(toTimestamp(baseDate, oper.getBd_loam()));
+			oper.setBd_lopm_ts(toTimestamp(baseDate, oper.getBd_lopm()));
+		} catch (Exception e) {
+			System.out.println("시간 변환 오류: " + e.getMessage());
+			return false;
+		}
+
+		return managerDAO.insertOperTimestamp(oper);
+		}
+
+	private Timestamp toTimestamp(String date, String time) {
+		if (date == null || time == null || time.isBlank()) return null;
+		return Timestamp.valueOf(date + " " + time + ":00");
 	}
+
 
 	public BusinessDateVO getBusinessDate(int bd_num) {
 		return managerDAO.selectBuisnessDate(bd_num);

@@ -23,7 +23,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   </style>
 </head>
 <body>
-	<main layout:fragment="content" class="container">
+	<main layout:fragment="content" class="container mt-3 mb-3">
 		 <div th:if="${restaurant != null}">
     <!-- 매장 정보 카드 -->
     <div class="card shadow-sm">
@@ -95,13 +95,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         <a class="btn btn-outline-primary" th:href="@{'/manager/opertimelist/' + ${restaurant.rt_num}}"><i class="bi bi-clock"></i> 영업시간</a>
         <a class="btn btn-outline-primary" th:href="@{'/manager/restimelist/' + ${restaurant.rt_num}}"><i class="bi bi-calendar-check"></i> 예약시간</a>
         <a class="btn btn-outline-primary" th:href="@{'/manager/resfacilitylist/' + ${restaurant.rt_num}}"><i class="bi bi-shop"></i> 편의시설</a>
-        <a class="btn btn-outline-primary" th:href="@{'/manager/couponlist/' + ${restaurant.rt_num}}"><i class="bi bi-ticket-perforated"></i> 쿠폰</a>
+        <a class="btn btn-outline-primary" th:href="@{'/manager/coupon/couponlist/' + ${restaurant.rt_num}}"><i class="bi bi-ticket-perforated"></i> 쿠폰</a>
       </div>
     </div>
   </div>
 
   <!-- 매장 미등록 상태 -->
-  <div th:unless="${restaurant != null}" class="text-center py-5">
+  <div th:unless="${restaurant != null}" class="text-center py-5 mb-3">
     <h4 class="mb-3 text-muted">아직 매장 정보가 등록되지 않았습니다.</h4>
     <button class="btn btn-success btn-lg" onclick="location.href='/manager/make'">매장 등록하러 가기</button>
   </div>

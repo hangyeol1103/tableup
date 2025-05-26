@@ -1,21 +1,286 @@
 <!DOCTYPE html>
-<html lang="en">
+<html 
+lang="en" 
+xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/layout.html}"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<title>테이블업 - 식당 예약</title>
 </head>
+<style>
+	.header-search-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .header-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 버튼과 검색창 간격 */
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  input[type="search"] {
+    width: 300px;
+  }
+</style>
 <body>
-	<h1>Test Page</h1>
-	<p>This is a test page.</p>
-	<p>Thymeleaf is working!</p>
+	<main layout:fragment="content">
+		<header id="main-header" xmlns:v-bind="http://www.w3.org/1999/xhtml" class="main-header inner-xs bg-cover outer40-bottom" style="background-image: url(&quot;/assets/image/content01-bg3.jpg&quot;);">
+			<div class="container-lnb"><div class="row text-center main-header-title">
+				<div class="col-md-12"><img src="/assets/image/home/img_blueribbon.png">
+				</div> 
+				<div class="col-md-12">
+					<div class="title">Table UP<br>당신의 밥상은 어떤 밥상?
+					</div>
+				</div>
+			</div> 
+			<div class="row">
+				<div class="col-md-12">
+					<form id="form-header-search" role="search" action="/search" method="get">
+						<div id="header-search-group" class="header-search-group dropdown">
+							<div class="header-search-child header-search-form">
+								<div class="input-header-search">
+									<div class="form-group has-feedback has-clear">
+										<input type="search" name="query" placeholder="맛집 검색어 입력"> 
+										<img src="/assets/image/home/img_close.png" class="form-control-clear form-control-feedback hidden">
+									</div> 
+									<input type="text" name="isSearchName" hidden="hidden"> 
+									<input type="text" name="location" hidden="hidden">
+								</div> 
+								<button type="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="키워드 검색" class="btn btn-header-search search-all">
+									<span class="icon-br-search"></span>
+								</button> 
+								<button type="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="상호 검색" class="btn btn-header-search search-name">
+									<span class="icon-br-cutlery"></span>
+								</button>
+							</div>
+						 	<!---->
+						</div>
+					</form> 
+						<div class="row">
+							<div class="col-md-12 ">
+								<div class="main-header-area">
+									<a href="#">
+									<label>
+										<img src="/assets/image/home/home_icon_1.png">
+										<span>맛집 검색</span>
+									</label>
+								</a> <a href="#">
+								<label>
+									<img src="/assets/image/home/home_icon_2.png"> 
+									<span>음식 종류별 검색</span>
+								</label>
+								</a> 
+								<a href="#">
+									<label>
+										<img src="/assets/image/home/home_icon_3.png"> 
+										<span>지역별 검색</span>
+									</label>
+								</a>
+								<span class="new-line visible-xs-block">&nbsp;</span> 
+								<a href="#">
+									<label>
+									<img src="/assets/image/home/home_icon_4.png"> 
+									<span>특징별 검색</span>
+								</label></a> 
+								<a href="#" class="order-2">
+									<label>
+									<img src="/assets/image/home/home_icon_5.png"> 
+									<span>블루리본 2025</span></label>
+								</a> 
+								<a href="#" class="order-2">
+									<label>
+									<img src="/assets/image/home/home_icon_6.png"> 
+									<span>멀티 검색</span>
+									</label>
+								</a> 
+								<span class="new-line visible-xs-block order-2">&nbsp;</span> 
+								<a href="#" class="order-2">
+									<label>
+									<img src="/assets/image/home/home_icon_7.png"> 
+									<span>주변 맛집 검색</span>
+									</label>
+								</a> 
+								<a href="#" class="order-3">
+									<label>
+									<img src="/assets/image/home/home_icon_8.png">
+								<span>브랜드 맛집</span></label>
+								</a> 
+								<a href="#" class="order-3">
+									<label>
+									<img src="/assets/image/home/home_icon_9.png"> 
+									<span>스토어</span>
+									</label>
+								</a> 
+								<a href="#" class="order-3 hidden-xs">
+									<label>
+									<img src="/assets/image/home/home_icon_10.png"> 
+									<span>많이가본 맛집</span>
+									</label>
+								</a> 
+								<span class="new-line visible-xs-block order-4">&nbsp;</span> 
+								<a href="#" class="order-4 visible-xs-block" style="width: 100%;">
+									<label style="width: 100%; text-align: center;">
+									<img src="/assets/image/home/home_icon_10_mobile.png" style="width: auto; height: 54px;"> 
+									<span>청결 평점으로 검색</span>
+									</label>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<section class="top10">
+		<div class="container-lnb">
+			<header class="main-section-header">
+				<h2>
+					<img src="">
+					테이블 업 매거진
+				</h2>
+				<p class="decription">여기에 뭘 넣을까요?</p>
+			</header>
+			<div class="text-right outer10-bottom">
+				<a href="" class="btn-more">
+					"더 보기"
+					<i class="icon-ep0right-open-big"></i>
+				</a>
+			</div>
+		</div>
+		<div id="main-top10">
+			<div class="owl-carousel owl-theme owl-main-featuring owl-loaded owl-drag" style>
+				<div class="owl-stage-outer">
+					<div class="owl-stage" style="transform: translate3d(300px, 300px, 300px); transition: all; width: 1160px; padding-left: 30px; padding-right: 30px;">
+						<div class="owl-item cloned" style="width: 45px; margin-right: 10px;">
+							<div class="magazine-thumb-item">
+								<a class="br-card br-card-1" href=""></a>
+							</div>
+						</div>
+					</div>
+					<div class="owl-nav disabled">
+						<div class="owl-prev">
+							<i class="icon-ep-left-open-big">
+							</i>
+						</div>
+						<div class="owl-next">
+							<i class="icon-ep-right-open-big">
+							</i>
+						</div>
+					</div>
+					<div class="text-center data-loading" style="display: none;">
+        		<i class="icon-loading-spin5 animate-spin"></i>
+      		</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="inner40 pc-background-gray">
+		<div class="container-lnb">
+				<header class="main-section-header">
+				<h3 class="title">요즘 &nbsp;<span style="color: red" class="top-image">핫한</span> 검색어</h3>
+				<p class="description">많이 찾는 검색어로 요즘 유행하는 맛집을 찾아보세요!</p>
+			</header>
+			<div class="main-section-keyword">
+				<div class="keyword-list">
+						<a href="">핫플맛집</a>
+						<a href="">카이막</a>
+						<a href="">오마카세</a>
+						<a href="">스시</a>
+						<a href="">하이엔드스시</a>
+						<a href="">평양냉면</a>
+						<a href="">생면파스타</a>
+						<a href="">스페셜티커피</a>
+						<a href="">에스프레소바</a>
+						<a href="">스시오마카세</a>
+						<a href="">한우오마카세</a>
+						<a href="">비건레스토랑</a>
+						<a href="">미들급스시</a>
+						<a href="">중저가스시</a>
+						<a href="">오션뷰</a>
+				</div>
+			</div>
+		</div>
+	</section>
 
-	<!-- Example of using Thymeleaf expressions -->
-	<p th:text="'Hello, ' + ${name} + '!'">Hello, User!</p>
+	<section class="inner50">
+		<div class="container-lnb">
 
-	<!-- Example of using a loop -->
-	<ul>
-		<li th:each="item : ${items}" th:text="${item}"></li>
-	</ul>
+				<header class="main-section-header">
+				<h3 class="title"><img src="/assets/image/home/img_feature.png"><span style="color: #1B47B3">목적</span>에 따라 찾는 맛집</h3>
+				<p class="description">특별한 날인가요? 목적에 맞는 맛집을 쉽게 찾아보세요!</p>
+			</header>
+
+			<div class="main-section-keyword">
+				<div class="keyword-list">
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=93">바다가 보이는</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=40">테라스가 있는</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=48">새벽까지 영업하는</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=55">가격대비 만족도가 높은</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=54">파인 다이닝을 할 수 있는</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=4">비즈니스 다이닝에 좋은</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=78">프라이빗룸이 있는</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=6">소개팅하기 좋은</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=8">연인과 같이 가면 좋은</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=49">아침을 먹을 수 있는</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=12">술 한잔하기 좋은</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=35">전망이 좋은</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=26">브런치 메뉴가 있는</a>
+						<a href="/search?tabMode=single&amp;searchMode=feature&amp;feature=77">전통주 리스트가 좋은</a>
+				</div>
+				<div class="keyword-more">
+					<a href="/search?tabMode=single&amp;searchMode=feature">
+						<i class="icon-ep-plus-circled"></i> 더 많은 목적별 찾아보기
+					</a>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="inner50 pc-background-gray">
+		<div class="container-lnb">
+			<header class="main-section-header">
+				<h2 class="title">
+					<img src="">
+					<span style="color :blue">최근</span>
+					"등록된 매장"
+				</h2>
+				<p class="description">새로 등록된 매장입니다.</p>
+			</header>
+		</div>
+	</section>
+	
+
+
+	<script id="tmpl-magazine" type="x-tmpl-mustache">
+		<div class="magazine-thumb-item">
+			<a class="br-card br-card-1" href="/magazine/{{id}}">
+					<figure>
+
+					<div class="embed-responsive embed-responsive-4by3 border">
+						<div class="embed-responsive-item bg-cover" style="background-image:url({{thumbnail}});"></div>
+					</div>
+
+					<figcaption>
+						<span class="card-category">{{category}}&nbsp;</span>
+						<h4 class="card-title">{{title}}</h4>
+
+						<p class="card-description">{{{overview}}}</p>
+						<span class="card-date">{{date}}</span>
+					</figcaption>
+				</figure>
+			</a>
+		</div>
+	</script>
+	</main>
 </body>
 </html>

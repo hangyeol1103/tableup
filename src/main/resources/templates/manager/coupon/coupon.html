@@ -34,13 +34,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			</div>
 			<div>
 				<!-- <button type="button" class="btn btn-outline-warning col-12 mb-3" onclick="location.href='/manager/remake_menu'">메뉴 정보 변경</button> -->
-				<a th:href="@{/manager/remake_coupon/{rec_num}(rec_num=${coupon.rec_num})}" class="btn btn-outline-warning col-12 mb-3">쿠폰 정보 변경</a>
-				<form th:action="@{/manager/coupon/delete_coupon/{rec_num}(rec_num=${coupon.rec_num})}"  method="post">
+				<a th:href="@{/manager/coupon/remake_coupon/{rec_num}(rec_num=${coupon.rec_num})}" class="btn btn-outline-warning col-12 mb-3">쿠폰 정보 변경</a>
+				<form th:action="@{/manager/delete_coupon/{rec_num}(rec_num=${coupon.rec_num})}"  method="post">
 					<button type="submit" class="btn btn-outline-danger col-12 mb-3" onclick="return confirm('정말 삭제하시겠습니까?');">쿠폰 삭제</button>
 				</form>
 				
 			</div>
-			 <a th:href="@{/manager/couponlist/{rt_num}(rt_num=${coupon.rec_rt_num})}" class="btn btn-outline-secondary col-12 mb-3">쿠폰 목록으로</a>
+			 <a th:href="@{/manager/coupon/couponlist/{rt_num}(rt_num=${coupon.rec_rt_num})}" class="btn btn-outline-secondary col-12 mb-3">쿠폰 목록으로</a>
 		</div>
 	</main>
 </body>

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -43,6 +45,18 @@ public class HomeController {
 		//System.out.println(regionList);
 		return "index";
 	}
+
+	@GetMapping("/test_orive_young")
+	public String test1(Model model) {
+		UserVO user = userService.getUserById("123");
+
+		model.addAttribute("sample", user.getUs_name());
+		model.addAttribute("url", "/test_orive_young");
+		List<RegionVO> regionList = userService.getRegionListWithWhole();
+		model.addAttribute("regionList", regionList);
+		return "/test_orive_young";
+	}
+	
 
 	
 }

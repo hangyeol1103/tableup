@@ -1,5 +1,6 @@
 package kr.kh.tableup.dao;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -133,6 +134,10 @@ public interface ManagerDAO {
 	void deletefile(int rt_num);
 
 	boolean updateRestaurant(RestaurantVO restaurant);
+
+	List<ResCouponVO> getExpiredCoupons(LocalDate now);
+
+	void updateCouponState(ResCouponVO c);
 
 	
 }

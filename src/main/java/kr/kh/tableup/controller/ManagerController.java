@@ -384,7 +384,7 @@ public class ManagerController {
 
 	//매니저 쿠폰 페이지
 	//쿠폰 리스트
-	@GetMapping("/couponlist/{rt_num}")
+	@GetMapping("/coupon/couponlist/{rt_num}")
 	public String couponListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
 		System.out.println("couponlist rt_num: " + rt_num);
 		List<ResCouponVO> couponlist = managerService.getCouponList(rt_num);
@@ -392,17 +392,17 @@ public class ManagerController {
 		model.addAttribute("couponlist", couponlist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
-		return "manager/couponlist";
+		return "manager/coupon/couponlist";
 	}
 
 	//쿠폰 등록 페이지
-	@GetMapping("/make_coupon")
+	@GetMapping("/coupon/make_coupon")
 	public String makeCouponPage(Model model) {
 		model.addAttribute("url", "/make_coupon");
-		return "/manager/make_coupon";
+		return "/manager/coupon/make_coupon";
 	}
 
-	@PostMapping("/make_coupon")
+	@PostMapping("/coupon/make_coupon")
 	public String insertCoupon(ResCouponVO coupon,  @AuthenticationPrincipal CustomManager manager) {
 		coupon.setRec_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
@@ -419,31 +419,31 @@ public class ManagerController {
     }
 
 		if(managerService.makeCoupon(coupon)){
-			return "redirect:/manager/couponlist/"+rtNum;
+			return "redirect:/manager/coupon/couponlist/"+rtNum;
 		}
 
-		return "/manager/make_coupon/";
+		return "/manager/coupon/make_coupon/";
 	}
 
 	//쿠폰 정보 출력 페이지
-	@GetMapping("/coupon/{rec_num}")
+	@GetMapping("/coupon/coupon/{rec_num}")
 	public String detailCoupon(Model model, @PathVariable int rec_num) {
 		ResCouponVO coupon = managerService.getCoupon(rec_num);
 		model.addAttribute("coupon", coupon);
-		return "/manager/coupon";
+		return "/manager/coupon/coupon";
 	}
 
 	//쿠폰 수정 페이지
-	@GetMapping("/remake_coupon/{rec_num}")
+	@GetMapping("/coupon/remake_coupon/{rec_num}")
 	public String reMakeCouponPage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int rec_num) {
 		ResCouponVO coupon = managerService.getCoupon(rec_num);
     System.out.println(coupon);
 		model.addAttribute("coupon", coupon);
 		model.addAttribute("url", "/remake_coupon");
-		return "/manager/remake_coupon";
+		return "/manager/coupon/remake_coupon";
 	}
 	
-	@PostMapping("/remake_coupon")
+	@PostMapping("/coupon/remake_coupon")
 	public String updateCoupon(ResCouponVO coupon,  @AuthenticationPrincipal CustomManager manager) {
 		coupon.setRec_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
@@ -459,20 +459,20 @@ public class ManagerController {
     }
 
 		if(managerService.updateCoupon(coupon)){
-			return "redirect:/manager/couponlist/"+rtNum;
+			return "redirect:/manager/coupon/couponlist/"+rtNum;
 		}
 		
-		return "/manager/remake_coupon";
+		return "/manager/coupon/remake_coupon";
 	}
 
 	//쿠폰 삭제
-	@PostMapping("/coupon/delete_coupon/{rec_num}")
+	@PostMapping("/delete_coupon/{rec_num}")
 	public String deleteCouponPage(@AuthenticationPrincipal CustomManager manager, @PathVariable int rec_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
 		 if(managerService.deleteCoupon(rec_num)) {
-        return "redirect:/manager/couponlist/"+rtNum;
+        return "redirect:/manager/coupon/couponlist/"+rtNum;
     }
-		return "redirect:/manager/coupon?rec_num=" + rec_num;
+		return "redirect:/manager/coupon/coupon?rec_num=" + rec_num;
 	}
 
 	//매장 소식 페이지

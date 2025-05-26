@@ -29,7 +29,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<tbody>
 				<tr th:each="coupon : ${couponlist}">
 					<td>
-						<a th:href="@{/manager/coupon/{rec_num}(rec_num = ${coupon.rec_num})}" th:text="${coupon.rec_content}"></a>
+						<a th:href="@{/manager/coupon/coupon/{rec_num}(rec_num = ${coupon.rec_num})}" th:text="${coupon.rec_content}"></a>
 					</td>
 					<td th:text="${coupon.rec_state != null ?(coupon.rec_state ? '공개' : '비공개'):'-'} ">상태</td>
 					<td th:text="${coupon.rec_period}">기간</td>
@@ -40,7 +40,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</tr>
 			</tbody>
 		</table>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_coupon'">쿠폰등록</button>
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/coupon/make_coupon'">쿠폰등록</button>
 		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 	</main>
 </body>

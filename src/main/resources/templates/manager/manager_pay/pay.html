@@ -16,10 +16,49 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 </head>
 <body>
 	<main layout:fragment="content" class="container">
-		<!-- 메뉴 정보가 등록이 되어 있으면-->
+		<!-- 매출 정보가 등록이 되어 있으면-->
 		<h1>매출 관리</h1>
+		<div class="">
+			<h3 class="mb-3" th:text="${restaurant.rt_name + '의 매출'}"></h3>
+		</div>
+		<div class="mb-3 row">
+      <label class="col-md-3 form-label">이번 달 매출:</label>
+      <div class="col-md-9" id="monthly-total">총 매출</div>
+    </div>
+		<div class="mb-3 row">
+      <label class="col-md-3 form-label">일일 매출:</label>
+      <div class="col-md-9" id="daily-total">일별 매출 매출</div>
+    </div>
 			
-		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+		<a th:href="@{/manager}" class="btn btn-outline-secondary col-12 mb-3">매니저 메인 화면으로 돌아가기</a>
+		<!-- 요번달 총 매출 출력 스크립트 -->
+		<script th:inline="javascript">
+			const paymentList=/*[[${paymentList}]]*/[];
+
+			function getCurrentMonthTotal(payment){
+				const now = new Date();
+				const month= now.getMonth();
+				const year = now.getFullYear();
+
+				let total = 0;
+
+				payment.forEach(p => {
+					if (!p.pay_time) return;
+
+					const date = new Date(p.pay_time); 
+					if (date.getFullYear() === year && date.getMonth() === month) {
+						total += p.pay_amount;
+					}
+				});
+				
+				return total;
+			}
+			console.log(paymentList);
+			const total = getCurrentMonthTotal(paymentList);
+			const formatted = total.toLocaleString() + ' 원';
+			document.getElementById('monthly-total').innerText = formatted;
+		
+		</script>
 	</main>
 </body>
 </html>

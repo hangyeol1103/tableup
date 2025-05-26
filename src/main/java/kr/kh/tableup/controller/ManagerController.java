@@ -27,14 +27,17 @@ import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
+import kr.kh.tableup.model.vo.PaymentVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
+import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
+import kr.kh.tableup.service.PaymentService;
 
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,7 +64,8 @@ public class ManagerController {
 	@Autowired
 	ManagerService managerService;
 
-	
+	@Autowired
+	PaymentService paymentService;
 
 	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
@@ -94,7 +98,6 @@ public class ManagerController {
 	@GetMapping("/restaurant/{rm_id}")
 	public String restaurantPage(@PathVariable("rm_id") String rm_id,Model model, Principal principal) {
 		String loginId = principal.getName();
-		
 		
 		if (!loginId.equals(rm_id)) {
 			return "redirect:/manager";
@@ -899,6 +902,24 @@ public class ManagerController {
     }
 		return "redirect:/manager/resfacilitylist/"+rtNum;
 	}
+
+	@GetMapping("/manager_pay/pay")
+	public String paymentPage(Model model, @AuthenticationPrincipal CustomManager manager, Principal principal){
+		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
+			 manager == null || manager.getManager() == null){
+			return "redirect:/manager/login";
+		}
+
+		List<PaymentVO> paymentList = paymentService.getPaymentList(manager.getManager().getRm_rt_num());
+		RestaurantVO restaurant = managerService.getRestaurantByNum(manager.getManager().getRm_rt_num());
+		System.out.println("예약 결제 내역"+paymentList);
+
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("manager",manager.getManager());
+		model.addAttribute("paymentList", paymentList);
+		return "/manager/manager_pay/pay";
+	}
+	
 
 	
 }

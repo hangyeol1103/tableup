@@ -330,5 +330,6 @@
 			rec_state = #{rec_state}
 		where rec_period =#{rec_period} 
 	</update>
+
 	
 </mapper>

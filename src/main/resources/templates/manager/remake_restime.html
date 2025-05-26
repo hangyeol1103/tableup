@@ -21,11 +21,11 @@
       <input type="hidden" name="bh_num" th:value="${restime.bh_num}" />
       <div class="mb-3 form-group box">
         <label for="bh_start" class="form-label">예약시간(시작)</label>
-        <input type="time" class="form-control" name="bh_start" id="bh_start" required>
+        <input type="datetime-local" class="form-control" name="bh_start" id="bh_start" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bh_end" class="form-label">예약시간(끝)</label>
-        <input type="time" class="form-control" name="bh_end" id="bh_end" required>
+        <input type="datetime-local" class="form-control" name="bh_end" id="bh_end" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bh_seat_max" class="form-label">최대 좌석 수</label>

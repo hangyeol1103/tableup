@@ -43,5 +43,10 @@
     WHERE res_num = #{res_num}
 	</update>
 
+	<!-- 매장 예약 모두 출력 -->
+	<select id="selectReservationList" resultType="ReservationVO">
+		select * from reservation where res_rt_num = #{rt_num}
+	</select>
+
 	
 </mapper>

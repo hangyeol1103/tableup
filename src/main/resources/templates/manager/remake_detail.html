@@ -17,28 +17,28 @@
       
   </head>
 <body>
-  <main div class="container mt-4"layout:fragment="content" >
+  <main class="container mt-4" layout:fragment="content">
     <h2>상세정보 변경</h2>
     <form th:action="@{/manager/remake_detail}" method="post" id="signup-form">
       <div class="mb-3 form-group box">
         <label for="rd_phone" class="form-label">전화번호</label>
-        <input type="text" class="form-control" name="rd_phone" id="rd_phone">
+        <input type="text" class="form-control" name="rd_phone" id="rd_phone" th:value="${res.rd_phone}">
       </div>
 			<div class="mb-3 form-group box">
         <label for="rd_closed_days" class="form-label">휴점일</label>
-        <input type="text" class="form-control" name="rd_closed_days" id="rd_closed_days">
+        <input type="text" class="form-control" name="rd_closed_days" id="rd_closed_days" th:value="${res.rd_closed_days}">
       </div>
       <div class="mb-3 form-group box">
         <label for="rd_info" class="form-label">안내및 유의사항</label>
-        <textarea class="form-control" name="rd_info" id="rd_info"></textarea>
+        <textarea class="form-control" name="rd_info" id="rd_info" th:text="${res.rd_info}"></textarea>
       </div>
       <div class="mb-3 form-group box">
         <label for="rd_home" class="form-label">홈페이지(없으면 입력x)</label>
-        <input type="text" class="form-control" name="rd_home" id="rd_home">
+        <input type="text" class="form-control" name="rd_home" id="rd_home" th:value="${res.rd_home}">
       </div>
       <div class="mb-3 form-group box">
         <label for="rd_addr" class="form-label">주소</label>
-        <input type="text" class="form-control" name="rd_addr" id="rd_addr">
+        <input type="text" class="form-control" name="rd_addr" id="rd_addr" th:value="${res.rd_addr}">
       </div>
       <button type="submit" class="btn btn-success w-100">상세 정보 변경 하기</button>
     </form>

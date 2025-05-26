@@ -360,6 +360,12 @@ public class ManagerController {
 	@GetMapping("/remake_detail")
 	public String reMakeDetailPage(Model model, @AuthenticationPrincipal CustomManager manager) {
 
+		int rtNum = manager.getManager().getRm_rt_num();
+		System.out.println("매니저의 매장 번호: " + rtNum);
+		RestaurantVO resdetail = managerService.getResDetail(rtNum);
+
+		model.addAttribute("res", resdetail);
+		System.out.println(resdetail);
 		model.addAttribute("url", "/remake_detail");
 		return "/manager/remake_detail";
 	}

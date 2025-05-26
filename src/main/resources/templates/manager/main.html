@@ -84,6 +84,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
         <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/restaurant'|">매장 관리</div>
         <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">매장 관리</div>
+
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/restaurant'|">매출 관리</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">매출 관리</div>
 			</div>
 			<div class="sub-box">
         <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/schedule/manager_schedulelist'|">일정 관리</div>

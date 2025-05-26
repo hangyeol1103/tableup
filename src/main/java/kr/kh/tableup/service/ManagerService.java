@@ -400,7 +400,27 @@ public class ManagerService {
 
 
 	public BusinessDateVO getBusinessDate(int bd_num) {
-		return managerDAO.selectBuisnessDate(bd_num);
+			BusinessDateVO oper = managerDAO.selectBuisnessDate(bd_num);
+
+			oper.setBd_open(trimTime(oper.getBd_open()));
+			oper.setBd_close(trimTime(oper.getBd_close()));
+			oper.setBd_brstart(trimTime(oper.getBd_brstart()));
+			oper.setBd_brend(trimTime(oper.getBd_brend()));
+			oper.setBd_loam(trimTime(oper.getBd_loam()));
+			oper.setBd_lopm(trimTime(oper.getBd_lopm()));
+
+			return oper;
+	}
+
+	private String trimTime(String datetime) {
+			if (datetime == null || datetime.isBlank()) return null;
+
+			try {
+					// "2025-05-07 14:50:00" → "14:50:00"
+					return datetime.trim().substring(11);
+			} catch (Exception e) {
+					return null;
+			}
 	}
 
 	//영업일자 변경

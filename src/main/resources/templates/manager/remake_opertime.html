@@ -4,11 +4,9 @@
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
   layout:decorate="~{layout/manager_layout.html}">
   <head>
-    <title>Bootstrap Example</title>
+    <title>영업일자 변경</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
    
 
@@ -21,45 +19,46 @@
       <input type="hidden" name="bd_num" th:value="${opertime.bd_num}" />
       <div class="mb-3 form-group box">
         <label for="bd_date" class="form-label">영업 날짜</label>
-        <input type="type"  class="form-control"  id="bd_date" name="bd_date" required>
+        <input type="date"  class="form-control"  id="bd_date" name="bd_date" th:value="${opertime.bd_date}" required>
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_off" class="form-label">휴무일 여부</label>
-         <select class="form-select"  id="bd_off" name="bd_off" required>
-          <option value="false">여는날</option>
-          <option value="true">쉬는날</option>
-         </select>
+        <select class="form-select" id="bd_off" name="bd_off" required>
+          <option th:value="false" th:selected="${opertime.bd_off == false}">여는날</option>
+          <option th:value="true" th:selected="${opertime.bd_off == true}">쉬는날</option>
+        </select>
+
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_open" class="form-label">개점 시간</label>
-        <input type="time" class="form-control time-input"  id="bd_open" name="bd_open">
+        <input type="time" class="form-control time-input"  id="bd_open" th:value="${opertime.bd_open}" name="bd_open">
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_close" class="form-label">마감 시간</label>
-        <input type="time" class="form-control time-input" id="bd_close" name="bd_close">
+        <input type="time" class="form-control time-input" id="bd_close" th:value="${opertime.bd_close}" name="bd_close">
       </div>
       <div class="mb-3 form-group box">
         <label for="has_break" class="form-label">브레이크 타임 유무</label>
         <select class="form-select time-input" id="has_break">
-          <option value="true">있음</option>
-          <option value="false">없음</option>
+          <option value="true" th:selected="${breakTimeExists == true}">있음</option>
+          <option value="false" th:selected="${breakTimeExists == false}">없음</option>
         </select>
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_brstart" class="form-label">브레이크 시작시간</label>
-        <input type="time" class="form-control time-input break-time-input"  id="bd_brstart" name="bd_brstart">
+        <input type="time" class="form-control time-input break-time-input"  id="bd_brstart" name="bd_brstart" th:value="${opertime.bd_brstart}" >
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_brend" class="form-label">브레이크 마감시간</label>
-        <input type="time" class="form-control time-input break-time-input"  id="bd_brend" name="bd_brend">
+        <input type="time" class="form-control time-input break-time-input"  id="bd_brend" name="bd_brend" th:value="${opertime.bd_brend}" >
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_loam" class="form-label">라스트오더(점심)</label>
-        <input type="time" class="form-control time-input"  id="bd_loam" name="bd_loam">
+        <input type="time" class="form-control time-input"  id="bd_loam" name="bd_loam" th:value="${opertime.bd_loam}">
       </div>
       <div class="mb-3 form-group box">
         <label for="bd_lopm" class="form-label">라스트오더(저녁)</label>
-        <input type="time" class="form-control time-input"  id="bd_lopm" name="bd_lopm">
+        <input type="time" class="form-control time-input"  id="bd_lopm" name="bd_lopm" th:value="${opertime.bd_lopm}">
       </div>
       <button type="submit" class="btn btn-success w-100">영업일자 변경</button>
     </form>

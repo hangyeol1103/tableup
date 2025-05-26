@@ -2,23 +2,27 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.model.util.CustomManager;
-import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.BusinessDateVO;
-import kr.kh.tableup.model.vo.BusinessDateVO2;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -30,23 +34,10 @@ import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
-import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
-
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -744,7 +735,7 @@ public class ManagerController {
 
 		System.out.println("opertimelist rt_num: " + rt_num);
 		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
-
+		System.out.println(opertimelist);
 		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
@@ -753,8 +744,10 @@ public class ManagerController {
 
 	//영업 일자 등록 페이지
 	@GetMapping("/make_opertime")
-	public String makeOperTimePage(Model model) {
+	public String makeOperTimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
 		
+		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("url", "/make_opertime");
 		return "/manager/make_opertime";
 	}
@@ -833,8 +826,18 @@ public class ManagerController {
 	//영업 일자 변경
 	@GetMapping("/remake_opertime/{bd_num}")
 	public String reMakeOperTimePage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int bd_num) {
+
 		BusinessDateVO opertime = managerService.getBusinessDate(bd_num);
+		if(opertime == null) {
+			return "redirect:/manager/opertimelist/"+manager.getManager().getRm_rt_num();
+		}
+
+		if(manager.getManager().getRm_rt_num() != opertime.getBd_rt_num()) {
+			return "redirect:/manager/opertimelist/"+manager.getManager().getRm_rt_num();
+		}
+
     System.out.println(opertime);
+		System.out.println(opertime.getBd_open_ts());
 		model.addAttribute("opertime", opertime);
 		model.addAttribute("url", "/remake_opertime");
 		return "/manager/remake_opertime";

@@ -67,7 +67,10 @@
 
   <button id="submitCalendar" class="btn btn-success w-100 mt-3">등록하기</button>
 
-  <script>
+  <script th:inline="javascript">
+
+    const opertimelist = [[${opertimelist}]];
+
     const today = new Date();
     let currentMonth = today.getMonth();
     let currentYear = today.getFullYear();
@@ -75,7 +78,7 @@
     function renderCalendar(year, month) {
       $('#calendar').empty();
       const container = $('<div class="calendar-month"></div>');
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const days = new Date(year, month + 1, 0).getDate();
       const firstDay = new Date(year, month, 1).getDay();
 
       $('#calendarTitle').text(`${year}년 ${month + 1}월`);
@@ -87,14 +90,33 @@
       row = $('<div class="calendar-row"></div>');
       for (let i = 0; i < firstDay; i++) row.append('<div class="calendar-cell"></div>');
 
-      for (let i = 1; i <= daysInMonth; i++) {
+      for (let i = 1; i <= days; i++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        row.append(`
-          <div class="calendar-cell" data-date="${dateStr}" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <strong>${i}</strong>
-            <div class="drop-content"></div>
-          </div>
-        `);
+        const match = opertimelist.find(op => op.bd_date === dateStr);
+
+        let cellHtml;
+
+        if (match) {
+          // 등록된 날짜면 drop 불가 + 상세 링크
+          cellHtml = `
+            <div class="calendar-cell bg-light text-muted" data-date="${dateStr}" style="cursor: pointer;" onclick="location.href='/manager/remake_opertime/${match.bd_num}'">
+              <strong>${i}</strong>
+              <div class="drop-content">
+                ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
+                ${match.bd_off ? '쉬는날' : '여는날'}
+              </div>
+            </div>`;
+        } else {
+          // 등록 안 된 날짜는 드래그앤드롭 가능
+          cellHtml = `
+            <div class="calendar-cell" data-date="${dateStr}" ondrop="drop(event)" ondragover="allowDrop(event)">
+              <strong>${i}</strong>
+              <div class="drop-content"></div>
+            </div>`;
+        }
+
+        row.append(cellHtml);
+
         if ((firstDay + i) % 7 === 0) {
           container.append(row);
           row = $('<div class="calendar-row"></div>');

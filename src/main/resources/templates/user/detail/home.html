@@ -31,25 +31,76 @@
 
     <title>식당 리스트</title>
    <style>
-    .icon-crop-box {
-      width: 80px;
-      height: 80px;
-      overflow: hidden;
-      position: relative;
-      display: inline-block;
-      margin: 4px;
+    .restaurant-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .icon-crop-box img {
-      position: absolute;
-      width: auto;
-      height: auto;
-      /*
-      position: absolute;
-      top: -220px;                /* 기본값 : -220 위쪽 여백 조정 (픽셀 단위로 조절) 들어가있는 이미지 기준 하나 높이 간격 : -200px */
-      /*left: -257px;           /* 기본값 : -257 왼쪽으로 아이콘 2개만큼 이동 (80px * 2) 들어가있는 이미지 기준 하나 넓이 간격 : -175px
-      height: auto;
-      width: auto; */
+    .facility-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 80px;
+      margin: 10px;
+    }
+
+    .facility-icon {
+      width: 80px; height: 80px; overflow: hidden;
+      background-image: url(/resources/static/img/facility/facility.jpg);
+      display: inline-block;
+    }
+
+    .facility-name {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #222;
+    }
+
+    .facility-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+    }
+
+    .facility-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      color: #333;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .check-icon {
+      color: #186ADE;
+    }
+
+    .dropdown-icon {
+      margin-left: auto;
+      color: #9E9E9E;
+    }
+
+    .drop-icon {
+      margin-left: auto;
+      color: #9E9E9E;
+    }
+
+    .facility-detail {
+      display: none;
+      background-color: #f5f5f5; /* 밝은 회색 배경 */
+      padding: 16px;
+      font-size: 14px;
+      color: #333;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .facility-detail .detail-icon {
+      margin-right: 8px;
+      color: #666;
     }
   </style>
   </head>
@@ -169,16 +220,39 @@
       </li>
     </ul>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
-      <h5 class="fw-bold">공지사항 ></h5>
+      <h5 class="fw-bold">공지사항></h5>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">편의시설</h5>
       <div class="section-body">
         <div class="restaurant-features mb-20">
-          <span th:each="facility : ${facilityList}" class="icon-crop-box">
-            <img src="/resources/static/img/facility/facility.jpg" th:alt="${facility.rf_detail != null ? facility.rf_detail : '편의시설'}" 
-            style="top: -220px; left: -257px;"/>
-          </span>
+          <div class="facility-box text-center" th:each="rf : ${restaurantFacilityList}">
+            <i class="facility-icon" th:alt="${rf.rf_detail != null ? rf.rf_detail : '편의시설'}"
+              th:style="'background-position: '+${rf.facility.fa_icon}+'; margin: 4px;'"></i>
+            <span class="facility-name" th:text="${rf.facility.fa_name}"></span>
+          </div>
+        </div>
+        <div class="facility-list ml-20 mr-20">
+          <div th:each="rf : ${restaurantFacilityList}">
+            <div class="facility-header">
+              <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                color="#186ADE" style="margin-right: 4px;"><path fill-rule="evenodd" clip-rule="evenodd"
+                d="M9.92115 14.9979L17.8647 7.08203L19.1353 8.35705L10.5453 16.917C10.3747 17.0871 10.1431 17.1816 9.9022 17.1795C9.66135 17.1774 9.43139 17.0789 9.26376 16.9059L4.85376 12.3559L6.14628 11.1032L9.92115 14.9979Z"
+                fill="currentColor"></path>
+              </svg>
+
+              <span class="facility-title" th:text="${rf.facility.fa_title}"></span>
+
+              <svg class="drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                color="#9E9E9E"><path fill-rule="evenodd" clip-rule="evenodd"
+                d="M11.9999 14.7274L6.63632 9.36377L5.36353 10.6366L11.3635 16.6366C11.715 16.988 12.2848 16.988 12.6363 16.6366L18.6363 10.6366L17.3635 9.36377L11.9999 14.7274Z"
+                fill="currentColor"></path>
+              </svg>
+            </div>
+            <div class="facility-detail" style="display: none;">
+              <p th:text="${rf.rf_detail}"></p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -211,5 +285,14 @@
         </button>
       </div>
     </div>
+
+    <script>
+      $(function() {
+        $(".facility-header").on("click", function () {
+          $(this).next(".facility-detail").slideToggle(200); // 부드럽게 토글
+        });
+      });
+    </script>
+
   </body>
 </html>

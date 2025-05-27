@@ -35,11 +35,13 @@ import kr.kh.tableup.model.vo.PaymentVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
+import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.PaymentService;
+import kr.kh.tableup.service.ReservationService;
 
 
 
@@ -55,7 +57,12 @@ public class ManagerController {
 	ManagerService managerService;
 
 	@Autowired
+	ReservationService reservationService;
+
+	@Autowired
 	PaymentService paymentService;
+
+	
 
 	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
@@ -1043,5 +1050,17 @@ public class ManagerController {
 	}
 	
 
+	@GetMapping("/reservation")
+	public String reservateion(Model model) {
+		
+		return "/manager/reservation";
+	}
+	@PostMapping("/reservation/date")
+	public String getMethodName(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {
+		List<ReservationVO> reservations = reservationService.getReservationList(customManager, date);
+		model.addAttribute("date", date);
+		model.addAttribute("reservations",reservations);
+		return "/manager/reservation_date";
+	}
 	
 }

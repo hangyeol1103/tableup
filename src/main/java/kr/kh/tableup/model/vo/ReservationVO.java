@@ -16,6 +16,7 @@ public class ReservationVO {
 	private LocalDateTime res_created;   // Creation time
 	private int res_state;       // Reservation state
 
+	UserVO user;
 	private String us_name;
 	private String rt_name;
 }

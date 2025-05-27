@@ -20,6 +20,8 @@ public interface ReservationDAO {
 
 	List<ReservationVO> selectExpiredReservations(LocalDateTime now);
 	
-	List<ReservationVO> selectReservationList(int rt_num);
+	//List<ReservationVO> selectReservationList(int rt_num);
+
+	List<ReservationVO> selectReservationList(int rt_num, String date);
 
 }

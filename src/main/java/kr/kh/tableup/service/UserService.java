@@ -182,10 +182,12 @@ public class UserService {
 
   public boolean insertReview(ReviewVO review) {
 
+    System.out.println(review);
     if (review.getRev_rt_num() <= 0 || review.getRev_visit() == null || review.getRev_visitor() <= 0
-        || review.getRev_content() == null || review.getUs_name() == null) {
+        || review.getRev_content() == null || review.getRev_us_num() < 1 ) {
       return false;
     }
+    System.out.println("널체크 통과");
 
     return userDAO.insertReview(review);
   }

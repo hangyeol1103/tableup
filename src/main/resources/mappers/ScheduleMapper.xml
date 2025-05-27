@@ -7,7 +7,10 @@
 	</select>
 
 	<select id="selectOperTimeByDay" resultType="BusinessDateVO">
-		select * from businessdate where bd_date between concat(#{date}, '00:00:00')and concat(#{date}, '23:59:59')
+		SELECT * 
+		FROM businessdate 
+		WHERE bd_date BETWEEN CONCAT(#{date}, ' 00:00:00') 
+										AND CONCAT(#{date}, ' 23:59:59')
 	</select>
 
 	

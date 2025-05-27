@@ -96,8 +96,10 @@ public class ScheduleController {
 	@GetMapping("/business-date")
 	@ResponseBody
 	public BusinessDateVO getBusinessDate(@RequestParam String date) {
-		System.out.println(date);	
-		return scheduleService.getOperTimeByDay(date); // JSON 반환
+		System.out.println(date);
+		BusinessDateVO db = scheduleService.getOperTimeByDay(date);
+		System.out.println(db);
+		return db; // JSON 반환
 	}
 
 }

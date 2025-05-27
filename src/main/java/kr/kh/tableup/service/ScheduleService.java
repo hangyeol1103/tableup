@@ -21,6 +21,8 @@ public class ScheduleService {
 	}
 
 	public BusinessDateVO getOperTimeByDay(String date) {
+		System.out.println("--------------");
+		System.out.println(date);
 		return scheduleDAO.selectOperTimeByDay(date);
 	}
 	

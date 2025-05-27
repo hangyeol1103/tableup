@@ -23,5 +23,9 @@ public interface ReservationDAO {
 	//List<ReservationVO> selectReservationList(int rt_num);
 
 	List<ReservationVO> selectReservationList(int rt_num, String date);
+	
+	List<ReservationVO> selectScheduleReservationList(int rt_num);
+
+	
 
 }

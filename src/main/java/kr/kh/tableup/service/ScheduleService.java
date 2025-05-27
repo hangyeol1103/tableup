@@ -19,5 +19,9 @@ public class ScheduleService {
 	public List<BusinessDateVO> getOperTimeList(int rt_num) {
 		return scheduleDAO.selectScheduleOperTimeList(rt_num);
 	}
+
+	public BusinessDateVO getOperTimeByDay(String date) {
+		return scheduleDAO.selectOperTimeByDay(date);
+	}
 	
 }

@@ -8,5 +8,7 @@ import kr.kh.tableup.model.vo.BusinessHourVO;
 public interface ScheduleDAO {
 
 	List<BusinessDateVO> selectScheduleOperTimeList(int rt_num);
+
+	BusinessDateVO selectOperTimeByDay(String date);
 	
 }

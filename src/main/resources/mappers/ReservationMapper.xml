@@ -76,5 +76,9 @@
 		where res_rt_num = #{rt_num} and res_time like concat(#{date}, '%')
 		order by res_time
 	</select>
+
+	<select id="selectScheduleReservationList" resultType="ReservationVO">
+		select * from reservation where res_state = 1
+	</select>
 	
 </mapper>

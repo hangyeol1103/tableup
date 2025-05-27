@@ -72,4 +72,10 @@ public class ReservationService {
 		return reservationDAO.selectReservationList(rm.getRm_rt_num(), date);
 	}
 
+		public List<ReservationVO> getScheduleReservationList(int rt_num) {
+			return reservationDAO.selectScheduleReservationList(rt_num);
+		}
+
+		
+
 }

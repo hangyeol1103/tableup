@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
@@ -71,7 +72,7 @@ public class ScheduleController {
       model.addAttribute("restimelist", restimelist);
 		}
 		
-		List<ReservationVO> reservationList = reservationService.getReservation(rt_num);
+		List<ReservationVO> reservationList = reservationService.getScheduleReservationList(rt_num);
 		List<LocalDate> dateList= new ArrayList<>();
 		LocalDate today = LocalDate.now();
 		for(int i=0;i<7;i++){
@@ -90,6 +91,13 @@ public class ScheduleController {
 		model.addAttribute("manager", manager);
 		model.addAttribute("url","/manager_schedulelist");
 		return "schedule/manager_schedulelist";
+	}
+
+	@GetMapping("/business-date")
+	@ResponseBody
+	public BusinessDateVO getBusinessDate(@RequestParam String date) {
+		System.out.println(date);	
+		return scheduleService.getOperTimeByDay(date); // JSON 반환
 	}
 
 }

@@ -1,5 +1,6 @@
 package kr.kh.tableup.dao;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -23,6 +24,8 @@ import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
 public interface ManagerDAO {
+	
+	List<RestaurantManagerVO> selectManagerList();
 
 	boolean insertManager(RestaurantManagerVO rm);
 
@@ -88,6 +91,8 @@ public interface ManagerDAO {
 
 	boolean insertOperTime(BusinessDateVO opertime);
 
+	boolean insertOperTimeStamp(BusinessDateVO oper);
+
 	BusinessDateVO selectBuisnessDate(int bd_num);
 
 	boolean insertResDetail(RestaurantVO resdetail);
@@ -134,6 +139,11 @@ public interface ManagerDAO {
 	void deletefile(int rt_num);
 
 	boolean updateRestaurant(RestaurantVO restaurant);
+
+	List<ResCouponVO> getExpiredCoupons(LocalDate now);
+
+	void updateCouponState(ResCouponVO c);
+
 
 	
 }

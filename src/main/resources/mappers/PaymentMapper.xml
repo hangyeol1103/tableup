@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kh.tableup.dao.PaymentDAO">
+
+<resultMap id="PaymentMap" type="PaymentVO">
+	<id property="pay_num" column="pay_num"/>
+	<result property="pay_res_num" column="pay_res_num"/>
+	<result property="pay_method" column="pay_method"/>
+	<result property="pay_amount" column="pay_amount"/>
+	<result property="pay_status" column="pay_status"/>
+	<result property="pay_time" column="pay_time"/>
+
+	<association property="reservation" javaType="ReservationVO">
+		<id property="res_num" column="res_num"/>
+		<result property="res_rt_num" column="res_rt_num"/>
+		<result property="res_time" column="res_time"/>
+		<result property="us_name" column="us_name"/>
+		<result property="rt_name" column="rt_name"/>
+	</association>
+</resultMap>
+
+<select id="selectPaymentList" resultMap="PaymentMap">
+	select * from payment 
+	join reservation on res_num= pay_res_num
+	where pay_status='Y' and reservation.res_rt_num=#{rt_num}
+</select>
+
+	
+</mapper>

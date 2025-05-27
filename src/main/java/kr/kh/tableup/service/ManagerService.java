@@ -1,5 +1,7 @@
 package kr.kh.tableup.service;
 
+import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,6 @@ import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
-import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -44,6 +45,26 @@ public class ManagerService {
 		if(rm == null){
 			return false;
 		}
+		List<RestaurantManagerVO> dbManager = managerDAO.selectManagerList();
+
+		for(RestaurantManagerVO db: dbManager){
+			// 아이디 중복 체크
+			if(db.getRm_id().equals(rm.getRm_id())){
+				System.out.println("중복된 아이디 입니다.");
+				return false;
+			}
+			// 사업자 번호 중복 체크
+			if(db.getRm_business().equals(rm.getRm_business())){
+				System.out.println("중복된 사업자 번호 입니다.");
+				return false;
+			}
+			// 전화 번호 중복 체크
+			if(db.getRm_phone().equals(rm.getRm_phone())){
+				System.out.println("중복된 전화 번호 입니다.");
+				return false;
+			}
+		}
+
 		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
 		return managerDAO.insertManager(rm);
 	}
@@ -225,6 +246,16 @@ public class ManagerService {
 		if(menu == null){
 			return false;
 		}
+
+		if(mn_img2.isEmpty()){
+			MenuVO dbMenu = managerDAO.selectMenu(menu.getMn_num());
+			if(dbMenu == null){
+				return false;
+			}
+			menu.setMn_img(dbMenu.getMn_img()); // 기존 이미지 유지
+			return managerDAO.updateMenu(menu);
+		}else{
+
 		//메뉴 이미지 작업
 		try{
 			String fileName = mn_img2.getOriginalFilename();
@@ -236,12 +267,14 @@ public class ManagerService {
 				menuImage = UploadFileUtils.uploadFile(uploadPath, newFileName, mn_img2.getBytes(),"menu");
 				menu.setMn_img(menuImage);
 			}
+
 			return managerDAO.updateMenu(menu);
 
 		} catch(Exception e){
 			e.printStackTrace();
 			return false;
 		}
+	}
 	}
 	
 	//메뉴 정보 삭제
@@ -358,22 +391,56 @@ public class ManagerService {
 		return managerDAO.selectOperTimeList(rt_num);
 	}
 
-	//영업일자 등록
-	public boolean makeOperTime(BusinessDateVO opertime) {
-		if(opertime==null){
+	// 영업일자 등록
+	public boolean makeOperTime(BusinessDateVO oper) {
+		if (oper == null) return false;
+		System.out.println("영업일자 등록 : " + oper);
+		try {
+			// 날짜 + 시간 조합 (시간이 null이면 변환하지 않음)
+			String baseDate = oper.getBd_date(); // yyyy-MM-dd
+
+			oper.setBd_open_ts(toTimestamp(baseDate, oper.getBd_open()));
+			oper.setBd_close_ts(toTimestamp(baseDate, oper.getBd_close()));
+			oper.setBd_brstart_ts(toTimestamp(baseDate, oper.getBd_brstart()));
+			oper.setBd_brend_ts(toTimestamp(baseDate, oper.getBd_brend()));
+			oper.setBd_loam_ts(toTimestamp(baseDate, oper.getBd_loam()));
+			oper.setBd_lopm_ts(toTimestamp(baseDate, oper.getBd_lopm()));
+		} catch (Exception e) {
+			System.out.println("시간 변환 오류: " + e.getMessage());
 			return false;
 		}
-		boolean res =managerDAO.insertOperTime(opertime);
-		if(!res){
-			System.out.println("등록 실패");
-			return false;
+
+		return managerDAO.insertOperTimeStamp(oper);
 		}
-		System.out.println("등록 성공");
-		return true;
+
+	private Timestamp toTimestamp(String date, String time) {
+		if (date == null || time == null || time.isBlank()) return null;
+		return Timestamp.valueOf(date + " " + time + ":00");
 	}
 
+
 	public BusinessDateVO getBusinessDate(int bd_num) {
-		return managerDAO.selectBuisnessDate(bd_num);
+			BusinessDateVO oper = managerDAO.selectBuisnessDate(bd_num);
+
+			oper.setBd_open(trimTime(oper.getBd_open()));
+			oper.setBd_close(trimTime(oper.getBd_close()));
+			oper.setBd_brstart(trimTime(oper.getBd_brstart()));
+			oper.setBd_brend(trimTime(oper.getBd_brend()));
+			oper.setBd_loam(trimTime(oper.getBd_loam()));
+			oper.setBd_lopm(trimTime(oper.getBd_lopm()));
+
+			return oper;
+	}
+
+	private String trimTime(String datetime) {
+			if (datetime == null || datetime.isBlank()) return null;
+
+			try {
+					// "2025-05-07 14:50:00" → "14:50:00"
+					return datetime.trim().substring(11);
+			} catch (Exception e) {
+					return null;
+			}
 	}
 
 	//영업일자 변경
@@ -502,6 +569,20 @@ public class ManagerService {
 		return managerDAO.selectFileList(rm_rt_num);
 	}
 
+	public void expireOldCoupons() {
+		List<ResCouponVO> expired =managerDAO.getExpiredCoupons(LocalDate.now());
+		for(ResCouponVO c: expired){
+			c.setRec_state(false);
+			managerDAO.updateCouponState(c);
+		}
+	}
+
+
 
 	
+
+	
+
+	
+
 }

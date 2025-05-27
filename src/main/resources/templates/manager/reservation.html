@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html 
+lang="en" 
+xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/manager_layout.html}"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<title>테이블업 - 매니저페이지</title>
+	<style>
+  
+  </style>
+</head>
+<body>
+	<main layout:fragment="content">
+    <div class="container d-flex mt-3">
+      <div class="calendar col-8">
+
+      </div>
+      <div class="reservation-list col-4">
+
+      </div>
+    </div>
+		<script>
+      getReservateionList(null, ".reservation-list");
+      /** 날짜가 주어지면 날짜에 맞는 예약 정보를 가져와 화면으로 만들어 출력하는 함수
+       * @param {Date} date 예약 날짜
+       * @param {String} target 화면을 출력할 요소의 선택자
+       * @returns {void}
+       * @author KH Instructor
+      */
+      function getReservateionList(date, target){
+        if(!date){
+          date = convertDateToString(new Date());
+        }
+        $.ajax({
+          url : '/manager/reservation/date',
+          method : 'post',
+          data : {date },
+          success : data =>{
+            $(target).html(data);
+          }
+        })
+      }
+      /** 날짜가 주어지면 날짜를 yyyy-MM-dd로 변환하여 반환하는 함수
+       * @param {Date} date 날짜
+       * @returns {String} 변환된 문자열
+       * @author KH Instructor
+       * */
+      function convertDateToString(date){
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1
+        const day = date.getDate().toString().padStart(2, '0'); // 날짜가 한 자리 수일 경우 0을 추가
+
+        return `${year}-${month}-${day}`;
+      }
+    </script>
+	</main>
+</body>
+</html>

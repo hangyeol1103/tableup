@@ -773,7 +773,7 @@ public class ManagerController {
 	}
 
 	//영업 일자 등록 페이지
-	@GetMapping("/opertime/make_opertime")
+	@GetMapping("/make_opertime")
 	public String makeOperTimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
 		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
 		
@@ -783,7 +783,7 @@ public class ManagerController {
 	}
 
 
-	@GetMapping("/opertime/make_opertime_sub") 
+	@GetMapping("/make_opertime_sub") 
 	public String makeOperTimeSubPage(Model model,  @AuthenticationPrincipal CustomManager manager) {
 		if(manager.getManager().getRm_id() == null) {
 			return "/manager/login";

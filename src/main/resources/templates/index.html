@@ -179,14 +179,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
 					<!-- 소분류 아이콘들 -->
 					<div class="d-flex flex-wrap gap-3" id="dfcIcons">
-						<div th:each="f : ${foodList}" 
-								class="dfc-item text-center" 
-								th:data-fc="${f.fc_main}">
-							<a th:href="@{/user/list(dfc_num=${f.dfc_num})}">
+						<div th:each="f : ${foodList}" class="dfc-item text-center" th:data-fc="${f.fc_main}" th:data-dfc="${f.dfc_num}">
+							<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
 								<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
 										onerror="this.src='/resources/static/img/index/default.jpg'" 
 										class="rounded" style="width:110px; height:110px; object-fit:cover;">
-								<div class="mt-2" th:text="${f.dfc_sub}"></div>
+								
+								<div class="mt-2">
+									<span th:if="${f.dfc_num == 0}" th:text="${f.dfc_sub}"></span>
+									<span th:unless="${f.dfc_num == 0}" th:text="${f.dfc_sub}"></span>
+								</div>
 							</a>
 						</div>
 					</div>
@@ -239,7 +241,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 							const dreg = this.getAttribute("data-dreg");
 							const reg = this.getAttribute("data-reg");
 
-							// 필요 시 Ajax 전환 가능
+							// 필요 시 Ajax 전환
 							const url = `/user/list?dreg_num=${dreg}&reg_num=${reg}`;
 							window.location.href = url;
 						});
@@ -271,25 +273,29 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
 			<script>
 				document.addEventListener("DOMContentLoaded", function () {
-					const buttons = document.querySelectorAll("#fcButtons button");
+					const fcButtons = document.querySelectorAll("#fcButtons button");
 					const items = document.querySelectorAll(".dfc-item");
 
-					buttons.forEach(button => {
+					fcButtons.forEach(button => {
 						button.addEventListener("click", () => {
-							const selectedFc = button.getAttribute("data-fc");
+							const $fc = button.getAttribute("data-fc");
 
 							items.forEach(item => {
 								const itemFc = item.getAttribute("data-fc");
+								const allDfc = item.getAttribute("data-dfc") === "0";
 
-								if (selectedFc === "0" || selectedFc === itemFc) {
-									item.style.display = "block";
+								if ($fc === "0") {
+									item.style.display = allDfc ? "none" : "block"; // 전체일 때는 전체만 숨김
 								} else {
-									item.style.display = "none";
+									item.style.display = ($fc === itemFc) ? "block" : "none";
 								}
 							});
 						});
 					});
+					const defaultButton = document.querySelector('#fcButtons button[data-fc="0"]');
+					if (defaultButton) defaultButton.click();
 				});
+
 			</script>
 
 

@@ -74,106 +74,109 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		</div>
 		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/schedule/make_schetime'">일정등록</button>
         <script>
-            const timeList = /*[[${timeList}]]*/ [];
-            const restimeList = /*[[${restimelist}]]*/ [];
-            const tableCount = /*[[${restaurant.rt_max_table}]]*/ 0;
-            const tableCapacity = /*[[${restaurant.rt_max_person}]]*/ 0;
+        const timeList = /*[[${timeList}]]*/ [];
+        const restimeList = /*[[${restimelist}]]*/ [];
+        const reservationList = /*[[${reservationList}]]*/ [];
 
-            function selectDate(button) {
+        function selectDate(button) {
             // 날짜 버튼 활성화
             document.querySelectorAll('.date-button').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
-            // 선택된 날짜에 해당하는 시간대 필터링
             const selectedDate = button.getAttribute('data-date');
             const filteredTimes = restimeList
-                .filter(item => item.date === selectedDate)
-                .map(item => item.time);
+            .filter(item => item.date === selectedDate)
+            .map(item => item.time);
 
-            // 시간대 목록 업데이트
             const timeListDiv = document.getElementById('time-list');
             timeListDiv.innerHTML = '';
-            // filteredTimes.forEach(time => {
-            //     const timeButton = document.createElement('button');
-            //     timeButton.className = 'list-group-item list-group-item-action time-button';
-            //     timeButton.textContent = time;
-            //     timeButton.setAttribute('data-time', time);
-            //     timeButton.onclick = () => selectTime(timeButton);
-            //     timeListDiv.appendChild(timeButton);
-            // });
+
             for (let h = 0; h < 24; h++) {
-                const timeStr = `${h.toString().padStart(2, '0')}:00`;
+            const timeStr = `${h.toString().padStart(2, '0')}:00`;
 
-                const timeButton = document.createElement('button');
-                timeButton.className = 'list-group-item list-group-item-action time-button';
-                timeButton.textContent = timeStr;
-                timeButton.setAttribute('data-time', timeStr);
+            const status = reservationList.find(item => item.date === selectedDate && item.time === timeStr);
+            const bh = restimeList.find(item => item.date === selectedDate && item.time === timeStr);
+            const isAvailable = filteredTimes.includes(timeStr);
+            const isFull = bh && status && status.tableCount >= bh.bh_table_max;
 
-                // 예약 가능한 시간만 클릭 가능하도록
-                if (filteredTimes.includes(timeStr)) {
-                    timeButton.onclick = () => selectTime(timeButton);
+            const timeButton = document.createElement('button');
+            timeButton.className = 'list-group-item list-group-item-action time-button';
+            timeButton.setAttribute('data-time', timeStr);
+            timeButton.setAttribute('data-date', selectedDate); // 추가로 보관
+
+            if (isAvailable) {
+                if (isFull) {
+                timeButton.innerHTML = `<span>${timeStr}</span> <small class="text-danger">(마감)</small>`;
+                timeButton.classList.add('disabled');
                 } else {
-                    timeButton.classList.add('disabled');
+                timeButton.textContent = timeStr;
+                timeButton.onclick = () => selectTime(timeButton);
                 }
+            } else {
+                timeButton.textContent = timeStr;
+                timeButton.classList.add('disabled');
+            }
 
-                timeListDiv.appendChild(timeButton);
+            timeListDiv.appendChild(timeButton);
             }
 
             // 테이블 정보 초기화
             document.getElementById('table-info').innerHTML = '';
-            }
+        }
 
-            function selectTime(button) {
-            // 시간대 버튼 활성화
+        function selectTime(button) {
             document.querySelectorAll('.time-button').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
-            const selectedDate = document.querySelector('.data-button.active').getAttribute('data-date');
+            const selectedDate = document.querySelector('.date-button.active').getAttribute('data-date');
             const selectedTime = button.getAttribute('data-time');
 
+            const bh = restimeList.find(item => item.date === selectedDate && item.time === selectedTime);
+            const maxTables = bh ? bh.bh_table_max : 0;
+            const maxSeats = bh ? bh.bh_seat_max : 0;
+
             const status = reservationList.find(item => item.date === selectedDate && item.time === selectedTime);
-            
-            // 테이블 정보 표시
+
             const tableInfoDiv = document.getElementById('table-info');
             tableInfoDiv.innerHTML = '';
 
-            if(status){
-                const table = status.tableCount;
-                const person = status.personCount;
+            const summary = document.createElement('div');
+            summary.className = 'mb-3';
 
-                const isFull = table >= tableCount;
+            if (status) {
+            const table = status.tableCount;
+            const person = status.personCount;
+            const isFull = table >= maxTables;
 
-                const summary =document.createElement('div');
-                summary.className= 'mb-3';
+            if (isFull) {
+                summary.innerHTML = `
+                <div class="alert alert-danger">
+                    예약 마감! (${table}/${maxTables} 테이블, ${person}/${maxSeats}명)
+                </div>`;
+                button.innerHTML = `<span>${selectedTime}</span> <small class="text-danger">(마감)</small>`;
+                button.classList.add('disabled');
+            } else {
+                summary.innerHTML = `
+                <div class="alert alert-info">
+                    현재 예약 상태 (${table}/${maxTables} 테이블, ${person}/${maxSeats}명)
+                </div>`;
+            }
+            } else {
+            summary.innerHTML = `
+                <div class="alert alert-secondary">
+                예약 없음
+                </div>`;
+            }
 
-                if(isFull){
-                    summary.innerHTML= `
-                        <div class="alert alert-danger">
-                            예약 마감! (${table}/${tableCount} 테이블, ${person}/${tableCapacity}명)
-                        </div>`;
-                    // 해당 시간 버튼 텍스트에 "예약마감" 추가
-                    button.textContent = `${selectTime}(마감)`; 
-                }
-                else{
-                    summary.innerHTML= `
-                        <div class="alert alert-info">
-                            현제 예약 상태 (${table}/${tableCount} 테이블, ${person}/${tableCapacity}명)
-                        </div>`;
-                }
+            tableInfoDiv.appendChild(summary);
 
-                tableInfoDiv.appendChild(summary);
+            for (let i = 1; i <= maxTables; i++) {
+            const tableBox = document.createElement('div');
+            tableBox.className = 'table-box';
+            tableBox.textContent = `T${i} (${maxSeats}명)`;
+            tableInfoDiv.appendChild(tableBox);
             }
-            else{
-                tableInfoDiv.innerHTML = '<div class="alert alert-secondary">예약 없음</div>';
-            }
-            //테이블 박스
-            for (let i = 1; i <= tableCount; i++) {
-                const tableBox = document.createElement('div');
-                tableBox.className = 'table-box';
-                tableBox.textContent = `T${i} (${tableCapacity}명)`;
-                tableInfoDiv.appendChild(tableBox);
-            }
-            }
+        }
         </script>
 
         

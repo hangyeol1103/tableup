@@ -211,7 +211,7 @@ public class ManagerController {
 		return "/manager/restaurant/remake";
 	}
 
-	@PostMapping("manager/restaurant/remake")
+	@PostMapping("/restaurant/remake")
 	public String updatePage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
 													 @AuthenticationPrincipal CustomManager manager ) {
 		System.out.println(manager);

@@ -646,7 +646,7 @@ public class ManagerController {
 		}
 
 		if(rt_num != manager.getManager().getRm_rt_num()){
-			return "redirect:/manager/restimelist/"+manager.getManager().getRm_rt_num();
+			return "redirect:/manager/restime/restimelist/"+manager.getManager().getRm_rt_num();
 		}
 
 
@@ -685,7 +685,7 @@ public class ManagerController {
 		if(managerService.makeResTiem(restime)){
 			System.out.println("bh_start = " + restime.getBh_start());
 			System.out.println("bh_state = " + restime.isBh_state());
-			return "redirect:/manager/restimelist/"+rtNum;
+			return "redirect:/manager/restime/restimelist/"+rtNum;
 		}
 
 		return "/manager/restime/make_restime/";

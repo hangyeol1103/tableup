@@ -138,11 +138,17 @@ public class ManagerController {
     }
 
 	@GetMapping("/restaurant/make")
-	public String makePage(Model model) {
+	public String makePage(Model model, @AuthenticationPrincipal CustomManager manager) {
 		List<FoodCategoryVO> foodcategory = managerService.getFoodCategory();
 		List<RegionVO> region = managerService.getRegion();
 		List<DetailRegionVO> dr = managerService.getDetailRegion();
 		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
+
+		if(manager.getManager().getRm_rt_num() > 0) {
+			// 매장 정보가 있는 매니저 → 매장 정보 수정 페이지로
+			System.out.println("매니저 정보가 있습니다.");
+			return "redirect:/manager/restaurant/remake";
+		}
 
 		System.out.println(region);
 		System.out.println(dr);
@@ -155,6 +161,19 @@ public class ManagerController {
 		model.addAttribute("dr", dr);
 		model.addAttribute("dfc", dfc);
 		return "/manager/restaurant/make";
+	}
+	
+	@PostMapping("/restaurant/make")
+	public String insertPage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
+													 @AuthenticationPrincipal CustomManager manager ) {
+		System.out.println(manager);
+		System.out.println(restaurant);
+		
+
+		if(managerService.insertRestaurant(restaurant, manager.getManager(), fileList)){
+			return "redirect:/manager/restaurant/restaurant";
+		}
+		return "redirect:/manager/restaurant/make";
 	}
 
 	@ResponseBody
@@ -169,18 +188,6 @@ public class ManagerController {
 	public List<DetailRegionVO> getDetailRegion(@RequestParam("regNum") int reg_num) {
     System.out.println("받은 regNum : " + reg_num);
 		return managerService.getDetailByRegNum(reg_num);
-	}
-	
-	@PostMapping("/restaurant/make")
-	public String insertPage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
-													 @AuthenticationPrincipal CustomManager manager ) {
-		System.out.println(manager);
-		System.out.println(restaurant);
-
-		if(managerService.insertRestaurant(restaurant, manager.getManager(), fileList)){
-			return "redirect:/manager/restaurant/restaurant";
-		}
-		return "redirect:/manager/restaurant/make";
 	}
 
 	//매장 정보 수정
@@ -807,12 +814,12 @@ public class ManagerController {
     if (rtNum <= 0) {
 				
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
+        return "redirect:/manager/restaurant/make";
     }
 
 		if(managerService.makeOperTime(opertime)){
 			System.out.println("bd_date = " + opertime.getBd_date());
-			return "redirect:/manager/opertime/opertimelist/"+rtNum;
+			return "redirect:/manager/opertimelist/"+rtNum;
 		}
 
 		return "/manager/opertime/make_opertime";

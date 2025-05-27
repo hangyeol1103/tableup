@@ -173,12 +173,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 										th:if="${fc.dfc_sub == '전체'}"
 										class="btn btn-outline-primary"
 										th:data-fc="${fc.fc_main}"
+										th:data-dfc="${fc.dfc_num}"
 										th:text="${fc.fc_main}">
 						</button>
 					</div>
 
 					<!-- 소분류 아이콘들 -->
 					<div class="d-flex flex-wrap gap-3" id="dfcIcons">
+						<div class="dfc-item text-center" >
+							<a th:href="@{/user/list}">
+								<img th:src="@{/resources/static/img/index/default.jpg}" 
+											onerror="this.src='/resources/static/img/index/default.jpg'" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+								<div class="mt-2">전체</div>
+							</a>
+						</div>
 						<div th:each="f : ${foodList}" class="dfc-item text-center" th:data-fc="${f.fc_main}" th:data-dfc="${f.dfc_num}">
 							<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
 								<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 

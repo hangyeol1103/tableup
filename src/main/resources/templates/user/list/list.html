@@ -86,7 +86,7 @@
                         th:data-dfc-num="${food.dfc_num}"
                         th:data-fc-num="${food.fc_num}"
                         th:text="${food.fc_main + ' : ' + food.dfc_sub}"
-                        th:selected="${food.dfc_num == dfc_num}"></option>
+                        th:selected="${dfc_num != null and fc_num != null and food.dfc_num == dfc_num and food.fc_num == fc_num}"></option>
               </select>
             </div>
           </div>

@@ -363,6 +363,8 @@ public class UserController {
 
         List<ScoreTypeVO> scoreTypeList = userService.getScoreTypeList();
 
+        System.out.println(dreg_num + " " + dfc_num + " " + reg_num + " " + fc_num);
+
         model.addAttribute("regionList", regionList);
         model.addAttribute("foodList", foodList);
 

@@ -213,7 +213,7 @@ public class ManagerController {
 		return "/manager/restaurant/remake";
 	}
 
-	@PostMapping("/restaurant/remake")
+	@PostMapping("manager/restaurant/remake")
 	public String updatePage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
 													 @AuthenticationPrincipal CustomManager manager ) {
 		System.out.println(manager);
@@ -258,7 +258,7 @@ public class ManagerController {
 		if (manager.getManager().getRm_rt_num() <= 0) {
 			// 매장 정보가 없는 매니저 → 매장 등록 페이지로
 			System.out.println("매니저 정보가 없습니다.");
-			return "redirect:/manager/make";
+			return "redirect:/manager/restaurant/make";
     }
 		List<MenuTypeVO> menutype = managerService.getMenuTypeList();
 		
@@ -281,7 +281,7 @@ public class ManagerController {
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
 				System.out.println("매니저 정보가 없습니다.");
-        return "redirect:/manager/make";
+        return "redirect:/manager/restaurant/make";
     }
 
 		if(managerService.makeMenu(menu,mn_img2)){
@@ -343,7 +343,7 @@ public class ManagerController {
 
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
+        return "redirect:/manager/restaurant/make";
     }
 
 		if(managerService.updateMenu(menu,mn_img2)){

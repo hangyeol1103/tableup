@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html 
-lang="en" 
+lang="ko" 
 xmlns:th="http://www.thymeleaf.org"
 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
 layout:decorate="~{layout/manager_layout.html}"
@@ -11,6 +11,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <!-- <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.css" rel="stylesheet"> -->
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
 	<title>테이블업 - 매니저페이지</title>
 	<style>
   
@@ -158,6 +159,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			var calendarEl = document.getElementById('calendar'); 
       //캘린더 생성
 			var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'ko',
 				initialView: 'dayGridMonth',
         //캘린더 헤더
         headerToolbar: {
@@ -182,7 +184,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         eventClick: function(info) {
           const clickedDate = info.event.startStr;
           calendar.getOption('dateClick')({ dateStr: clickedDate });
-        }
+        },
+        titleFormat: { year: 'numeric', month: 'long' }, // 👈 YYYY-MM 형식
 			});
 			calendar.render(); //캘린더 렌더링(화면에 출력)
       

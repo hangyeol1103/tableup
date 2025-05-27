@@ -10,6 +10,7 @@ import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -75,6 +76,9 @@ public interface UserDAO {
 
 
 	List<RestaurantFacilityVO> selectRestaurantFacilityList(@Param("rt_num") int rt_num);
+
+	List<ResNewsVO> selectResNewsList(@Param("rt_num") int rt_num);
+
 
 
 }

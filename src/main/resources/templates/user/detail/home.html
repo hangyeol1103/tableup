@@ -102,6 +102,14 @@
       margin-right: 8px;
       color: #666;
     }
+
+    .news-box {
+      border: 1px solid #e3e3e3;
+      border-radius: 12px;
+      padding: 16px;
+      background-color: #fff;
+      margin-top: 10px;
+    }
   </style>
   </head>
 
@@ -220,7 +228,10 @@
       </li>
     </ul>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
-      <h5 class="fw-bold">공지사항></h5>
+      <h5 class="fw-bold">소식</h5>
+      <div class="news-box">
+        <div th:each="rn : ${resNewsList}" th:text="${rn.rn_content}"></div>
+      </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">편의시설</h5>
@@ -257,15 +268,15 @@
       </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
-      <h5 class="fw-bold">지도 API</h5>
+      <h5 class="fw-bold">메뉴</h5>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
-      <h5 class="fw-bold">메뉴</h5>
+      <h5 class="fw-bold">지도 API</h5>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">식당 사진</h5>
       <div class="restaurant-pictures">
-        
+        <!-- 5/27 기준 dev 머지했는데 매장 사진 등록안돼서 일단 다른것부터 하고 이거 작업.-->
       </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">

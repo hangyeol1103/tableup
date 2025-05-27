@@ -35,6 +35,7 @@ import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -449,6 +450,7 @@ public class UserController {
     TagVO tag = userService.getTagByRestaurant(rt_num);
     // List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
+    List<ResNewsVO> resNewsList = userService.getResNewsList(rt_num);
 
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
@@ -456,6 +458,7 @@ public class UserController {
     model.addAttribute("tag", tag);
     // model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
+    model.addAttribute("resNewsList", resNewsList);
     return "user/detail/home";
   }
   

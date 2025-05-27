@@ -451,5 +451,11 @@ public class UserService {
   }
 
 
+	public List<ResNewsVO> getResNewsList(int rt_num) {
+		return userDAO.selectResNewsList(rt_num);
+	}
+
+
+
 
 }

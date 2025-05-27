@@ -438,5 +438,7 @@
 	<select id="selectRestaurantFacilityList" resultMap="RestaurantFacilityMap">
 		select * from restaurantfacility join facility on fa_num = rf_fa_num where rf_rt_num = #{rt_num}
 	</select>
-
+	<select id="selectResNewsList" resultType="ResNewsVO">
+		select * from resnews where rn_rt_num = #{rt_num}
+	</select>
 </mapper>

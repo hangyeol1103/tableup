@@ -28,6 +28,7 @@ import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.ReservationService;
+import kr.kh.tableup.service.ScheduleService;
 
 @Controller
 @RequestMapping("/schedule")
@@ -38,6 +39,9 @@ public class ScheduleController {
 
 	@Autowired
 	ReservationService reservationService;
+
+	@Autowired
+	ScheduleService scheduleService;
 
 	@GetMapping("/manager_schedulelist")
 	public String manager(@RequestParam(defaultValue = "0") int offset, Model model, @AuthenticationPrincipal CustomManager manager, Principal principal ) {
@@ -54,7 +58,7 @@ public class ScheduleController {
 		}
 		else{
 			RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
-			List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
+			List<BusinessDateVO> opertimelist = scheduleService.getOperTimeList(rt_num);
 			
 			List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
 			//터미널에 필요한 매장 정보 및 세부 정보들 출력

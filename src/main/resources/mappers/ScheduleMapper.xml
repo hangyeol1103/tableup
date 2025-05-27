@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kh.tableup.dao.ScheduleDAO">
+
+	<select id="selectScheduleOperTimeList" resultType="BusinessDateVO">
+		select * from businessdate where bd_rt_num=#{rt_num} and bd_date like concat(#{date},"%") order by bd_date desc
+	</select>
+
+	
+</mapper>

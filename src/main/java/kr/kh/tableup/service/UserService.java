@@ -251,24 +251,24 @@ public class UserService {
     return index < 0 ? null : fileName.substring(index);
   }
 
-  public List<RegionVO> getRegionList() {
+  public List<DetailRegionVO> getRegionList() {
 
     return userDAO.selectRegionList();
 	}
   
-	public 	Map<String, List<RegionVO>> getRegionMap() {
+	public 	Map<String, List<DetailRegionVO>> getRegionMap() {
 		
-     List<RegionVO> list = getRegionList();
+     List<DetailRegionVO> list = getRegionList();
 
     // 대분류별
-    Map<String, List<RegionVO>> regionMap = list.stream()
-        .collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+    Map<String, List<DetailRegionVO>> regionMap = list.stream()
+        .collect(Collectors.groupingBy(DetailRegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
 
     // 각 그룹 앞에 "전체" 추가
-    for (Map.Entry<String, List<RegionVO>> entry : regionMap.entrySet()) {
-        RegionVO first = entry.getValue().get(0);
+    for (Map.Entry<String, List<DetailRegionVO>> entry : regionMap.entrySet()) {
+        DetailRegionVO first = entry.getValue().get(0);
 
-        RegionVO all = new RegionVO();
+        DetailRegionVO all = new DetailRegionVO();
         all.setReg_num(first.getReg_num()); // 대분류 번호 그대로
         all.setReg_main(first.getReg_main());
         all.setDreg_num(0); // 전체 구분용
@@ -281,19 +281,19 @@ public class UserService {
     
 	} //이게 잘안돼서 밑에걸로
 
-  public List<RegionVO> getRegionListWithWhole() {
-    List<RegionVO> original = getRegionList(); // 기본 목록
+  public List<DetailRegionVO> getRegionListWithWhole() {
+    List<DetailRegionVO> original = getRegionList(); // 기본 목록
 
-    Map<String, List<RegionVO>> grouped = original.stream()
-        .collect(Collectors.groupingBy(RegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
+    Map<String, List<DetailRegionVO>> grouped = original.stream()
+        .collect(Collectors.groupingBy(DetailRegionVO::getReg_main, LinkedHashMap::new, Collectors.toList()));
 
-    List<RegionVO> result = new ArrayList<>();
-    for (Map.Entry<String, List<RegionVO>> entry : grouped.entrySet()) {
+    List<DetailRegionVO> result = new ArrayList<>();
+    for (Map.Entry<String, List<DetailRegionVO>> entry : grouped.entrySet()) {
         String regMain = entry.getKey();
-        List<RegionVO> list = entry.getValue();
+        List<DetailRegionVO> list = entry.getValue();
 
-        // 첫 RegionVO 하나를 복사해서 "전체"로 만들기
-        RegionVO whole = new RegionVO();
+        // 첫 DetailRegionVO 하나를 복사해서 "전체"로 만들기
+        DetailRegionVO whole = new DetailRegionVO();
         whole.setReg_main(regMain);
         whole.setDreg_sub("전체");
         whole.setDreg_num(0);
@@ -306,12 +306,40 @@ public class UserService {
     return result;
 }
 
+
+
   
 
-  public List<FoodCategoryVO> getFoodCategoryList() {
+  public List<DetailFoodCategoryVO> getFoodCategoryList() {
 
     return userDAO.selectFoodCategoryList();
   }
+
+  public List<DetailFoodCategoryVO> getFoodCategoryListWithWhole(){
+    List<DetailFoodCategoryVO> original = getFoodCategoryList(); // 기본 목록
+
+    Map<String, List<DetailFoodCategoryVO>> grouped = original.stream()
+        .collect(Collectors.groupingBy(DetailFoodCategoryVO::getFc_main, LinkedHashMap::new, Collectors.toList()));
+
+    List<DetailFoodCategoryVO> result = new ArrayList<>();
+    for (Map.Entry<String, List<DetailFoodCategoryVO>> entry : grouped.entrySet()) {
+        String fcMain = entry.getKey();
+        List<DetailFoodCategoryVO> list = entry.getValue();
+
+        // 첫 DetailFoodCategoryVO 하나를 복사해서 "전체"로 만들기
+        DetailFoodCategoryVO whole = new DetailFoodCategoryVO();
+        whole.setFc_main(fcMain);
+        whole.setDfc_sub("전체");
+        whole.setDfc_num(0);
+        whole.setFc_num(list.get(0).getFc_num()); // 대분류 번호 복사
+
+        result.add(whole);      // "한식 전체"
+        result.addAll(list);    // 한식:불고기, 한식:비빔밥 ...
+    }
+
+    return result;
+  }
+
 
   public List<RestaurantVO> getRestaurantList(Criteria cri) {
     if (cri == null) {

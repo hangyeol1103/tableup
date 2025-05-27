@@ -227,14 +227,14 @@
 		file_path, file_name, File_type, File_FOREIGN, file_tag, FILE_RES_NUM ) VALUES ( #{file_path},
 		#{file_name}, #{file_type}, #{file_foreign}, #{file_tag}, #{file_res_num} ) </insert>
 
-		<select id="selectRegionList" resultType="RegionVO">
-		SELECT reg_num, reg_main, dreg_num, dreg_sub FROM region
-		RIGHT JOIN detailregion ON reg_num = dreg_reg_num
+		<select id="selectRegionList" resultType="DetailRegionVO">
+		SELECT reg_num, reg_main, dreg_num, dreg_sub FROM detailregion
+		RIGHT JOIN region ON reg_num = dreg_reg_num
 		ORDER BY reg_num, dreg_num
 		</select>
 
-	<select id="selectFoodCategoryList" resultType="FoodCategoryVO"> SELECT
-		fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory RIGHT JOIN detailfoodcategory ON fc_num =
+	<select id="selectFoodCategoryList" resultType="DetailFoodCategoryVO"> SELECT
+		fc_num, fc_main, dfc_num, dfc_sub, dfc_fc_num FROM foodcategory RIGHT JOIN detailfoodcategory ON fc_num =
 		dfc_fc_num </select>
 
 	<select id="selectRestaurantList" resultType="RestaurantVO">

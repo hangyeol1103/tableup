@@ -1049,6 +1049,12 @@ public class ManagerController {
 		return "/manager/manager_pay/pay";
 	}
 	
+	
+	@GetMapping("/manager_reservation")
+	public String reservateionManager(Model model) {
+		
+		return "/manager/reservation/manager_reservation";
+	}
 
 	@GetMapping("/reservation")
 	public String reservateion(Model model) {
@@ -1060,7 +1066,7 @@ public class ManagerController {
 		List<ReservationVO> reservations = reservationService.getReservationList(customManager, date);
 		model.addAttribute("date", date);
 		model.addAttribute("reservations",reservations);
-		return "/manager/reservation_date";
+		return "/manager/reservation/reservation_date";
 	}
 	
 }

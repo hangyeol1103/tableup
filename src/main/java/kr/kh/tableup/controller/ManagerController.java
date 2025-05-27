@@ -1066,6 +1066,7 @@ public class ManagerController {
 		List<ReservationVO> reservations = reservationService.getReservationList(customManager, date);
 		model.addAttribute("date", date);
 		model.addAttribute("reservations",reservations);
+		System.out.println("reservaions = " + reservations);
 		return "/manager/reservation/reservation_date";
 	}
 	

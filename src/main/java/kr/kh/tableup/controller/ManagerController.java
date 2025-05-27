@@ -4,7 +4,9 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -910,11 +912,9 @@ public class ManagerController {
 		return "/manager/reservation";
 	}
 	@PostMapping("/reservation/date")
-	public String getMethodName(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {
-		List<ReservationVO> reservations = reservationService.getReservationList(customManager, date);
-		model.addAttribute("date", date);
-		model.addAttribute("reservations",reservations);
-		return "/manager/reservation_date";
+	@ResponseBody
+	public List<ReservationVO> getMethodName(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {
+		return reservationService.getReservationList(customManager, date);
 	}
 	
 }

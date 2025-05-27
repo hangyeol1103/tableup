@@ -17,11 +17,12 @@
   </head>
 <body>
   <main div class="container mt-4"layout:fragment="content" >
-    <h2>매장 편의시설 등록</h2>
-    <form th:action="@{/manager/make_resfacility}" method="post" id="signup-form" >
+    <h2>매장 편의시설 변경</h2>
+    <form th:action="@{/manager/resfacility/remake_resfacility}" method="post" id="signup-form" >
+      <input type="hidden" name="rf_num" th:value="${resfacility.rf_num}" />
       <div class="mb-3 form-group box">
         <label for="rf_fa_num" class="form-label">편의시설</label>
-        <select class="form-select" id="rf_fa_num" name="rf_fa_num" required>
+        <select class="form-select" id="rf_fa_num" name="rf_fa_num" th:value="${resfacility.rf_fa_num}" required>
           <option value="">편의시설 선택</option>
           <th:block th:each="fa : ${facility}">
             <option th:value="${fa.fa_num}" th:text="${fa.fa_name}"></option>
@@ -30,10 +31,10 @@
       </div>
       <div class="mb-3 form-group box">
         <label for="rf_detail" class="form-label">편의시설 설명</label>
-        <input type="text" class="form-control" name="rf_detail" id="rf_detail" required>
+        <input type="text" class="form-control" name="rf_detail" id="rf_detail" th:value="${resfacility.rf_detail}" required>
       </div>
       
-      <button type="submit" class="btn btn-success w-100">매장 편의시설 등록</button>
+      <button type="submit" class="btn btn-success w-100">매장 편의시설 변경</button>
     </form>
 
   </main>

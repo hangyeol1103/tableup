@@ -40,6 +40,10 @@
 
 		<result column="dfc_fc_num" property="fc_num"/>
 	</resultMap>
+	
+	<select id="selectManagerList" resultType="RestaurantManagerVO">
+		select * from restaurantmanager
+	</select>
 
 	<insert id="insertManager">
 		insert into restaurantmanager (rm_id, rm_pw, rm_email, rm_name, rm_phone, rm_business)
@@ -363,5 +367,6 @@
 			rec_state = #{rec_state}
 		where rec_period =#{rec_period} 
 	</update>
+
 	
 </mapper>

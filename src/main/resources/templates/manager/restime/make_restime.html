@@ -16,9 +16,8 @@
   </head>
 <body>
   <main div class="container mt-4"layout:fragment="content" >
-    <h2>예약시간 변경</h2>
-    <form th:action="@{/manager/remake_restime}" method="post" id="signup-form">
-      <input type="hidden" name="bh_num" th:value="${restime.bh_num}" />
+    <h2>예약시간 등록</h2>
+    <form th:action="@{/manager/restime/make_restime}" method="post" id="signup-form">
       <div class="mb-3 form-group box">
         <label for="bh_start" class="form-label">예약시간(시작)</label>
         <input type="datetime-local" class="form-control" name="bh_start" id="bh_start" required>
@@ -42,7 +41,7 @@
           <option value="true">닫힘</option>
          </select>
       </div>
-      <button type="submit" class="btn btn-success w-100">예약시간 변경하기</button>
+      <button type="submit" class="btn btn-success w-100">예약시간 등록</button>
     </form>
   </main>
 </body>

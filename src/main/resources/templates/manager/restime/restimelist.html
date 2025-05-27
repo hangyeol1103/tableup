@@ -45,10 +45,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<td th:text="${restime.bh_state != null ? (restime.bh_state ? '닫힘' : '열림') : '-'}">닫힘여부</td>
 					<td class="">
 						<!-- <a th:href="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" class="btn btn-ouline-warning">변경</a> -->
-						<form th:action="@{/manager/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" method="get" style="display:inline;">
+						<form th:action="@{/manager/restime/remake_restime/{bh_num}(bh_num=${restime.bh_num})}" method="get" style="display:inline;">
 							<button type="submit" class="btn btn-outline-warning">변경</button>
 						</form>
-						<form th:action="@{/manager/delete_restime/{bh_num}(bh_num=${restime.bh_num})}" method="post" style="display:inline;">
+						<form th:action="@{/manager/restime/delete_restime/{bh_num}(bh_num=${restime.bh_num})}" method="post" style="display:inline;">
 							<button type="submit" class="btn btn-outline-danger">삭제</button>
 						</form>
 					</td>
@@ -59,8 +59,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</tr>
 			</tbody>
 		</table>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_restime'">예약 가능 시간 등록</button>
-		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/restime/make_restime'">예약 가능 시간 등록</button>
+		<a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 	</main>
 </body>
 </html>

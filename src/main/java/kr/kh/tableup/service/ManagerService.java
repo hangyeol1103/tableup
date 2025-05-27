@@ -45,6 +45,26 @@ public class ManagerService {
 		if(rm == null){
 			return false;
 		}
+		List<RestaurantManagerVO> dbManager = managerDAO.selectManagerList();
+
+		for(RestaurantManagerVO db: dbManager){
+			// 아이디 중복 체크
+			if(db.getRm_id().equals(rm.getRm_id())){
+				System.out.println("중복된 아이디 입니다.");
+				return false;
+			}
+			// 사업자 번호 중복 체크
+			if(db.getRm_business().equals(rm.getRm_business())){
+				System.out.println("중복된 사업자 번호 입니다.");
+				return false;
+			}
+			// 전화 번호 중복 체크
+			if(db.getRm_phone().equals(rm.getRm_phone())){
+				System.out.println("중복된 전화 번호 입니다.");
+				return false;
+			}
+		}
+
 		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
 		return managerDAO.insertManager(rm);
 	}
@@ -552,6 +572,7 @@ public class ManagerService {
 			managerDAO.updateCouponState(c);
 		}
 	}
+
 
 
 	

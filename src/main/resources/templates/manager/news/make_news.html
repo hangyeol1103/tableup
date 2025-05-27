@@ -18,7 +18,7 @@
 <body>
   <main div class="container mt-4"layout:fragment="content" >
     <h2>소식/공지사항 등록</h2>
-    <form th:action="@{/manager/make_news}" method="post" id="signup-form" >
+    <form th:action="@{/manager/news/make_news}" method="post" id="signup-form" >
       <div class="mb-3 form-group box">
         <label for="rn_content" class="form-label">소식/공지사항 내용</label>
         <input type="text" class="form-control" name="rn_content" id="rn_content" required>

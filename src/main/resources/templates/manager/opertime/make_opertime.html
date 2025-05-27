@@ -183,7 +183,7 @@
       
       console.log("보낼 데이터:", JSON.stringify(resultList));
       $.ajax({
-        url : '/manager/make_opertime_list', 
+        url : '/manager/opertime/make_opertime_list', 
         type : 'post', 
         data : JSON.stringify(resultList), 
         contentType : "application/json; charset=utf-8",

@@ -31,12 +31,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				<tr th:each="menu : ${menulist}">
 					<td>
 						<a style="cursor : pointer;"
-							 th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}">
+							 th:href="@{/manager/menu/menu/{mn_num}(mn_num = ${menu.mn_num})}">
 							<img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="이미지 없음" style="width:200px" height="200px">
 						</a>
 					</td>
 					<td>
-						<a th:href="@{/manager/menu/{mn_num}(mn_num = ${menu.mn_num})}" th:text="${menu.mn_name}"></a>
+						<a th:href="@{/manager/menu/menu/{mn_num}(mn_num = ${menu.mn_num})}" th:text="${menu.mn_name}"></a>
 					</td>
 					<td th:text="${#numbers.formatInteger(menu.mn_price, 3, 'COMMA')}">가격</td>
 					<td th:text="${menu.mn_div}">색인</td>
@@ -47,8 +47,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</tr>
 			</tbody>
 		</table>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_menu'">메뉴등록</button>
-		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/menu/make_menu'">메뉴등록</button>
+		<a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 	</main>
 </body>
 </html>

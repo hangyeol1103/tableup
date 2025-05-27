@@ -36,10 +36,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</td>
 					<td th:text="${rf.rf_detail} ">상세설명</td>
 					<td class="">
-						<form th:action="@{/manager/remake_resfacility/{rf_num}(rf_num=${rf.rf_num})}" method="get" style="display:inline;">
+						<form th:action="@{/manager/resfacility/remake_resfacility/{rf_num}(rf_num=${rf.rf_num})}" method="get" style="display:inline;">
 							<button type="submit" class="btn btn-outline-primary">매장 상세정보 변경</button>
 						</form>
-						<form th:action="@{/manager/delete_resfacility/{rf_num}(rf_num=${rf.rf_num})}" method="post" style="display:inline;">
+						<form th:action="@{/manager/resfacility/delete_resfacility/{rf_num}(rf_num=${rf.rf_num})}" method="post" style="display:inline;">
 							<button type="submit" class="btn btn-outline-danger">매장 상세정보 삭제</button>
 						</form>
 					</td>
@@ -50,8 +50,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</tr>
 			</tbody>
 		</table>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_resfacility'">편의시설 등록</button>
-		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/resfacility/make_resfacility'">편의시설 등록</button>
+		<a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 	</main>
 </body>
 </html>

@@ -17,9 +17,8 @@
   </head>
 <body>
   <main div class="container mt-4"layout:fragment="content" >
-    <h2>매장 편의시설 변경</h2>
-    <form th:action="@{/manager/remake_resfacility}" method="post" id="signup-form" >
-      <input type="hidden" name="rf_num" th:value="${resfacility.rf_num}" />
+    <h2>매장 편의시설 등록</h2>
+    <form th:action="@{/manager/resfacility/make_resfacility}" method="post" id="signup-form" >
       <div class="mb-3 form-group box">
         <label for="rf_fa_num" class="form-label">편의시설</label>
         <select class="form-select" id="rf_fa_num" name="rf_fa_num" required>
@@ -34,7 +33,7 @@
         <input type="text" class="form-control" name="rf_detail" id="rf_detail" required>
       </div>
       
-      <button type="submit" class="btn btn-success w-100">매장 편의시설 변경</button>
+      <button type="submit" class="btn btn-success w-100">매장 편의시설 등록</button>
     </form>
 
   </main>

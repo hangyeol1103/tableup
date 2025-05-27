@@ -20,7 +20,7 @@
 <body>
   <main div class="container mt-4"layout:fragment="content" >
     <h2>매장 정보 변경</h2>
-    <form th:action="@{remake}" method="post" id="signup-form" enctype="multipart/form-data">
+    <form th:action="@{/restaurant/remake}" method="post" id="signup-form" enctype="multipart/form-data">
       <input type="hidden" name="rt_num" th:value="${restaurant.rt_num}" />
       <div class="mb-3 form-group box">
         <label for="rt_name" class="form-label">매장이름</label>

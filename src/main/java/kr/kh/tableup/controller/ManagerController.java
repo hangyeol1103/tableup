@@ -31,13 +31,17 @@ import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
+import kr.kh.tableup.model.vo.PaymentVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
+import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
+import kr.kh.tableup.service.PaymentService;
 
 
 
@@ -52,7 +56,8 @@ public class ManagerController {
 	@Autowired
 	ManagerService managerService;
 
-	
+	@Autowired
+	PaymentService paymentService;
 
 	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
@@ -78,17 +83,19 @@ public class ManagerController {
 	
 	@PostMapping("/signup")
 	public String postMethodName(RestaurantManagerVO rm) {
-		managerService.insertManager(rm);
-		return "redirect:/manager/login";
+		if(managerService.insertManager(rm)){
+			return "redirect:/manager/login";
+		}
+		return "redirect:/manager/signup";
 	}
 	
-	@GetMapping("/restaurant/{rm_id}")
+	@GetMapping("/restaurant/restaurant/{rm_id}")
 	public String restaurantPage(@PathVariable("rm_id") String rm_id,Model model, Principal principal) {
 		String loginId = principal.getName();
 		
 		if (!loginId.equals(rm_id)) {
 			return "redirect:/manager";
-	}
+		}
 		RestaurantManagerVO manager = managerService.getManagerId(loginId);
 		//해당 매니저의 매장 외래키를 가져옴
 		int rm_num=manager.getRm_num();
@@ -116,16 +123,16 @@ public class ManagerController {
 		model.addAttribute("dfc", dfc);
 		
 		model.addAttribute("url", "/restaurant");
-		return "/manager/restaurant";
+		return "/manager/restaurant/restaurant";
 	}
 
-	@GetMapping("/restaurant")
+	@GetMapping("/restaurant/restaurant")
     public String redirectRestaurant(Principal principal) {
         String loginId = principal.getName();
-        return "redirect:/manager/restaurant/" + loginId;
+        return "redirect:/manager/restaurant/restaurant/" + loginId;
     }
 
-	@GetMapping("/make")
+	@GetMapping("/restaurant/make")
 	public String makePage(Model model) {
 		List<FoodCategoryVO> foodcategory = managerService.getFoodCategory();
 		List<RegionVO> region = managerService.getRegion();
@@ -142,7 +149,7 @@ public class ManagerController {
 		model.addAttribute("region", region);
 		model.addAttribute("dr", dr);
 		model.addAttribute("dfc", dfc);
-		return "/manager/make";
+		return "/manager/restaurant/make";
 	}
 
 	@ResponseBody
@@ -159,20 +166,20 @@ public class ManagerController {
 		return managerService.getDetailByRegNum(reg_num);
 	}
 	
-	@PostMapping("/make")
+	@PostMapping("/restaurant/make")
 	public String insertPage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
 													 @AuthenticationPrincipal CustomManager manager ) {
 		System.out.println(manager);
 		System.out.println(restaurant);
 
 		if(managerService.insertRestaurant(restaurant, manager.getManager(), fileList)){
-			return "redirect:/manager/restaurant";
+			return "redirect:/manager/restaurant/restaurant";
 		}
-		return "redirect:/manager/make";
+		return "redirect:/manager/restaurant/make";
 	}
 
 	//매장 정보 수정
-	@GetMapping("/remake")
+	@GetMapping("/restaurant/remake")
 	public String remakePage(Model model,@AuthenticationPrincipal CustomManager manager) {
 		if (manager.getManager().getRm_rt_num() <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
@@ -201,23 +208,24 @@ public class ManagerController {
 		model.addAttribute("detailRegionList", dr);
 		model.addAttribute("detailFoodList", dfc);
 		model.addAttribute("fileList", fileList);
-		return "/manager/remake";
+
+		return "/manager/restaurant/remake";
 	}
 
-	@PostMapping("/remake")
+	@PostMapping("/restaurant/remake")
 	public String updatePage(RestaurantVO restaurant,@RequestParam("fileList") MultipartFile[] fileList,  
 													 @AuthenticationPrincipal CustomManager manager ) {
 		System.out.println(manager);
 		System.out.println("수정할 매장 정보 :"+restaurant);
 
 		if(managerService.updateRestaurant(restaurant, manager.getManager(), fileList)){
-			return "redirect:/manager/restaurant";
+			return "redirect:/manager/restaurant/restaurant";
 		}
-		return "redirect:/manager/remake";
+		return "redirect:/manager/restaurant/remake";
 	}
 	
 	//메뉴 리스트 출력
-	@GetMapping("/menulist/{rt_num}")
+	@GetMapping("/menu/menulist/{rt_num}")
 	public String menuListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
 
 
@@ -236,11 +244,11 @@ public class ManagerController {
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
 		System.out.println(manager.getManager());
-		return "manager/menulist";
+		return "manager/menu/menulist";
 	}
 
 	//메뉴 등록 페이지
-	@GetMapping("/make_menu")
+	@GetMapping("/menu/make_menu")
 	public String makeMenuPage(Model model, @AuthenticationPrincipal CustomManager manager) {
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/";
@@ -255,10 +263,10 @@ public class ManagerController {
 		
 		model.addAttribute("url", "/make_menu");
 		model.addAttribute("menutype", menutype);
-		return "/manager/make_menu";
+		return "/manager/menu/make_menu";
 	}
 
-	@PostMapping("/make_menu")
+	@PostMapping("/menu/make_menu")
 	public String insertMenu(MenuVO menu, MultipartFile mn_img2,  @AuthenticationPrincipal CustomManager manager) {
 		menu.setMn_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
@@ -276,20 +284,20 @@ public class ManagerController {
     }
 
 		if(managerService.makeMenu(menu,mn_img2)){
-			return "redirect:/manager/menulist/"+rtNum;
+			return "redirect:/manager/menu/menulist/"+rtNum;
 		}
 
-		return "/manager/make_menu/";
+		return "/manager/menu/make_menu/";
 	}
 	
 	//메뉴 상세 페이지
-	@GetMapping("/menu/{mn_num}")
+	@GetMapping("/menu/menu/{mn_num}")
 	public String detailMenu(Model model, @PathVariable int mn_num) {
 		MenuVO menu = managerService.getMenu(mn_num);
 		MenuTypeVO menutype =managerService.getMenuType(menu.getMn_mt_num());
 		model.addAttribute("menu", menu);
 		model.addAttribute("menutype", menutype);
-		return "/manager/menu";
+		return "/manager/menu/menu";
 	}
 
 	//메뉴 삭제
@@ -297,14 +305,14 @@ public class ManagerController {
 	public String deleteMenuPage(@AuthenticationPrincipal CustomManager manager, @PathVariable int mn_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
 		 if(managerService.deleteMenu(mn_num)) {
-        return "redirect:/manager/menulist/"+rtNum;
+        return "redirect:/manager/menu/menulist/"+rtNum;
     }
-		return "redirect:/manager/menu?mn_num=" + mn_num;
+		return "redirect:/manager/menu/menu?mn_num=" + mn_num;
 	}
 	
 
 	//메뉴 수정 페이지
-	@GetMapping("/remake_menu")
+	@GetMapping("/menu/remake_menu")
 	public String reMakeMenuPage(Model model, @AuthenticationPrincipal CustomManager manager, @RequestParam("mn_num") int mn_num) {
 		List<MenuTypeVO> menutype = managerService.getMenuTypeList();
 		MenuVO menu = managerService.getMenu(mn_num);
@@ -313,10 +321,10 @@ public class ManagerController {
 		model.addAttribute("url", "/remake_menu");
 		model.addAttribute("menutype", menutype);
 		model.addAttribute("menu", menu);
-		return "/manager/remake_menu";
+		return "/manager/menu/remake_menu";
 	}
 	
-	@PostMapping("/remake_menu")
+	@PostMapping("/menu/remake_menu")
 	public String updateMenu(MenuVO menu, MultipartFile mn_img2,  @AuthenticationPrincipal CustomManager manager) {
 		menu.setMn_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
@@ -333,14 +341,14 @@ public class ManagerController {
     }
 
 		if(managerService.updateMenu(menu,mn_img2)){
-			return "redirect:/manager/menulist/"+rtNum;
+			return "redirect:/manager/menu/menulist/"+rtNum;
 		}
 		
-		return "/manager/remake_menu";
+		return "/manager/menu/remake_menu";
 	}
 	
 	//매장 상세 정보 출력
-	@GetMapping("/restaurantdetail/{rt_num}")
+	@GetMapping("/detail/restaurantdetail/{rt_num}")
 	public String restaurantDetailPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
 
 
@@ -356,16 +364,16 @@ public class ManagerController {
 		RestaurantVO resdetail = managerService.getResDetail(rt_num);
 		if(resdetail != null) model.addAttribute("resdetail", resdetail);
 		model.addAttribute("manager", manager.getManager());
-		return "/manager/restaurantdetail";
+		return "/manager/detail/restaurantdetail";
 	}
 
-	@GetMapping("/make_detail")
+	@GetMapping("/detail/make_detail")
 	public String makeResDetailPage(Model model) {
 		model.addAttribute("url", "/make_detail");
-		return "/manager/make_detail";
+		return "/manager/detail/make_detail";
 	}
 	
-	@PostMapping("/make_detail")
+	@PostMapping("/detail/make_detail")
 	public String insertResDetailPage(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
 		int rtNum = manager.getManager().getRm_rt_num();
     System.out.println("매니저의 정보: " + manager);
@@ -381,13 +389,13 @@ public class ManagerController {
         return "redirect:/manager/make";
     }
 		if(managerService.insertResDetail(resdetail)){
-			return "redirect:/manager/restaurantdetail/"+ rtNum;
+			return "redirect:/manager/detail/restaurantdetail/"+ rtNum;
 		}
-		return "redirect:/manager/make_detail";
+		return "redirect:/manager/detail/make_detail";
 	}
 
 	//상세정보 변경 페이지
-	@GetMapping("/remake_detail")
+	@GetMapping("/detail/remake_detail")
 	public String reMakeDetailPage(Model model, @AuthenticationPrincipal CustomManager manager) {
 
 		int rtNum = manager.getManager().getRm_rt_num();
@@ -397,11 +405,11 @@ public class ManagerController {
 		model.addAttribute("res", resdetail);
 		System.out.println(resdetail);
 		model.addAttribute("url", "/remake_detail");
-		return "/manager/remake_detail";
+		return "/manager/detail/remake_detail";
 	}
 	
-	@PostMapping("/remake_detail")
-	public String updateDetail(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
+	@PostMapping("/detail/remake_detail")
+	public String updateDetail(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
     System.out.println("매니저의 매장 번호: " + rtNum);
     resdetail.setRd_rt_num(rtNum);
@@ -415,10 +423,10 @@ public class ManagerController {
     }
 
 		if(managerService.updateDetail(resdetail)){
-			return "redirect:/manager/restaurantdetail/"+ rtNum;
+			return "redirect:/manager/detail/restaurantdetail/"+ rtNum;
 		}
 		System.out.println("수정 실패");
-		return "/manager/remake_detail";
+		return "/manager/detail/remake_detail";
 	}
 
 	//매니저 쿠폰 페이지
@@ -528,7 +536,7 @@ public class ManagerController {
 
 	//매장 소식 페이지
 	//매장 소식 리스트
-	@GetMapping("/newslist/{rt_num}")
+	@GetMapping("/news/newslist/{rt_num}")
 	public String newsListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
 
 
@@ -547,15 +555,15 @@ public class ManagerController {
 		model.addAttribute("newslist", newslist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
-		return "manager/newslist";
+		return "manager/news/newslist";
 	}
-	@GetMapping("/make_news")
+	@GetMapping("/news/make_news")
 	public String makeNewsPage(Model model) {
 		model.addAttribute("url", "/make_news");
-		return "/manager/make_news";
+		return "/manager/news/make_news";
 	}
 
-	@PostMapping("/make_news")
+	@PostMapping("/news/make_news")
 	public String insertCoupon(ResNewsVO news,  @AuthenticationPrincipal CustomManager manager) {
 		news.setRn_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
@@ -572,32 +580,32 @@ public class ManagerController {
     }
 
 		if(managerService.makeNews(news)){
-			return "redirect:/manager/newslist/"+rtNum;
+			return "redirect:/manager/news/newslist/"+rtNum;
 		}
 
-		return "/manager/make_news/";
+		return "/manager/news/make_news/";
 	}
 
 	//소식 정보 출력 페이지
-	@GetMapping("/news/{rn_num}")
+	@GetMapping("/news/news/{rn_num}")
 	public String detailNews(Model model, @PathVariable int rn_num) {
 		ResNewsVO news = managerService.getNews(rn_num);
 		System.out.println(news);
 		model.addAttribute("news", news);
-		return "/manager/news";
+		return "/manager/news/news";
 	}
 
 	//소식 수정 페이지
-	@GetMapping("/remake_news/{rn_num}")
+	@GetMapping("/news/remake_news/{rn_num}")
 	public String reMakeNewsPage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int rn_num) {
 		ResNewsVO news = managerService.getNews(rn_num);
     System.out.println(news);
 		model.addAttribute("news", news);
-		model.addAttribute("url", "/remake_news");
-		return "/manager/remake_news";
+		model.addAttribute("url", "/news/remake_news");
+		return "/manager/news/remake_news";
 	}
 	
-	@PostMapping("/remake_news")
+	@PostMapping("/news/remake_news")
 	public String updateNews(ResNewsVO news,  @AuthenticationPrincipal CustomManager manager) {
 		news.setRn_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
@@ -613,10 +621,10 @@ public class ManagerController {
     }
 
 		if(managerService.updateNews(news)){
-			return "redirect:/manager/newslist/"+rtNum;
+			return "redirect:/manager/news/newslist/"+rtNum;
 		}
 		
-		return "/manager/remake_news";
+		return "/manager/news/remake_news";
 	}
 
 	//소식 삭제
@@ -624,15 +632,15 @@ public class ManagerController {
 	public String deleteNewsPage(@AuthenticationPrincipal CustomManager manager, @PathVariable int rn_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
 		 if(managerService.deleteNews(rn_num)) {
-        return "redirect:/manager/newslist/"+rtNum;
+        return "redirect:/manager/news/newslist/"+rtNum;
     }
-		return "redirect:/manager/news?rec_num=" + rn_num;
+		return "redirect:/manager/news/news?rec_num=" + rn_num;
 	}
 
 
 	//예약 가능 시간 페이지
 	//예약 가능 시간 목록(리스트)
-	@GetMapping("/restimelist/{rt_num}")
+	@GetMapping("/restime/restimelist/{rt_num}")
 	public String ResTimeListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
 		System.out.println("restimelist rt_num: " + rt_num);
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
@@ -651,17 +659,17 @@ public class ManagerController {
 		model.addAttribute("restimelist", restimelist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
-		return "manager/restimelist";
+		return "manager/restime/restimelist";
 	}
 
 	//예약 시간 등록 페이지
-	@GetMapping("/make_restime")
+	@GetMapping("/restime/make_restime")
 	public String makeResTimePage(Model model) {
 		model.addAttribute("url", "/make_restime");
-		return "/manager/make_restime";
+		return "/manager/restime/make_restime";
 	}
 
-	@PostMapping("/make_restime")
+	@PostMapping("/restime/make_restime")
 	public String insertResTime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager) {
 		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
@@ -682,19 +690,19 @@ public class ManagerController {
 			return "redirect:/manager/restimelist/"+rtNum;
 		}
 
-		return "/manager/make_restime/";
+		return "/manager/restime/make_restime/";
 	}
 	//예약 시간 변경
-	@GetMapping("/remake_restime/{bh_num}")
+	@GetMapping("/restime/remake_restime/{bh_num}")
 	public String reMakeResTimePage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int bh_num) {
 		BusinessHourVO restime = managerService.getBusinessHour(bh_num);
     System.out.println(restime);
 		model.addAttribute("restime", restime);
 		model.addAttribute("url", "/remake_restime");
-		return "/manager/remake_restime";
+		return "/manager/restime/remake_restime";
 	}
 	
-	@PostMapping("/remake_restime")
+	@PostMapping("/restime/remake_restime")
 	public String updateRestime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager ) {
 		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
@@ -714,19 +722,19 @@ public class ManagerController {
 		if(managerService.remakeResTime(restime)){
 			System.out.println("bh_start = " + restime.getBh_start());
 			System.out.println("bh_state = " + restime.isBh_state());
-			return "redirect:/manager/restimelist/"+rtNum;
+			return "redirect:/manager/restime/restimelist/"+rtNum;
 		}
-		return "/manager/remake_restime";
+		return "/manager/restime/remake_restime";
 	}
 
 	//예약 가능 시간 삭제
-	@PostMapping("/delete_restime/{bh_num}")
+	@PostMapping("/restime/delete_restime/{bh_num}")
 	public String deleteResTime(@AuthenticationPrincipal CustomManager manager, @PathVariable int bh_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
 		 if(managerService.deleteResTime(bh_num)) {
-        return "redirect:/manager/restimelist/"+rtNum;
+        return "redirect:/manager/restime/restimelist/"+rtNum;
     }
-		return "redirect:/manager/restimelist/"+rtNum;
+		return "redirect:/manager/restime/restimelist/"+rtNum;
 	}
 
 	//날짜 입력 처리(HH:mm)
@@ -738,7 +746,7 @@ public class ManagerController {
 	}
 
 	//영업 일자 페이지
-	@GetMapping("/opertimelist/{rt_num}")
+	@GetMapping("/opertime/opertimelist/{rt_num}")
 	public String OperTimePage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
 
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
@@ -756,32 +764,32 @@ public class ManagerController {
 		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
-		return "manager/opertimelist";
+		return "manager/opertime/opertimelist";
 	}
 
 	//영업 일자 등록 페이지
-	@GetMapping("/make_opertime")
+	@GetMapping("/opertime/make_opertime")
 	public String makeOperTimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
 		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
 		
 		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("url", "/make_opertime");
-		return "/manager/make_opertime";
+		return "/manager/opertime/make_opertime";
 	}
 
 
-	@GetMapping("/make_opertime_sub") 
+	@GetMapping("/opertime/make_opertime_sub") 
 	public String makeOperTimeSubPage(Model model,  @AuthenticationPrincipal CustomManager manager) {
 		if(manager.getManager().getRm_id() == null) {
 			return "/manager/login";
 		}
 		model.addAttribute("managerId", manager.getManager().getRm_id());
 		model.addAttribute("url", "/make_opertime_sub");
-		return "/manager/make_opertime_sub";
+		return "/manager/opertime/make_opertime_sub";
 	}
 
 
-	@PostMapping("/make_opertime")
+	@PostMapping("/opertime/make_opertime")
 	public String insertOperTime(BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager) {
 		opertime.setBd_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
@@ -799,14 +807,14 @@ public class ManagerController {
 
 		if(managerService.makeOperTime(opertime)){
 			System.out.println("bd_date = " + opertime.getBd_date());
-			return "redirect:/manager/opertimelist/"+rtNum;
+			return "redirect:/manager/opertime/opertimelist/"+rtNum;
 		}
 
-		return "/manager/make_opertime";
+		return "/manager/opertime/make_opertime";
 	}
 
 
-	@PostMapping("/make_opertime_list")
+	@PostMapping("/opertime/make_opertime_list")
 	@ResponseBody
 	public String insertOperTimeList(
 		@RequestBody List<BusinessDateVO> operList
@@ -841,7 +849,7 @@ public class ManagerController {
 
 
 	//영업 일자 변경
-	@GetMapping("/remake_opertime/{bd_num}")
+	@GetMapping("/opertime/remake_opertime/{bd_num}")
 	public String reMakeOperTimePage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int bd_num) {
 
 		BusinessDateVO opertime = managerService.getBusinessDate(bd_num);
@@ -857,10 +865,10 @@ public class ManagerController {
 		System.out.println(opertime.getBd_open_ts());
 		model.addAttribute("opertime", opertime);
 		model.addAttribute("url", "/remake_opertime");
-		return "/manager/remake_opertime";
+		return "/manager/opertime/remake_opertime";
 	}
 	
-	@PostMapping("/remake_opertime")
+	@PostMapping("/opertime/remake_opertime")
 	public String updateOpertime(BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager ) {
 		opertime.setBd_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
@@ -876,19 +884,19 @@ public class ManagerController {
         return "redirect:/manager/make";
     }
 		 if(managerService.remakeOperTime(opertime)){
-		 	return "redirect:/manager/opertimelist/"+rtNum;
+		 	return "redirect:/manager/opertime/opertimelist/"+rtNum;
 		 }
-		return "/manager/remake_opertime";
+		return "/manager/opertime/remake_opertime";
 	}
 
 	//영업 시간 삭제
-	@PostMapping("/delete_opertime/{bd_num}")
+	@PostMapping("/opertime/delete_opertime/{bd_num}")
 	public String deleteOperTime(@AuthenticationPrincipal CustomManager manager, @PathVariable int bd_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
 		 if(managerService.deleteOperTime(bd_num)) {
-        return "redirect:/manager/opertimelist/"+rtNum;
+        return "redirect:/manager/opertime/opertimelist/"+rtNum;
     }
-		return "redirect:/manager/opertimelist/"+rtNum;
+		return "redirect:/manager/opertime/opertimelist/"+rtNum;
 	}
 
 	//매니저페이지
@@ -901,7 +909,7 @@ public class ManagerController {
 	}
 	
 	//매장 편의시설 목록 페이지
-	@GetMapping("/resfacilitylist/{rt_num}")
+	@GetMapping("/resfacility/resfacilitylist/{rt_num}")
 	public String facilityListPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
 		
 		
@@ -923,20 +931,20 @@ public class ManagerController {
 		model.addAttribute("facility", facility);
 		model.addAttribute("facilitylist", facilitylist);
 		model.addAttribute("manager", manager.getManager());
-		return "manager/resfacilitylist";
+		return "manager/resfacility/resfacilitylist";
 	}
 
 	//매장 편의시설 등록 페이지
-	@GetMapping("/make_resfacility")
+	@GetMapping("/resfacility/make_resfacility")
 	public String makeResFacilityPage(Model model) {
 		List<FacilityVO> facility = managerService.getFacilityList();
 
 		model.addAttribute("facility", facility);
 		model.addAttribute("url", "/make_resfacility");
-		return "/manager/make_resfacility";
+		return "/manager/resfacility/make_resfacility";
 	}
 
-	@PostMapping("/make_resfacility")
+	@PostMapping("/resfacility/make_resfacility")
 	public String insertResFacility(RestaurantFacilityVO resfacility,  @AuthenticationPrincipal CustomManager manager) {
 		resfacility.setRf_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
@@ -952,14 +960,14 @@ public class ManagerController {
     }
 
 		if(managerService.makeResFacility(resfacility)){
-			return "redirect:/manager/resfacilitylist/"+rtNum;
+			return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;
 		}
 
-		return "/manager/make_resfacility";
+		return "/manager/resfacility/make_resfacility";
 	}
 
 	//편의시설 정보 변경
-	@GetMapping("/remake_resfacility/{rf_num}")
+	@GetMapping("/resfacility/remake_resfacility/{rf_num}")
 	public String reMakeResFacilityPage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int rf_num) {
 		RestaurantFacilityVO resfacility = managerService.getResFacility(rf_num);
 		List<FacilityVO> facility = managerService.getFacilityList();
@@ -968,10 +976,10 @@ public class ManagerController {
 		model.addAttribute("facility", facility);
 		model.addAttribute("resfacility", resfacility);
 		model.addAttribute("url", "/remake_resfacility");
-		return "/manager/remake_resfacility";
+		return "/manager/resfacility/remake_resfacility";
 	}
 	
-	@PostMapping("/remake_resfacility")
+	@PostMapping("/resfacility/remake_resfacility")
 	public String updateResFacility(RestaurantFacilityVO resfacility,  @AuthenticationPrincipal CustomManager manager ) {
 		resfacility.setRf_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
@@ -988,19 +996,37 @@ public class ManagerController {
         return "redirect:/manager/make";
     }
 		 if(managerService.remakeResFacility(resfacility)){
-		 	return "redirect:/manager/resfacilitylist/"+rtNum;
+		 	return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;
 		 }
-		return "/manager/remake_resfacility";
+		return "/manager/resfacility/remake_resfacility";
 	}
 
-	@PostMapping("/delete_resfacility/{rf_num}")
+	@PostMapping("/resfacility/delete_resfacility/{rf_num}")
 	public String deleteResFacility(@AuthenticationPrincipal CustomManager manager, @PathVariable int rf_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
 		 if(managerService.deleteResFacility(rf_num)) {
-        return "redirect:/manager/resfacilitylist/"+rtNum;
+        return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;
     }
-		return "redirect:/manager/resfacilitylist/"+rtNum;
+		return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;
 	}
+
+	@GetMapping("/manager_pay/pay")
+	public String paymentPage(Model model, @AuthenticationPrincipal CustomManager manager, Principal principal){
+		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
+			 manager == null || manager.getManager() == null){
+			return "redirect:/manager/login";
+		}
+
+		List<PaymentVO> paymentList = paymentService.getPaymentList(manager.getManager().getRm_rt_num());
+		RestaurantVO restaurant = managerService.getRestaurantByNum(manager.getManager().getRm_rt_num());
+		System.out.println("예약 결제 내역"+paymentList);
+
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("manager",manager.getManager());
+		model.addAttribute("paymentList", paymentList);
+		return "/manager/manager_pay/pay";
+	}
+	
 
 	
 }

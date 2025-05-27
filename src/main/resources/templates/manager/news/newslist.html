@@ -28,7 +28,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<tbody>
 				<tr th:each="news : ${newslist}">
 					<td>
-						<a th:href="@{/manager/news/{rn_num}(rn_num = ${news.rn_num})}" th:text="${news.rn_content}"></a>
+						<a th:href="@{/manager/news/news/{rn_num}(rn_num = ${news.rn_num})}" th:text="${news.rn_content}"></a>
 					</td>
 					<td th:text="${news.rn_state != null ?(news.rn_state ? '공개' : '비공개'):'-'} ">상태</td>
 				</tr>
@@ -38,8 +38,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</tr>
 			</tbody>
 		</table>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_news'">뉴스등록</button>
-		<a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/news/make_news'">뉴스등록</button>
+		<a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 	</main>
 </body>
 </html>

@@ -24,6 +24,8 @@ import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 
 public interface ManagerDAO {
+	
+	List<RestaurantManagerVO> selectManagerList();
 
 	boolean insertManager(RestaurantManagerVO rm);
 
@@ -140,6 +142,7 @@ public interface ManagerDAO {
 	List<ResCouponVO> getExpiredCoupons(LocalDate now);
 
 	void updateCouponState(ResCouponVO c);
+
 
 	
 }

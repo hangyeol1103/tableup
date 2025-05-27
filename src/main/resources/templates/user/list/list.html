@@ -186,6 +186,7 @@
       rt_dfc_num : 0,
       rt_dreg_num : 0,
       dreg_reg_num: 0,
+      dfc_fc_num : 0,
       page : 1,
       orderBy : "rt_num desc",
       tagList: [],
@@ -234,6 +235,7 @@
       cri.rt_dreg_num = Number(selected.data('dreg-num')) || 0;
       cri.dreg_reg_num = Number(selected.data('reg-num')) || 0;
       cri.rt_dfc_num = Number($('#foodSelect').val()) || 0;
+      cri.dfc_fc_num = Number($('#foodSelect option:selected').data('fc-num')) || 0;
       cri.orderBy = $('.sel-type').val();
 
       if (resetPage) cri.page = 1;

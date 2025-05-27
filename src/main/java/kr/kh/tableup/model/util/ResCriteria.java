@@ -13,6 +13,8 @@ public class ResCriteria extends Criteria {
 	private String orderBy;
 
 	private int dreg_reg_num;
+	private int dfc_fc_num;
+
 
 	private List<Integer> tagList;
 	private List<Integer> facilityList;

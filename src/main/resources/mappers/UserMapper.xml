@@ -275,9 +275,17 @@
 				)
 			</when>
 		</choose>
-		<if test="rt_dfc_num > 0">
-			AND r.rt_dfc_num = #{rt_dfc_num}
-		</if>
+		<choose>
+			<when test="rt_dfc_num > 0">
+				AND r.rt_dfc_num = #{rt_dfc_num}
+			</when>
+			<when test="rt_dfc_num == 0 and dfc_fc_num > 0">
+				AND r.rt_dfc_num IN (
+					SELECT dfc_num FROM detailfoodcategory WHERE dfc_fc_num = #{dfc_fc_num}
+				)
+			</when>
+		</choose>
+	
 
 		<if test="minPrice != null and maxPrice != null and priceType != null">
 			<choose>

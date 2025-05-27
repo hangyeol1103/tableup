@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.UserVO;
@@ -42,8 +43,11 @@ public class HomeController {
 
 
 		List<DetailRegionVO> regionList = userService.getRegionListWithWhole();
+		List<DetailFoodCategoryVO> foodList = userService.getFoodCategoryListWithWhole();
 		model.addAttribute("regionList", regionList);
+		model.addAttribute("foodList", foodList);
 		//System.out.println(regionList);
+		System.out.println("foodList: " + foodList);
 		return "index";
 	}
 

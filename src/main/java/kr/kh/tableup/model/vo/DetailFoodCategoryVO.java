@@ -10,7 +10,7 @@ public class DetailFoodCategoryVO {
 	String dfc_sub; //소분류 이름
 	int dfc_fc_num; //대분류 번호
 
-  String fc_name; //대분류 이름
+  String fc_main; //대분류 이름
   String fc_num;  //대분류 번호
 
 

@@ -306,12 +306,40 @@ public class UserService {
     return result;
 }
 
+
+
   
 
-  public List<FoodCategoryVO> getFoodCategoryList() {
+  public List<DetailFoodCategoryVO> getFoodCategoryList() {
 
     return userDAO.selectFoodCategoryList();
   }
+
+  public List<DetailFoodCategoryVO> getFoodCategoryListWithWhole(){
+    List<DetailFoodCategoryVO> original = getFoodCategoryList(); // 기본 목록
+
+    Map<String, List<DetailFoodCategoryVO>> grouped = original.stream()
+        .collect(Collectors.groupingBy(DetailFoodCategoryVO::getFc_main, LinkedHashMap::new, Collectors.toList()));
+
+    List<DetailFoodCategoryVO> result = new ArrayList<>();
+    for (Map.Entry<String, List<DetailFoodCategoryVO>> entry : grouped.entrySet()) {
+        String fcMain = entry.getKey();
+        List<DetailFoodCategoryVO> list = entry.getValue();
+
+        // 첫 DetailFoodCategoryVO 하나를 복사해서 "전체"로 만들기
+        DetailFoodCategoryVO whole = new DetailFoodCategoryVO();
+        whole.setFc_main(fcMain);
+        whole.setDfc_sub("전체");
+        whole.setDfc_num(0);
+        whole.setFc_num(list.get(0).getFc_num()); // 대분류 번호 복사
+
+        result.add(whole);      // "한식 전체"
+        result.addAll(list);    // 한식:불고기, 한식:비빔밥 ...
+    }
+
+    return result;
+  }
+
 
   public List<RestaurantVO> getRestaurantList(Criteria cri) {
     if (cri == null) {

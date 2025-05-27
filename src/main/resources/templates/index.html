@@ -46,7 +46,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 								<h5 class="modal-title">관심지역 설정</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 							</div>
-							<div class="modal-body">
+							<div class="modal-body" th:if="${regionList != null and #lists.size(regionList) > 0}">
 								<!-- 인기 지역 (동그란 이미지/버튼) -->
 								<div class="mb-3">
 									<strong>인기 지역</strong>
@@ -106,6 +106,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
 								</div>
 							</div>
+							<div th:if="${regionList == null or #lists.size(regionList) == 0}" class="modal-body">
+								<div class="alert alert-warning" role="alert">
+									지역 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.
+								</div>
+							</div>
 
 							<div class="modal-footer">
 								<button type="button" class="btn btn-outline-secondary">초기화</button>
@@ -135,16 +140,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				<!-- The slideshow/carousel -->
 				<div class="carousel-inner">
 					<div class="carousel-item active">
-						<img src="/img/index/index1.jpg" alt="Los Angeles" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index1.jpg" alt="Los Angeles" class="d-block" style="width:100%">
 					</div>
 					<div class="carousel-item">
-						<img src="/img/index/index2.jpg" alt="Chicago" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index2.jpg" alt="Chicago" class="d-block" style="width:100%">
 					</div>
 					<div class="carousel-item">
-						<img src="/img/index/index3.jpg" alt="New York" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index3.jpg" alt="New York" class="d-block" style="width:100%">
 					</div>
 					<div class="carousel-item">
-						<img src="/img/index/index4.jpg" alt="4" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index4.jpg" alt="4" class="d-block" style="width:100%">
 					</div>
 				</div>
 				
@@ -158,33 +163,39 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				</div>
 
 
-				<div class="container mt-4">
-					<h4 class="fw-bold mb-3">요리 테마별 탐색</h4>
-					<div class="d-flex gap-4">
-						<div class="text-center">
-							<img src="img/index/Cuisine/China.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">한식</div>
+				<div class="container mt-4"  th:if="${foodList != null}">
+					<h4 class="fw-bold mb-3">음식 카테고리 선택</h4>
+					
+					<!-- 대분류 버튼들 -->
+					<div class="d-flex flex-wrap gap-2 mb-3" id="fcButtons">
+						<button class="btn btn-outline-primary" data-fc="0">전체</button>
+						<button th:each="fc : ${foodList}" 
+										th:if="${fc.dfc_sub == '전체'}"
+										class="btn btn-outline-primary"
+										th:data-fc="${fc.fc_main}"
+										th:text="${fc.fc_main}">
+						</button>
+					</div>
+
+					<!-- 소분류 아이콘들 -->
+					<div class="d-flex flex-wrap gap-3" id="dfcIcons">
+						<div th:each="f : ${foodList}" 
+								class="dfc-item text-center" 
+								th:data-fc="${f.fc_main}">
+							<a th:href="@{/user/list(dfc_num=${f.dfc_num})}">
+								<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
+										onerror="this.src='/resources/static/img/index/default.jpg'" 
+										class="rounded" style="width:110px; height:110px; object-fit:cover;">
+								<div class="mt-2" th:text="${f.dfc_sub}"></div>
+							</a>
 						</div>
-						<div class="text-center">
-							<img src="img/index/Cuisine/China.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">중식</div>
-						</div>
-						<div class="text-center">
-							<img src="img/index/Cuisine/japan.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">일식</div>
-						</div>
-						<div class="text-center">
-							<img src="img/index/Cuisine/America.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">양식</div>
-						</div>
-						<div class="text-center">
-							<img src="img/index/Cuisine/Italia.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">이탈리아 요리</div>
-						</div>
-						<div class="text-center">
-							<img src="img/index/Cuisine/France.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">프랑스 요리</div>
-						</div>
+					</div>
+
+				</div>
+				<div th:if="${foodList == null}" class="container mt-4">
+					<h4 class="fw-bold mb-3">음식 카테고리 선택</h4>
+					<div class="alert alert-warning" role="alert">
+						카테고리 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.						
 					</div>
 				</div>
 
@@ -192,23 +203,23 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
 					<div class="d-flex gap-4">
 						<div class="text-center">
-							<img src="img/index/Cuisine/Sushi.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<img src="/resources/static/img/index/Cuisine/Sushi.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
 							<div class="mt-2">스시</div>
 						</div>
 						<div class="text-center">
-							<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
 							<div class="mt-2">예시</div>
 						</div>
 						<div class="text-center">
-							<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
 							<div class="mt-2">예시</div>
 						</div>
 						<div class="text-center">
-							<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
 							<div class="mt-2">예시</div>
 						</div>
 						<div class="text-center">
-							<img src="img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
 							<div class="mt-2">예시</div>
 						</div>
 					</div>
@@ -251,6 +262,31 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 							if (targetTab) {
 								targetTab.classList.add("show", "active");
 							}
+						});
+					});
+				});
+			</script>
+
+
+
+			<script>
+				document.addEventListener("DOMContentLoaded", function () {
+					const buttons = document.querySelectorAll("#fcButtons button");
+					const items = document.querySelectorAll(".dfc-item");
+
+					buttons.forEach(button => {
+						button.addEventListener("click", () => {
+							const selectedFc = button.getAttribute("data-fc");
+
+							items.forEach(item => {
+								const itemFc = item.getAttribute("data-fc");
+
+								if (selectedFc === "0" || selectedFc === itemFc) {
+									item.style.display = "block";
+								} else {
+									item.style.display = "none";
+								}
+							});
 						});
 					});
 				});

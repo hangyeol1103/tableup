@@ -51,7 +51,7 @@ public interface UserDAO {
 
 	List<DetailRegionVO> selectRegionList();
 
-	List<FoodCategoryVO> selectFoodCategoryList();
+	List<DetailFoodCategoryVO> selectFoodCategoryList();
 
 	List<RestaurantVO> selectRestaurantList(Criteria cri);
 	int selectCountRestaurantList(Criteria cri);

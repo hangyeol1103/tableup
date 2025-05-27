@@ -233,8 +233,8 @@
 		ORDER BY reg_num, dreg_num
 		</select>
 
-	<select id="selectFoodCategoryList" resultType="FoodCategoryVO"> SELECT
-		fc_num, fc_main, dfc_num, dfc_sub FROM foodcategory RIGHT JOIN detailfoodcategory ON fc_num =
+	<select id="selectFoodCategoryList" resultType="DetailFoodCategoryVO"> SELECT
+		fc_num, fc_main, dfc_num, dfc_sub, dfc_fc_num FROM foodcategory RIGHT JOIN detailfoodcategory ON fc_num =
 		dfc_fc_num </select>
 
 	<select id="selectRestaurantList" resultType="RestaurantVO">

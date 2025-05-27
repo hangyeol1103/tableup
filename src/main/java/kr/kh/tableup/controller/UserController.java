@@ -351,10 +351,12 @@ public class UserController {
     public String list(Model model, 
             @RequestParam(required = false) Integer dreg_num, 
             @RequestParam(required = false) Integer dfc_num,
-            @RequestParam(required = false) Integer reg_num){
+            @RequestParam(required = false) Integer reg_num,
+            @RequestParam(required = false) Integer fc_num){
+          //@RequestParam Map<String, Integer> paramMap 로 한꺼번에 받아와서 paramMap.get("dreg_num") 이런식으로 쓰는게 나을수도
 
         List<DetailRegionVO> regionList = userService.getRegionListWithWhole();
-        List<FoodCategoryVO> foodList = userService.getFoodCategoryList();
+        List<DetailFoodCategoryVO> foodList = userService.getFoodCategoryListWithWhole();
 
         Map<String, List<TagVO>> tagList = userService.getTagList();
         List<FacilityVO> facilityList = userService.getFacilityList();
@@ -372,6 +374,7 @@ public class UserController {
         if(dreg_num != null)model.addAttribute("dreg_num", dreg_num);
         if(reg_num != null) model.addAttribute("reg_num", reg_num);
         if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
+        if(fc_num != null)model.addAttribute("fc_num", fc_num);  
 
         System.out.println("리스트 호출");
         //System.out.println(dreg_num + " " + dfc_num + " " + reg_num); 

@@ -1053,7 +1053,7 @@ public class ManagerController {
 	@GetMapping("/reservation")
 	public String reservateion(Model model) {
 		
-		return "/manager/reservation";
+		return "/manager/reservation/reservation";
 	}
 	@PostMapping("/reservation/date")
 	public String getMethodName(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {

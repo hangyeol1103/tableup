@@ -24,12 +24,12 @@
       <input type="hidden" name="rt_num" th:value="${restaurant.rt_num}" />
       <div class="mb-3 form-group box">
         <label for="rt_name" class="form-label">매장이름</label>
-        <input type="text" class="form-control" name="rt_name" id="rt_name" required>
+        <input type="text" class="form-control" name="rt_name" id="rt_name" required th:value="${restaurant.rt_name}">
       </div>
 
 			<div class="mb-3 form-group box">
         <label for="reg_num" class="form-label">지역</label>
-        <select class="form-select" id="reg_num" name="reg_num" required>
+        <select class="form-select" id="reg_num" name="reg_num" required >
           <option value="">지역 선택</option>
           <th:block th:each="rg : ${region}">
             <option th:value="${rg.reg_num}" th:text="${rg.reg_main}"></option>
@@ -45,7 +45,7 @@
 
 			<div class="mb-3 form-group box">
         <label for="fc_num" class="form-label">장르</label>
-        <select class="form-select" id="fc_num" name="fc_num" required>
+        <select class="form-select" id="fc_num" name="fc_num" required >
           <option value="">장르 선택</option>
           <th:block th:each="fc : ${foodcategory}">
             <option th:value="${fc.fc_num}" th:text="${fc.fc_main}"></option>
@@ -61,15 +61,15 @@
 
 			<div class="mb-3 form-group box">
         <label for="rt_closed_days" class="form-label">휴점일</label>
-        <input type="text" class="form-control" name="rt_closed_days" id="rt_closed_days" required>
+        <input type="text" class="form-control" name="rt_closed_days" id="rt_closed_days" required th:value="${restaurant.rt_closed_days}">
       </div>
 			<div class="mb-3 form-group box">
         <label for="rt_price_lunch" class="form-label">점심 가격대</label>
-        <input type="text" class="form-control" name="rt_price_lunch" id="rt_price_lunch" required>
+        <input type="text" class="form-control" name="rt_price_lunch" id="rt_price_lunch" required th:value="${restaurant.rt_price_lunch}">
       </div>
 			<div class="mb-3 form-group box">
         <label for="rt_price_dinner" class="form-label">저녁 가격대</label>
-        <input type="text" class="form-control" name="rt_price_dinner" id="rt_price_dinner" required>
+        <input type="text" class="form-control" name="rt_price_dinner" id="rt_price_dinner" required th:value="${restaurant.rt_price_dinner}">
       </div>
 			<div class="mb-3 form-group box">
         <label for="fileList" class="form-label">대표 이미지(여러장? 가능)</label>
@@ -79,7 +79,7 @@
       </div>
       <div class="mb-3 form-group box">
         <label for="rt_description" class="form-label">매장 설명 요약</label>
-        <textarea class="form-control" name="rt_description" id="rt_description" required></textarea>
+        <textarea class="form-control" name="rt_description" id="rt_description" required th:value="${restaurant.rt_description}"></textarea>
       </div>
       <button type="submit" class="btn btn-success w-100">매장 정보 변경하기</button>
     </form>

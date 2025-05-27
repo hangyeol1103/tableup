@@ -1,5 +1,6 @@
 package kr.kh.tableup.controller;
 
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,10 +23,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
-import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
+import kr.kh.tableup.service.ReservationService;
 
 @Controller
 @RequestMapping("/schedule")
@@ -34,9 +36,13 @@ public class ScheduleController {
 	@Autowired
 	ManagerService managerService;
 
+	@Autowired
+	ReservationService reservationService;
+
 	@GetMapping("/manager_schedulelist")
-	public String manager(@RequestParam(defaultValue = "0") int offset, Model model, @AuthenticationPrincipal CustomManager manager ) {
-		if (manager == null) {
+	public String manager(@RequestParam(defaultValue = "0") int offset, Model model, @AuthenticationPrincipal CustomManager manager, Principal principal ) {
+		String loginId =principal.getName();
+		if (manager == null || loginId !=manager.getManager().getRm_id()) {
         return "redirect:/manager/login";
     }
 		System.out.println(manager);
@@ -60,7 +66,8 @@ public class ScheduleController {
       model.addAttribute("opertimelist", opertimelist);
       model.addAttribute("restimelist", restimelist);
 		}
-
+		
+		List<ReservationVO> reservationList = reservationService.getReservation(rt_num);
 		List<LocalDate> dateList= new ArrayList<>();
 		LocalDate today = LocalDate.now();
 		for(int i=0;i<7;i++){
@@ -72,6 +79,7 @@ public class ScheduleController {
         timeList.add(startTime.plusMinutes(30 * i));
     }
 
+		model.addAttribute("reservationList", reservationList);
 		model.addAttribute("dateList", dateList);
 		model.addAttribute("timeList", timeList);
 		model.addAttribute("offset", offset);

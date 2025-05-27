@@ -12,7 +12,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<title>매장 메뉴 리스트</title>
 	<style>
-
+		
 	</style>
 </head>
 <body>
@@ -20,37 +20,35 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		<h2 class="mt-4">매니저 정보</h2>
   
   <div class="card mt-4">
-  <div class="card-header bg-secondary text-white">
+  <div class="card-header bg-secondary text-white mb-3">
     <h4><i class="bi bi-person-badge"></i>매니저 정보</h4>
   </div>
-			<divc class="container">
-				<table class="table table-bordered mt-3">
-					<tr>
-						<th>아이디</th>
-						<td th:text="${rm.rm_id}"></td>
-					</tr>
-					<tr>
-						<th>이메일</th>
-						<td th:text="${rm.rm_email}"></td>
-					</tr>
-					<tr>
-						<th>이름</th>
-						<td th:text="${rm.rm_name}"></td>
-					</tr>
-					<tr>
-						<th>전화번호</th>
-						<td th:text="${rm.rm_phone}"></td>
-					</tr>
-					<tr>
-						<th>사업자 번호</th>
-						<td th:text="${rm.rm_business}"></td>
-					</tr>
-				</table>
-			</divc>
-			<div class="text-end">
-				<button class="btn btn-success mb-4">정보 수정</button>
-			</div>
-
+			<form th:action="@{/manager/managerpage}" th:object="${rm}" class="container" method="post">
+				<input type="hidden" name="rm_num" th:value="${rm.rm_num}"/>
+				<div class="mb-3">
+					<label class="form-label">아이디</label>
+					<input type="text" class="form-control" th:field="*{rm_id}" th:value="${rm.rm_id}" readonly>
+				</div>
+				<div class="mb-3">
+					<label for="email" class="form-label">이메일</label>
+					<input type="email" class="form-control" id="email" name="rm_email" th:field="*{rm_email}" th:value="${rm.rm_email}">
+				</div>
+				<div class="mb-3">
+					<label for="name" class="form-label">이름</label>
+					<input type="text" class="form-control" id="name" name="rm_name" th:field="*{rm_name}" th:value="${rm.rm_name}">
+				</div>
+				<div class="mb-3">
+					<label for="phone" class="form-label">전화번호</label>
+					<input type="text" class="form-control" id="phone" name="rm_phone" th:field="*{rm_phone}" th:value="${rm.rm_phone}">
+				</div>
+				<div class="mb-3">
+					<label class="form-label">사업자 번호</label>
+					<input type="text" class="form-control" th:value="${rm.rm_business}" th:field="*{rm_business}"	 readonly>
+				</div>
+				<div class="text-end">
+					<button type="submit" class="btn btn-success mb-4">정보 수정</button>
+				</div>
+			</form>
 	</main>
 </body>
 </html>

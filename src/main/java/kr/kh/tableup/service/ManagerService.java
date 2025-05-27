@@ -502,6 +502,10 @@ public class ManagerService {
 		return managerDAO.selectTemplateList(rt_num);
 	}
 
+	public int updateManagerInfo(RestaurantManagerVO rm) {
+		return managerDAO.updateManagerInfo(rm);
+	}
+
 	//매장 상세정보
 	public List<FacilityVO> getFacilityList() {
 		return managerDAO.selectFacilityList();

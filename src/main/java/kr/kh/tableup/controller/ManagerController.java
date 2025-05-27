@@ -35,8 +35,6 @@ import kr.kh.tableup.model.vo.PaymentVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ResCouponVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
-import kr.kh.tableup.model.vo.ReservationVO;
-import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -652,7 +650,7 @@ public class ManagerController {
 		}
 
 		if(rt_num != manager.getManager().getRm_rt_num()){
-			return "redirect:/manager/restimelist/"+manager.getManager().getRm_rt_num();
+			return "redirect:/manager/restime/restimelist/"+manager.getManager().getRm_rt_num();
 		}
 
 
@@ -910,6 +908,23 @@ public class ManagerController {
 		model.addAttribute("rm", rm);
 
 		return "/manager/managerpage";
+	}
+	
+	@PostMapping("/managerpage")
+	public String PostmanagerPage(Model model, @AuthenticationPrincipal CustomManager manager, RestaurantManagerVO rm) {
+		RestaurantManagerVO currentManager = manager.getManager();
+
+		if(!currentManager.getRm_id().equals(rm.getRm_id())){
+			return "redirect:/manager/managerpage";
+		}
+
+		managerService.updateManagerInfo(rm);
+
+		currentManager.setRm_email(rm.getRm_email());
+		currentManager.setRm_name(rm.getRm_name());
+		currentManager.setRm_phone(rm.getRm_phone());
+
+		return "manager/main";
 	}
 	
 	//매장 편의시설 목록 페이지

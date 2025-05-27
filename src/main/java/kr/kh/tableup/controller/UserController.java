@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,6 +52,9 @@ public class UserController {
 
   @Autowired
   private ManagerService managerService;
+
+    @Value("${my-api-key}")
+    private String apiKey;
 
   /** 로그인 */
 
@@ -464,12 +468,15 @@ public class UserController {
     List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
 
+    //System.out.println(apiKey);
+
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
     model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
+    model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가
     return "user/detail/home";
   }
   

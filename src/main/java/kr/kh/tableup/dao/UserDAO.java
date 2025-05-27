@@ -1,17 +1,15 @@
 package kr.kh.tableup.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
-import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.Criteria;
-import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
+import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
-import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -51,7 +49,7 @@ public interface UserDAO {
 
 	void insertFile(FileVO fileVO);
 
-	List<RegionVO> selectRegionList();
+	List<DetailRegionVO> selectRegionList();
 
 	List<FoodCategoryVO> selectFoodCategoryList();
 

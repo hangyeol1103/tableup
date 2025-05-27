@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.UserService;
@@ -36,11 +37,11 @@ public class HomeController {
 		model.addAttribute("url", "/");
 
 		// 지역
-		//Map<String, List<RegionVO>> regionMap = userService.getRegionMap();
+		//Map<String, List<DetailRegionVO>> regionMap = userService.getRegionMap();
 		//model.addAttribute("regionMap", regionMap);
 
 
-		List<RegionVO> regionList = userService.getRegionListWithWhole();
+		List<DetailRegionVO> regionList = userService.getRegionListWithWhole();
 		model.addAttribute("regionList", regionList);
 		//System.out.println(regionList);
 		return "index";
@@ -52,7 +53,7 @@ public class HomeController {
 
 		model.addAttribute("sample", user.getUs_name());
 		model.addAttribute("url", "/test_orive_young");
-		List<RegionVO> regionList = userService.getRegionListWithWhole();
+		List<DetailRegionVO> regionList = userService.getRegionListWithWhole();
 		model.addAttribute("regionList", regionList);
 		return "/test_orive_young";
 	}

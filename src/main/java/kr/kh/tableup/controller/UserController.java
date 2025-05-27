@@ -32,6 +32,7 @@ import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
 import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
+import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
@@ -352,7 +353,7 @@ public class UserController {
             @RequestParam(required = false) Integer dfc_num,
             @RequestParam(required = false) Integer reg_num){
 
-        List<RegionVO> regionList = userService.getRegionListWithWhole();
+        List<DetailRegionVO> regionList = userService.getRegionListWithWhole();
         List<FoodCategoryVO> foodList = userService.getFoodCategoryList();
 
         Map<String, List<TagVO>> tagList = userService.getTagList();

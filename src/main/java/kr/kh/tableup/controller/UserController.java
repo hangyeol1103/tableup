@@ -39,6 +39,7 @@ import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.TagVO;
+import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.UserService;
@@ -368,7 +369,8 @@ public class UserController {
             @RequestParam(required = false) Integer dreg_num, 
             @RequestParam(required = false) Integer dfc_num,
             @RequestParam(required = false) Integer reg_num,
-            @RequestParam(required = false) Integer fc_num){
+            @RequestParam(required = false) Integer fc_num,
+            @AuthenticationPrincipal CustomUser customUser) {
           //@RequestParam Map<String, Integer> paramMap 로 한꺼번에 받아와서 paramMap.get("dreg_num") 이런식으로 쓰는게 나을수도
 
         List<DetailRegionVO> regionList = userService.getRegionListWithWhole();
@@ -393,6 +395,11 @@ public class UserController {
         if(reg_num != null) model.addAttribute("reg_num", reg_num);
         if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
         if(fc_num != null)model.addAttribute("fc_num", fc_num);  
+        if(customUser != null && customUser.getUser() != null) {
+            model.addAttribute("user", customUser.getUser());
+        } else {
+            model.addAttribute("user", new UserVO()); // 로그인하지 않은 경우 빈 UserVO 객체를 추가
+        }
 
         System.out.println("리스트 호출");
         //System.out.println(dreg_num + " " + dfc_num + " " + reg_num); 
@@ -403,7 +410,8 @@ public class UserController {
     }
 
   @PostMapping("/list/sub")
-  public String listPost(Model model, @RequestBody ResCriteria cri) {
+  public String listPost(Model model, @RequestBody ResCriteria cri,
+      @AuthenticationPrincipal CustomUser customUser) {
     cri.setPerPageNum(2);   //차후 삭제
     // num를 서비스에게 주면서 게시판 번호에 맞는 게시글 목록 중 2개를 가져오라고 요청.
     System.out.println(cri);
@@ -421,6 +429,12 @@ public class UserController {
     // 가져온 게시글 목록을 화면에 전송
     model.addAttribute("list", list);
     model.addAttribute("pm", pm);
+    if(customUser != null && customUser.getUser() != null) {
+        model.addAttribute("user", customUser.getUser());
+    } else {
+        model.addAttribute("user", new UserVO()); // 로그인하지 않은 경우 빈 UserVO 객체를 추가
+    }
+
     // System.out.println("상세 호출");
     return "user/list/sublist";
   }
@@ -499,6 +513,25 @@ public class UserController {
 
     // model.addAttribute("apiKey", apiKey); // API 키
     return "user/detail/home";
+  }
+
+  @PostMapping("/follow")
+  public Map<String, Object> toggleLike(UsFollowVO follow, @AuthenticationPrincipal CustomUser customUser) {
+    if (customUser == null || customUser.getUser() == null) {
+      return Map.of("error", "로그인이 필요합니다.");
+    }
+    if(follow == null || follow.getUf_type() == null || follow.getUf_foreign() <= 0) {
+      return Map.of("error", "잘못된 요청입니다.");
+    }
+    boolean liked = userService.toggleFollow(follow);
+    
+    return Map.of("liked", liked);
+  }
+
+  // 찜 목록 조회
+  @GetMapping("/list")
+  public List<Integer> getLikeList(String type, @RequestParam int us_num) {
+    return userService.getFollowByUser(us_num); // 예: [3, 7, 12]
   }
   
 }

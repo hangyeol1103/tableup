@@ -133,20 +133,27 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
                     if(data.bd_off == true){
                         console.error("쉬는날 입니다.");
-                        renderTimeButtons(selectedDate, 0, 0);
+                        renderTimeButtons(selectedDate, 0, 0); // 전체 비활성화
                         return
                     }
 
-                    if (!data || !data.bd_start || !data.bd_end) {
+                    if (!data || !data.bd_open || !data.bd_close) {
                         console.error("데이터에 bd_start 또는 bd_end가 없음");
                         renderTimeButtons(selectedDate, 0, 0); // 전체 비활성화
                         return;
                     }
-                    const startHour = parseInt(data.bd_start.split(':')[0]);
-                    const endHour = parseInt(data.bd_end.split(':')[0]);
-                    const brstartHour = parseInt(data.bd_brstart.split(':')[0]);
-                    const brendHour = parseInt(data.bd_brend.split(':')[0]);
-                    console.log(date);
+
+                    const startHour = parseInt(data.bd_open.split(':')[0]);
+                    const endHour = parseInt(data.bd_close.split(':')[0]);
+                    // const brstartHour = parseInt(data.bd_brstart.split(':')[0]);
+                    // const brendHour = parseInt(data.bd_brend.split(':')[0]);
+                    
+                    console.log("개점 시간 : ",data.bd_open);
+                    console.log("마감 시간 : ",data.bd_close);
+                    console.log("브레이크(시작) : ",data.bd_brstart);
+                    console.log("브레이크(마감) : ",data.bd_brend);
+                    
+                    console.log("응답 확인 : ",data);
                     renderTimeButtons(selectedDate, startHour, endHour);
                 }, 
                 error: function () {
@@ -213,7 +220,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         //     }
         // }
 
-        function renderTimeButtons(selectedDate, start, end) {
+        function renderTimeButtons(selectedDate, startHour, endHour) {
         const filteredTimes = restimeList
             .filter(item => item.date === selectedDate)
             .map(item => item.time);

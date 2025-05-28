@@ -156,7 +156,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       function convertReservationToObject(res){
         
         let date = convertArrayToDateString(res.res_time);
-        let time = res.res_time.slice(3,5).join(":");
+        let hour = res.res_time.slice(3,4);
+        let minute = res.res_time.slice(4,5);
+        let time = fillZero(hour, 2) + ":" + fillZero(minute,2);
         let user = res.user.us_id;
         let res_state = res.res_state;
         let person = res.res_person;

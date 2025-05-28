@@ -49,7 +49,7 @@
   <div id="calendar"></div>
 
   <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/opertime/make_opertime'">영업시간 등록</button>
-  <a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+  <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 
   <script th:inline="javascript">
     const today = new Date();

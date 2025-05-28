@@ -74,7 +74,6 @@ public class ScheduleController {
       model.addAttribute("restimelist", restimelist);
 		}
 		
-		
 		List<LocalDate> dateList= new ArrayList<>();
 		LocalDate today = LocalDate.now();
 		for(int i=0;i<7;i++){
@@ -86,7 +85,6 @@ public class ScheduleController {
         timeList.add(startTime.plusMinutes(30 * i));
     }
 
-		
 		model.addAttribute("dateList", dateList);
 		model.addAttribute("timeList", timeList);
 		model.addAttribute("offset", offset);

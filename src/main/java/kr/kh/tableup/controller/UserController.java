@@ -297,12 +297,14 @@ public class UserController {
 
   @GetMapping("/review/insertsub")
   public String getRestaurantInfo(int rt_Num, Model model) {
+    System.out.println("리뷰 작성 페이지로 이동, 식당 번호: " + rt_Num);
     RestaurantVO restaurant = managerService.getResDetail(rt_Num);
     if (restaurant == null) {
       model.addAttribute("error", "해당 식당 정보를 찾을 수 없습니다.");
     } else {
       model.addAttribute("restaurant", restaurant);
     }
+    
     return "user/review/insertsub";
   }
 
@@ -529,7 +531,7 @@ public class UserController {
   }
 
   // 찜 목록 조회
-  @GetMapping("/list")
+  @GetMapping("/follow/list")
   public List<Integer> getLikeList(String type, @RequestParam int us_num) {
     return userService.getFollowByUser(us_num); // 예: [3, 7, 12]
   }

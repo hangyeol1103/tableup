@@ -77,5 +77,7 @@ public interface UserDAO {
 
 	List<RestaurantFacilityVO> selectRestaurantFacilityList(@Param("rt_num") int rt_num);
 
+	List<Integer> selectFollowByUser(int us_num);
+
 
 }

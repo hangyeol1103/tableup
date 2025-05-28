@@ -119,7 +119,7 @@
   // 찜 토글 함수
   function likeRestaurant(rt_num) {
     $.ajax({
-      url: '/user/follow?type=restaurant',
+      url: '/user/follow',
       type: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ uf_foreign : rt_num, uf_us_num : us_num, uf_type : "RESTAURANT" }),
@@ -142,7 +142,7 @@
     if (!us_num) return;
 
     $.ajax({
-      url: `/user/like/list?us_num=${us_num}`,
+      url: `/user/follow/list?us_num=${us_num}`,
       type: 'GET',
       success: function(likedList) {
         likedList.forEach(rt_num => {

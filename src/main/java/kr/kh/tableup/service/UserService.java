@@ -456,5 +456,25 @@ public class UserService {
   }
 
 
+	public List<Integer> getFollowByUser(int us_num) {
+		if(us_num <= 0) {
+      return Collections.emptyList();
+    }
+    
+    List<Integer> followList = userDAO.selectFollowByUser(us_num);
+    if (followList == null) {
+      return Collections.emptyList();
+    }
+    System.out.println("Follow List: " + followList);
+    return followList;
+	}
+
+
+	public boolean toggleFollow(UsFollowVO follow) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'toggleFollow'");
+	}
+
+
 
 }

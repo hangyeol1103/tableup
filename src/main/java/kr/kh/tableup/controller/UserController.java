@@ -436,6 +436,24 @@ public class UserController {
     // model.addAttribute("foodCategory", foodCategory);
     // model.addAttribute("detailFoodCategory", detailFoodCategory);
     // model.addAttribute("tag", tag);
+    RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
+    FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
+    DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
+    TagVO tag = userService.getTagByRestaurant(rt_num);
+    List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
+    List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
+
+    //System.out.println(apiKey);
+    System.out.println("restaurant: " + restaurant);
+
+    model.addAttribute("restaurant", restaurant);
+    model.addAttribute("foodCategory", foodCategory);
+    model.addAttribute("detailFoodCategory", detailFoodCategory);
+    model.addAttribute("tag", tag);
+    model.addAttribute("facilityList", facilityList);
+    model.addAttribute("restaurantFacilityList", restaurantFacilityList);
+
+
 
     model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가
     return "user/detail/detail";
@@ -470,6 +488,7 @@ public class UserController {
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
 
     //System.out.println(apiKey);
+    System.out.println("restaurant: " + restaurant);
 
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
@@ -477,6 +496,7 @@ public class UserController {
     model.addAttribute("tag", tag);
     model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
+
     // model.addAttribute("apiKey", apiKey); // API 키
     return "user/detail/home";
   }

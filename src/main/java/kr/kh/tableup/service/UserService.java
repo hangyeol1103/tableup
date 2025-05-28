@@ -461,6 +461,11 @@ public class UserService {
 	}
 
 
+  public List<MenuVO> getMenuList(int rt_num) {
+    return userDAO.selectMenuList(rt_num);
+  }
+
+
 
 
 }

@@ -1068,5 +1068,14 @@ public class ManagerController {
 	public List<ReservationVO> reservationDate(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {
 		return reservationService.getReservationList(customManager, date);
 	}
-	
+	@PostMapping("/reservation/state")
+	@ResponseBody
+	public Map<String, Object> reservateionState(@RequestBody ReservationVO reservation, HashMap<String, Object> map) {
+		try{
+			map.put("res", reservationService.updateReservationState(reservation));
+		}catch(Exception e){
+			map.put("error", e.getMessage());
+		}
+		return map;
+	}
 }

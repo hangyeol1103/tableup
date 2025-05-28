@@ -23,6 +23,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       <h1>예약 현황</h1>
       <div id='calendar'></div>
     </div>
+    <!-- 날짜 클릭 시 뜨는 모달 창 -->
     <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -42,6 +43,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       </div>
     </div>
 		<script>
+      const dateModal = new bootstrap.Modal(document.getElementById('dateModal'));
       /***************************************
       * 문구 변경시 여기를 수정해주세요.
       ****************************************/
@@ -57,7 +59,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       function viewModal(info){
         const selectedDateEl = document.getElementById('selectedDate');
         selectedDateEl.textContent = info.dateStr;
-        const dateModal = new bootstrap.Modal(document.getElementById('dateModal'));
+        
         dateModal.show();
         let list = getReservateionList(info.dateStr);
         let str = '';
@@ -71,8 +73,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
               <div>${obj.state}</div>
             </div>
             <div>
-              ${obj.res_state == 0 ? '<button type="button" class="btn btn-outline-success">'+confirmState+'</button>' : ''}
-              ${obj.res_state >= 0 ? '<button type="button" class="btn btn-outline-danger">'+cancelState+'</button>' : ''}
+              ${obj.res_state == 0 ? '<button type="button" class="btn-reservation btn btn-outline-success" data-target="'+obj.res_num+'" data-state="1" data-date="'+obj.date+'">'+confirmState+'</button>' : ''}
+              ${obj.res_state >= 0 ? '<button type="button" class="btn-reservation btn btn-outline-danger" data-target="'+obj.res_num+'" data-state="-1" data-date="'+obj.date+'">'+cancelState+'</button>' : ''}
             </div>
           `
         })
@@ -161,7 +163,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         let state = res_state == 0 ? readyState : res_state == 1 ? confirmState : cancelState;
         let title = `${time} ${user}(${person}명) ${state}`;
         let color = colorList[res_state+1];
-        return { date,time,title,color,state,user, res_state, person}
+        let res_num = res.res_num;
+        return { date,time,title,color,state,user, res_state, person, res_num, date}
       }
   
       
@@ -202,6 +205,52 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			});
 			calendar.render(); //캘린더 렌더링(화면에 출력)
       
+      /***************************************
+       * 이벤트 : 예약 확정/취소 버튼 클릭
+      ****************************************/
+      $(document).on('click', '.btn-reservation', function(){
+        let res_num = $(this).data("target");
+        let res_state = $(this).data("state");
+        let date = $(this).data("date");
+        $.ajax({
+          url : "/manager/reservation/state",
+          method : "post",
+          data : JSON.stringify({res_num , res_state}),
+          contentType : "application/json; charset=utf-8",
+          dataType : "json",
+          success : data=>{
+            let res = data.res;
+            let error = data.error;
+            if(error){
+              alert(error);
+              return;
+            }
+            if(res){
+              alert(res_state == 1 ? "예약이 확정되었습니다." : "예약이 취소되었습니다.");
+              
+              dateModal.hide();
+              calendar.refetchEvents();//캘린더 새로고침
+              setTimeout(() => {
+                calendarDateClick(date);
+              },400)
+            }
+          }
+        })
+      })
+      /**
+       * 함수 : 캘린더에서 지정 날짜(date)를 주면 js에서 클릭 이벤트를 호출하는 함수
+      */
+      function calendarDateClick(date){
+        // dateClick 콜백 수동 실행
+        const dateClickHandler = calendar.getOption('dateClick');
+        if (typeof dateClickHandler === 'function') {
+          dateClickHandler({
+            date: new Date(date),
+            dateStr: date,
+            view: calendar.view
+          });
+        }
+      }
 		</script>
 	</main>
 </body>

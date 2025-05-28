@@ -22,6 +22,10 @@
 <body>
 <main layout:fragment="content" class="container mt-5">
   <h2 class="mb-4">리뷰 작성</h2>
+  <div th:if="${errorMsg != null}" class="alert alert-danger" role="alert" th:text="${errorMsg}"></div>
+
+  <input type="hidden" name="us_name" th:value="${user.us_name}" />
+  
   <div class="mt-4 text-end">
     <button type="button" class="btn btn-info" onclick="resInfo()">식당 조회</button>
   </div>
@@ -40,12 +44,13 @@
 
     <div class="mb-3">
       <label class="form-label">방문 인원</label>
-      <input type="number" class="form-control" name="rev_visitor" min="1" max="99" value="2" th:value="${review != null} ? ${review.rev_visitor}: ''" required>
+      <input type="number" class="form-control" name="rev_visitor" min="1" max="99" th:value="${review != null} ? ${review.rev_visitor} : 2" required>
     </div>
 
     <div class="mb-3">
       <label for="rev_content" class="form-label">리뷰 내용</label>
-      <textarea class="form-control" name="rev_content" id="rev_content" th:value="${review != null} ? ${review.rev_content}: ''"></textarea>
+      <textarea class="form-control" name="rev_content" id="rev_content"
+          th:text="${review != null} ? ${review.rev_content} : ''"></textarea>
     </div>
 
     <div class="mb-4">

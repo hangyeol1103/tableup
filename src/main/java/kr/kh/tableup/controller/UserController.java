@@ -2,12 +2,12 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,21 +26,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
-import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
-import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
-import kr.kh.tableup.model.vo.TagTypeVO;
 import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
@@ -55,6 +52,9 @@ public class UserController {
 
   @Autowired
   private ManagerService managerService;
+
+    @Value("${my-api-key}")
+    private String apiKey;
 
   /** 로그인 */
 
@@ -261,29 +261,41 @@ public class UserController {
     return "user/mypage/info";
   }
 
+  @GetMapping("/detail")
+  public String detailPage() {
+    return "user/detail/detail";
+  }
+
   @GetMapping("/review/insert")
-  public String reviewpage(@RequestParam(required = false) Integer rt_num, Model model,
-      @AuthenticationPrincipal CustomUser customUser) {
+  public String reviewpage(Model model, @RequestParam(required = false) Integer rt_num, @ModelAttribute String errorMsg,
+      @ModelAttribute ReviewVO review, @AuthenticationPrincipal CustomUser customUser) {
     model.addAttribute("user", customUser.getUser());
 
     // model.addAttribute("errorMsg", "에러입니다."); //post에서 이런식으로 에러 넘기면 될듯
-
-    List<ScoreTypeVO> scoreTypeList = userService.getScoreType();
-    System.out.println("scoreTypeList: " + scoreTypeList);
-
+    
     if (rt_num != null) {
       model.addAttribute("restaurant", managerService.getResDetail(rt_num)); // 식당 정보
       model.addAttribute("rev_rt_num", rt_num); // 식당 번호 (만약 내 리뷰나 식당 페이지에서 넘어올땐 이거 이용해서 식당 번호 띄우기)
-    } else {
-
     }
+    List<ScoreTypeVO> scoreTypeList = userService.getScoreType();
+    System.out.println("scoreTypeList: " + scoreTypeList);
     model.addAttribute("scoreTypeList", scoreTypeList); // 평점 항목
+
+
+    if(errorMsg != null && !errorMsg.isEmpty()) {
+      model.addAttribute("errorMsg", errorMsg);
+    }
+    if (review != null) {
+      model.addAttribute("review", review); // 리뷰 정보
+    } else {
+      model.addAttribute("review", new ReviewVO()); // 빈 리뷰 객체
+    }
 
     return "user/review/insert";
   }
 
   @GetMapping("/review/insertsub")
-  public String getRestaurantInfo(@RequestParam("rt_num") int rt_Num, Model model) {
+  public String getRestaurantInfo(int rt_Num, Model model) {
     RestaurantVO restaurant = managerService.getResDetail(rt_Num);
     if (restaurant == null) {
       model.addAttribute("error", "해당 식당 정보를 찾을 수 없습니다.");
@@ -293,43 +305,46 @@ public class UserController {
     return "user/review/insertsub";
   }
 
-  @GetMapping("/detail")
-  public String detailPage() {
-    return "user/detail/detail";
-  }
-
   @PostMapping("/review/insertPost")
+  //@ResponseBody
   public String insertReview(
-      Model model,
-      @ModelAttribute ReviewVO review,
-      Map<String, String> allParams, @RequestParam(required = false) List<MultipartFile> files,
+      RedirectAttributes rttr,
+      ReviewVO review,
+      Map<String, String> scores, @RequestParam(required = false) List<MultipartFile> files,
       @RequestParam(required = false) List<String> fileNames, @RequestParam(required = false) List<String> fileTags,
       @AuthenticationPrincipal CustomUser user) {
 
+    if(user.getUser() == null) {
+      rttr.addFlashAttribute("errorMsg", "로그인이 필요합니다.");
+      return "redirect:/user/login";
+    }
     // 사용자 ID 또는 번호를 수동 세팅
     review.setRev_us_num(user.getUser().getUs_num());
+    review.setUs_name(user.getUser().getUs_name());
     System.out.println("리뷰 작성자 번호 : " + review.getRev_us_num());
     if (!userService.insertReview(review)) {
-      model.addAttribute("errorMsg", "빈 내용이 있거나 문제가 생겨 리뷰 저장에 실패했습니다.");
-      model.addAttribute("review", review);
-      return "user/review/insert";
+      rttr.addFlashAttribute("errorMsg", "빈 내용이 있거나 문제가 생겨 리뷰 저장에 실패했습니다.");
+      rttr.addFlashAttribute("review", review);
+      return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
     }
 
     // 점수 저장
-    for (Map.Entry<String, String> entry : allParams.entrySet()) {
-      String key = entry.getKey();
+    for (Map.Entry<String, String> score : scores.entrySet()) {
+      String key = score.getKey();
       if (key.startsWith("score[")) {
         try {
           int rs_st_num = Integer.parseInt(key.substring(6, key.length() - 1));
-          int rs_score = Integer.parseInt(entry.getValue());
+          int rs_score = Integer.parseInt(score.getValue());
 
           if (!userService.insertReviewScore(review, rs_st_num, rs_score)) {
-            model.addAttribute("errorMsg", "리뷰는 등록됐지만 점수 저장에 실패했습니다.");
-            return "user/review/insert";
+            rttr.addFlashAttribute("errorMsg", "리뷰는 등록됐지만 점수 저장에 실패했습니다.");
+            rttr.addFlashAttribute("review", review);
+            return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
           }
         } catch (NumberFormatException e) {
-          model.addAttribute("errorMsg", "잘못된 점수 형식이 입력되었습니다.");
-          return "user/review/insert";
+          rttr.addFlashAttribute("errorMsg", "잘못된 점수 형식이 입력되었습니다.");
+          rttr.addFlashAttribute("review", review);
+          return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
         }
       }
     }
@@ -338,11 +353,12 @@ public class UserController {
     if (!userService.insertFile(review, files, fileNames, fileTags)) {
       String errorMsg = "리뷰는 등록됐지만 파일 저장에 실패했습니다.";
       System.out.println(errorMsg);
-      model.addAttribute("errorMsg", errorMsg);
-      return "user/review/insert"; // 리뷰 등록 실패
+      rttr.addFlashAttribute("errorMsg", "리뷰는 등록됐지만 파일 저장에 실패했습니다.");
+      rttr.addFlashAttribute("review", review);
+      return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
     }
 
-    return "user/review/list";
+    return "redirect:/user/review/list";
   }
 
 
@@ -362,6 +378,8 @@ public class UserController {
         List<FacilityVO> facilityList = userService.getFacilityList();
 
         List<ScoreTypeVO> scoreTypeList = userService.getScoreTypeList();
+
+        System.out.println(dreg_num + " " + dfc_num + " " + reg_num + " " + fc_num);
 
         model.addAttribute("regionList", regionList);
         model.addAttribute("foodList", foodList);
@@ -418,7 +436,26 @@ public class UserController {
     // model.addAttribute("foodCategory", foodCategory);
     // model.addAttribute("detailFoodCategory", detailFoodCategory);
     // model.addAttribute("tag", tag);
+    RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
+    FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
+    DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
+    TagVO tag = userService.getTagByRestaurant(rt_num);
+    List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
+    List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
 
+    //System.out.println(apiKey);
+    System.out.println("restaurant: " + restaurant);
+
+    model.addAttribute("restaurant", restaurant);
+    model.addAttribute("foodCategory", foodCategory);
+    model.addAttribute("detailFoodCategory", detailFoodCategory);
+    model.addAttribute("tag", tag);
+    model.addAttribute("facilityList", facilityList);
+    model.addAttribute("restaurantFacilityList", restaurantFacilityList);
+
+
+
+    model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가
     return "user/detail/detail";
   }
 
@@ -450,12 +487,17 @@ public class UserController {
     List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
 
+    //System.out.println(apiKey);
+    System.out.println("restaurant: " + restaurant);
+
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
     model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
+
+    // model.addAttribute("apiKey", apiKey); // API 키
     return "user/detail/home";
   }
   

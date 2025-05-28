@@ -437,6 +437,7 @@ public class UserController {
     // model.addAttribute("detailFoodCategory", detailFoodCategory);
     // model.addAttribute("tag", tag);
 
+    model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가
     return "user/detail/detail";
   }
 
@@ -476,7 +477,7 @@ public class UserController {
     model.addAttribute("tag", tag);
     model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
-    model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가
+    // model.addAttribute("apiKey", apiKey); // API 키
     return "user/detail/home";
   }
   

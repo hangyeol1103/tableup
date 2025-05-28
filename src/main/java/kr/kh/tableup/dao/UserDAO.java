@@ -17,6 +17,7 @@ import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.TagVO;
+import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 
 public interface UserDAO {
@@ -77,7 +78,13 @@ public interface UserDAO {
 
 	List<RestaurantFacilityVO> selectRestaurantFacilityList(@Param("rt_num") int rt_num);
 
-	List<Integer> selectFollowByUser(int us_num);
+	List<UsFollowVO> selectFollowByUser(int us_num);
+
+	UsFollowVO selectUsFollow(UsFollowVO follow);
+
+	int deleteUsFollow(UsFollowVO follow);
+
+	int insertUsFollow(UsFollowVO follow);
 
 
 }

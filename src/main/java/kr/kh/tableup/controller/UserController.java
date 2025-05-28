@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -518,22 +520,70 @@ public class UserController {
   }
 
   @PostMapping("/follow")
-  public Map<String, Object> toggleLike(UsFollowVO follow, @AuthenticationPrincipal CustomUser customUser) {
+  @ResponseBody
+  public Map<String, Object> toggleLike(@RequestBody UsFollowVO follow, @AuthenticationPrincipal CustomUser customUser) {
+    System.out.println("follow: " + follow);
     if (customUser == null || customUser.getUser() == null) {
+      System.out.println("로그인하지 않은 사용자");
       return Map.of("error", "로그인이 필요합니다.");
     }
     if(follow == null || follow.getUf_type() == null || follow.getUf_foreign() <= 0) {
+      System.out.println("잘못된 follow 정보: " + follow);
       return Map.of("error", "잘못된 요청입니다.");
     }
-    boolean liked = userService.toggleFollow(follow);
-    
-    return Map.of("liked", liked);
+    follow.setUf_us_num(customUser.getUser().getUs_num()); // 현재 로그인한 사용자의 번호를 설정
+    int num = userService.toggleFollow(follow);
+    System.out.println("찜 처리 결과: " + num);
+
+    if(num>0)return Map.of("liked", true);
+    if(num<0)return Map.of("liked", false);
+    return Map.of("error", "찜 처리에 실패했습니다.");
   }
 
   // 찜 목록 조회
   @GetMapping("/follow/list")
-  public List<Integer> getLikeList(String type, @RequestParam int us_num) {
+  @ResponseBody
+  public List<UsFollowVO> getLikeList(String type, @RequestParam int us_num) {
     return userService.getFollowByUser(us_num); // 예: [3, 7, 12]
   }
+
+  @PostMapping("/follow/check")
+  @ResponseBody
+  public ResponseEntity<Map<Integer, Boolean>> checkFollow(
+      @RequestBody Map<String, Object> param,
+      @AuthenticationPrincipal CustomUser customUser) {
+    System.out.println(param);
+    if (customUser == null || customUser.getUser() == null) {
+      return ResponseEntity.badRequest().build();
+    }
+    System.out.println("111111111111111111111");
+    String uf_type = (String) param.get("uf_type");
+    List<Integer> uf_foreign_list;
+    try {
+      uf_foreign_list = (List<Integer>) param.get("uf_foreign_list");
+    } catch (ClassCastException e) {
+      uf_foreign_list = ((List<?>) param.get("uf_foreign_list"))
+                          .stream()
+                          .map(obj -> Integer.parseInt(obj.toString()))
+                          .collect(Collectors.toList());
+    }
+    System.out.println(uf_foreign_list);
+
+    if (uf_type == null || uf_foreign_list == null || uf_foreign_list.isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
+    System.out.println("222222222222222222222");
+    Map<Integer, Boolean> result = new HashMap<>();
+    for (Integer rtNum : uf_foreign_list) {
+      boolean liked = userService.isFollow(customUser.getUser().getUs_num(), uf_type, rtNum);
+      System.out.println(liked);
+      result.put(rtNum, liked);
+    }
+    System.out.println("333333333333333333333");
+
+    return ResponseEntity.ok(result);
+  }
+
+
   
 }

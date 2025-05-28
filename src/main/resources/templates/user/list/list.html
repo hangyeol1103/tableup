@@ -252,11 +252,13 @@
           } else {
             $(".pl-container").append(data);
           }
+          checkVisibleLikes();
         },
         error: function () {
           $(".pl-container").html('<div class="text-danger">불러오는 데 실패했습니다.</div>');
         }
       });
+
     }
 
 
@@ -339,7 +341,103 @@
     syncInputFromSlider();
 
     syncSliderFromInput();
+
+
+
+
+    
   </script>
+
+
+
+ <script>
+
+  const us_num = document.getElementById('us_num') ? parseInt(document.getElementById('us_num').dataset.usNum) : null;
+
+  // 찜 토글 함수
+  function likeRestaurant(rt_num) {
+    $.ajax({
+      url: '/user/follow',
+      type: 'POST',
+      contentType: "application/json; charset=utf-8",
+      dataType : "json", 
+      data: JSON.stringify({ uf_foreign : rt_num, uf_us_num : us_num, uf_type : "RESTAURANT" }),
+      success: res => {
+        const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
+        if (res.liked) {
+          //icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+          alert('찜 성공');
+          checkVisibleLikes(); 
+        } if (res.liked == false) {
+          //icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+          alert('찜 해제 성공');
+          checkVisibleLikes();
+        } else{
+          console.error('찜 상태 업데이트 실패:', res.error);
+        }
+      },
+      error: err => console.error('찜 실패:', err)
+    });
+  }
+/*
+  // 찜 여부 로딩 (페이지 로딩 시 실행)
+  function loadUserLikes() {
+    if (!us_num) return;
+
+    $.ajax({
+      url: `/user/follow/list?us_num=${us_num}`,
+      type: 'GET',
+      success: function(likedList) {
+        likedList.forEach(rt_num => {
+          const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
+          icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+        });
+      },
+      error: function() {
+        console.error("찜 불러오기 실패");
+      }
+    });
+  }
+
+  $(document).ready(function() {
+    loadUserLikes();
+  });
+*/
+
+
+    function checkVisibleLikes() {
+      //const us_num = parseInt(document.getElementById('us_num').dataset.usNum);
+      const rtNums = $(".follow-btn").map(function() {
+        return parseInt($(this).data("rt-num"));
+      }).get(); // ex: [3, 5, 9]
+      console.log("찜 상태 확인을 위한 rtNums:", rtNums);
+      $.ajax({
+        url: '/user/follow/check',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ uf_us_num: us_num, uf_type: "RESTAURANT", uf_foreign_list: rtNums }),
+        success: function(res) {
+          for (const [rt_num, liked] of Object.entries(res)) {
+            console.log(`찜 상태 업데이트: rt_num=${rt_num}, liked=${liked}`);
+            const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
+            if (liked) {
+              icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+            } else {
+              icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+            }
+          }
+        },
+        error: function() {
+          console.error("찜 상태 확인 실패");
+        }
+      });
+    }
+    $(document).ready(function() {
+      if(us_num) checkVisibleLikes();
+    });
+
+  </script>
+
 </main>
 
 </body>

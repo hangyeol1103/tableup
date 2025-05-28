@@ -74,19 +74,13 @@ public class ScheduleController {
       model.addAttribute("restimelist", restimelist);
 		}
 		
-		List<LocalDate> dateList= new ArrayList<>();
-		LocalDate today = LocalDate.now();
-		for(int i=0;i<7;i++){
-			dateList.add(today.plusDays(i));
-		}
-		List<LocalTime> timeList = new ArrayList<>();
-		LocalTime startTime = LocalTime.of(0, 0);
-    for (int i = 0; i < 48; i++) {
-        timeList.add(startTime.plusMinutes(30 * i));
-    }
+		// List<LocalDate> dateList= new ArrayList<>();
+		// LocalDate today = LocalDate.now();
+		// for(int i=0;i<7;i++){
+		// 	dateList.add(today.plusDays(i));
+		// }
 
-		model.addAttribute("dateList", dateList);
-		model.addAttribute("timeList", timeList);
+		// model.addAttribute("dateList", dateList);
 		model.addAttribute("offset", offset);
 		model.addAttribute("manager", manager);
 		model.addAttribute("url","/manager_schedulelist");

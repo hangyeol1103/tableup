@@ -252,11 +252,13 @@
           } else {
             $(".pl-container").append(data);
           }
+          checkVisibleLikes();
         },
         error: function () {
           $(".pl-container").html('<div class="text-danger">불러오는 데 실패했습니다.</div>');
         }
       });
+
     }
 
 
@@ -357,14 +359,19 @@
     $.ajax({
       url: '/user/follow',
       type: 'POST',
-      contentType: 'application/json',
+      contentType: "application/json; charset=utf-8",
+      dataType : "json", 
       data: JSON.stringify({ uf_foreign : rt_num, uf_us_num : us_num, uf_type : "RESTAURANT" }),
       success: res => {
-        const icon = $(`.like-btn[data-rt-num='${rt_num}'] i`);
+        const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
         if (res.liked) {
-          icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+          //icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+          alert('찜 성공');
+          checkVisibleLikes(); 
         } if (res.liked == false) {
-          icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+          //icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+          alert('찜 해제 성공');
+          checkVisibleLikes();
         } else{
           console.error('찜 상태 업데이트 실패:', res.error);
         }
@@ -382,7 +389,7 @@
       type: 'GET',
       success: function(likedList) {
         likedList.forEach(rt_num => {
-          const icon = $(`.like-btn[data-rt-num='${rt_num}'] i`);
+          const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
           icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
         });
       },
@@ -400,18 +407,19 @@
 
     function checkVisibleLikes() {
       //const us_num = parseInt(document.getElementById('us_num').dataset.usNum);
-      const rtNums = $(".like-btn").map(function() {
+      const rtNums = $(".follow-btn").map(function() {
         return parseInt($(this).data("rt-num"));
       }).get(); // ex: [3, 5, 9]
-
+      console.log("찜 상태 확인을 위한 rtNums:", rtNums);
       $.ajax({
         url: '/user/follow/check',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ us_num: us_num, uf_type: "RESTAURANT", uf_foreign_list: rtNums }),
+        data: JSON.stringify({ uf_us_num: us_num, uf_type: "RESTAURANT", uf_foreign_list: rtNums }),
         success: function(res) {
           for (const [rt_num, liked] of Object.entries(res)) {
-            const icon = $(`.like-btn[data-rt-num='${rt_num}'] i`);
+            console.log(`찜 상태 업데이트: rt_num=${rt_num}, liked=${liked}`);
+            const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
             if (liked) {
               icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
             } else {
@@ -425,7 +433,7 @@
       });
     }
     $(document).ready(function() {
-      checkVisibleLikes();
+      if(us_num) checkVisibleLikes();
     });
 
   </script>

@@ -11,5 +11,5 @@ public class UsFollowVO {
   private String uf_type;       // uf_TYPE enum('REVIEW','RESTAURANT')
   private int uf_foreign;       // uf_FOREIGN int
 
-  private List<Integer> uf_foreign_list;
+  //private List<Integer> uf_foreign_list;
 }

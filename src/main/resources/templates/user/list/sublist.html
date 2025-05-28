@@ -81,7 +81,7 @@
 								<strong>기타 정보:</strong> <span th:text="${restaurant.rd_info}">주차 가능 / 반려동물 동반 가능</span>
 							</p>
 							<div class="mt-2 d-flex justify-content-between">
-								<button class="btn btn-outline-danger btn-sm"
+								<button class="btn btn-outline-danger btn-sm follow-btn"
                         th:attr="data-rt-num=${restaurant.rt_num}"
 												th:onclick="'likeRestaurant(' + ${restaurant.rt_num} + ')'">
 									<i class="bi bi-heart"></i> 찜하기

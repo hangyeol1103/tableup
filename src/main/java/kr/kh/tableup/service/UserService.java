@@ -490,10 +490,16 @@ public class UserService {
 	}
 
 
-	public boolean toggleFollow(UsFollowVO follow) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'toggleFollow'");
-	}
+  public int toggleFollow(UsFollowVO follow) {
+    UsFollowVO dbFollow = userDAO.selectUsFollow(follow);
+    if (dbFollow != null) {
+      int result = userDAO.deleteUsFollow(follow);
+      return result * (-1);
+    } else {
+      int result = userDAO.insertUsFollow(follow);
+      return result;
+    }
+  }
 
 
 	public boolean isFollow(int uf_us_num, String uf_type, int uf_foreign) {

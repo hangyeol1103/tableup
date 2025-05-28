@@ -80,5 +80,11 @@ public interface UserDAO {
 
 	List<UsFollowVO> selectFollowByUser(int us_num);
 
+	UsFollowVO selectUsFollow(UsFollowVO follow);
+
+	int deleteUsFollow(UsFollowVO follow);
+
+	int insertUsFollow(UsFollowVO follow);
+
 
 }

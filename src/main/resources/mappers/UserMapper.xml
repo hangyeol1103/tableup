@@ -431,7 +431,27 @@
 	</select>
 
 	<select id="selectFollowByUser" resultType="UsFollowVO">
-		SELECT * FROM usfollow WHERE uf_us_num = #{us_num} AND uf_type = #{uf_type} AND uf_foreign = #{uf_foreign}
+		SELECT * FROM usfollow WHERE uf_us_num = #{us_num}
 	</select>
+
+	<select id="selectUsFollow" resultType="UsFollowVO" >
+		SELECT * FROM usfollow
+		WHERE uf_us_num = #{uf_us_num}
+			AND uf_type = #{uf_type}
+			AND uf_foreign = #{uf_foreign}
+	</select>
+
+	<insert id="insertUsFollow" useGeneratedKeys="true" > 
+		INSERT INTO usfollow(uf_us_num, uf_type, uf_foreign)
+		VALUES(#{uf_us_num}, #{uf_type}, #{uf_foreign})
+	</insert>
+
+	<delete id="deleteUsFollow" > 
+		DELETE FROM usfollow
+		WHERE uf_us_num = #{uf_us_num}
+			AND uf_type = #{uf_type}
+			AND uf_foreign = #{uf_foreign}
+	</delete>
+
 
 </mapper>

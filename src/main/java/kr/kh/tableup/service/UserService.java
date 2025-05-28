@@ -1,6 +1,12 @@
 package kr.kh.tableup.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +17,23 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.dao.UserDAO;
-
-import kr.kh.tableup.model.util.*;
-import kr.kh.tableup.model.vo.*;
+import kr.kh.tableup.model.util.Criteria;
+import kr.kh.tableup.model.util.PageMaker;
+import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
+import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantFacilityVO;
+import kr.kh.tableup.model.vo.RestaurantVO;
+import kr.kh.tableup.model.vo.ReviewScoreVO;
+import kr.kh.tableup.model.vo.ReviewVO;
+import kr.kh.tableup.model.vo.ScoreTypeVO;
+import kr.kh.tableup.model.vo.TagVO;
+import kr.kh.tableup.model.vo.UsFollowVO;
+import kr.kh.tableup.model.vo.UserVO;
 
 @Service
 public class UserService {
@@ -456,12 +476,12 @@ public class UserService {
   }
 
 
-	public List<Integer> getFollowByUser(int us_num) {
+	public List<UsFollowVO> getFollowByUser(int us_num) {
 		if(us_num <= 0) {
       return Collections.emptyList();
     }
     
-    List<Integer> followList = userDAO.selectFollowByUser(us_num);
+    List<UsFollowVO> followList = userDAO.selectFollowByUser(us_num);
     if (followList == null) {
       return Collections.emptyList();
     }
@@ -473,6 +493,14 @@ public class UserService {
 	public boolean toggleFollow(UsFollowVO follow) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'toggleFollow'");
+	}
+
+
+	public boolean isFollow(int uf_us_num, String uf_type, int uf_foreign) {
+		
+    return userDAO.selectFollowByUser(uf_us_num).stream()
+        .anyMatch(follow -> follow.getUf_type().equals(uf_type) && follow.getUf_foreign() == uf_foreign);
+    
 	}
 
 

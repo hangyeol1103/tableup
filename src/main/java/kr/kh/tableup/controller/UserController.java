@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -532,8 +534,31 @@ public class UserController {
 
   // 찜 목록 조회
   @GetMapping("/follow/list")
-  public List<Integer> getLikeList(String type, @RequestParam int us_num) {
+  public List<UsFollowVO> getLikeList(String type, @RequestParam int us_num) {
     return userService.getFollowByUser(us_num); // 예: [3, 7, 12]
   }
+
+  @PostMapping("/user/follow/check")
+  public ResponseEntity<Map<Integer, Boolean>> checkFollow(@RequestBody UsFollowVO follow, @AuthenticationPrincipal CustomUser customUser) {
+    if (follow == null || follow.getUf_foreign_list() == null || follow.getUf_foreign_list().isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
+    if (customUser == null || customUser.getUser() == null) {
+      return ResponseEntity.badRequest().build();
+    }
+    System.out.println("유저 확인");
+    System.out.println("follow: " + follow);
+    
+    UserVO user = customUser.getUser();
+    follow.setUf_us_num(user.getUs_num()); // 현재 로그인한 사용자의 번호를 설정
+
+    Map<Integer, Boolean> result = new HashMap<>();
+    for (Integer rtNum : follow.getUf_foreign_list()) {
+      boolean liked = userService.isFollow(follow.getUf_us_num(), follow.getUf_type(), rtNum);
+      result.put(rtNum, liked);
+    }
+    return ResponseEntity.ok(result);
+}
+
   
 }

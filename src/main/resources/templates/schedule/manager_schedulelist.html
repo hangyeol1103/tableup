@@ -132,8 +132,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     const timeListDiv =document.getElementById('time-list');
                     timeListDiv.innerHTML='';
 
+                    if(!filteredTimes || filteredTimes.length === 0){
+                        timeListDiv.innerHTML = '<div class="text-secondary">등록된 예약 시간이 없습니다.</div>';
+                        return;
+                    }
+
                     filteredTimes.forEach(timeStr => {
-                        const status = reservationList.find(item => item.date === selectedDate && item.time === timeStr);
+                        // const status = reservationList.find(item => item.date === selectedDate && item.time === timeStr);
                         const bh = restimeList.find(item => item.date === selectedDate && item.time === timeStr);
                         const isFull = bh && status && status.tableCount >= bh.bh_table_max;
                         
@@ -164,13 +169,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         function HolidayStatus(date, newStatus){
             console.log("보내는 데이터:", { date: date, bd_off: newStatus });
             $.ajax({
-                async : false, 
+                async : true, 
                 url : '/schedule/update-holiday', 
                 type : 'post', 
                 data : JSON.stringify({bd_date: date, bd_off: newStatus}), 
                 contentType: 'application/json', 
                 success : function (){
                     alert('상태가 변경되었습니다.');
+                    const updated = opertimeList.find(item => item.bd_date?.substring(0, 10) === date);
+                    if (updated) {
+                        updated.bd_off = newStatus;
+                    }
+                    
                     const btn = document.querySelector(`.date-button[data-date="${date}"]`);
                     if (btn) selectDate(btn);
                 }, 
@@ -180,7 +190,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             });
         }
 
-        
         //예약 가능 시간대 버튼 출력
         function renderTimeButtons(selectedDate, startHour, endHour) {
             console.log('selectedDate:', selectedDate);
@@ -195,7 +204,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         function selectTime(button){
             const selectedDate = button.getAttribute('data-date');
             const selectedTime = button.getAttribute('data-time');
-            
             
             $.ajax({
                 async : true,
@@ -223,11 +231,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     document.getElementById('selected-time-infomation').innerHTML = "오류가 생겼습니다.";
                 }
             });
-        }
-        
-        </script>
-
-        
+        }        
+        </script>        
     </main>
 </body>
 </html>

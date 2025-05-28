@@ -271,7 +271,7 @@ public class ManagerController {
 		if (manager.getManager().getRm_rt_num() <= 0) {
 			// 매장 정보가 없는 매니저 → 매장 등록 페이지로
 			System.out.println("매니저 정보가 없습니다.");
-			return "redirect:/manager/make";
+			return "redirect:/manager/restaurant/make";
     }
 		List<MenuTypeVO> menutype = managerService.getMenuTypeList();
 		
@@ -294,7 +294,7 @@ public class ManagerController {
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
 				System.out.println("매니저 정보가 없습니다.");
-        return "redirect:/manager/make";
+        return "redirect:/manager/restaurant/make";
     }
 
 		if(managerService.makeMenu(menu,mn_img2)){
@@ -306,7 +306,12 @@ public class ManagerController {
 	
 	//메뉴 상세 페이지
 	@GetMapping("/menu/menu/{mn_num}")
-	public String detailMenu(Model model, @PathVariable int mn_num) {
+	public String detailMenu(Model model, @PathVariable int mn_num, Principal principal, @AuthenticationPrincipal CustomManager manager) {
+		String loginId =principal.getName();
+		if (manager == null || loginId !=manager.getManager().getRm_id()) {
+        return "redirect:/manager/login";
+    }
+
 		MenuVO menu = managerService.getMenu(mn_num);
 		MenuTypeVO menutype =managerService.getMenuType(menu.getMn_mt_num());
 		model.addAttribute("menu", menu);
@@ -351,7 +356,7 @@ public class ManagerController {
 
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
+        return "redirect:/manager/restaurant/make";
     }
 
 		if(managerService.updateMenu(menu,mn_img2)){
@@ -364,8 +369,6 @@ public class ManagerController {
 	//매장 상세 정보 출력
 	@GetMapping("/detail/restaurantdetail/{rt_num}")
 	public String restaurantDetailPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
-
-
 		
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/";
@@ -500,7 +503,7 @@ public class ManagerController {
 
 	//쿠폰 정보 출력 페이지
 	@GetMapping("/coupon/coupon/{rec_num}")
-	public String detailCoupon(Model model, @PathVariable int rec_num) {
+	public String detailCoupon(Model model, @PathVariable int rec_num, Principal principal) {
 		ResCouponVO coupon = managerService.getCoupon(rec_num);
 		model.addAttribute("coupon", coupon);
 		return "/manager/coupon/coupon";
@@ -602,7 +605,7 @@ public class ManagerController {
 
 	//소식 정보 출력 페이지
 	@GetMapping("/news/news/{rn_num}")
-	public String detailNews(Model model, @PathVariable int rn_num) {
+	public String detailNews(Model model, @PathVariable int rn_num, @AuthenticationPrincipal CustomManager manager, Principal principal) {
 		ResNewsVO news = managerService.getNews(rn_num);
 		System.out.println(news);
 		model.addAttribute("news", news);
@@ -655,7 +658,7 @@ public class ManagerController {
 	//예약 가능 시간 페이지
 	//예약 가능 시간 목록(리스트)
 	@GetMapping("/restime/restimelist/{rt_num}")
-	public String ResTimeListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
+	public String ResTimeListPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager, Principal principal) {
 		System.out.println("restimelist rt_num: " + rt_num);
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/";

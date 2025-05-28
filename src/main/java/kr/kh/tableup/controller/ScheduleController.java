@@ -1,7 +1,9 @@
 package kr.kh.tableup.controller;
 
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,7 +13,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,13 +23,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
-import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
+import kr.kh.tableup.service.ReservationService;
+import kr.kh.tableup.service.ScheduleService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 @RequestMapping("/schedule")
@@ -34,12 +44,18 @@ public class ScheduleController {
 	@Autowired
 	ManagerService managerService;
 
+	@Autowired
+	ReservationService reservationService;
+
+	@Autowired
+	ScheduleService scheduleService;
+
 	@GetMapping("/manager_schedulelist")
-	public String manager(@RequestParam(defaultValue = "0") int offset, Model model, @AuthenticationPrincipal CustomManager manager ) {
-		if (manager == null) {
+	public String manager(@RequestParam(defaultValue = "0") int offset, Model model, @AuthenticationPrincipal CustomManager manager, Principal principal ) {
+		String loginId =principal.getName();
+		if (manager == null || loginId !=manager.getManager().getRm_id()) {
         return "redirect:/manager/login";
     }
-		System.out.println(manager);
 
 		int rt_num = manager.getManager().getRm_rt_num();
 
@@ -48,19 +64,17 @@ public class ScheduleController {
 		}
 		else{
 			RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
-			List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
+			List<BusinessDateVO> opertimelist = scheduleService.getOperTimeList(rt_num);
 			
 			List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
 			//터미널에 필요한 매장 정보 및 세부 정보들 출력
-			System.out.println(restaurant);
-			System.out.println(opertimelist);
-			System.out.println(restimelist);
 
       model.addAttribute("restaurant", restaurant);
       model.addAttribute("opertimelist", opertimelist);
       model.addAttribute("restimelist", restimelist);
 		}
-
+		
+		
 		List<LocalDate> dateList= new ArrayList<>();
 		LocalDate today = LocalDate.now();
 		for(int i=0;i<7;i++){
@@ -72,6 +86,7 @@ public class ScheduleController {
         timeList.add(startTime.plusMinutes(30 * i));
     }
 
+		
 		model.addAttribute("dateList", dateList);
 		model.addAttribute("timeList", timeList);
 		model.addAttribute("offset", offset);
@@ -79,5 +94,63 @@ public class ScheduleController {
 		model.addAttribute("url","/manager_schedulelist");
 		return "schedule/manager_schedulelist";
 	}
+
+	@GetMapping("/business-date")
+	@ResponseBody
+	public BusinessDateVO getBusinessDate(@RequestParam String date) {
+		BusinessDateVO db = scheduleService.getOperTimeByDay(date);
+		return db; // JSON 반환
+	}
+
+	// 날짜 선택시 날짜와 같은 예약 가능 시간 버튼으로 출력
+	@GetMapping("/getTimes")
+	@ResponseBody
+	public List<String> getFilteredTimes(@RequestParam("selectedDate")String selectedDate, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num=manager.getManager().getRm_rt_num();
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate startDate = LocalDate.parse(selectedDate, formatter);
+    LocalDate endDate = startDate.plusDays(6);
+
+		List<BusinessHourVO> selectedResStart = scheduleService.getResStart(rt_num, startDate, endDate);
+
+		return selectedResStart.stream()
+      .filter(bh -> bh.getBh_start().toLocalDate().equals(startDate)) // 선택 날짜만 필터
+      .map(bh -> bh.getBh_start().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
+      .collect(Collectors.toList());
+	}
+
+	//예약 가능 시간 인원수 정보 출력
+	@GetMapping("/time-infomation")
+	@ResponseBody
+	public Map<String, Object> getTimeInfomation(@RequestParam String date, @RequestParam String time, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num=manager.getManager().getRm_rt_num();
+		LocalDateTime dateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.parse(time));
+
+		BusinessHourVO restimedetail=scheduleService.getResTimeDetail(rt_num,dateTime);
+		Map<String, Object> result= new HashMap<>();
+
+		
+		if (restimedetail != null) {
+        result.put("seatCount", restimedetail.getBh_seat_current());
+        result.put("seatMax", restimedetail.getBh_seat_max());
+    }
+
+		return result;
+		}
+
+		//쉬는날 변경 기능
+		@PostMapping("/update-holiday")
+		@ResponseBody
+		public ResponseEntity<Boolean> updateHoliday(@RequestBody BusinessDateVO date) {
+			
+			System.out.println("bd_date: " + date.getBd_date());
+    	System.out.println("bd_off: " + date.isBd_off());
+			
+			boolean result = scheduleService.updateBdOff(date);
+			return ResponseEntity.ok(result);
+		}
+		
+	
 
 }

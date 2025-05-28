@@ -18,7 +18,7 @@
 <body>
   <main div class="container mt-4"layout:fragment="content" >
     <h2>메뉴 등록</h2>
-    <form th:action="@{/manager/make_menu}" method="post" id="signup-form" enctype="multipart/form-data">
+    <form th:action="@{/manager/menu/make_menu}" method="post" id="signup-form" enctype="multipart/form-data">
       <div class="mb-3 form-group box">
         <label for="mn_name" class="form-label">메뉴이름</label>
         <input type="text" class="form-control" name="mn_name" id="mn_name" required>

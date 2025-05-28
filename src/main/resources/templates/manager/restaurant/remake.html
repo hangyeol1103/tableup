@@ -56,7 +56,7 @@
 
 			<div class="mb-3 form-group box">
         <label for="fc_num" class="form-label">장르</label>
-        <select class="form-select" id="fc_num" name="fc_num" required>
+        <select class="form-select" id="fc_num" name="fc_num" required >
           <option value="">장르 선택</option>
           <th:block th:each="fc : ${foodcategory}">
             <option th:value="${fc.fc_num}" th:text="${fc.fc_main}" th:selected="${fc.fc_num==restaurant.fc_num}"></option>

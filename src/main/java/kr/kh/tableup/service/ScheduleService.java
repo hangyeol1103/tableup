@@ -1,5 +1,7 @@
 package kr.kh.tableup.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,14 @@ public class ScheduleService {
 		System.out.println("--------------");
 		System.out.println(date);
 		return scheduleDAO.selectOperTimeByDay(date);
+	}
+
+	public List<BusinessHourVO> getResStart(int rt_num, LocalDate startDate, LocalDate endDate) {
+		return scheduleDAO.selectResTime(rt_num, startDate, endDate);
+	}
+
+	public BusinessHourVO getResTimeDetail(int rt_num, LocalDateTime dateTime) {
+		return scheduleDAO.selectResTimeDetail(rt_num, dateTime);
 	}
 	
 }

@@ -3,6 +3,7 @@ package kr.kh.tableup.controller;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -50,7 +51,6 @@ public class ScheduleController {
 		if (manager == null || loginId !=manager.getManager().getRm_id()) {
         return "redirect:/manager/login";
     }
-		System.out.println(manager);
 
 		int rt_num = manager.getManager().getRm_rt_num();
 
@@ -63,9 +63,6 @@ public class ScheduleController {
 			
 			List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
 			//터미널에 필요한 매장 정보 및 세부 정보들 출력
-			System.out.println(restaurant);
-			System.out.println(opertimelist);
-			System.out.println(restimelist);
 
       model.addAttribute("restaurant", restaurant);
       model.addAttribute("opertimelist", opertimelist);
@@ -96,10 +93,45 @@ public class ScheduleController {
 	@GetMapping("/business-date")
 	@ResponseBody
 	public BusinessDateVO getBusinessDate(@RequestParam String date) {
-		System.out.println(date);
 		BusinessDateVO db = scheduleService.getOperTimeByDay(date);
-		System.out.println(db);
 		return db; // JSON 반환
 	}
+
+	@GetMapping("/getTimes")
+	@ResponseBody
+	public List<String> getFilteredTimes(@RequestParam("selectedDate")String selectedDate, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num=manager.getManager().getRm_rt_num();
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate startDate = LocalDate.parse(selectedDate, formatter);
+    LocalDate endDate = startDate.plusDays(6);
+
+		List<BusinessHourVO> selectedResStart = scheduleService.getResStart(rt_num, startDate, endDate);
+
+		return selectedResStart.stream()
+      .filter(bh -> bh.getBh_start().toLocalDate().equals(startDate)) // 선택 날짜만 필터
+      .map(bh -> bh.getBh_start().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
+      .collect(Collectors.toList());
+	}
+
+	@GetMapping("/time-infomation")
+	@ResponseBody
+	public Map<String, Object> getTimeInfomation(@RequestParam String date, @RequestParam String time, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num=manager.getManager().getRm_rt_num();
+		LocalDateTime dateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.parse(time));
+
+		BusinessHourVO restimedetail=scheduleService.getResTimeDetail(rt_num,dateTime);
+		Map<String, Object> result= new HashMap<>();
+
+		
+		if (restimedetail != null) {
+        result.put("seatCount", restimedetail.getBh_seat_current());
+        result.put("seatMax", restimedetail.getBh_seat_max());
+    }
+
+		return result;
+		}
+	
+	
 
 }

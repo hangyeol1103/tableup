@@ -13,5 +13,15 @@
 										AND CONCAT(#{date}, ' 23:59:59')
 	</select>
 
+	<select id="selectResTime" resultType="BusinessHourVO">
+		select * from businesshour 
+		where bh_rt_num=#{rt_num} and bh_start between #{startDate} and #{endDate}
+	</select>
+
+	<select id="selectResTimeDetail" resultType="BusinessHourVO">
+		select * from businesshour
+		where bh_rt_num=#{rt_num} and bh_start=#{dateTime}
+	</select>
+
 	
 </mapper>

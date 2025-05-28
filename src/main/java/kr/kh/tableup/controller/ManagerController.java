@@ -3,7 +3,9 @@ package kr.kh.tableup.controller;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -1057,7 +1059,7 @@ public class ManagerController {
 	}
 	
 	
-	@GetMapping("/manager_reservation")
+	@GetMapping("/manager/manager_reservation")
 	public String reservateionManager(Model model) {
 		
 		return "/manager/reservation/manager_reservation";
@@ -1069,12 +1071,9 @@ public class ManagerController {
 		return "/manager/reservation/reservation";
 	}
 	@PostMapping("/reservation/date")
-	public String getMethodName(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {
-		List<ReservationVO> reservations = reservationService.getReservationList(customManager, date);
-		model.addAttribute("date", date);
-		model.addAttribute("reservations",reservations);
-		System.out.println("reservaions = " + reservations);
-		return "/manager/reservation/reservation_date";
+	@ResponseBody
+	public List<ReservationVO> reservationDate(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {
+		return reservationService.getReservationList(customManager, date);
 	}
 	
 }

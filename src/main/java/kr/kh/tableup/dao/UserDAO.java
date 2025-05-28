@@ -79,6 +79,8 @@ public interface UserDAO {
 
 	List<ResNewsVO> selectResNewsList(@Param("rt_num") int rt_num);
 
+	List<FileVO> selectFileList(@Param("rt_num") int rt_num);
+
 
 
 }

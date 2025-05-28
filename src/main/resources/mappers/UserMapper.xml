@@ -441,4 +441,8 @@
 	<select id="selectResNewsList" resultType="ResNewsVO">
 		select * from resnews where rn_rt_num = #{rt_num}
 	</select>
+
+	<select id="selectFileList" resultType="FileVO">
+		select * from file where file_type = 'RestaurantDetail' and file_res_num = #{rt_num}
+	</select>
 </mapper>

@@ -456,6 +456,11 @@ public class UserService {
 	}
 
 
+	public List<FileVO> getFileList(int rt_num) {
+		return userDAO.selectFileList(rt_num);
+	}
+
+
 
 
 }

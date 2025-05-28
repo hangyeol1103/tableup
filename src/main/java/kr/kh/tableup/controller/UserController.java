@@ -53,8 +53,8 @@ public class UserController {
   @Autowired
   private ManagerService managerService;
 
-    @Value("${my-api-key}")
-    private String apiKey;
+  @Value("${my-api-key}")
+  private String apiKey;
 
   /** 로그인 */
 

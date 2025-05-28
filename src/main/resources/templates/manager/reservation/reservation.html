@@ -67,7 +67,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
           `
             <div>
               <div>${obj.time}</div>
-              <div>${obj.user}</div>
+              <div>${obj.user}(${obj.person}명)</div>
               <div>${obj.state}</div>
             </div>
             <div>
@@ -83,24 +83,34 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       /***************************************
        * 변환 함수들 : 코드의 재사용을 위해 만듬
       ****************************************/
-      //num 앞에 0으로 채워 반환. 글자 길이를 size 기준으로
+      /***************************************
+       * 함수 : num 앞에 0으로 채워 반환. 글자 길이를 size 기준으로
+       * 예시 : 5 => 05로 변환
+      ****************************************/
       function fillZero(num, size) {
         return num.toString().padStart(size, '0');
       }
-      //Date객체를 yyyy-MM 문자열로 변환
+      /***************************************
+       * 함수 : Date객체를 yyyy-MM 문자열로 변환
+      ****************************************/
       function convertDateToString(date){
         const year = date.getFullYear();
         const month = fillZero(date.getMonth() + 1, 2); 
         return `${year}-${month}`;
       }
-      //[yyyy, M, d] 년, 월, 일이 들어 있는 배열을 yyyy-MM-dd 문자열로 변환
+      /***************************************
+       * 함수 : [yyyy, M, d] 년, 월, 일이 들어 있는 배열을 yyyy-MM-dd 문자열로 변환
+       * 예시 : [2025,5,15] => 2025-05-15
+      ****************************************/
       function convertArrayToDateString(arr){
         const year = arr[0];
         const month = fillZero(arr[1],2); 
         const date = fillZero(arr[2],2); ; 
         return `${year}-${month}-${date}`;
       } 
-      //날짜를 기준으로 예약 목록을 가져와서 배열로 반환
+      /***************************************
+       * 함수 : 날짜를 기준으로 예약 목록을 가져와서 배열로 반환
+      ****************************************/
       function getReservateionList(date){
         //date가 없으면 오늘 날짜 기준으로 년 월 일
         if(!date){
@@ -119,9 +129,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         })
         return res;
       }
-      
-      
-      //예약 내역리스트를 켈린더에 추가하기 위해 event들로 변환
+
+      /***************************************
+       * 함수 : 예약 내역리스트를 켈린더에 추가하기 위해 event들로 변환
+      ****************************************/
       function getEvents(date){
 
         let list = getReservateionList(date);
@@ -137,18 +148,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
           }
         })
       }
-      //예약 내역을 객체로 변환
+      /***************************************
+       * 함수 : 예약 내역을 객체로 변환
+      ****************************************/
       function convertReservationToObject(res){
         
         let date = convertArrayToDateString(res.res_time);
         let time = res.res_time.slice(3,5).join(":");
         let user = res.user.us_id;
         let res_state = res.res_state;
+        let person = res.res_person;
         let state = res_state == 0 ? readyState : res_state == 1 ? confirmState : cancelState;
-        
-        let title = `${time} ${user} ${state}`;
+        let title = `${time} ${user}(${person}명) ${state}`;
         let color = colorList[res_state+1];
-        return { date,time,title,color,state,user, res_state}
+        return { date,time,title,color,state,user, res_state, person}
       }
   
       

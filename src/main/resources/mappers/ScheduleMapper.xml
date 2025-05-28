@@ -23,5 +23,12 @@
 		where bh_rt_num=#{rt_num} and bh_start=#{dateTime}
 	</select>
 
+	<!--  -->
+	<update id="updateBdOff">
+		update businessdate set
+			bd_off = #{bd_off}
+		where date(bd_date) = #{bd_date}
+	</update>
+
 	
 </mapper>

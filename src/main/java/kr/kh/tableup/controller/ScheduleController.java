@@ -13,7 +13,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +33,9 @@ import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.ReservationService;
 import kr.kh.tableup.service.ScheduleService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 @RequestMapping("/schedule")
@@ -97,6 +102,7 @@ public class ScheduleController {
 		return db; // JSON 반환
 	}
 
+	// 날짜 선택시 날짜와 같은 예약 가능 시간 버튼으로 출력
 	@GetMapping("/getTimes")
 	@ResponseBody
 	public List<String> getFilteredTimes(@RequestParam("selectedDate")String selectedDate, @AuthenticationPrincipal CustomManager manager) {
@@ -114,6 +120,7 @@ public class ScheduleController {
       .collect(Collectors.toList());
 	}
 
+	//예약 가능 시간 인원수 정보 출력
 	@GetMapping("/time-infomation")
 	@ResponseBody
 	public Map<String, Object> getTimeInfomation(@RequestParam String date, @RequestParam String time, @AuthenticationPrincipal CustomManager manager) {
@@ -131,7 +138,19 @@ public class ScheduleController {
 
 		return result;
 		}
-	
+
+		//쉬는날 변경 기능
+		@PostMapping("/update-holiday")
+		@ResponseBody
+		public ResponseEntity<Boolean> updateHoliday(@RequestBody BusinessDateVO date) {
+			
+			System.out.println("bd_date: " + date.getBd_date());
+    	System.out.println("bd_off: " + date.isBd_off());
+			
+			boolean result = scheduleService.updateBdOff(date);
+			return ResponseEntity.ok(result);
+		}
+		
 	
 
 }

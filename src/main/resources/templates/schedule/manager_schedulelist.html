@@ -58,8 +58,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             <div class="row">
                 <div class="col-md-3">
                     <h5>예약 가능 시간</h5>
-                    <div class="list-group" id="time-list">
-                    </div>
+                    <div class="list-group" id="time-list"></div>
+                    <!-- 쉬는 날 상태 변경 버튼 -->
+                    <div id="holiday-toggle-area" class="mt-2"></div>
                 </div>
 
                 <div class="col-md-9">
@@ -74,7 +75,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		<div th:unless="${restaurant != null}">
 			<h3>아직 식당정보를 입력하지 않앗습니다.</h3>
 		</div>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/schedule/make_schetime'">일정등록</button>
+		<button type="button" class="btn btn-outline-secondary col-12 mt-3 mb-3" onclick="location.href='/manager'">매장 화면으로 돌아가기</button>
         <script th:inline="javascript">
         const timeList = /*[[${timeList}]]*/ [];
         
@@ -93,23 +94,30 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             const selectedDate = button.getAttribute('data-date');
             const timeListDiv = document.getElementById('time-list');
             const infoDiv = document.getElementById('selected-time-infomation'); 
-
+            const hoildayButton = document.getElementById('holiday-toggle-area');
+           
             // 이전 정보 초기화
             timeListDiv.innerHTML = '';
             infoDiv.innerHTML = '';
+            hoildayButton.innerHTML = '';
 
-            const businessDay = opertimeList.find(item => item.bd_date?.substring(0, 10) === selectedDate);
+            const openDay = opertimeList.find(item => item.bd_date?.substring(0, 10) === selectedDate);
 
-            console.log("businessDay",businessDay);
             // 등록된 날짜가 없는 경우
-            if (!businessDay) {
-                timeListDiv.innerHTML = '<div class="text-danger">[미등록 된 날짜입니다]</div>';
+            if (!openDay) {
+                timeListDiv.innerHTML = '<div class="text-danger">미등록 된 날짜입니다</div>';
                 return;
             }
+            // 쉬는 날 버튼 생성
+            const toggleButton = document.createElement('button');
+            toggleButton.className = 'btn btn-outline-warning';
+            toggleButton.textContent = openDay.bd_off ? '쉬는 날 해제' : '쉬는 날로 변경';
+            toggleButton.onclick = () => HolidayStatus(selectedDate, !openDay.bd_off);
+            hoildayButton.appendChild(toggleButton);
 
             // 쉬는 날인 경우
-            if (businessDay.bd_off === true) {
-                timeListDiv.innerHTML = '<div class="text-warning">[쉬는 날입니다]</div>';
+            if (openDay.bd_off === true) {
+                timeListDiv.innerHTML = '<div class="text-warning">쉬는 날입니다</div>';
                 return;
             }
 
@@ -151,6 +159,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                 }
             });
 
+        }
+        //쉬는날 변경 여부 버튼
+        function HolidayStatus(date, newStatus){
+            console.log("보내는 데이터:", { date: date, bd_off: newStatus });
+            $.ajax({
+                async : false, 
+                url : '/schedule/update-holiday', 
+                type : 'post', 
+                data : JSON.stringify({bd_date: date, bd_off: newStatus}), 
+                contentType: 'application/json', 
+                success : function (){
+                    alert('상태가 변경되었습니다.');
+                    const btn = document.querySelector(`.date-button[data-date="${date}"]`);
+                    if (btn) selectDate(btn);
+                }, 
+                error : function(){
+                    alert('오류가 발생하였습니다.');
+                }
+            });
         }
 
         

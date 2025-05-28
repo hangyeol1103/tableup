@@ -35,5 +35,9 @@ public class ScheduleService {
 	public BusinessHourVO getResTimeDetail(int rt_num, LocalDateTime dateTime) {
 		return scheduleDAO.selectResTimeDetail(rt_num, dateTime);
 	}
+
+	public boolean updateBdOff(BusinessDateVO date) {
+		return scheduleDAO.updateBdOff(date);
+	}
 	
 }

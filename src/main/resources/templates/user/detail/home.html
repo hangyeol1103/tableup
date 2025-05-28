@@ -277,7 +277,7 @@
       <h5 class="fw-bold">식당 사진</h5>
       <div class="restaurant-pictures">
         <div th:each="file : ${fileList}">
-          <img th:src="@{/file{uploadfilename}(uploadfilename=${file.file_path})}" alt="식당 사진">
+          <img th:src="@{/file/${file.file_path}/${file.file_name}}" alt="식당 사진">
         </div>
       </div>
     </div>

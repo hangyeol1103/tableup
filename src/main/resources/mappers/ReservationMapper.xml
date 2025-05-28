@@ -76,5 +76,8 @@
 		where res_rt_num = #{rt_num} and res_time like concat(#{date}, '%')
 		order by res_time
 	</select>
-	
+	<!-- 예약 번호에 맞는 예약 정보를 가져오는 쿼리 -->
+	<select id="selectReservation">
+		select * from reservation where res_num = #{res_num}
+	</select>
 </mapper>

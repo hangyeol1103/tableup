@@ -7,4 +7,7 @@
 		SET bh_seat_current = #{seat}
 		WHERE bh_num = #{bh_num}
 	</update>
+	<select id="selectBusinessHourByBh_start" resultType="BusinessHourVO">
+		select * from businesshour where bh_start = #{time}
+	</select>
 </mapper>

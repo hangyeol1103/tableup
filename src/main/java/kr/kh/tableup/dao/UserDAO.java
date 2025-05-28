@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import kr.kh.tableup.model.util.Criteria;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
@@ -83,6 +84,8 @@ public interface UserDAO {
 	List<FileVO> selectFileList(@Param("rt_num") int rt_num);
 
 	List<MenuVO> selectMenuList(@Param("rt_num") int rt_num);
+
+	List<DefaultResTimeVO> selectDefaultResTimeList(@Param("rt_num") int rt_num);
 
 
 

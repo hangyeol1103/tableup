@@ -449,4 +449,8 @@
 	<select id="selectMenuList" resultType="MenuVO">
 		select * from menu where mn_rt_num = #{rt_num}
 	</select>
+
+	<select id="selectDefaultResTimeList" resultType="DefaultResTimeVO">
+		select * from defaultrestime where drt_rt_num = #{rt_num}
+	</select>
 </mapper>

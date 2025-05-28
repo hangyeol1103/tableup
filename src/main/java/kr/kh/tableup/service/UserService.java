@@ -466,6 +466,11 @@ public class UserService {
   }
 
 
+  public List<DefaultResTimeVO> getDefaultResTimeList(int rt_num) {
+    return userDAO.selectDefaultResTimeList(rt_num);
+  }
+
+
 
 
 }

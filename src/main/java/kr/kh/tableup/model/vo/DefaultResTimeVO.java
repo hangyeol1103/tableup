@@ -4,14 +4,14 @@ import lombok.Data;
 
 @Data
 public class DefaultResTimeVO {
-	int dtr_num;
-	int dtr_rt_num;
+	int drt_num;
+	int drt_rt_num;
 	String drt_date;
-	boolean dtr_off;
-	String dtr_open;
-	String dtr_close;
-	String dtr_brstart;
-	String dtr_brend;
-	String dtr_loam;
-	String dtr_lopm;
+	boolean drt_off;
+	String drt_open;
+	String drt_close;
+	String drt_brstart;
+	String drt_brend;
+	String drt_loam;
+	String drt_lopm;
 }

@@ -182,10 +182,12 @@ public class UserService {
 
   public boolean insertReview(ReviewVO review) {
 
+    System.out.println(review);
     if (review.getRev_rt_num() <= 0 || review.getRev_visit() == null || review.getRev_visitor() <= 0
-        || review.getRev_content() == null || review.getUs_name() == null) {
+        || review.getRev_content() == null || review.getRev_us_num() < 1 ) {
       return false;
     }
+    System.out.println("널체크 통과");
 
     return userDAO.insertReview(review);
   }
@@ -452,6 +454,26 @@ public class UserService {
   public UserVO selectUserById(String loginId) {
     return userDAO.selectUserById(loginId);
   }
+
+
+	public List<Integer> getFollowByUser(int us_num) {
+		if(us_num <= 0) {
+      return Collections.emptyList();
+    }
+    
+    List<Integer> followList = userDAO.selectFollowByUser(us_num);
+    if (followList == null) {
+      return Collections.emptyList();
+    }
+    System.out.println("Follow List: " + followList);
+    return followList;
+	}
+
+
+	public boolean toggleFollow(UsFollowVO follow) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'toggleFollow'");
+	}
 
 
 

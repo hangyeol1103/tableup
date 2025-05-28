@@ -430,4 +430,8 @@
 		select * from restaurantfacility where rf_rt_num = #{rt_num}
 	</select>
 
+	<select id="selectFollowByUser" resultType="UsFollowVO">
+		SELECT * FROM usfollow WHERE uf_us_num = #{us_num} AND uf_type = #{uf_type} AND uf_foreign = #{uf_foreign}
+	</select>
+
 </mapper>

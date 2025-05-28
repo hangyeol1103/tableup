@@ -99,7 +99,7 @@
         if (match) {
           // 등록된 날짜면 drop 불가 + 상세 링크
           cellHtml = `
-            <div class="calendar-cell bg-light text-muted" data-date="${dateStr}" style="cursor: pointer;" onclick="location.href='/manager/remake_opertime/${match.bd_num}'">
+            <div class="calendar-cell bg-light text-muted" data-date="${dateStr}" style="cursor: pointer;" onclick="location.href='/manager/opertime/remake_opertime/${match.bd_num}'">
               <strong>${i}</strong>
               <div class="drop-content">
                 ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>

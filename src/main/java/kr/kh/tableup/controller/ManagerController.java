@@ -835,21 +835,22 @@ public class ManagerController {
 	@ResponseBody
 	public String insertOperTimeList(
 		@RequestBody List<BusinessDateVO> operList
-			/*, @AuthenticationPrincipal CustomManager manager*/
+			, @AuthenticationPrincipal CustomManager manager
 	) {
 			// List<BusinessDateVO> operList = new ArrayList<>();
 			System.out.println("ajax 수신");
-			/*if (manager == null || manager.getManager() == null) {
+			if (manager == null || manager.getManager() == null) {
 					return "로그인 정보가 없습니다.";
-			}*/
+			}
 			if (operList == null || operList.isEmpty()) {
 					return "등록할 영업일자가 없습니다.";
 			}
 			System.out.println("opertimelist: " + operList);
 			
 
-			//int rtNum = manager.getManager().getRm_rt_num();
-			int rtNum = 1;
+			//int rtNum = 1;
+			int rtNum = manager.getManager().getRm_rt_num();
+			System.out.println("매니저의 매장 번호: " + rtNum);
 			int result = 0;
 			for (BusinessDateVO oper : operList) {
 					oper.setBd_rt_num(rtNum); 
@@ -861,7 +862,7 @@ public class ManagerController {
 					result++;
 			}
 
-			return "등록 성공" + result + "건";
+			return "등록 성공 " + result + "건";
 	}
 
 

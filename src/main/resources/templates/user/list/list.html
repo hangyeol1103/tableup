@@ -53,6 +53,13 @@
   <!-- 전체 레이아웃 -->
   <div class="row">
 
+    <!-- 검색창 -->
+    <div class="input-group mb-3">
+      <input type="text" id="searchKeyword" class="form-control" placeholder="식당명, 지역, 음식 키워드로 검색" onkeyup="handleSearchEnter(event)">
+      <button class="btn btn-outline-secondary" type="button" onclick="search()">검색</button>
+    </div>
+
+
     <!-- 좌측 -->
     <aside class="col-md-3">
 
@@ -183,6 +190,7 @@
   <!-- 스크립트 -->
   <script type="text/javascript">
     let cri = {
+      keyword: "",
       rt_dfc_num : 0,
       rt_dreg_num : 0,
       dreg_reg_num: 0,
@@ -238,8 +246,10 @@
       cri.dfc_fc_num = Number($('#foodSelect option:selected').data('fc-num')) || 0;
       cri.orderBy = $('.sel-type').val();
 
-      if (resetPage) cri.page = 1;
-
+      if (resetPage) {
+        cri.page = 1;
+        cri.keyword = $('#searchKeyword').val().trim();
+      }
       $.ajax({
         async: true,
         url: "/user/list/sub",
@@ -435,6 +445,34 @@
     $(document).ready(function() {
       if(us_num) checkVisibleLikes();
     });
+
+  </script>
+
+  <script>
+     // 검색 적용
+    function search() {
+      cri.keyword = $('#searchKeyword').val().trim().replace(/'/g, "\\'");
+      console.log("검색어:", cri.keyword);
+      loadList(true);
+    }
+
+    function handleSearchEnter(event) {
+      if (event.key === 'Enter') {
+        search();
+      }
+    }
+
+    // 초기화
+    $(document).ready(function() {
+      $('#searchKeyword').val(cri.keyword);
+      $('#regionSelect').val(cri.rt_dreg_num);
+      $('#foodSelect').val(cri.rt_dfc_num);
+      $('.sel-type').val(cri.orderBy);
+      $('#minPriceInput').val(cri.minPrice || 0);
+      $('#maxPriceInput').val(cri.maxPrice || 50000);
+      loadList(true);
+    });
+    
 
   </script>
 

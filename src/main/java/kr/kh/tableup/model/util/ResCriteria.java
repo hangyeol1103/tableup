@@ -6,6 +6,9 @@ import lombok.Data;
 
 @Data
 public class ResCriteria extends Criteria {
+
+	private String keyword;
+	private List<String> keywordList;
 	
 	private int rt_dfc_num;
 	private int rt_dreg_num;

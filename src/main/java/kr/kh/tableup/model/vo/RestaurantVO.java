@@ -35,4 +35,5 @@ public class RestaurantVO {
 	List<TagVO> tagList;
 	List<ReviewVO> reviewList;
 
+	DefaultResTimeVO defaultResTime;
 }

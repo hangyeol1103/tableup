@@ -7,4 +7,8 @@
     SELECT * FROM restaurant WHERE rt_num = #{rt_num}
   </select>
 
+  <select id="selectRestaurantDetailList" resultType="RestaurantDetailVO">
+    select * from restaurantdetail where rd_rt_num = #{rt_num}
+  </select>
+
 </mapper>

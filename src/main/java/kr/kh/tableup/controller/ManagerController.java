@@ -757,33 +757,33 @@ public class ManagerController {
 			int rtNum = manager.getManager().getRm_rt_num();
 			System.out.println("매니저의 매장 번호: " + rtNum);
 			int result = 0;
-			// for (BusinessHourVO restime : resList) {
-			// 		restime.setBh_rt_num(rtNum); 
-			// 		if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
-			// 				continue; 
-			// 		}
-
-			// 		managerService.makeResTiem(restime); // insert 로직 호출
-			// 		result++;
-			// }
-
 			for (BusinessHourVO restime : resList) {
-					restime.setBh_rt_num(manager.getManager().getRm_rt_num());
-
+					restime.setBh_rt_num(rtNum); 
 					if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
-							continue;
+							continue; 
 					}
 
-					// 날짜만 추출해서 Set에 포함되는지 확인
-					String dateStr = restime.getBh_start().substring(0, 10); // "yyyy-MM-dd"
-					if (!businessDateSet.contains(dateStr)) {
-							System.out.println("영업일자 미등록으로 등록 건너뜀: " + dateStr);
-							continue;
-					}
-
-					managerService.makeResTiem(restime);
+					managerService.makeResTiem(restime); // insert 로직 호출
 					result++;
 			}
+
+			// for (BusinessHourVO restime : resList) {
+			// 		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
+
+			// 		if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
+			// 				continue;
+			// 		}
+
+			// 		// 날짜만 추출해서 Set에 포함되는지 확인
+			// 		String dateStr = restime.getBh_start().substring(0, 10); // "yyyy-MM-dd"
+			// 		if (!businessDateSet.contains(dateStr)) {
+			// 				System.out.println("영업일자 미등록으로 등록 건너뜀: " + dateStr);
+			// 				continue;
+			// 		}
+
+			// 		managerService.makeResTiem(restime);
+			// 		result++;
+			// }
 
 			return "등록 성공 " + result + "건";
 	}

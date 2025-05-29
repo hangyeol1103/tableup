@@ -64,6 +64,18 @@
 		<collection property="reviewList" resultMap="ReviewMap"/>
 	</resultMap>
 
+	<resultMap id="RestaurantFacilityMap" type="RestaurantFacilityVO">
+		<id property="rf_num" column="rf_num"/>
+		<result property="rf_detail" column="rf_detail"/>
+		<result property="rf_rt_num" column="rf_rt_num"/>
+		<result property="rf_fa_num" column="rf_fa_num"/>
+		<association property="facility" javaType="FacilityVO">
+			<id property="fa_num" column="fa_num"/>
+			<result property="fa_name" column="fa_name"/>
+			<result property="fa_title" column="fa_title"/>
+			<result property="fa_icon" column="fa_icon"/>
+		</association>
+	</resultMap>
 	<!-- 매장 태그 리스트 -->
 	<select id="selectRestaurantTagList" resultMap="TagMap">
 		SELECT tag.*, tagtype.tt_name
@@ -422,12 +434,15 @@
 		#{rt_num} </select>
 	<select id="selectTagByRestaurant" resultType="TagVO"> SELECT * FROM tag WHERE tag_tt_num =
 		#{rt_num} LIMIT 1 </select>
-	
+
 	<select id="selectByFacilityList" resultType="FacilityVO">
 		select * from restaurantfacility join facility on fa_num = rf_fa_num where rf_rt_num = #{rt_num}
 	</select>
-	<select id="selectRestaurantFacilityList" resultType="RestaurantFacilityVO">
-		select * from restaurantfacility where rf_rt_num = #{rt_num}
+	<select id="selectRestaurantFacilityList" resultMap="RestaurantFacilityMap">
+		select * from restaurantfacility join facility on fa_num = rf_fa_num where rf_rt_num = #{rt_num}
+	</select>
+	<select id="selectResNewsList" resultType="ResNewsVO">
+		select * from resnews where rn_rt_num = #{rt_num}
 	</select>
 
 	<select id="selectFollowByUser" resultType="UsFollowVO">
@@ -454,4 +469,15 @@
 	</delete>
 
 
+	<select id="selectFileList" resultType="FileVO">
+		select * from file where file_type = 'RestaurantDetail' and file_res_num = #{rt_num}
+	</select>
+
+	<select id="selectMenuList" resultType="MenuVO">
+		select * from menu where mn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectDefaultResTimeList" resultType="DefaultResTimeVO">
+		select * from defaultrestime where drt_rt_num = #{rt_num}
+	</select>
 </mapper>

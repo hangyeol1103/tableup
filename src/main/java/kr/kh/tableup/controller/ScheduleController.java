@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
@@ -68,7 +69,7 @@ public class ScheduleController {
 			RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 			List<BusinessDateVO> opertimelist = scheduleService.getOperTimeList(rt_num);
 			
-			List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
+			List<BusinessHourVO22> restimelist = managerService.getResTimeList(rt_num);
 			//터미널에 필요한 매장 정보 및 세부 정보들 출력
 
       model.addAttribute("restaurant", restaurant);
@@ -111,10 +112,17 @@ public class ScheduleController {
 
 		List<BusinessHourVO> selectedResStart = scheduleService.getResStart(rt_num, startDate, endDate);
 
-		return selectedResStart.stream()
-      .filter(bh -> bh.getBh_start().toLocalDate().equals(startDate)) // 선택 날짜만 필터
-      .map(bh -> bh.getBh_start().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
-      .collect(Collectors.toList());
+		 return selectedResStart.stream()
+       .filter(bh -> bh.getBh_start().toLocalDate().equals(startDate)) // 선택 날짜만 필터
+       .map(bh -> bh.getBh_start().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
+       .collect(Collectors.toList());
+
+		//return selectedResStart.stream()
+    //.filter(bh -> LocalDate.parse(bh.getBh_date()).equals(startDate)) // 날짜는 따로 비교
+    //.map(bh -> LocalTime.parse(bh.getBh_start(), DateTimeFormatter.ofPattern("HH:mm"))
+    //                    .format(DateTimeFormatter.ofPattern("HH:mm")))
+    //.collect(Collectors.toList());
+
 	}
 
 	//예약 가능 시간 인원수 정보 출력

@@ -25,4 +25,6 @@ public class BusinessHourVO {
 	int bh_table_current;
 	boolean bh_state;
 	int bh_rt_num;
+
+	String bh_date;
 }

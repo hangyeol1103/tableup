@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
-import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
@@ -669,10 +669,10 @@ public class ManagerController {
 		}
 
 
-		List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
+		List<BusinessHourVO22> restimelist = managerService.getResTimeList(rt_num);
+		List<BusinessDateVO> opertimelist= managerService.getOperTimeList(rt_num);
 
-
-
+		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("restimelist", restimelist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
@@ -681,13 +681,30 @@ public class ManagerController {
 
 	//예약 시간 등록 페이지
 	@GetMapping("/restime/make_restime")
-	public String makeResTimePage(Model model) {
+	public String makeResTimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num = manager.getManager().getRm_rt_num();
+		List<BusinessDateVO> opertimelist= managerService.getOperTimeList(rt_num);
+		List<BusinessHourVO22> restimelist = managerService.getResTimeList(rt_num);
+
+		model.addAttribute("manager", manager.getManager());
+		model.addAttribute("restimelist", restimelist);
+		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("url", "/make_restime");
 		return "/manager/restime/make_restime";
 	}
 
+	@GetMapping("/make_restime_sub") 
+	public String makeResTimeSubPage(Model model,  @AuthenticationPrincipal CustomManager manager) {
+		if(manager.getManager().getRm_id() == null) {
+			return "/manager/login";
+		}
+		model.addAttribute("managerId", manager.getManager().getRm_id());
+		model.addAttribute("url", "/make_restime_sub");
+		return "/manager/restime/make_restime_sub";
+	}
+
 	@PostMapping("/restime/make_restime")
-	public String insertResTime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager) {
+	public String insertResTime(BusinessHourVO22 restime,  @AuthenticationPrincipal CustomManager manager) {
 		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
 		System.out.println(restime);
@@ -709,10 +726,42 @@ public class ManagerController {
 
 		return "/manager/restime/make_restime/";
 	}
+
+	@PostMapping("/Restime/make_restime_list")
+	@ResponseBody
+	public String insertResTimeList(
+		@RequestBody List<BusinessHourVO22> resList	, @AuthenticationPrincipal CustomManager manager) {
+			// List<BusinessDateVO> operList = new ArrayList<>();
+			System.out.println("ajax 수신");
+			if (manager == null || manager.getManager() == null) {
+					return "로그인 정보가 없습니다.";
+			}
+			if (resList == null || resList.isEmpty()) {
+					return "등록할 영업일자가 없습니다.";
+			}
+			System.out.println("opertimelist: " + resList);
+			
+
+			//int rtNum = 1;
+			int rtNum = manager.getManager().getRm_rt_num();
+			System.out.println("매니저의 매장 번호: " + rtNum);
+			int result = 0;
+			for (BusinessHourVO22 restime : resList) {
+					restime.setBh_rt_num(rtNum); 
+					if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
+							continue; 
+					}
+
+					managerService.makeResTiem(restime); // insert 로직 호출
+					result++;
+			}
+
+			return "등록 성공 " + result + "건";
+	}
 	//예약 시간 변경
 	@GetMapping("/restime/remake_restime/{bh_num}")
 	public String reMakeResTimePage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int bh_num) {
-		BusinessHourVO restime = managerService.getBusinessHour(bh_num);
+		BusinessHourVO22 restime = managerService.getBusinessHour(bh_num);
     System.out.println(restime);
 		model.addAttribute("restime", restime);
 		model.addAttribute("url", "/remake_restime");
@@ -720,7 +769,7 @@ public class ManagerController {
 	}
 	
 	@PostMapping("/restime/remake_restime")
-	public String updateRestime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager ) {
+	public String updateRestime(BusinessHourVO22 restime,  @AuthenticationPrincipal CustomManager manager ) {
 		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
 		System.out.println(restime);

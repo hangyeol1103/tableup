@@ -20,7 +20,7 @@ import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.CustomManager;
-import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.UserVO;

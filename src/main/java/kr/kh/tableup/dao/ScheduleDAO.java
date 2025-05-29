@@ -6,6 +6,7 @@ import java.util.List;
 
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 
 public interface ScheduleDAO {
 

@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
-import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
@@ -77,13 +77,13 @@ public interface ManagerDAO {
 
 	List<ResNewsVO> selectNewsList(int rt_num);
 
-	List<BusinessHourVO> selectResTimeList(int rt_num);
+	List<BusinessHourVO22> selectResTimeList(int rt_num);
 
-	boolean insertResTime(BusinessHourVO restime);
+	boolean insertResTime(BusinessHourVO22 restime);
 
-	BusinessHourVO selectBusinessHour(int bh_num);
+	BusinessHourVO22 selectBusinessHour(int bh_num);
 
-	boolean updateResTime(BusinessHourVO restime);
+	boolean updateResTime(BusinessHourVO22 restime);
 
 	boolean deleteResTime(int bh_num);
 

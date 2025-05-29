@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.model.util.CustomManager;
-import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantManagerVO;
 
@@ -36,11 +36,11 @@ public class ReservationService {
 			return false;
 			
 			// 예약 성공 후 → 겹치는 시간대 조회
-			List<BusinessHourVO> bhList = reservationDAO.selectOverlapHours(
+			List<BusinessHourVO22> bhList = reservationDAO.selectOverlapHours(
 				res.getRes_rt_num(), res.getRes_time(), res.getRes_end_time());
 
 		// 좌석 누적 갱신
-		for (BusinessHourVO bh : bhList) {
+		for (BusinessHourVO22 bh : bhList) {
 			int updated = bh.getBh_seat_current() + res.getRes_person();
 			businessHourDAO.updateCurrentSeat(bh.getBh_num(), updated);
 		}
@@ -49,9 +49,9 @@ public class ReservationService {
 	}
 
 	public boolean isReservationAvailable(int rt_num, LocalDateTime resStart, LocalDateTime resEnd, int person) {
-		List<BusinessHourVO> bhList = reservationDAO.selectOverlapHours(rt_num, resStart, resEnd);
+		List<BusinessHourVO22> bhList = reservationDAO.selectOverlapHours(rt_num, resStart, resEnd);
 
-		for (BusinessHourVO bh : bhList) {
+		for (BusinessHourVO22 bh : bhList) {
 			int remaining = bh.getBh_seat_max() - bh.getBh_seat_current();
 			if (remaining < person) {
 				return false;
@@ -95,7 +95,7 @@ public class ReservationService {
 				throw new RuntimeException("예약 내역이 없습니다.");
 			}
 			//예약 가능 정보를 가져옴
-			BusinessHourVO businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
+			BusinessHourVO22 businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
 			if(businessHour == null){
 				throw new RuntimeException("예약 가능한 시간대가 아닙니다.");
 			}
@@ -119,7 +119,7 @@ public class ReservationService {
 				throw new RuntimeException("예약 내역이 없습니다.");
 			}
 			//예약 가능 정보를 가져옴
-			BusinessHourVO businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
+			BusinessHourVO22 businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
 			if(businessHour == null){
 				throw new RuntimeException("예약 가능한 시간대가 아닙니다.");
 			}

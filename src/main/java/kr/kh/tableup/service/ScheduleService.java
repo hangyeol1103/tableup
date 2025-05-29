@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import kr.kh.tableup.dao.ScheduleDAO;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 
 
 @Service

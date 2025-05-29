@@ -1,6 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -17,8 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.dao.UserDAO;
-import kr.kh.tableup.model.util.Criteria;
 import kr.kh.tableup.model.util.PageMaker;
+import kr.kh.tableup.model.util.ResCriteria;
 import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
@@ -366,9 +367,16 @@ public class UserService {
   }
 
 
-  public List<RestaurantVO> getRestaurantList(Criteria cri) {
+  public List<RestaurantVO> getRestaurantList(ResCriteria cri) {
     if (cri == null) {
       return null;
+    }
+    if (cri.getKeyword() != null && !cri.getKeyword().isBlank()) {
+      List<String> keywordList = Arrays.stream(cri.getKeyword().split(","))
+              .map(String::trim)
+              .filter(k -> !k.isEmpty())
+              .collect(Collectors.toList());
+      cri.setKeywordList(keywordList);
     }
 
     
@@ -411,10 +419,18 @@ public class UserService {
   }
 */
 
-  	public PageMaker getPageMaker(Criteria cri) {
+  	public PageMaker getPageMaker(ResCriteria cri) {
     if(cri == null) {
 			return null;
 		}
+    
+    if (cri.getKeyword() != null && !cri.getKeyword().isBlank()) {
+      List<String> keywordList = Arrays.stream(cri.getKeyword().split(","))
+              .map(String::trim)
+              .filter(k -> !k.isEmpty())
+              .collect(Collectors.toList());
+      cri.setKeywordList(keywordList);
+    }
 		
 		int count = userDAO.selectCountRestaurantList(cri);
 		return new PageMaker(1, cri, count);

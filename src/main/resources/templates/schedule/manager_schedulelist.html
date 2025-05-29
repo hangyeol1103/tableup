@@ -53,6 +53,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                 <div class="col-md-3">
                     <h5>예약 가능 시간</h5>
                     <div class="list-group" id="time-list"></div>
+                    <!-- 토글 버튼 -->
+                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
+                            id="toggle-restime-form" style="display: none;">추가 등록</button>
+                    <!-- 예약 가능 시간 간단 등록 -->
+                    <div id="quick-time-restime" class="mt-3" style="display: none;"></div>
                     <!-- 쉬는 날 상태 변경 버튼 -->
                     <div id="holiday-toggle-area" class="mt-2"></div>
                 </div>
@@ -129,19 +134,31 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             const timeListDiv = document.getElementById('time-list');
             const infoDiv = document.getElementById('selected-time-infomation'); 
             const hoildayButton = document.getElementById('holiday-toggle-area');
-           
+            
+            //예약 가능 시간 추가 버튼
+            const quickRestimeDiv = document.getElementById('quick-time-restime');
+            const toggleResButton = document.getElementById('toggle-restime-form');
+            
             // 이전 정보 초기화
             timeListDiv.innerHTML = '';
             infoDiv.innerHTML = '';
             hoildayButton.innerHTML = '';
+            
+            //예약 가능 시간 추가 버튼 초기화
+            quickRestimeDiv.style.display='none';
+            quickRestimeDiv.innerHTML = '';
+            toggleResButton.style.display = 'none';
+            toggleResButton.textContent = '+ 추가 등록';
 
             const openDay = opertimeList.find(item => item.bd_date?.substring(0, 10) === selectedDate);
 
             // 등록된 날짜가 없는 경우
             if (!openDay) {
                 timeListDiv.innerHTML = '<div class="text-danger">미등록 된 날짜입니다</div>';
+                toggleResButton.style.display = 'none';
                 return;
             }
+            //간단 등록 버튼 
             // 쉬는 날 버튼 생성
             const toggleButton = document.createElement('button');
             toggleButton.className = 'btn btn-outline-warning';
@@ -149,11 +166,125 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             toggleButton.onclick = () => HolidayStatus(selectedDate, !openDay.bd_off);
             hoildayButton.appendChild(toggleButton);
 
+            //예약 가능 시간 등록
+
+            //예약 시간(시작)
+            const starttimeLabel = document.createElement('label');
+            starttimeLabel.textContent = '예약 시작 시간';
+            starttimeLabel.className = 'form-label';
+
+            const starttimeInput = document.createElement('input');
+            starttimeInput.type = 'time';
+            starttimeInput.className = 'form-control mb-2';
+            starttimeInput.id = 'start-time-input';
+            starttimeInput.style.maxWidth = '200px';
+
+            //예약 시간(종료)
+            const endtimeLabel = document.createElement('label');
+            endtimeLabel.textContent = '예약 종료 시간';
+            endtimeLabel.className = 'form-label';
+
+            const endtimeInput = document.createElement('input');
+            endtimeInput.type = 'time';
+            endtimeInput.className = 'form-control mb-2';
+            endtimeInput.id = 'end-time-input';
+            endtimeInput.style.maxWidth = '200px';
+
+            // 좌석 수
+            const seatLabel = document.createElement('label');
+            seatLabel.textContent = '최대 좌석 수';
+            seatLabel.className = 'form-label mt-2';
+
+            const seatInput = document.createElement('input');
+            seatInput.type = 'number';
+            seatInput.className = 'form-control mb-2';
+            seatInput.id = 'seat-max-input';
+            seatInput.placeholder = '예: 10';
+            seatInput.style.maxWidth = '200px';
+
+            // 테이블 수
+            const tableLabel = document.createElement('label');
+            tableLabel.textContent = '최대 테이블 수';
+            tableLabel.className = 'form-label mt-2';
+
+            const tableInput = document.createElement('input');
+            tableInput.type = 'number';
+            tableInput.className = 'form-control mb-2';
+            tableInput.id = 'table-max-input';
+            tableInput.placeholder = '예: 5';
+            tableInput.style.maxWidth = '200px';
+
+            const addButton = document.createElement('button');
+            addButton.textContent='등록';
+            addButton.className='btn btn-sm btn-outline-primary';
+            addButton.onclick = function(){
+                const newTime = starttimeInput.value;
+                const endTime = endtimeInput.value;
+                const seatMax = seatInput.value;
+                const tableMax = tableInput.value;
+                const selectedDate = document.querySelector('.date-button.active')?.getAttribute('data-date');
+
+                if(!selectedDate || !newTime ||!seatMax){
+                    alert('날짜와 시간, 좌석을 모두 선택해주세요.');
+                    return;
+                }
+                $.ajax({
+                    async : true, 
+                    url : '/schedule/insertRestime', 
+                    type : 'post', 
+                    contentType: 'application/json',
+                    data : JSON.stringify({
+                        date : selectedDate,
+                        startTime : newTime,
+                        endTime : endTime,
+                        seatMax : parseInt(seatMax),
+                        tableMax : parseInt(tableMax),
+                    }), 
+                    success : function (){
+                        alert('등록했습니다.');
+                        const btn=document.querySelector(`.date-button[data-date="${selectedDate}"]`);
+                        if (btn) selectDate(btn);
+                    }, 
+                    error : function(){
+                        alert('등록에 실패했습니다.');
+                    }
+                });
+                
+            }
+            //
+            if(openDay.bd_off === true) {
+                document.getElementById('quick-time-restime').style.display = 'none';
+                return;
+            } else {
+                document.getElementById('quick-time-restime').style.display = 'block';
+            }
+            
+
+            quickRestimeDiv.appendChild(starttimeLabel);
+            quickRestimeDiv.appendChild(starttimeInput);
+            
+            quickRestimeDiv.appendChild(endtimeLabel);
+            quickRestimeDiv.appendChild(endtimeInput);
+
+            quickRestimeDiv.appendChild(seatLabel);
+            quickRestimeDiv.appendChild(seatInput);
+
+            quickRestimeDiv.appendChild(tableLabel);
+            quickRestimeDiv.appendChild(tableInput);
+
+            quickRestimeDiv.appendChild(addButton);
+
             // 쉬는 날인 경우
             if (openDay.bd_off === true) {
                 timeListDiv.innerHTML = '<div class="text-warning">쉬는 날입니다</div>';
+                toggleResButton.style.display = 'none';
+                quickRestimeDiv.style.display = 'none';
                 return;
             }
+
+            toggleResButton.style.display='inline-block';
+            quickRestimeDiv.style.display='none';
+
 
             document.getElementById('selected-time-infomation').innerHTML = '';
            $.ajax({
@@ -196,6 +327,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     console.error("불러오기 실패")
                 }
             });
+            
 
         }
         //쉬는날 변경 여부 버튼
@@ -264,7 +396,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     document.getElementById('selected-time-infomation').innerHTML = "오류가 생겼습니다.";
                 }
             });
-        }        
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleResButton = document.getElementById('toggle-restime-form');
+            const formDiv = document.getElementById('quick-time-restime');
+
+            toggleResButton.addEventListener('click', function () {
+                const isHidden = formDiv.style.display === 'none';
+                formDiv.style.display = isHidden ? 'block' : 'none';
+                toggleResButton.textContent = isHidden ? '▲ 닫기' : '+ 추가 등록';
+            });
+        });
+                
         </script>
         
         

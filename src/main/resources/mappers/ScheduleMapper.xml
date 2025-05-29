@@ -3,7 +3,7 @@
 <mapper namespace="kr.kh.tableup.dao.ScheduleDAO">
 
 	<select id="selectScheduleOperTimeList" resultType="BusinessDateVO">
-		select * from businessdate where bd_rt_num=#{rt_num} and bd_date like concat(#{date},"%") order by bd_date desc
+		select * from businessdate where bd_rt_num=#{rt_num} 
 	</select>
 
 	<select id="selectOperTimeByDay" resultType="BusinessDateVO">
@@ -29,6 +29,12 @@
 			bd_off = #{bd_off}
 		where date(bd_date) = #{bd_date}
 	</update>
+
+	<insert id="insertResTime" useGeneratedKeys="true" keyProperty="bh_num">
+		insert into businesshour
+			(bh_start, bh_end, bh_seat_max, bh_seat_current, bh_table_max, bh_table_current, bh_state, bh_rt_num)
+		value(#{bh_start}, #{bh_end}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
+	</insert>
 
 	
 </mapper>

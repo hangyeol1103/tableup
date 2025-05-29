@@ -39,5 +39,12 @@ public class ScheduleService {
 	public boolean updateBdOff(BusinessDateVO date) {
 		return scheduleDAO.updateBdOff(date);
 	}
+
+	public boolean insertRestime(BusinessHourVO res) {
+		if(res==null){
+			return false;
+		}
+		return scheduleDAO.insertResTime(res);
+	}
 	
 }

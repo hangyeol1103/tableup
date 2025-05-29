@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -145,6 +146,37 @@ public class ScheduleController {
 			
 			boolean result = scheduleService.updateBdOff(date);
 			return ResponseEntity.ok(result);
+		}
+
+		//일정관리 페이지에서 예약 시간 추가
+		@PostMapping("/insertRestime")
+		public ResponseEntity<?> insertRestime(@RequestBody Map<String, Object> data, @AuthenticationPrincipal CustomManager manager) {
+			try{
+				String date=(String)data.get("date");
+				String startTime=(String)data.get("startTime");
+				String endTime=(String)data.get("endTime");
+				int seatMax = (int)data.get("seatMax");
+				int tableMax = (int)data.get("tableMax");
+
+				LocalDateTime start = LocalDateTime.parse(date + "T" + startTime);
+        LocalDateTime end = LocalDateTime.parse(date + "T" + endTime);
+
+				BusinessHourVO res = new BusinessHourVO();
+				res.setBh_start(start);
+				res.setBh_end(end);
+				res.setBh_seat_max(seatMax);
+				res.setBh_table_max(tableMax);
+				res.setBh_rt_num(manager.getManager().getRm_rt_num());
+
+				boolean result = scheduleService.insertRestime(res);
+
+				return result ? ResponseEntity.ok().build()
+							: ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+			}catch(Exception e){
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못 입력했습니다.");
+			}
+			
 		}
 		
 	

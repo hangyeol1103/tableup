@@ -18,5 +18,7 @@ public interface ScheduleDAO {
 	BusinessHourVO selectResTimeDetail(int rt_num, LocalDateTime dateTime);
 
 	boolean updateBdOff(BusinessDateVO date);
+
+	boolean insertResTime(BusinessHourVO res);
 	
 }

@@ -1,9 +1,12 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -447,6 +450,9 @@ public class UserController {
   }
   @PostMapping("/list/home/{rt_num}")
   public String listHome(@PathVariable("rt_num") int rt_num, Model model) {
+    String today = new SimpleDateFormat("E", Locale.KOREA).format(new Date());
+    model.addAttribute("today", today);
+    
     RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);

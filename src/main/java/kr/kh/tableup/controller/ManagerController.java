@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -733,7 +735,17 @@ public class ManagerController {
 		@RequestBody List<BusinessHourVO> resList	, @AuthenticationPrincipal CustomManager manager) {
 			// List<BusinessDateVO> operList = new ArrayList<>();
 			System.out.println("ajax 수신");
-			 System.out.println("받은 데이터: " + resList);
+			System.out.println("받은 데이터: " + resList);
+			//매장에 등록된 영업일자 리스트 모두 가져오기
+			List<BusinessDateVO> opertimeList = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
+			
+			//날짜만 추출
+			Set<String> businessDateSet = opertimeList.stream()
+									.map(bd -> bd.getBd_date().substring(0, 10)) // "yyyy-MM-dd" 추출
+									.collect(Collectors.toSet());
+			
+							
+			
 			if (manager == null || manager.getManager() == null) {
 					return "로그인 정보가 없습니다.";
 			}
@@ -745,13 +757,31 @@ public class ManagerController {
 			int rtNum = manager.getManager().getRm_rt_num();
 			System.out.println("매니저의 매장 번호: " + rtNum);
 			int result = 0;
+			// for (BusinessHourVO restime : resList) {
+			// 		restime.setBh_rt_num(rtNum); 
+			// 		if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
+			// 				continue; 
+			// 		}
+
+			// 		managerService.makeResTiem(restime); // insert 로직 호출
+			// 		result++;
+			// }
+
 			for (BusinessHourVO restime : resList) {
-					restime.setBh_rt_num(rtNum); 
+					restime.setBh_rt_num(manager.getManager().getRm_rt_num());
+
 					if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
-							continue; 
+							continue;
 					}
 
-					managerService.makeResTiem(restime); // insert 로직 호출
+					// 날짜만 추출해서 Set에 포함되는지 확인
+					String dateStr = restime.getBh_start().substring(0, 10); // "yyyy-MM-dd"
+					if (!businessDateSet.contains(dateStr)) {
+							System.out.println("영업일자 미등록으로 등록 건너뜀: " + dateStr);
+							continue;
+					}
+
+					managerService.makeResTiem(restime);
 					result++;
 			}
 

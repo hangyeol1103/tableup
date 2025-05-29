@@ -226,7 +226,7 @@
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">소식</h5>
       <div class="news-box">
-        <div th:each="rn : ${resNewsList}" th:text="${rn.rn_content}"></div>
+        <p th:each="rn : ${resNewsList}" th:utext="${#strings.replace(rn.rn_content, '\n', '<br/>')}"></p>
       </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">

@@ -58,7 +58,8 @@ public class ScheduleController {
     }
 
 		int rt_num = manager.getManager().getRm_rt_num();
-
+		System.out.println("나의 정보 : " + manager.getManager());
+		System.out.println("접속한 아이디 : " + principal);
 		if(rt_num <=0){
 			model.addAttribute("restaurant", null);
 		}
@@ -72,6 +73,9 @@ public class ScheduleController {
       model.addAttribute("restaurant", restaurant);
       model.addAttribute("opertimelist", opertimelist);
       model.addAttribute("restimelist", restimelist);
+
+			System.out.println("나의 매장 : " + restaurant);
+			System.out.println("나의 매장 영업 일자 : " + opertimelist);
 		}
 		
 		// List<LocalDate> dateList= new ArrayList<>();

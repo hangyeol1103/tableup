@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
 
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
@@ -69,7 +70,7 @@ public class ScheduleController {
 			RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 			List<BusinessDateVO> opertimelist = scheduleService.getOperTimeList(rt_num);
 			
-			List<BusinessHourVO22> restimelist = managerService.getResTimeList(rt_num);
+			List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
 			//터미널에 필요한 매장 정보 및 세부 정보들 출력
 
       model.addAttribute("restaurant", restaurant);
@@ -106,22 +107,38 @@ public class ScheduleController {
 	public List<String> getFilteredTimes(@RequestParam("selectedDate")String selectedDate, @AuthenticationPrincipal CustomManager manager) {
 		int rt_num=manager.getManager().getRm_rt_num();
 
+		if (selectedDate == null || selectedDate.isBlank()) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "선택된 날짜가 비어 있습니다.");
+		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		LocalDate startDate = LocalDate.parse(selectedDate, formatter);
     LocalDate endDate = startDate.plusDays(6);
 
+		System.out.println("selectedDate : "+ selectedDate);
+		System.out.println("formatter : "+ formatter);
+		System.out.println("startDate : "+ startDate);
+		System.out.println("endDate : "+ endDate);
+
 		List<BusinessHourVO> selectedResStart = scheduleService.getResStart(rt_num, startDate, endDate);
-
-		 return selectedResStart.stream()
-       .filter(bh -> bh.getBh_start().toLocalDate().equals(startDate)) // 선택 날짜만 필터
-       .map(bh -> bh.getBh_start().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
-       .collect(Collectors.toList());
-
-		//return selectedResStart.stream()
-    //.filter(bh -> LocalDate.parse(bh.getBh_date()).equals(startDate)) // 날짜는 따로 비교
-    //.map(bh -> LocalTime.parse(bh.getBh_start(), DateTimeFormatter.ofPattern("HH:mm"))
-    //                    .format(DateTimeFormatter.ofPattern("HH:mm")))
-    //.collect(Collectors.toList());
+		System.out.println("리스트 : " + selectedResStart);
+		
+		//  return selectedResStart.stream()
+    //    .filter(bh -> bh.getBh_start().toLocalDate().equals(startDate)) // 선택 날짜만 필터
+    //    .map(bh -> bh.getBh_start().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
+    //    .collect(Collectors.toList());
+		
+		return selectedResStart.stream()
+			.filter(bh -> {
+					try {
+							// bh_start: "2025-05-29 15:00:00" 같은 포맷일 경우
+							return bh.getBh_start() != null &&
+										bh.getBh_start().startsWith(selectedDate); // 날짜 부분 비교
+					} catch (Exception e) {
+							return false;
+					}
+			})
+			.map(bh -> bh.getBh_start().substring(11, 16)) // 시간 부분만 추출 (HH:mm)
+			.collect(Collectors.toList());
 
 	}
 
@@ -170,6 +187,8 @@ public class ScheduleController {
         LocalDateTime end = LocalDateTime.parse(date + "T" + endTime);
 
 				BusinessHourVO res = new BusinessHourVO();
+				// res.setBh_start(start);
+				// res.setBh_end(end);
 				res.setBh_start(start);
 				res.setBh_end(end);
 				res.setBh_seat_max(seatMax);

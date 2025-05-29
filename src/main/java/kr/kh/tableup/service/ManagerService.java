@@ -353,8 +353,8 @@ public class ManagerService {
 			return false;
 		}
 		try{
-			
-
+			// restime.setBh_start(restime.getBh_start_ts());
+			// restime.setBh_end(restime.getBh_end_ts());
 		}catch(Exception e){
 			System.out.println("오류 발생");
 			return false;

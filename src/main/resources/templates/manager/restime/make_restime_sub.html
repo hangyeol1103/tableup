@@ -33,6 +33,13 @@
         <label for="bh_table_max" class="form-label">최대 테이블 수</label>
         <input type="text" class="form-control" name="bh_table_max" id="bh_table_max" required>
       </div>
+      <div class="mb-3 form-group box">
+        <label for="bh_state" class="form-label">마감 여부</label>
+         <select class="form-select" name="bh_state" id="bh_state" required>
+          <option value="false">열림</option>
+          <option value="true">닫힘</option>
+         </select>
+      </div>
     <button type="button" class="btn btn-primary w-100" id="saveSampleBtn">샘플 저장</button>
   </form>
 </main>
@@ -49,7 +56,8 @@
         bh_start: $('#bh_start').val(),
         bh_end: $('#bh_end').val(),
         bh_seat_max: $('#bh_seat_max').val(),
-        bh_table_max: $('#bh_table_max').val()
+        bh_table_max: $('#bh_table_max').val(),
+        bh_state: $('#bh_state').is(':checked')
       };
       const cookieValue = encodeURIComponent(JSON.stringify(sample));
       document.cookie = `${key}=${cookieValue}; path=/; max-age=86400;`;

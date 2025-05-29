@@ -285,7 +285,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             toggleResButton.style.display='inline-block';
             quickRestimeDiv.style.display='none';
 
-
+            console.log("selectedDate", selectedDate);
             document.getElementById('selected-time-infomation').innerHTML = '';
            $.ajax({
                 async : true, 
@@ -296,7 +296,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     
                     const timeListDiv =document.getElementById('time-list');
                     timeListDiv.innerHTML='';
-
+                    console.log("filteredTimes : ",filteredTimes);
                     if(!filteredTimes || filteredTimes.length === 0){
                         timeListDiv.innerHTML = '<div class="text-secondary">등록된 예약 시간이 없습니다.</div>';
                         return;

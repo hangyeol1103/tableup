@@ -206,7 +206,7 @@
 	<insert id="insertResTime" useGeneratedKeys="true" keyProperty="bh_num">
 		insert into businesshour
 			(bh_start, bh_end, bh_seat_max, bh_seat_current, bh_table_max, bh_table_current, bh_state, bh_rt_num)
-		value(#{bh_start}, #{bh_end}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
+		value(#{bh_start_ts}, #{bh_end_ts}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
 	</insert>
 
 	<select id="selectBusinessHour" resultType="BusinessHourVO">

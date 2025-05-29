@@ -727,22 +727,21 @@ public class ManagerController {
 		return "/manager/restime/make_restime/";
 	}
 
-	@PostMapping("/Restime/make_restime_list")
+	@PostMapping("/restime/make_restime_list")
 	@ResponseBody
 	public String insertResTimeList(
 		@RequestBody List<BusinessHourVO> resList	, @AuthenticationPrincipal CustomManager manager) {
 			// List<BusinessDateVO> operList = new ArrayList<>();
 			System.out.println("ajax 수신");
+			 System.out.println("받은 데이터: " + resList);
 			if (manager == null || manager.getManager() == null) {
 					return "로그인 정보가 없습니다.";
 			}
 			if (resList == null || resList.isEmpty()) {
-					return "등록할 영업일자가 없습니다.";
+					return "등록할 예약 일자가 없습니다.";
 			}
-			System.out.println("opertimelist: " + resList);
+			System.out.println("restimelist: " + resList);
 			
-
-			//int rtNum = 1;
 			int rtNum = manager.getManager().getRm_rt_num();
 			System.out.println("매니저의 매장 번호: " + rtNum);
 			int result = 0;

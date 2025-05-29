@@ -1,14 +1,16 @@
 package kr.kh.tableup.controller;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -31,10 +33,14 @@ import jakarta.validation.Valid;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -458,7 +464,7 @@ public class UserController {
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
     TagVO tag = userService.getTagByRestaurant(rt_num);
-    List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
+    List<FacilityVO> facilityList = userService.getFacilityList();
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
 
     //System.out.println(apiKey);
@@ -498,12 +504,19 @@ public class UserController {
   }
   @PostMapping("/list/home/{rt_num}")
   public String listHome(@PathVariable("rt_num") int rt_num, Model model) {
+    String today = new SimpleDateFormat("E", Locale.KOREA).format(new Date());
+    model.addAttribute("today", today);
+    
     RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
     TagVO tag = userService.getTagByRestaurant(rt_num);
-    List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
+    // List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
+    List<ResNewsVO> resNewsList = userService.getResNewsList(rt_num);
+    List<FileVO> fileList = userService.getFileList(rt_num);
+    List<MenuVO> menuList = userService.getMenuList(rt_num);
+    List<DefaultResTimeVO> defaultResTimeList = userService.getDefaultResTimeList(rt_num);
 
     //System.out.println(apiKey);
     System.out.println("restaurant: " + restaurant);
@@ -512,10 +525,14 @@ public class UserController {
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
-    model.addAttribute("facilityList", facilityList);
+    // model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
 
     // model.addAttribute("apiKey", apiKey); // API 키
+    model.addAttribute("resNewsList", resNewsList);
+    model.addAttribute("fileList", fileList);
+    model.addAttribute("menuList", menuList);
+    model.addAttribute("defaultResTimeList", defaultResTimeList);
     return "user/detail/home";
   }
 

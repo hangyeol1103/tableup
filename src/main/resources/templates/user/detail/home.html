@@ -31,25 +31,108 @@
 
     <title>식당 리스트</title>
    <style>
-    .icon-crop-box {
-      width: 80px;
-      height: 80px;
-      overflow: hidden;
-      position: relative;
-      display: inline-block;
-      margin: 4px;
+    .restaurant-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .icon-crop-box img {
-      position: absolute;
-      width: auto;
-      height: auto;
-      /*
-      position: absolute;
-      top: -220px;                /* 기본값 : -220 위쪽 여백 조정 (픽셀 단위로 조절) 들어가있는 이미지 기준 하나 높이 간격 : -200px */
-      /*left: -257px;           /* 기본값 : -257 왼쪽으로 아이콘 2개만큼 이동 (80px * 2) 들어가있는 이미지 기준 하나 넓이 간격 : -175px
-      height: auto;
-      width: auto; */
+    .facility-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 80px;
+      margin: 10px;
+    }
+
+    .facility-icon {
+      width: 80px; height: 80px; overflow: hidden;
+      background-image: url(/resources/static/img/facility/facility.jpg);
+      display: inline-block;
+    }
+
+    .facility-name {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #222;
+    }
+
+    .facility-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+    }
+
+    .facility-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      color: #333;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .check-icon {
+      color: #186ADE;
+    }
+
+    .dropdown-icon {
+      margin-left: auto;
+      color: #9E9E9E;
+    }
+
+    .drop-icon {
+      margin-left: auto;
+      color: #9E9E9E;
+    }
+
+    .facility-detail {
+      display: none;
+      background-color: #f5f5f5; /* 밝은 회색 배경 */
+      padding: 16px;
+      font-size: 14px;
+      color: #333;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .facility-detail .detail-icon {
+      margin-right: 8px;
+      color: #666;
+    }
+
+    .news-box {
+      border: 1px solid #e3e3e3;
+      border-radius: 12px;
+      padding: 16px;
+      background-color: #fff;
+      margin-top: 10px;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3열 */
+      gap: 16px;
+    }
+
+    .image-grid img {
+      width: 100%;
+      height: 180px; /* 원하는 고정 높이 */
+      object-fit: cover; /* 비율 유지하면서 채우기 */
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .today-time {
+      font-weight: bold;
+      color: #000;
+    }
+
+    .normal-time {
+      font-weight: normal;
+      color: #000;
     }
   </style>
   </head>
@@ -65,138 +148,158 @@
         margin-bottom: 10px;
       "
     />
-    <ul class="list-group bg-white rounded shadow-sm p-3">
-      <li class="list-group-item border-0 ps-3 fw-bold py-0">
-        <span class="text-secondary">
-          <span th:text="${foodCategory.fc_main}"></span>&nbsp;|
-          <span th:text="${detailFoodCategory.dfc_sub}"></span>&nbsp;|
-          <span th:if="${tag != null}" th:text="${tag.tag_name}"
-            >태그</span
-          >
-          <span th:unless="${tag != null}">태그 없음</span>
-        </span>
-      </li>
-      <li
-        class="list-group-item border-0 ps-3 fw-bold py-0 fs-5"
-        th:text="${restaurant.rt_name}"
-      ></li>
+    <div class="bg-white rounded shadow-sm p-3">
+      <!-- 상단 카테고리 -->
+      <div class="text-secondary small mb-1">
+        <span th:text="${foodCategory.fc_main}"></span>&nbsp;|
+        <span th:text="${detailFoodCategory.dfc_sub}"></span>&nbsp;|
+        <span th:if="${tag != null}" th:text="${tag.tag_name}">태그</span>
+        <span th:unless="${tag != null}">태그 없음</span>
+      </div>
+      <!-- 식당명 -->
+      <div class="d-flex align-items-center justify-content-between">
+        <h3 class="fw-bold mb-1" th:text="${restaurant.rt_name}"></h3>
+      </div>
+      <!-- 별점/리뷰 -->
       <input type="hidden" id="rt-num" th:value="${restaurant.rt_num}" />
-      <li class="list-group-item border-0 ps-3 fw-bold py-0">
-        ⭐️ 4.7 • 리뷰 123개 >
-      </li>
-      <li
-        class="list-group-item border-0 ps-3 py-0"
-        th:text="${restaurant.rt_description}"
-      ></li>
-      <hr class="my-2 border-secondary" />
-      <li class="list-group-item border-0 d-flex align-items-center">
-        <i class="bi bi-geo-alt me-2 text-secondary"></i>
-        위치 :&nbsp
+      <div class="d-flex align-items-center mb-2">
+        <span class="text-warning me-1">★</span>
+        <span class="fw-bold me-2">4.7</span>
+        <span class="text-muted small">리뷰 123개</span>
+      </div>
+      <!-- 설명 -->
+      <p class="text-muted mb-1" th:text="${restaurant.rt_description}"></p>
+
+      <hr class="my-2"/>
+      <!-- 위치 -->
+      <div class="mb-1 d-flex align-items-center">
+        <i class="bi bi-geo-alt text-primary me-2"></i>
         <span th:text="${restaurant.rd_addr}"></span>
-      </li>
-      <li class="list-group-item border-0 d-flex align-items-center">
-        <i class="bi bi-cash-coin me-2 text-secondary"></i>
-        가격 = 점심 :&nbsp;
-        <span th:text="${restaurant.rt_price_lunch}"></span>원 / 저녁
-        :&nbsp; <span th:text="${restaurant.rt_price_dinner}"></span>원
-      </li>
-      <li class="list-group-item border-0 d-flex align-items-center">
-        <i class="bi bi-clock me-2 text-secondary"></i>
-        휴무일 :&nbsp<span
-          th:text="${restaurant.rt_closed_days}"
-        ></span>
-        &nbsp;&nbsp;&nbsp;
-        <i class="bi bi-clock me-2 text-secondary"></i>
-        영업시간 : 오늘 (월) · 17:00 ~ 새벽 02:00
-      </li>
-      <li class="list-group-item border-0 d-flex align-items-center">
-        <button
-          type="button"
-          class="btn btn-warning"
-          style="font-size: 12px; margin-right: 12px"
-        >
-          오늘 (요)<br />
-          예약 가능
-        </button>
-        <button
-          type="button"
-          class="btn btn-warning"
-          style="font-size: 12px; margin-right: 16px"
-        >
-          오늘 (요)<br />
-          예약 가능
-        </button>
-        <button
-          type="button"
-          class="btn btn-warning"
-          style="font-size: 12px; margin-right: 16px"
-        >
-          오늘 (요)<br />
-          예약 가능
-        </button>
-        <button
-          type="button"
-          class="btn btn-warning"
-          style="font-size: 12px; margin-right: 16px"
-        >
-          오늘 (요)<br />
-          예약 가능
-        </button>
-        <button
-          type="button"
-          class="btn btn-warning"
-          style="font-size: 12px; margin-right: 16px"
-        >
-          오늘 (요)<br />
-          예약 가능
-        </button>
-        <button
-          type="button"
-          class="btn btn-warning"
-          style="font-size: 12px; margin-right: 16px"
-        >
-          오늘 (요)<br />
-          예약 가능
-        </button>
-        <button
-          type="button"
-          class="btn btn-warning"
-          style="font-size: 12px; margin-right: 16px"
-        >
-          오늘 (요)<br />
-          예약 가능
-        </button>
-      </li>
-    </ul>
+      </div>
+      <!-- 가격 -->
+      <div class="mb-1 d-flex align-items-center">
+        <i class="bi bi-cash-coin text-success me-2"></i>
+        점심 :&nbsp; <span th:text="${restaurant.rt_price_lunch}"></span>원 /
+        저녁 :&nbsp; <span th:text="${restaurant.rt_price_dinner}"></span>원
+      </div>
+      <div class="mb-1 alltimebox">
+        <!-- 시간 -->
+        <div class="d-flex align-items-center time-toggle" style="cursor: pointer; gap: 8px;">
+          <!-- 시계 아이콘 -->
+          <i class="bi bi-clock me-2"></i>
+          휴무일 :&nbsp;<span th:text="${restaurant.rt_closed_days}"></span>&nbsp;/ 오늘
+          <span th:if="${defaultResTimeList != null and !defaultResTimeList.isEmpty()}" 
+                th:with="firstDrt=${defaultResTimeList[0]}">
+            (<span th:text="${firstDrt.drt_date}"></span>)
+            <!-- 점 -->
+            <svg width="14" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg"
+              color="#E4E4E4" style="vertical-align: middle;"><path d="M1.5625 3.06836C0.728516 3.06836 0.0449219 2.39844 0.0449219 1.55078C0.0449219 0.703125 0.728516 0.0195312 1.5625 0.0195312C2.41016 0.0195312 3.09375 0.703125 3.09375 1.55078C3.09375 2.39844 2.41016 3.06836 1.5625 3.06836Z" fill="currentColor"></path>
+            </svg>
+            <span th:text="${#strings.substring(firstDrt.drt_open, 0, 5)}"></span>&nbsp;~
+            <span th:text="${#strings.substring(firstDrt.drt_close, 0, 5)}"></span>
+          </span>
+            
+          <!-- 드롭 아이콘 -->
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="zn9ch5c">
+            <path d="M15 8.33334L10 13.3333L5 8.33334" stroke="#B5B5B5" stroke-width="1.5" stroke-miterlimit="10" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        <div class="time-detail mt-2 p-0" style="display: none;">
+          <div class="mb-2" th:each="drt : ${defaultResTimeList}"
+              th:class="${#strings.trim(drt.drt_date).equals(#strings.trim(today))} ? 'today-time' : 'normal-time'"
+              style="margin-bottom: 4px; padding-left: 11em;">
+            <!-- 공통 박스 -->
+            <div th:class="${#strings.trim(drt.drt_date).equals(#strings.trim(today))} ? 'fw-bold' : ''" style="padding: 1px; margin-bottom: 1px;">
+              <div>
+                <span th:text="${drt.drt_date}"></span> · 
+                <span th:text="${#strings.substring(drt.drt_open, 0, 5)}"></span>&nbsp;~
+                <span th:text="${#strings.substring(drt.drt_close, 0, 5)}"></span>
+              </div>
+              <div th:if="${drt.drt_lopm != null}" style="padding-left: 2em;" >
+                <span th:text="${#strings.substring(drt.drt_lopm, 0, 5)} + ' 까지 라스트오더'"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
-      <h5 class="fw-bold">공지사항 ></h5>
+      <h5 class="fw-bold">소식</h5>
+      <div class="news-box">
+        <div th:each="rn : ${resNewsList}" th:text="${rn.rn_content}"></div>
+      </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">편의시설</h5>
       <div class="section-body">
         <div class="restaurant-features mb-20">
-          <span th:each="facility : ${facilityList}" class="icon-crop-box">
-            <img src="/resources/static/img/facility/facility.jpg" th:alt="${facility.rf_detail != null ? facility.rf_detail : '편의시설'}" 
-            style="top: -220px; left: -257px;"/>
-          </span>
+          <div class="facility-box text-center" th:each="rf : ${restaurantFacilityList}">
+            <i class="facility-icon" th:alt="${rf.rf_detail != null ? rf.rf_detail : '편의시설'}"
+              th:style="'background-position: '+${rf.facility.fa_icon}+'; margin: 4px;'"></i>
+            <span class="facility-name" th:text="${rf.facility.fa_name}"></span>
+          </div>
+        </div>
+        <div class="facility-list ml-20 mr-20">
+          <div th:each="rf : ${restaurantFacilityList}">
+            <div class="facility-header">
+              <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                color="#186ADE" style="margin-right: 4px;"><path fill-rule="evenodd" clip-rule="evenodd"
+                d="M9.92115 14.9979L17.8647 7.08203L19.1353 8.35705L10.5453 16.917C10.3747 17.0871 10.1431 17.1816 9.9022 17.1795C9.66135 17.1774 9.43139 17.0789 9.26376 16.9059L4.85376 12.3559L6.14628 11.1032L9.92115 14.9979Z"
+                fill="currentColor"></path>
+              </svg>
+
+              <span class="facility-title" th:text="${rf.facility.fa_title}"></span>
+
+              <svg class="drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                color="#9E9E9E"><path fill-rule="evenodd" clip-rule="evenodd"
+                d="M11.9999 14.7274L6.63632 9.36377L5.36353 10.6366L11.3635 16.6366C11.715 16.988 12.2848 16.988 12.6363 16.6366L18.6363 10.6366L17.3635 9.36377L11.9999 14.7274Z"
+                fill="currentColor"></path>
+              </svg>
+            </div>
+            <div class="facility-detail" style="display: none;">
+              <p th:text="${rf.rf_detail}"></p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
-      <h5 class="fw-bold"><i class="bi bi-geo-alt-fill"></i> 매장 위치</h5>
-      <div id="map" style="width:100%; height:400px; border-radius: 10px;"></div>
+      <div class="container mt-4">
+        <h5 class="fw-bold">메뉴</h5>
+        <div class="d-flex justify-content-between align-items-start border-bottom py-3" th:each="menu : ${menuList}">
+          <!-- 왼쪽 메뉴 정보 -->
+          <div class="flex-grow-1 me-3"> 
+            <div class="d-flex align-items-center">
+              <h5 class="mb-2" th:text="${menu.mn_name}"></h5>
+            </div>
+            <p class="mb-2 text-muted small text-truncate" style="max-width: 330px;" th:text="${menu.mn_content}"></p>
+            <div class="fw-bold mt-2" th:text="${#numbers.formatInteger(menu.mn_price, 0, 'COMMA')} + '원'"></div>
+          </div>
+          <!-- 오른쪽 사진 -->
+          <div>
+            <img th:src="@{/resources/static/img/menu/{path}(path=${menu.mn_img})}" alt="메뉴 사진"
+            style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+          </div>
+
+        </div>
+      </div>
     </div>
 
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
-      <h5 class="fw-bold">메뉴</h5>
-    </div>
-    <div class="mt-3 p-3 bg-white rounded shadow-sm">
-      <h5 class="fw-bold">식당 사진</h5>
-      <h6>매장사진, 음식사진</h6>
+      <h5 class="fw-bold">사진</h5>
+      <div class="img-grid">
+        <span th:each="file : ${fileList}">
+          <img th:src="@{/file{path}(path=${file.file_path})}" alt="식당 사진">
+        </span>
+      </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">리뷰</h5>
+    </div>
+    <div class="mt-3 p-3 bg-white rounded shadow-sm">
+      <h5 class="fw-bold"><i class="bi bi-geo-alt-fill"></i> 위치</h5>
+      <div id="map" style="width:100%; height:400px; border-radius: 10px;"></div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">상세정보</h5>
@@ -215,9 +318,21 @@
       </div>
     </div>
 
+    <script>
+      $(function() {
+        $(".facility-header").on("click", function () {
+          $(this).next(".facility-detail").slideToggle(200); // 부드럽게 토글
+        });
+      });
+    </script>
 
-
-
+    <script>
+      $(function () {
+        $(".time-toggle").on("click", function () {
+          $(this).closest(".alltimebox").find(".time-detail").slideToggle(200);
+        });
+      });
+    </script>
 
 
   </body>

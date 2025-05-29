@@ -1,6 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -17,14 +18,17 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.dao.UserDAO;
-import kr.kh.tableup.model.util.Criteria;
 import kr.kh.tableup.model.util.PageMaker;
+import kr.kh.tableup.model.util.ResCriteria;
 import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -363,9 +367,16 @@ public class UserService {
   }
 
 
-  public List<RestaurantVO> getRestaurantList(Criteria cri) {
+  public List<RestaurantVO> getRestaurantList(ResCriteria cri) {
     if (cri == null) {
       return null;
+    }
+    if (cri.getKeyword() != null && !cri.getKeyword().isBlank()) {
+      List<String> keywordList = Arrays.stream(cri.getKeyword().split(","))
+              .map(String::trim)
+              .filter(k -> !k.isEmpty())
+              .collect(Collectors.toList());
+      cri.setKeywordList(keywordList);
     }
 
     
@@ -408,10 +419,18 @@ public class UserService {
   }
 */
 
-  	public PageMaker getPageMaker(Criteria cri) {
+  	public PageMaker getPageMaker(ResCriteria cri) {
     if(cri == null) {
 			return null;
 		}
+    
+    if (cri.getKeyword() != null && !cri.getKeyword().isBlank()) {
+      List<String> keywordList = Arrays.stream(cri.getKeyword().split(","))
+              .map(String::trim)
+              .filter(k -> !k.isEmpty())
+              .collect(Collectors.toList());
+      cri.setKeywordList(keywordList);
+    }
 		
 		int count = userDAO.selectCountRestaurantList(cri);
 		return new PageMaker(1, cri, count);
@@ -461,10 +480,7 @@ public class UserService {
     return userDAO.selectScoreTypeList();
   }
 
-  public List<FacilityVO> getFacilityList(int rt_num) {
-    return userDAO.selectByFacilityList(rt_num);
-  }
-
+  
 
   public List<RestaurantFacilityVO> getRestaurantFacilityList(int rt_num) {
     return userDAO.selectRestaurantFacilityList(rt_num);
@@ -508,6 +524,25 @@ public class UserService {
         .anyMatch(follow -> follow.getUf_type().equals(uf_type) && follow.getUf_foreign() == uf_foreign);
     
 	}
+	public List<ResNewsVO> getResNewsList(int rt_num) {
+		return userDAO.selectResNewsList(rt_num);
+	}
+
+
+	public List<FileVO> getFileList(int rt_num) {
+		return userDAO.selectFileList(rt_num);
+	}
+
+
+  public List<MenuVO> getMenuList(int rt_num) {
+    return userDAO.selectMenuList(rt_num);
+  }
+
+
+  public List<DefaultResTimeVO> getDefaultResTimeList(int rt_num) {
+    return userDAO.selectDefaultResTimeList(rt_num);
+  }
+
 
 
 

@@ -9,4 +9,6 @@ public class RestaurantFacilityVO {
 	String rf_detail;
 	int rf_rt_num;
 	int rf_fa_num;
+
+	FacilityVO facility;
 }

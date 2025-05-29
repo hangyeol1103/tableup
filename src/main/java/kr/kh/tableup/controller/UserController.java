@@ -50,6 +50,7 @@ import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
+import kr.kh.tableup.service.ReviewService;
 import kr.kh.tableup.service.UserService;
 
 @Controller
@@ -61,6 +62,9 @@ public class UserController {
 
   @Autowired
   private ManagerService managerService;
+
+  @Autowired
+  private ReviewService reviewService;
 
   @Value("${my-api-key}")
   private String apiKey;
@@ -321,7 +325,7 @@ public class UserController {
   public String insertReview(
       RedirectAttributes rttr,
       ReviewVO review,
-      Map<String, String> scores, @RequestParam(required = false) List<MultipartFile> files,
+      Map<String, String> scores, @RequestParam(required = false) List<MultipartFile> fileList,
       @RequestParam(required = false) List<String> fileNames, @RequestParam(required = false) List<String> fileTags,
       @AuthenticationPrincipal CustomUser user) {
 
@@ -361,7 +365,7 @@ public class UserController {
     }
 
     // 파일 저장
-    if (!userService.insertFile(review, files, fileNames, fileTags)) {
+    if (!userService.insertFile(review, fileList, fileNames, fileTags)) {
       String errorMsg = "리뷰는 등록됐지만 파일 저장에 실패했습니다.";
       System.out.println(errorMsg);
       rttr.addFlashAttribute("errorMsg", "리뷰는 등록됐지만 파일 저장에 실패했습니다.");
@@ -369,7 +373,7 @@ public class UserController {
       return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
     }
 
-    return "redirect:/user/review/list";
+    return "redirect:/user/review/view";
   }
 
 
@@ -600,6 +604,35 @@ public class UserController {
 
     return ResponseEntity.ok(result);
   }
+
+
+  /////////////////////////////////////////////////////////
+ 
+  @PostMapping("/review/insertSamplePost")
+    public String insertSample(@ModelAttribute ReviewVO review,
+                              @RequestParam Map<String, String> scores,
+                              @RequestParam("preview") boolean preview,
+                              Model model) {
+        if (preview) {
+            model.addAttribute("review", review);
+            model.addAttribute("scores", scores);
+            return "user/review/insertsample"; // 리뷰 미리보기 템플릿
+        }
+        return "redirect:/error"; // 잘못된 접근
+    }
+
+    @PostMapping("/review/insertFinalPost")
+    @ResponseBody
+    public ResponseEntity<?> insertFinal(@ModelAttribute ReviewVO review,
+                                        @RequestParam Map<String, String> scores,
+                                        @RequestParam("preview") boolean preview) {
+        if (!preview) {
+            reviewService.insertReview(review, scores);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body("잘못된 요청");
+    }
+
 
 
   

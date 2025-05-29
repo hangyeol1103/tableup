@@ -170,7 +170,8 @@ INSERT INTO usercoupon(UC_STATE,UC_ReC_NUM,UC_us_num)
 INSERT INTO usfollow(uf_us_num, uf_TYPE, uf_FOREIGN)
 	VALUES (1,"RESTAURANT", 1),(1,"REVIEW", 1),(1,"RESTAURANT", 2);
 
-
+INSERT INTO defaultrestime(drt_rt_num, drt_date, drt_off, drt_open, drt_close, drt_lopm)
+	VALUES (1,"수", 0, '16:00:00', '23:00:00', '22:00:00');
     
 
 

@@ -20,11 +20,14 @@ import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.Criteria;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -461,10 +464,7 @@ public class UserService {
     return userDAO.selectScoreTypeList();
   }
 
-  public List<FacilityVO> getFacilityList(int rt_num) {
-    return userDAO.selectByFacilityList(rt_num);
-  }
-
+  
 
   public List<RestaurantFacilityVO> getRestaurantFacilityList(int rt_num) {
     return userDAO.selectRestaurantFacilityList(rt_num);
@@ -508,6 +508,25 @@ public class UserService {
         .anyMatch(follow -> follow.getUf_type().equals(uf_type) && follow.getUf_foreign() == uf_foreign);
     
 	}
+	public List<ResNewsVO> getResNewsList(int rt_num) {
+		return userDAO.selectResNewsList(rt_num);
+	}
+
+
+	public List<FileVO> getFileList(int rt_num) {
+		return userDAO.selectFileList(rt_num);
+	}
+
+
+  public List<MenuVO> getMenuList(int rt_num) {
+    return userDAO.selectMenuList(rt_num);
+  }
+
+
+  public List<DefaultResTimeVO> getDefaultResTimeList(int rt_num) {
+    return userDAO.selectDefaultResTimeList(rt_num);
+  }
+
 
 
 

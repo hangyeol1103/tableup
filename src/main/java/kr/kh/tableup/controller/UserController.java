@@ -523,6 +523,7 @@ public class UserController {
     List<MenuVO> menuList = userService.getMenuList(rt_num);
     List<DefaultResTimeVO> defaultResTimeList = userService.getDefaultResTimeList(rt_num);
     List<RestaurantDetailVO> restaurantDetailList = restaurantService.getRestaurantDetailList(rt_num);
+    List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
 
     //System.out.println(apiKey);
     System.out.println("restaurant: " + restaurant);
@@ -540,6 +541,7 @@ public class UserController {
     model.addAttribute("menuList", menuList);
     model.addAttribute("defaultResTimeList", defaultResTimeList);
     model.addAttribute("restaurantDetailList", restaurantDetailList);
+    model.addAttribute("reviewList", reviewList);
     return "user/detail/home";
   }
 

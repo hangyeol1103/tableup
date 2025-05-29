@@ -137,14 +137,6 @@
 		WHERE restaurant.rt_num = #{rt_num}
 	</select>
 
-
-
-
-
-	
-	
-	
-	
 	<select id="selectUser" resultType="userVO">
 		select * from User where us_num = #{us_num}
 	</select>

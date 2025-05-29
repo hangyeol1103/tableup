@@ -9,6 +9,7 @@ import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
+import kr.kh.tableup.model.vo.ReviewVO;
 
 @Service
 public class RestaurantService {
@@ -24,6 +25,10 @@ public class RestaurantService {
 
 	public List<RestaurantDetailVO> getRestaurantDetailList(int rt_num) {
 		return restaurantDAO.selectRestaurantDetailList(rt_num);
+	}
+
+	public List<ReviewVO> getReviewList(int rt_num) {
+		return restaurantDAO.selectReviewListbyNum(rt_num);
 	}
 
 	

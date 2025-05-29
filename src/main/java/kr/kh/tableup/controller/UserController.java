@@ -467,7 +467,7 @@ public class UserController {
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
     TagVO tag = userService.getTagByRestaurant(rt_num);
-    List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
+    List<FacilityVO> facilityList = userService.getFacilityList();
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
 
     //System.out.println(apiKey);

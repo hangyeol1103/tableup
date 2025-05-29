@@ -14,7 +14,7 @@ import kr.kh.tableup.dao.ManagerDAO;
 import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
-import kr.kh.tableup.model.vo.BusinessHourVO22;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
@@ -343,12 +343,12 @@ public class ManagerService {
 	}
 
 	//예약 가능 시간 출력
-	public List<BusinessHourVO22> getResTimeList(int rt_num) {
+	public List<BusinessHourVO> getResTimeList(int rt_num) {
 		return managerDAO.selectResTimeList(rt_num);
 	}
 
 	//예약 가능 시간 등록
-	public boolean makeResTiem(BusinessHourVO22 restime) {
+	public boolean makeResTiem(BusinessHourVO restime) {
 		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null || restime.getBh_seat_max()<1){
 			return false;
 		}
@@ -368,12 +368,12 @@ public class ManagerService {
 	}
 
 	//예약 가능시간 가져오기
-	public BusinessHourVO22 getBusinessHour(int bh_num) {
+	public BusinessHourVO getBusinessHour(int bh_num) {
 			return managerDAO.selectBusinessHour(bh_num);
 		}
 
 	//예약 가능시간 수정하기
-	public boolean remakeResTime(BusinessHourVO22 restime) {
+	public boolean remakeResTime(BusinessHourVO restime) {
 		System.out.println(restime);
 		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
 			System.out.println("수정 실패");

@@ -172,8 +172,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     }
 
                     filteredTimes.forEach(timeStr => {
-                        // const status = reservationList.find(item => item.date === selectedDate && item.time === timeStr);
-                        const bh = restimeList.find(item => item.date === selectedDate && item.time === timeStr);
+                        const bh = restimeList.find(item => item.bh_start?.substring(0,10) === selectedDate && item.bh_start?.substring(11,16) === timeStr);
                         const isFull = bh && status && status.tableCount >= bh.bh_table_max;
                         
                         const timeButton = document.createElement('button');

@@ -193,6 +193,7 @@ public class ScheduleController {
 				res.setBh_end(end);
 				res.setBh_seat_max(seatMax);
 				res.setBh_table_max(tableMax);
+				res.setBh_state(false);
 				res.setBh_rt_num(manager.getManager().getRm_rt_num());
 
 				boolean result = scheduleService.insertRestime(res);

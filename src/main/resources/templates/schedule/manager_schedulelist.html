@@ -117,6 +117,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         </script>
         
         <script th:inline="javascript">
+
+        const formatDate = (dateStr) => {
+            if (!dateStr) return '';
+            try {
+                return new Date(dateStr).toISOString().split('T')[0];
+            } catch(e) {
+                console.error("Invalid date:", dateStr);
+                return '';
+            }
+        };
         
         // opertimeList = List<businessHourVO>
         const restimeList = [[${restimelist}]];
@@ -126,6 +136,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         console.log("opertimeList : ",opertimeList);
         const reservationList = /*[[${reservationList}]]*/ [];
         function selectDate(button) {
+
+            
             // 날짜 버튼 활성화
             document.querySelectorAll('.date-button').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
@@ -225,7 +237,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                 const selectedDate = document.querySelector('.date-button.active')?.getAttribute('data-date');
 
                 if(!selectedDate || !newTime ||!seatMax){
-                    alert('날짜와 시간, 좌석을 모두 선택해주세요.');
+                    alert('날짜와 시간, 좌석을 모두 입력해주세요.');
                     return;
                 }
                 $.ajax({
@@ -296,6 +308,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     
                     const timeListDiv =document.getElementById('time-list');
                     timeListDiv.innerHTML='';
+                    console.log("선택된 날짜:", selectedDate);
+                    console.log("bh_start들:", restimeList.map(r => r.bh_start));
                     console.log("filteredTimes : ",filteredTimes);
                     if(!filteredTimes || filteredTimes.length === 0){
                         timeListDiv.innerHTML = '<div class="text-secondary">등록된 예약 시간이 없습니다.</div>';
@@ -303,7 +317,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     }
 
                     filteredTimes.forEach(timeStr => {
-                        const bh = restimeList.find(item => item.bh_start?.substring(0,10) === selectedDate && item.bh_start?.substring(11,16) === timeStr);
+                        const bh = restimeList.find(item => {
+                            const itemDate = new Date(item.bh_start);
+                            const itemDateStr = itemDate.toISOString().split('T')[0];
+                            const itemTimeStr = itemDate.toTimeString().substring(0,5);
+                            return itemDateStr === selectedDate && itemTimeStr === timeStr;
+                            });
                         const isFull = bh && status && status.tableCount >= bh.bh_table_max;
                         
                         const timeButton = document.createElement('button');

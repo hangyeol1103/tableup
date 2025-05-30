@@ -2,6 +2,7 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -745,8 +746,6 @@ public class ManagerController {
 									.map(bd -> bd.getBd_date().substring(0, 10)) // "yyyy-MM-dd" 추출
 									.collect(Collectors.toSet());
 			System.out.println("등록되어 있는 날짜 : "+ businessDateSet);
-
-			
 			
 			if (manager == null || manager.getManager() == null) {
 					return "로그인 정보가 없습니다.";
@@ -774,36 +773,31 @@ public class ManagerController {
 			
 			int rtNum = manager.getManager().getRm_rt_num();
 			System.out.println("매니저의 매장 번호: " + rtNum);
-			int result = 0;
-			for (BusinessHourVO restime : resList) {
-					restime.setBh_rt_num(rtNum); 
-					if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
-							continue; 
-					}
 
-					managerService.makeResTiem(restime); // insert 로직 호출
-					result++;
+			//영업일자 맵으로 정리
+			Map<String, BusinessDateVO> operDateMap = opertimeList.stream()
+        .collect(Collectors.toMap(bd -> bd.getBd_date().substring(0, 10), bd -> bd));
+
+			System.out.println("operDateMap : " + operDateMap);
+			//예약 시간 유효성 검사
+			int result = 0; // 성공횟수
+			int result1 = 0; // 실패횟수
+			for (BusinessHourVO restime : resList) {
+				
+				restime.setBh_rt_num(rtNum); 
+				if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
+						continue; 
+				}
+				 // insert 로직 호출
+				if(!managerService.makeResTiem(restime, operDateMap)){
+					result1++;
+					continue;
+				}
+				result++;
 			}
 
-			// for (BusinessHourVO restime : resList) {
-			// 		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
-
-			// 		if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
-			// 				continue;
-			// 		}
-
-			// 		// 날짜만 추출해서 Set에 포함되는지 확인
-			// 		String dateStr = restime.getBh_start().substring(0, 10); // "yyyy-MM-dd"
-			// 		if (!businessDateSet.contains(dateStr)) {
-			// 				System.out.println("영업일자 미등록으로 등록 건너뜀: " + dateStr);
-			// 				continue;
-			// 		}
-
-			// 		managerService.makeResTiem(restime);
-			// 		result++;
-			// }
-
-			return "등록 성공 " + result + "건";
+			return "등록 성공 " + result + "건" +
+						 "등록 실패 " + result1 + "건";
 	}
 	//예약 시간 변경
 	@GetMapping("/restime/remake_restime/{bh_num}")

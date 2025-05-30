@@ -185,8 +185,6 @@ public class ScheduleController {
 				 String endTime=(String)data.get("endTime");
 				 int seatMax = (int)data.get("seatMax");
 				 int tableMax = (int)data.get("tableMax");
-				
-
 
 				LocalDateTime start = LocalDateTime.parse(date + "T" + startTime);
         LocalDateTime end = LocalDateTime.parse(date + "T" + endTime);

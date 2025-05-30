@@ -1,5 +1,6 @@
 package kr.kh.tableup.dao;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -79,6 +80,8 @@ public interface ManagerDAO {
 
 	List<BusinessHourVO> selectResTimeList(int rt_num);
 
+	BusinessHourVO checkResTime(int bh_rt_num, Timestamp bh_start, Timestamp bh_end);
+
 	boolean insertResTime(BusinessHourVO restime);
 
 	BusinessHourVO selectBusinessHour(int bh_num);
@@ -143,6 +146,7 @@ public interface ManagerDAO {
 	List<ResCouponVO> getExpiredCoupons(LocalDate now);
 
 	void updateCouponState(ResCouponVO c);
+
 
 
 	

@@ -85,6 +85,8 @@ public interface ManagerDAO {
 	boolean insertResTime(BusinessHourVO restime);
 
 	BusinessHourVO selectBusinessHour(int bh_num);
+	
+	BusinessDateVO selectOperTimeByDate(int rt_num, String date);
 
 	boolean updateResTime(BusinessHourVO restime);
 

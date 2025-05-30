@@ -118,6 +118,7 @@
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-danger" id="deleteTimeBtn">삭제</button>
             <button type="submit" class="btn btn-primary">변경 하기</button>
           </div>
         </form>
@@ -136,6 +137,9 @@
 
     const opertimelist = /*[[${opertimelist}]]*/ [];
     const restimelist = /*[[${restimelist}]]*/ [];
+
+    // 삭제용 변수
+    let deletedBhNum=null;
 
 
     console.log("저장된 예약 가능 시간 : ",restimelist);
@@ -221,6 +225,7 @@
     $(document).ready(() => {
       renderCalendar(currentYear, currentMonth);
 
+      // 변경 버튼 이벤트
       $('#editTimeForm').submit(function(e){
         e.preventDefault();
         const data ={
@@ -252,6 +257,30 @@
           }
         });
       });
+      //삭제 버튼 이벤트
+      $('#deleteTimeBtn').click(()=>{
+        if(!deletedBhNum){
+          return;
+        }
+        if(!confirm("정말 삭제하시겠습니까?")){
+          return;
+        }
+        $.ajax({
+          async : true,
+          url : '/manager/restime/delete_restime/' + deletedBhNum, 
+          type : 'post', 
+          success : function (data){
+             $('#editTimeModal').modal('hide');
+             $.get('/manager/restime/restimelist_json/' + rtNum, function(data) {
+              restimelist = data;
+              renderCalendar(currentYear, currentMonth);
+            });
+          }, 
+          error : function(){
+            alert("삭제에 실패했습니다.");
+          }
+        });
+      })
     });
 
     function showTimeModal(dateStr) {
@@ -272,6 +301,7 @@
           // btn.click(() => {
           //   location.href = `/manager/restime/remake_restime/${item.bh_num}`; // 수정 페이지로 이동
           // });
+
           btn.click(() => {
 
             const bhDate = item.bh_start.substring(0, 10);  // ← 여기서 날짜 추출
@@ -287,6 +317,9 @@
             $('#editTimeModal input[name="bh_table_max"]').val(item.bh_table_max);
             $('#editTimeModal input[name="bh_state"]').val(item.bh_state);
             
+            deletedBhNum =item.bh_num;  //삭제용 ID 저장
+
+            console.log("deletedBhNum : ", deletedBhNum);
             console.log("item: ", item);
             $('#editTimeModal').modal('show');
           });

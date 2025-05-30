@@ -217,6 +217,11 @@
 		select * from businesshour where bh_num=#{bh_num}
 	</select>
 
+	<select id="selectOperTimeByDate" resultType="BusinessDateVO">
+		select * from businessdate 
+		where bd_rt_num = #{rt_num} and date(bd_date) = #{date}
+	</select>
+
 	<update id="updateResTime">
 		update businesshour set
 			bh_start = #{bh_start_ts}, 

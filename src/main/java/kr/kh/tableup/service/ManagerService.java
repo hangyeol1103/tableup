@@ -393,12 +393,6 @@ public class ManagerService {
         System.out.println("영업시간 범위 초과");
         return false;
     }
-		
-		//브레이크 타임 체크
-    // if (resStart.isBefore(brEnd) && resEnd.isAfter(brStart)) {
-    //     System.out.println("브레이크 타임 겹침");
-    //     return false;
-    // }
 
 		//중복 체크
 		BusinessHourVO check = managerDAO.checkResTime(restime.getBh_rt_num(), restime.getBh_start_ts(), restime.getBh_end_ts());
@@ -428,6 +422,8 @@ public class ManagerService {
 			System.out.println("수정 실패");
 			return false;
 		}
+
+
 		boolean res =managerDAO.updateResTime(restime);
 		if(!res){
 				System.out.println("수정 실패");
@@ -632,6 +628,7 @@ public class ManagerService {
 			managerDAO.updateCouponState(c);
 		}
 	}
+
 
 
 

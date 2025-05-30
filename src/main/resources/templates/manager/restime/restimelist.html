@@ -7,6 +7,11 @@
   <meta charset="UTF-8">
   <title>예약 가능시간 달력 보기</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS (있다면 skip) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap JS (필수) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <style>
     .calendar-cell {
@@ -36,6 +41,9 @@
       font-size: 0.8em;
       margin-top: 5px;
     }
+    .calendar-cell.has-reservations {
+      background-color: #eaf4ff;
+    }
   </style>
 </head>
 <body>
@@ -47,6 +55,76 @@
     <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
   </div>
   <div id="calendar"></div>
+   <!-- 날짜 클릭 시 뜨는 모달 창 -->
+  <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="dateModalLabel">
+            <strong id="selectedDate">-</strong>예약 가능 시간
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 수정용 모달 -->
+  <div class="modal fade" id="editTimeModal" tabindex="-1" aria-labelledby="editTimeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editTimeForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editTimeModalLabel">예약 시간 수정</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="bh_num">
+            <input type="hidden" name="bh_date">
+            <div class="mb-3">
+              <label for="bh_start" class="form-label">시작 시간</label>
+              <input type="time" class="form-control" name="bh_start" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="bh_end" class="form-label">종료 시간</label>
+              <input type="time" class="form-control" name="bh_end" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="bh_seat_max" class="form-label">최대 좌석 수</label>
+              <input type="number" class="form-control" name="bh_seat_max" min="0" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="bh_table_max" class="form-label">최대 테이블 수</label>
+              <input type="number" class="form-control" name="bh_table_max" min="0">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="bh_state" class="form-label">마감 여부</label>
+            <select class="form-select" name="bh_state" id="bh_state" required>
+              <option value="false">열림</option>
+              <option value="true">닫힘</option>
+            </select>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="submit" class="btn btn-primary">변경 하기</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 
   <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/restime/make_restime'">예약 시간 등록</button>
   <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
@@ -104,11 +182,13 @@
           </div>
         `);
 
-        if (match) {
-          cell.click(() => {
-            location.href = `/manager/opertime/remake_opertime/${match.bd_num}`;
-          });
+        if (res.length > 0) {
+          cell.addClass('has-reservations');
         }
+
+        cell.click(() => {
+          showTimeModal(dateStr);
+        });
 
         row.append(cell);
         if ((firstDay + i) % 7 === 0) {
@@ -140,7 +220,83 @@
 
     $(document).ready(() => {
       renderCalendar(currentYear, currentMonth);
+
+      $('#editTimeForm').submit(function(e){
+        e.preventDefault();
+        const data ={
+          bh_num : $(this).find('input[name="bh_num"]').val(),
+          bh_date : $(this).find('input[name="bh_date"]').val(),
+          bh_start : $(this).find('input[name="bh_start"]').val(),
+          bh_end : $(this).find('input[name="bh_end"]').val(),
+          bh_seat_max : $(this).find('input[name="bh_seat_max"]').val(),
+          bh_table_max : $(this).find('input[name="bh_table_max"]').val(),
+          bh_state : $(this).find('select[name="bh_state"]').val()
+        };
+
+        $.ajax({
+          async : true,
+          url : '/manager/restime/remake_restime', 
+          type : 'post',
+          contentType: 'application/json', 
+          data : 	JSON.stringify(data),
+          success : function (){
+            alert('수정 완료');
+            $('#editTimeModal').modal('hide')
+            $.get('/manager/restime/restimelist_json/' + rtNum, function(data) {
+              restimelist = data;
+              renderCalendar(currentYear, currentMonth);
+            }); 
+          }, 
+          error : function(){
+            alert("변경에 오류가 생겼습니다.")
+          }
+        });
+      });
     });
+
+    function showTimeModal(dateStr) {
+      $('#selectedDate').text(dateStr); // 모달 제목 날짜 설정
+      const times = restimelist
+        .filter(res => res.bh_start?.substring(0,10) === dateStr)
+        .sort((a, b) => a.bh_start.localeCompare(b.bh_start));
+
+      const modalBody = $('#modalBody');
+      modalBody.empty();
+
+      if (times.length === 0) {
+        modalBody.append('<p>예약 가능한 시간이 없습니다.</p>');
+      } else {
+        times.forEach(item => {
+          const timeStr = item.bh_start.substring(11, 16);
+          const btn = $(`<button class="btn btn-outline-primary mb-2 me-2">${timeStr}</button>`);
+          // btn.click(() => {
+          //   location.href = `/manager/restime/remake_restime/${item.bh_num}`; // 수정 페이지로 이동
+          // });
+          btn.click(() => {
+
+            const bhDate = item.bh_start.substring(0, 10);  // ← 여기서 날짜 추출
+            const bhStart = item.bh_start.substring(11, 16);
+            const bhEnd = item.bh_end.substring(11, 16);
+
+            $('#editTimeModal').modal('show');  // 수정용 모달
+            $('#editTimeModal input[name="bh_num"]').val(item.bh_num);
+            $('#editTimeModal input[name="bh_date"]').val(bhDate);
+            $('#editTimeModal input[name="bh_start"]').val(bhStart);
+            $('#editTimeModal input[name="bh_end"]').val(bhEnd);
+            $('#editTimeModal input[name="bh_seat_max"]').val(item.bh_seat_max);
+            $('#editTimeModal input[name="bh_table_max"]').val(item.bh_table_max);
+            $('#editTimeModal input[name="bh_state"]').val(item.bh_state);
+            
+            console.log("item: ", item);
+            $('#editTimeModal').modal('show');
+          });
+          modalBody.append(btn);
+        });
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById('dateModal'));
+      modal.show();
+    }
   </script>
 </main>
 </body>

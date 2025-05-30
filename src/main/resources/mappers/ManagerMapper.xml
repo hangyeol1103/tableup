@@ -219,8 +219,8 @@
 
 	<update id="updateResTime">
 		update businesshour set
-			bh_start = #{bh_start}, 
-			bh_end = #{bh_end}, 
+			bh_start = #{bh_start_ts}, 
+			bh_end = #{bh_end_ts}, 
 			bh_seat_max = #{bh_seat_max}, 
 			bh_table_max = #{bh_table_max},
 			bh_state = #{bh_state}

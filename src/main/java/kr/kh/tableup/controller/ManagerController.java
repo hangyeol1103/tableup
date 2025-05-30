@@ -3,6 +3,7 @@ package kr.kh.tableup.controller;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -683,6 +686,16 @@ public class ManagerController {
 		return "manager/restime/restimelist";
 	}
 
+	//예약 가능 시간 목록 JSON 반환 용
+	@GetMapping("/restime/restimelist_json/{rt_num}")
+	public List<BusinessHourVO> getResTimeListJson(@PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
+		if(manager == null||manager.getManager() == null || manager.getManager().getRm_rt_num() != rt_num){
+			return Collections.emptyList();
+		}
+		return managerService.getResTimeList(rt_num);
+	}
+	
+
 	//예약 시간 등록 페이지
 	@GetMapping("/restime/make_restime")
 	public String makeResTimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
@@ -707,29 +720,29 @@ public class ManagerController {
 		return "/manager/restime/make_restime_sub";
 	}
 
-	@PostMapping("/restime/make_restime")
-	public String insertResTime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager) {
-		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
-		System.out.println(manager.getManager());
-		System.out.println(restime);
+	// @PostMapping("/restime/make_restime")
+	// public String insertResTime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager) {
+	// 	restime.setBh_rt_num(manager.getManager().getRm_rt_num());
+	// 	System.out.println(manager.getManager());
+	// 	System.out.println(restime);
 		
-		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    restime.setBh_rt_num(rtNum);
+	// 	int rtNum = manager.getManager().getRm_rt_num();
+  //   System.out.println("매니저의 매장 번호: " + rtNum);
+  //   restime.setBh_rt_num(rtNum);
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
+  //   if (rtNum <= 0) {
+  //       // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+  //       return "redirect:/manager/make";
+  //   }
 
-		if(managerService.makeResTiem(restime)){
-			System.out.println("bh_start = " + restime.getBh_start());
-			System.out.println("bh_state = " + restime.isBh_state());
-			return "redirect:/manager/restime/restimelist/"+rtNum;
-		}
+	// 	if(managerService.makeResTiem(restime)){
+	// 		System.out.println("bh_start = " + restime.getBh_start());
+	// 		System.out.println("bh_state = " + restime.isBh_state());
+	// 		return "redirect:/manager/restime/restimelist/"+rtNum;
+	// 	}
 
-		return "/manager/restime/make_restime/";
-	}
+	// 	return "/manager/restime/make_restime/";
+	// }
 
 	@PostMapping("/restime/make_restime_list")
 	@ResponseBody
@@ -809,30 +822,53 @@ public class ManagerController {
 		return "/manager/restime/remake_restime";
 	}
 	
+	// @PostMapping("/restime/remake_restime")
+	// public String updateRestime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager ) {
+	// 		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
+	// 		System.out.println("받은 시간 : " + restime);
+				
+	// 		if (manager == null || manager.getManager() == null) {
+	// 				return "로그인 정보가 없습니다.";
+	// 		}
+	// 		int rtNum = manager.getManager().getRm_rt_num();
+	// 		restime.setBh_rt_num(rtNum);
+			
+
+	// 		if (rtNum <= 0) {
+	// 				// 매장 정보가 없는 매니저 → 매장 등록 페이지로
+	// 				return "redirect:/manager/make";
+	// 		}
+	// 		if(managerService.remakeResTime(restime)){
+	// 			return "redirect:/manager/restime/restimelist/"+rtNum;
+	// 		}
+	// 		return "/manager/restime/remake_restime";
+	// }
+
 	@PostMapping("/restime/remake_restime")
-	public String updateRestime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager ) {
-		restime.setBh_rt_num(manager.getManager().getRm_rt_num());
-		System.out.println(manager);
-		System.out.println(restime);
-		
-		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    restime.setBh_rt_num(rtNum);
-		System.out.println("수정할 bh_num = " + restime.getBh_num());
+	@ResponseBody
+	public ResponseEntity<?> updateRestime(@RequestBody BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager ) {
+			restime.setBh_rt_num(manager.getManager().getRm_rt_num());
+			System.out.println("받은 시간 : " + restime);
+				
+			if (manager == null || manager.getManager() == null) {
+					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 정보가 없습니다.");
+			}
 
-    
+			int rtNum = manager.getManager().getRm_rt_num();
+			restime.setBh_rt_num(rtNum);
+			
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
-		if(managerService.remakeResTime(restime)){
-			System.out.println("bh_start = " + restime.getBh_start());
-			System.out.println("bh_state = " + restime.isBh_state());
-			return "redirect:/manager/restime/restimelist/"+rtNum;
-		}
-		return "/manager/restime/remake_restime";
+			if (rtNum <= 0) {
+					// 매장 정보가 없는 매니저 → 매장 등록 페이지로
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("매장 정보 없음");
+			}
+			if(managerService.remakeResTime(restime)){
+				return ResponseEntity.ok("수정 완료");
+			}
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정 실패");
 	}
+	
+
 
 	//예약 가능 시간 삭제
 	@PostMapping("/restime/delete_restime/{bh_num}")
@@ -1135,6 +1171,7 @@ public class ManagerController {
 		return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;
 	}
 
+	//결제내역 페이지
 	@GetMapping("/manager_pay/pay")
 	public String paymentPage(Model model, @AuthenticationPrincipal CustomManager manager, Principal principal){
 		if(principal == null || manager.getManager().getRm_rt_num()==0 || 

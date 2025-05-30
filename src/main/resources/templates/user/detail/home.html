@@ -289,8 +289,8 @@
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">사진</h5>
       <div class="img-grid">
-        <span th:each="file : ${fileList}">
-          <img th:src="@{/file{path}(path=${file.file_path})}" alt="식당 사진">
+        <span th:each="files : ${fileList}">
+          <img th:src="@{/files{path}(path=${files.file_path})}" alt="식당 사진">
         </span>
       </div>
     </div>
@@ -312,7 +312,7 @@
         </div>
         <div th:each="file : ${rvl.fileList}">
           <span th:text="${file}"></span>
-          <!-- <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진"> -->
+          <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진">
         </div>
       </div>
     </div>

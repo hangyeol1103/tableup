@@ -42,6 +42,7 @@ import kr.kh.tableup.model.vo.FoodCategoryVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.ReviewVO;
@@ -51,6 +52,7 @@ import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.ReviewService;
+import kr.kh.tableup.service.RestaurantService;
 import kr.kh.tableup.service.UserService;
 
 @Controller
@@ -59,6 +61,9 @@ public class UserController {
 
   @Autowired
   private UserService userService;
+
+  @Autowired
+  private RestaurantService restaurantService;
 
   @Autowired
   private ManagerService managerService;
@@ -521,6 +526,8 @@ public class UserController {
     List<FileVO> fileList = userService.getFileList(rt_num);
     List<MenuVO> menuList = userService.getMenuList(rt_num);
     List<DefaultResTimeVO> defaultResTimeList = userService.getDefaultResTimeList(rt_num);
+    List<RestaurantDetailVO> restaurantDetailList = restaurantService.getRestaurantDetailList(rt_num);
+    List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
 
     //System.out.println(apiKey);
     System.out.println("restaurant: " + restaurant);
@@ -537,6 +544,8 @@ public class UserController {
     model.addAttribute("fileList", fileList);
     model.addAttribute("menuList", menuList);
     model.addAttribute("defaultResTimeList", defaultResTimeList);
+    model.addAttribute("restaurantDetailList", restaurantDetailList);
+    model.addAttribute("reviewList", reviewList);
     return "user/detail/home";
   }
 

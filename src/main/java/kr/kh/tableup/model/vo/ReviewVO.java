@@ -23,4 +23,5 @@ public class ReviewVO {
 	private String rt_name;
 
 	private List<ReviewScoreVO> scoreList;
+	private List<FileVO> fileList;
 }

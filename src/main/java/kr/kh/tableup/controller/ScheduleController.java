@@ -174,14 +174,19 @@ public class ScheduleController {
 		}
 
 		//일정관리 페이지에서 예약 시간 추가
+
+		//@RequestBody Map<String, Object> data , @RequestBody BusinessHourVO data
 		@PostMapping("/insertRestime")
-		public ResponseEntity<?> insertRestime(@RequestBody Map<String, Object> data, @AuthenticationPrincipal CustomManager manager) {
+		public ResponseEntity<?> insertRestime(@RequestBody Map<String, Object> data , @AuthenticationPrincipal CustomManager manager) {
 			try{
-				String date=(String)data.get("date");
-				String startTime=(String)data.get("startTime");
-				String endTime=(String)data.get("endTime");
-				int seatMax = (int)data.get("seatMax");
-				int tableMax = (int)data.get("tableMax");
+				System.out.println("data : " + data);
+				 String date=(String)data.get("date");
+				 String startTime=(String)data.get("startTime");
+				 String endTime=(String)data.get("endTime");
+				 int seatMax = (int)data.get("seatMax");
+				 int tableMax = (int)data.get("tableMax");
+				
+
 
 				LocalDateTime start = LocalDateTime.parse(date + "T" + startTime);
         LocalDateTime end = LocalDateTime.parse(date + "T" + endTime);
@@ -189,8 +194,8 @@ public class ScheduleController {
 				BusinessHourVO res = new BusinessHourVO();
 				// res.setBh_start(start);
 				// res.setBh_end(end);
-				res.setBh_start(start);
-				res.setBh_end(end);
+				res.setBh_start(start.toString());
+				res.setBh_end(end.toString());
 				res.setBh_seat_max(seatMax);
 				res.setBh_table_max(tableMax);
 				res.setBh_state(false);

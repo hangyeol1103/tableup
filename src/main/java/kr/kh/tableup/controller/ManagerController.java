@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -743,14 +744,31 @@ public class ManagerController {
 			Set<String> businessDateSet = opertimeList.stream()
 									.map(bd -> bd.getBd_date().substring(0, 10)) // "yyyy-MM-dd" 추출
 									.collect(Collectors.toSet());
+			System.out.println("등록되어 있는 날짜 : "+ businessDateSet);
+
 			
-							
 			
 			if (manager == null || manager.getManager() == null) {
 					return "로그인 정보가 없습니다.";
 			}
 			if (resList == null || resList.isEmpty()) {
 					return "등록할 예약 일자가 없습니다.";
+			}
+
+			//영업날짜와 예약 가능 시간대의 날짜와 비교
+			boolean hasInvalidDate = resList.stream()
+					.map(restime -> {
+							if (restime.getBh_start_ts() == null) {
+								return null;
+							}
+							return restime.getBh_start_ts().toLocalDateTime().toLocalDate().toString();
+					})
+					.filter(Objects::nonNull)
+					.anyMatch(dateStr -> !businessDateSet.contains(dateStr));
+
+			if (hasInvalidDate) {
+					System.out.println("영업일자가 등록되지 않은 날짜가 포함되어 있습니다.");
+					return "영업일자가 등록되지 않은 날짜가 포함되어 있습니다.";
 			}
 			System.out.println("restimelist: " + resList);
 			

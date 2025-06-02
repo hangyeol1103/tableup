@@ -1,19 +1,15 @@
 <!DOCTYPE html>
-<html 
-lang="ko" 
-xmlns:th="http://www.thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
-layout:decorate="~{layout/manager_layout.html}"
-xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/manager_layout.html}"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-	<meta charset="utf-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <!-- <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.css" rel="stylesheet"> -->
-  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
-	<title>테이블업 - 매니저페이지</title>
-	<style>
+  <title>테이블업 - 매니저페이지</title>
+  <style>
     .calendar-cell {
       width: 120px;
       height: 100px;
@@ -28,9 +24,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
     .calendar-row {
       display: flex;
     }
-    .calendar-month {
-      margin-bottom: 2rem;
-    }
     .calendar-navigation {
       display: flex;
       justify-content: space-between;
@@ -41,171 +34,227 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       font-size: 0.8em;
       margin-top: 5px;
     }
+    .modal-footer button {
+      min-width: 120px;
+    }
   </style>
 </head>
 <body>
-	<main layout:fragment="content">
-    <div class="container">
-      <h1>예약 관리</h1>
-    </div>
-    <div class="calendar-navigation">
-      <button id="prevMonth" class="btn btn-outline-primary">이전달</button>
-      <span id="calendarTitle" class="fw-bold"></span>
-      <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
-    </div>
-    <div id="calendar"></div>
-    <!-- 날짜 클릭 시 뜨는 모달 창 -->
-    <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="dateModalLabel">
-              <p><strong id="selectedDate">-</strong>예약 관리</p>
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-          </div>
-          <div class="modal-body" id="modalBody">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-          </div>
+<main layout:fragment="content">
+  <div class="container">
+    <h1>예약 관리</h1>
+  </div>
+
+  <div class="calendar-navigation">
+    <button id="prevMonth" class="btn btn-outline-primary">이전달</button>
+    <span id="calendarTitle" class="fw-bold"></span>
+    <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
+  </div>
+
+  <div id="calendar"></div>
+
+  <!-- 모달 -->
+  <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <p><strong id="selectedDate">-</strong> 예약 관리</p>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-body d-none" id="detailBody"></div>
+
+        <div class="modal-footer d-flex justify-content-between align-items-center">
+          <button id="backBtn" type="button" class="btn btn-outline-secondary d-none btn-sm">&larr; 돌아가기</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
         </div>
       </div>
     </div>
-    <a th:href="@{/manager}" class="btn btn-outline-secondary col-12 mb-3">매니저 메인 화면으로 돌아가기</a>
-    <script th:inline="javascript">
-      const today = new Date();
-      let currentMonth = today.getMonth();
-      let currentYear = today.getFullYear();
+  </div>
 
-      const reservationlist = [[${reservationList}]] ;
-      const opertimelist = [[${operTimeList}]] ;
-      const restimelist = [[${resTimeList}]];
+  <a th:href="@{/manager}" class="btn btn-outline-secondary col-12 mb-3">매니저 메인 화면으로 돌아가기</a>
 
-      console.log("허가된 예약 : ",reservationlist);
-      console.log("매장의 영업일자 : ",opertimelist);
-      console.log("매장의 예약 가능 시간 : ",restimelist);
+  <script th:inline="javascript">
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
 
-      function renderCalendar(year, month) {
-        $('#calendar').empty();
-        const container = $('<div class="calendar-month"></div>');
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const firstDay = new Date(year, month, 1).getDay();
+    const reservationlist = [[${reservationList}]];
+    const opertimelist = [[${operTimeList}]];
+    const restimelist = [[${resTimeList}]];
 
-        $('#calendarTitle').text(`${year}년 ${month + 1}월`);
-        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-        let row = $('<div class="calendar-row"></div>');
-        weekdays.forEach(day => row.append(`<div class="calendar-cell"><strong>${day}</strong></div>`));
-        container.append(row);
+    let currentDateStr = ''; 
 
-        row = $('<div class="calendar-row"></div>');
-        for (let i = 0; i < firstDay; i++) row.append('<div class="calendar-cell"></div>');
+    function renderCalendar(year, month) {
+      $('#calendar').empty();
+      const container = $('<div class="calendar-month"></div>');
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDay = new Date(year, month, 1).getDay();
 
-        for (let i = 1; i <= daysInMonth; i++) {
-          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-          const match = opertimelist.find(op => op.bd_date === dateStr);
+      $('#calendarTitle').text(`${year}년 ${month + 1}월`);
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      let row = $('<div class="calendar-row"></div>');
+      weekdays.forEach(day => row.append(`<div class="calendar-cell"><strong>${day}</strong></div>`));
+      container.append(row);
 
-          const cell = $(`
-            <div class="calendar-cell" data-date="${dateStr}">
-              <strong>${i}</strong>
-              ${match ? `
-                <div class="opertime-info">
-                  ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
-                  ${match.bd_off ? '쉬는날' : '여는날'}
-                </div>
-              ` : ''}
-            </div>
+      row = $('<div class="calendar-row"></div>');
+      for (let i = 0; i < firstDay; i++) row.append('<div class="calendar-cell"></div>');
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const match = opertimelist.find(op => op.bd_date === dateStr);
+
+        const cell = $(`
+          <div class="calendar-cell" data-date="${dateStr}">
+            <strong>${i}</strong>
+            ${match ? `
+              <div class="opertime-info">
+                ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
+                ${match.bd_off ? '쉬는날' : '여는날'}
+              </div>
+            ` : ''}
+          </div>
+        `);
+
+        cell.click(() => {
+          currentDateStr = dateStr;
+          $('#selectedDate').text(dateStr);
+          renderTimeButtons(dateStr);
+          $('#dateModal').modal('show');
+        });
+
+        row.append(cell);
+        if ((firstDay + i) % 7 === 0) {
+          container.append(row);
+          row = $('<div class="calendar-row"></div>');
+        }
+      }
+
+      container.append(row);
+      $('#calendar').append(container);
+    }
+
+    function renderTimeButtons(dateStr) {
+      $('#modalBody').empty().removeClass('d-none');
+      $('#detailBody').addClass('d-none').empty();
+      $('#backBtn').addClass('d-none');
+
+      const times = restimelist.filter(item => item.bh_start?.substring(0, 10) === dateStr);
+
+      if (times.length === 0) {
+        $('#modalBody').append('<p>등록된 예약 가능 시간이 없습니다.</p>');
+      } else {
+        times.forEach(time => {
+          const timeText = time.bh_start.substring(11, 16) + ' ~ ' + time.bh_end.substring(11, 16);
+          const btn = $(`
+            <button class="btn btn-outline-primary mb-2" data-time="${time.bh_start}">
+              ${timeText}
+            </button>
           `);
-
-           cell.click(() => {
-            $('#selectedDate').text(dateStr);
-            $('#modalBody').empty();
-
-            const times = restimelist.filter(item => item.bh_start?.substring(0, 10) === dateStr);
-
-            if (times.length === 0) {
-              $('#modalBody').append('<p>등록된 예약 가능 시간이 없습니다.</p>');
-            } else {
-              times.forEach(time => {
-                const timeText = time.bh_start.substring(11, 16) + ' ~ ' + time.bh_end.substring(11, 16);
-                const btn = $(`
-                  <button class="btn btn-outline-primary mb-2" data-time="${time.bh_start}">
-                    ${timeText}
-                  </button>
-                `);
-                btn.on('click', function () {
-                  showReservations(dateStr, time.bh_start);
-                });
-                $('#modalBody').append(btn);
-              });
-            }
-
-            $('#dateModal').modal('show');
+          btn.on('click', function () {
+            showReservations(dateStr, time.bh_start);
           });
+          $('#modalBody').append(btn);
+        });
+      }
+    }
 
-          row.append(cell);
-          if ((firstDay + i) % 7 === 0) {
-            container.append(row);
-            row = $('<div class="calendar-row"></div>');
-          }
-        }
-        container.append(row);
-        $('#calendar').append(container);
+    function showReservations(dateStr, startTime) {
+      const timeOnly = startTime.substring(11, 16);
+      const reservations = reservationlist.filter(r =>
+        r.res_time?.substring(0, 10) === dateStr &&
+        r.res_time?.substring(11, 16) === timeOnly
+      );
+
+      $('#modalBody').empty().removeClass('d-none');
+      $('#detailBody').addClass('d-none').empty();
+
+      $('#modalBody').append(`<h6 class="mb-2 text-primary">${dateStr} ${timeOnly} 예약 목록</h6>`);
+
+      if (reservations.length === 0) {
+        $('#modalBody').append('<p>해당 시간대에 예약이 없습니다.</p>');
+      } else {
+        const list = $('<ul class="list-group"></ul>');
+        reservations.forEach(r => {
+          const li = $(`
+            <li class="list-group-item reservation-item" style="cursor: pointer;">
+              예약자: ${r.user?.us_name || 'N/A'}, 인원: ${r.res_person || 0}명
+            </li>
+          `);
+          li.on('click', () => showReservationDetail(r));
+          list.append(li);
+        });
+        $('#modalBody').append(list);
       }
 
-      function showReservations(dateStr, startTime) {
-        const timeOnly = startTime.substring(11, 16);
+      $('#backBtn')
+        .removeClass('d-none')
+        .text('← 날짜별 시간 선택으로')
+        .off('click')
+        .on('click', function () {
+          renderTimeButtons(dateStr);
+        });
+    }
 
-        const reservations = reservationlist.filter(r =>
-          r.res_time?.substring(0, 10) === dateStr &&
-          r.res_time?.substring(11, 16) === timeOnly
-        );
+    function showReservationDetail(r) {
+      $('#modalBody').addClass('d-none');
+      $('#detailBody').removeClass('d-none').empty();
 
-        $('#modalBody').empty();
-        $('#modalBody').append(`<h6 class="mb-2 text-primary">${dateStr} ${timeOnly} 예약 목록</h6>`);
+      const list = $(`
+        <ul class="list-group mb-3">
+          <li class="list-group-item"><strong>예약자:</strong> ${r.user?.us_name || 'N/A'}</li>
+          <li class="list-group-item"><strong>아이디:</strong> ${r.user?.us_id || 'N/A'}</li>
+          <li class="list-group-item"><strong>전화번호:</strong> ${r.user?.us_phone || 'N/A'}</li>
+          <li class="list-group-item"><strong>예약 시간:</strong> ${r.res_time?.replace('T', ' ')}</li>
+          <li class="list-group-item"><strong>신청 시간:</strong> ${r.res_created?.replace('T', ' ')}</li>
+          <li class="list-group-item"><strong>인원:</strong> ${r.res_person}명</li>
+          <li class="list-group-item"><strong>요청 사항:</strong> ${r.res_request || '없음'}</li>
+        </ul>
+      `);
 
-        if (reservations.length === 0) {
-          $('#modalBody').append('<p>해당 시간대에 예약이 없습니다.</p>');
-        } else {
-          const list = $('<ul class="list-group"></ul>');
-          reservations.forEach(r => {
-            const li = $(`
-              <li class="list-group-item">
-                예약자: ${r.user?.us_name || 'N/A'},
-                인원: ${r.res_person || 0}명,
-                예약 신청 시간: ${r.res_created?.replace('T', ' ') || '------'},
-                요청 사항: ${r.res_request || '없음'}
-              </li>
-            `);
-            list.append(li);
-          });
-          $('#modalBody').append(list);
-        }
+      $('#detailBody').append('<h6 class="mb-3 text-primary">예약자 정보</h6>', list);
+
+      $('#backBtn')
+        .removeClass('d-none')
+        .text('← 예약자 목록으로')
+        .off('click')
+        .on('click', function () {
+          $('#detailBody').addClass('d-none');
+          $('#modalBody').removeClass('d-none');
+          $('#backBtn')
+            .text('← 날짜별 시간 선택으로')
+            .off('click')
+            .on('click', function () {
+              renderTimeButtons(currentDateStr);
+            });
+        });
+    }
+
+    $('#prevMonth').click(() => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
       }
+      renderCalendar(currentYear, currentMonth);
+    });
 
-      $('#prevMonth').click(() => {
-        currentMonth--;
-        if (currentMonth < 0) {
-          currentMonth = 11;
-          currentYear--;
-        }
-        renderCalendar(currentYear, currentMonth);
-      });
+    $('#nextMonth').click(() => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
 
-      $('#nextMonth').click(() => {
-        currentMonth++;
-        if (currentMonth > 11) {
-          currentMonth = 0;
-          currentYear++;
-        }
-        renderCalendar(currentYear, currentMonth);
-      });
-
-      $(document).ready(() => {
-        renderCalendar(currentYear, currentMonth);
-      });
-    </script>
-		
-	</main>
+    $(document).ready(() => {
+      renderCalendar(currentYear, currentMonth);
+    });
+  </script>
+</main>
 </body>
 </html>

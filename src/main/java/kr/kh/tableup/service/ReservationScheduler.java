@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
-import kr.kh.tableup.model.vo.BusinessHourVO22;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 
 @Component
@@ -34,10 +34,10 @@ public class ReservationScheduler {
         List<ReservationVO> expiredList = reservationDAO.selectExpiredReservations(LocalDateTime.now());
 
         for (ReservationVO res : expiredList) {
-            List<BusinessHourVO22> bhList = reservationDAO.selectOverlapHours(
+            List<BusinessHourVO> bhList = reservationDAO.selectOverlapHours(
                 res.getRes_rt_num(), res.getRes_time(), res.getRes_end_time());
 
-            for (BusinessHourVO22 bh : bhList) {
+            for (BusinessHourVO bh : bhList) {
                 int updated = bh.getBh_seat_current() - res.getRes_person();
                 if (updated < 0) updated = 0;
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
-import kr.kh.tableup.model.vo.BusinessHourVO22;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 
 public interface ReservationDAO {
@@ -14,7 +14,7 @@ public interface ReservationDAO {
 	boolean insertReservation(ReservationVO reservation);
 	boolean updateReservationState(@Param("res_num") int res_num, @Param("state") int state);
 
-	List<BusinessHourVO22> selectOverlapHours(@Param("rt_num") int rt_num,
+	List<BusinessHourVO> selectOverlapHours(@Param("rt_num") int rt_num,
 	                                        @Param("resStart") LocalDateTime resStart,
   	                                      @Param("resEnd") LocalDateTime resEnd);
 

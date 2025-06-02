@@ -2,4 +2,44 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.ReviewDAO">
 
+
+<!-- ReviewScoreVO + ReviewVO -->
+	<resultMap id="ReviewMap" type="ReviewVO">
+		<!-- ReviewVO -->
+		<id property="rev_num" column="rev_num" />
+		<result property="rev_us_num" column="rev_us_num" />
+		<result property="rev_rt_num" column="rev_rt_num" />
+		<result property="rev_content" column="rev_content" />
+		<result property="rev_created" column="rev_created" />
+		<result property="rev_updated" column="rev_updated" />
+		<result property="rev_state" column="rev_state" />
+		<result property="rev_visit" column="rev_visit" />
+		<result property="rev_visitor" column="rev_visitor" />
+		
+		<!-- 유저와 식당 이름 -->
+		<result property="us_name" column="us_name" />
+		<result property="rt_name" column="rt_name" />
+
+		<!-- ReviewScoreVO 리스트 -->
+		<collection property="scoreList" ofType="ReviewScoreVO">
+			<id property="rs_num" column="rs_num" />
+			<result property="rs_rev_num" column="rs_rev_num" />
+			<result property="rs_st_num" column="rs_st_num" />
+			<result property="rs_score" column="rs_score" />
+			<result property="st_num" column="st_num" />
+			<result property="st_category" column="st_category" />
+		</collection>
+	</resultMap>
+
+
+	<insert id="insertReview" parameterType="ReviewVO" useGeneratedKeys="true" keyProperty="rev_num"> 
+		INSERT INTO review ( rev_us_num, rev_rt_num, rev_content, rev_created, rev_updated, rev_state, rev_visit, rev_visitor ) 
+			VALUES ( #{rev_us_num}, #{rev_rt_num}, #{rev_content}, now(), now(), 0, #{rev_visit}, #{rev_visitor} ) 
+	</insert>
+
+	<insert id="insertReviewScore" parameterType="ReviewScoreVO" useGeneratedKeys="true" > 
+		INSERT INTO reviewscore ( rs_rev_num, rs_st_num, rs_score ) 
+			VALUES ( #{rs_rev_num}, #{rs_st_num}, #{rs_score} ) 
+	</insert>
+
 </mapper>

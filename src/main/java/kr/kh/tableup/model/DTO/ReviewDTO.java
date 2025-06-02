@@ -10,4 +10,5 @@ import lombok.Data;
 public class ReviewDTO {
 	private ReviewVO review;
 	private List<ReviewScoreVO> scoreList;
+	private List<FileDTO> fileList;
 }

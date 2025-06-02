@@ -1231,17 +1231,21 @@ public class ManagerController {
 		}
 		int rt_num = manager.getManager().getRm_rt_num();
 		List<BusinessDateVO> operTimeList = managerService.getOperTimeList(rt_num);
+		List<BusinessHourVO> resTimeList = managerService.getResTimeList(rt_num);
 		List<ReservationVO> reservationList = reservationService.getReservations(rt_num);
 		System.out.println("manager : "+manager.getManager());
 		
 		System.out.println("---------------------");
 		System.out.println("operTimeList"+operTimeList);
 		System.out.println("---------------------");
+		System.out.println("resTimeList"+resTimeList);
+		System.out.println("---------------------");
 		System.out.println("reservationList"+reservationList);
 		System.out.println("---------------------");
 		
 		model.addAttribute("manager", manager);
 		model.addAttribute("operTimeList", operTimeList);
+		model.addAttribute("resTimeList", resTimeList);
 		model.addAttribute("reservationList", reservationList);
 		return "/manager/reservation/reservationlist";
 	}

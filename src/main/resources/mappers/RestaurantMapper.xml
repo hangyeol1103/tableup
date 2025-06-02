@@ -65,8 +65,58 @@
     SELECT * FROM restaurant WHERE rt_num = #{rt_num}
   </select>
 
+  <select id="selecrSearchRecommend" resultType="map">
+    SELECT keyword, source FROM (
+      SELECT rt_name AS keyword, '식당명' AS source FROM Restaurant
+      UNION
+      SELECT rt_description, '소개글' FROM Restaurant
+      UNION
+      SELECT rd_info, '식당정보' FROM RestaurantDetail
+      UNION
+      SELECT rd_addr, '주소' FROM RestaurantDetail
+      UNION
+      SELECT dreg_sub, '상세지역' FROM DetailRegion
+      UNION
+      SELECT reg_main, '지역대분류' FROM Region
+      UNION
+      SELECT dfc_sub, '음식소분류' FROM DetailFoodCategory
+      UNION
+      SELECT fc_main, '음식대분류' FROM FoodCategory
+      UNION
+      SELECT tag_name, '태그' FROM Tag
+      UNION
+      SELECT tt_name, '태그유형' FROM TagType
+      UNION
+      SELECT fa_name, '편의시설' FROM Facility
+    ) AS combined
+    WHERE keyword LIKE CONCAT('%', #{keyword}, '%')
+    LIMIT 10;  
+
+  </select>  
   <select id="selectRestaurantDetailList" resultType="RestaurantDetailVO">
     select * from restaurantdetail where rd_rt_num = #{rt_num}
   </select>
+
+  <select id="countScoreByRtNum">
+    SELECT ROUND(IFNULL(AVG(rs.rs_score), 0), 2)
+      FROM review rev
+      JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
+      WHERE rev.rev_rt_num = #{rt_num};
+  </select>
+
+  <select id="countReviewByRtNum">
+    SELECT COUNT(*)
+      FROM review rev
+      WHERE rev.rev_rt_num = #{rt_num};
+  </select>
+  
+
+  <select id="countReviewByUsNum">
+    SELECT COUNT(*)
+      FROM review rev
+      WHERE rev.rev_rt_num = #{rt_num} AND rev.rev_us_num = #{us_num};
+  </select>
+
+  
 
 </mapper>

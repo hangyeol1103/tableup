@@ -217,26 +217,40 @@ public class UserService {
   }
 
   public boolean insertReviewScore(ReviewVO review, int rs_st_num, int rs_score) {
+    System.out.println("insertReviewScore called with review: " + review + ", rs_st_num: " + rs_st_num + ", rs_score: " + rs_score);
     if (review == null || review.getRev_num() < 1 || rs_st_num < 1 || rs_score < 1 || rs_score > 5) return false;
 
     ReviewScoreVO reviewScore = new ReviewScoreVO();
     reviewScore.setRs_rev_num(review.getRev_num());
     reviewScore.setRs_st_num(rs_st_num);
     reviewScore.setRs_score(rs_score);
+    System.out.println("ReviewScoreVO created: " + reviewScore);
     return userDAO.insertReviewScore(reviewScore);
   }
 
   public boolean insertFile(ReviewVO review, List<MultipartFile> files, List<String> fileNames, List<String> fileTags) {
     if (review == null || files == null) return false;
-    if (files.size() != fileNames.size() || files.size() != fileTags.size()) return false;
+    System.out.println("File Names: " + fileNames);
+    //if (files.size() != fileNames.size() || files.size() != fileTags.size()) return false;
+    System.out.println(files.size() + " files to upload.");
+    System.out.println("File Tags: " + fileTags);
     if (review.getRev_num() < 1) return false;
+    System.out.println("Review Number: " + review.getRev_num());
 
-    for (int i = 0; i < files.size(); i++) {
+    for (int i = 0; i < Math.min(files.size(), Math.min(fileNames.size(), fileTags.size())); i++) {
       MultipartFile file = files.get(i);
       String inputFileName = fileNames.get(i);
       String fileTag = fileTags.get(i);
 
-      if (file == null || file.isEmpty()) return false;
+      if (file == null || file.isEmpty()) continue;
+      if (fileTag == null || fileTag.isEmpty()) fileTag = "default";
+      System.out.println("Processing file: " + inputFileName + " with tag: " + fileTag);
+      // 파일이 비어있거나 이름이 비어있으면 건너뛰기
+      if (file.getSize() <= 0 || inputFileName == null || inputFileName.isEmpty()) {
+        System.out.println("Skipping empty file: " + inputFileName);
+        continue;
+      }
+      
 
       try {
         // 파일 확장자 추출
@@ -262,10 +276,12 @@ public class UserService {
         // fileVO.setFile_res_num(review.getRev_rt_num());
 
         userDAO.insertFile(fileVO);
+        System.out.println(i + "파일 업로드 성공: " + uploadFileName);
 
       } catch (Exception e) {
         e.printStackTrace();
-        return false;
+        System.out.println(i + "파일 업로드 실패: " + e.getMessage());
+        continue;
       }
     }
 

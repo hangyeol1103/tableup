@@ -30,6 +30,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import kr.kh.tableup.model.DTO.FileDTO;
+import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
@@ -45,12 +47,14 @@ import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
+import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
+import kr.kh.tableup.service.ReviewService;
 import kr.kh.tableup.service.RestaurantService;
 import kr.kh.tableup.service.UserService;
 
@@ -66,6 +70,9 @@ public class UserController {
 
   @Autowired
   private ManagerService managerService;
+
+  @Autowired
+  private ReviewService reviewService;
 
   @Value("${my-api-key}")
   private String apiKey;
@@ -326,7 +333,7 @@ public class UserController {
   public String insertReview(
       RedirectAttributes rttr,
       ReviewVO review,
-      Map<String, String> scores, @RequestParam(required = false) List<MultipartFile> files,
+      Map<String, String> scores, @RequestParam(required = false) List<MultipartFile> fileList,
       @RequestParam(required = false) List<String> fileNames, @RequestParam(required = false) List<String> fileTags,
       @AuthenticationPrincipal CustomUser user) {
 
@@ -366,7 +373,7 @@ public class UserController {
     }
 
     // 파일 저장
-    if (!userService.insertFile(review, files, fileNames, fileTags)) {
+    if (!userService.insertFile(review, fileList, fileNames, fileTags)) {
       String errorMsg = "리뷰는 등록됐지만 파일 저장에 실패했습니다.";
       System.out.println(errorMsg);
       rttr.addFlashAttribute("errorMsg", "리뷰는 등록됐지만 파일 저장에 실패했습니다.");
@@ -374,7 +381,7 @@ public class UserController {
       return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
     }
 
-    return "redirect:/user/review/list";
+    return "redirect:/user/review/view";
   }
 
 
@@ -609,6 +616,60 @@ public class UserController {
 
     return ResponseEntity.ok(result);
   }
+
+
+  /////////////////////////////////////////////////////////
+ 
+  @PostMapping("/review/insertSamplePost")
+    public String insertSample(
+          RedirectAttributes rttr,
+          @RequestBody ReviewDTO reviewDTO,
+          boolean preview,
+          @AuthenticationPrincipal CustomUser user) {
+        if (preview) {
+            System.out.println("리뷰 미리보기 요청" + reviewDTO.getReview() + " " + reviewDTO.getScoreList());
+            rttr.addAttribute("review", reviewDTO.getReview());
+            rttr.addAttribute("scores", reviewDTO.getScoreList());
+            rttr.addAttribute("fileList", reviewDTO.getFileList());
+            return "user/review/insertsample"; // 리뷰 미리보기 템플릿
+        }
+        return "redirect:/error"; // 잘못된 접근
+    }
+
+    @PostMapping("/review/insertFinalPost")
+    @ResponseBody
+    public ResponseEntity<?> insertFinal(
+          RedirectAttributes rttr,
+          @RequestBody ReviewDTO reviewDTO,
+          boolean preview,
+          @AuthenticationPrincipal CustomUser user) {
+      System.out.println("리뷰 최종 저장 요청: " + reviewDTO.getReview() + " " + reviewDTO.getScoreList());
+      System.out.println("파일리스트: " +  reviewDTO.getFileList());
+      if(user.getUser() == null) return ResponseEntity.badRequest().body("확인되지 않은 이용자 접근");
+      reviewDTO.getReview().setRev_us_num(user.getUser().getUs_num()); // 사용자 ID 또는 번호를 수동 세팅
+      reviewDTO.getReview().setUs_name(user.getUser().getUs_name()); // 사용자 이름 세팅
+      System.out.println("리뷰 작성자 번호 : " + reviewDTO.getReview().getRev_us_num());           
+    
+      //if (!preview) {/*일단 false로 받아오긴 하는데*/ }
+      try{
+          rttr.addFlashAttribute("review", reviewDTO.getReview());
+          rttr.addFlashAttribute("scores", reviewDTO.getScoreList());
+
+          //reviewService.insertReview(reviewDTO);
+        }catch (RuntimeException e) {
+          System.out.println("리뷰 저장 중 오류 발생: " + e.getMessage());
+          rttr.addFlashAttribute("errorMsg", e.getMessage());
+          return ResponseEntity.badRequest().body("잘못된 요청");
+        }catch (Exception e) {
+
+          return ResponseEntity.badRequest().body("알수없는 오류");
+        }
+        System.out.println("리뷰 저장 완료");
+        rttr.addFlashAttribute("successMsg", "리뷰가 성공적으로 저장되었습니다.");
+        return ResponseEntity.ok().body("리뷰가 성공적으로 저장되었습니다.");
+        
+    }
+
 
 
   

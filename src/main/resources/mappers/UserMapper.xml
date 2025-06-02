@@ -330,8 +330,7 @@
 					OR EXISTS (
 						SELECT 1 FROM restauranttag
 						JOIN tag t ON restauranttag.tag_num = t.tag_num
-						JOIN tagtype tt ON t.tag_tt_num = tt.tt_num
-						WHERE restauranttag.rt_num = r.rt_num AND (t.tag_name LIKE CONCAT('%', #{kw}, '%') OR tt.tt_name LIKE CONCAT('%', #{kw}, '%'))
+						WHERE restauranttag.rt_num = r.rt_num AND t.tag_name LIKE CONCAT('%', #{kw}, '%')
 					)
 					OR EXISTS (
 						SELECT 1 FROM restaurantfacility
@@ -468,8 +467,7 @@
 					OR EXISTS (
 						SELECT 1 FROM restauranttag
 						JOIN tag t ON restauranttag.tag_num = t.tag_num
-						JOIN tagtype tt ON t.tag_tt_num = tt.tt_num
-						WHERE restauranttag.rt_num = r.rt_num AND (t.tag_name LIKE CONCAT('%', #{kw}, '%') OR tt.tt_name LIKE CONCAT('%', #{kw}, '%'))
+						WHERE restauranttag.rt_num = r.rt_num AND t.tag_name LIKE CONCAT('%', #{kw}, '%')
 					)
 					OR EXISTS (
 						SELECT 1 FROM restaurantfacility

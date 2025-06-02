@@ -64,6 +64,10 @@
 		where rm_num=#{rm_num}
 	</select>
 
+	<select id="selectRestaurantByNum" resultType="RestaurantVO">
+		select * from restaurant where rt_num=#{rt_num}
+	</select>
+
 	<select id="selectFoodCategoryList" resultType="FoodCategoryVO">
 		select * from foodcategory
 	</select>

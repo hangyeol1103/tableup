@@ -616,7 +616,7 @@ public class ManagerService {
 	}
 
 	public RestaurantVO getRestaurantByNum(int rt_num) {
-		return managerDAO.selectRestaurant(rt_num);
+		return managerDAO.selectRestaurantByNum(rt_num);
 	}
 
 	public List<BusinessHourTemplateVO> getTemplateList(int rt_num) {

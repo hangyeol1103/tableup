@@ -110,11 +110,11 @@ INSERT INTO restaurantdetail (
 -- 디폴트 예약 state=0 (미확정)review
 INSERT INTO reservation (
   res_us_num, res_rt_num, res_time, res_person,
-  res_request, res_created, res_state, res_end_time
+  res_request, res_created, res_state
 )
 VALUES (
   1, 1, now(), 2,
-  '요청사항', now(), 0, DATE_ADD(now(), INTERVAL 2 HOUR) -- 예: 2시간 후 종료
+  '요청사항', now(), 0--  DATE_ADD(now(), INTERVAL 2 HOUR) -- 예: 2시간 후 종료
 );
 
 -- 디폴트 리뷰

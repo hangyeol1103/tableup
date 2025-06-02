@@ -149,6 +149,8 @@ public interface ManagerDAO {
 
 	void updateCouponState(ResCouponVO c);
 
+	RestaurantVO selectRestaurantByNum(int rt_num);
+
 
 
 	

@@ -420,11 +420,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             const toggleResButton = document.getElementById('toggle-restime-form');
             const formDiv = document.getElementById('quick-time-restime');
 
-            toggleResButton.addEventListener('click', function () {
-                const isHidden = formDiv.style.display === 'none';
-                formDiv.style.display = isHidden ? 'block' : 'none';
-                toggleResButton.textContent = isHidden ? '▲ 닫기' : '+ 추가 등록';
-            });
+            if (toggleResButton && formDiv) {
+                toggleResButton.addEventListener('click', function () {
+                    const isHidden = formDiv.style.display === 'none';
+                    formDiv.style.display = isHidden ? 'block' : 'none';
+                    toggleResButton.textContent = isHidden ? '▲ 닫기' : '+ 추가 등록';
+                });
+            }
         });
                 
         </script>

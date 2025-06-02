@@ -49,7 +49,8 @@
 			user.us_name,
 			restaurant.rt_name,
 			reviewscore.*,
-			scoretype.st_num, scoretype.st_category
+			scoretype.st_num, scoretype.st_category,
+			f.*
 		FROM review
 		LEFT JOIN user ON review.rev_us_num = user.us_num
 		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num

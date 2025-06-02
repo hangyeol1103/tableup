@@ -289,7 +289,7 @@
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">사진</h5>
       <div class="img-grid">
-        <span th:each="file : ${fileList}">
+        <span th:each="file : ${restaurantFileList}">
           <img th:src="@{/file{path}(path=${file.file_path})}" alt="식당 사진">
         </span>
       </div>
@@ -311,9 +311,9 @@
           </span>
         </div>
         <div th:each="file : ${rvl.fileList}">
-          <span th:text="${file}"></span>
-          <!-- <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진"> -->
+          <img th:src="@{/file/{path}(path=${file.file_path})}" alt="사진">
         </div>
+        <p th:utext="${#strings.replace(rvl.rev_content, '\n', '<br/>')}"></p>
       </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
@@ -322,18 +322,18 @@
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <div th:each="rdl : ${restaurantDetailList}">
-        <h5 class="fw-bold">상세정보</h5>
-        <h5 class="fw-bold mt-3">전화번호</h5>
+        <h4 class="fw-bold">상세정보</h4>
+        <h6 class="fw-bold mt-3">전화번호</h6>
         <i class="bi bi-telephone me-2 text-secondary"></i>
         <span th:text="${rdl.rd_phone}"></span>
-        <h5 class="fw-bold mt-3">정기휴무</h5>
+        <h6 class="fw-bold mt-3">정기휴무</h6>
         <span th:text="${rdl.rd_closed_days}"></span>
-        <h5 class="fw-bold mt-3">안내 및 유의사항</h5>
+        <h6 class="fw-bold mt-3">안내 및 유의사항</h6>
         <!-- db에 \n값을 <br/>로 치환한다. -->
         <p th:utext="${#strings.replace(rdl.rd_info, '\n', '<br/>')}"></p>
-        <h5 class="fw-bold mt-3">홈페이지</h5>
+        <h6 class="fw-bold mt-3">홈페이지</h6>
         <a th:href="${rdl.rd_home}" th:text="${rdl.rd_home}" target="_blank"></a>
-        <h5 class="fw-bold mt-3">매장 주소</h5>
+        <h6 class="fw-bold mt-3">매장 주소</h6>
         <span th:text="${rdl.rd_addr}"></span>
       </div>
       <div class="d-grid mt-3">

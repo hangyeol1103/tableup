@@ -537,7 +537,7 @@ public class UserController {
 
     // model.addAttribute("apiKey", apiKey); // API 키
     model.addAttribute("resNewsList", resNewsList);
-    model.addAttribute("fileList", fileList);
+    model.addAttribute("restaurantFileList", fileList);
     model.addAttribute("menuList", menuList);
     model.addAttribute("defaultResTimeList", defaultResTimeList);
     model.addAttribute("restaurantDetailList", restaurantDetailList);

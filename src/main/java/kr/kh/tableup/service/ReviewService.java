@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.NestedExceptionUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import kr.kh.tableup.dao.ReviewDAO;
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.DTO.FileDTO;
-import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.UserVO;
@@ -44,8 +45,17 @@ public class ReviewService {
 		review.setRev_content(review.getRev_content().trim());
 
 		if(reviewError.length()>0) throw new RuntimeException(reviewError);
-		int rev_num = reviewDAO.insertReview(review) ? review.getRev_num() : 0;
-		if(rev_num < 1) throw new RuntimeException("리뷰 등록에 실패했습니다.");
+		try{
+			int rev_num = reviewDAO.insertReview(review) ? review.getRev_num() : 0;
+			if(rev_num < 1) throw new RuntimeException("리뷰 등록에 실패했습니다.");
+		} catch (DataAccessException e) {
+    Throwable rootCause = NestedExceptionUtils.getRootCause(e); 
+    if (rootCause != null && rootCause.getMessage().contains("이미 이 예약에 대한 리뷰가 존재합니다")) {
+        throw new RuntimeException("이미 작성한 리뷰가 존재합니다.");
+    } else {
+        throw new RuntimeException("알 수 없는 DB 오류가 발생했습니다.");
+    }
+}
 
 
 /*

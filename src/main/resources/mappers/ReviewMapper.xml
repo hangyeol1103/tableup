@@ -42,4 +42,12 @@
 			VALUES ( #{rs_rev_num}, #{rs_st_num}, #{rs_score} ) 
 	</insert>
 
+	<update id="deleteReview">
+		UPDATE `review` SET rev_state = -1 
+			WHERE rev_num = #{rev_num}
+	</update>
+
+	<update id="updateReview">
+		
+	</update>
 </mapper>

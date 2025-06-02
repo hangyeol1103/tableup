@@ -6,6 +6,8 @@ public interface ReviewDAO {
 
 	Boolean insertReview(ReviewVO review);
 
+	void deleteReview(int rev_num);
+
 	
 
 	

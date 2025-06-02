@@ -54,11 +54,11 @@
       <label class="form-label">평점 입력</label>
       <div class="d-flex flex-wrap gap-3">
         <div th:each="scoreType : ${scoreTypeList}" class="d-flex align-items-center me-3">
-          <label th:for="'scoreList[' + ${scoreType.st_num} + '].rs_score'" th:text="${scoreType.st_category}" class="me-2"></label>
+          <label th:for="'scoreList[' + ${scoreType.st_num} + '].value'" th:text="${scoreType.st_category}" class="me-2"></label>
           <input type="number"
                 class="form-control score-input"
-                th:id="'scoreList[' + ${scoreType.st_num} + '].rs_score'"
-                th:name="'scoreList[' + ${scoreType.st_num} + '].rs_score'"
+                th:id="'scoreList[' + ${scoreType.st_num} + '].value'"
+                th:name="'scoreList[' + ${scoreType.st_num} + '].value'"
                 min="1" max="5" value="5" required>
 
         </div>
@@ -182,12 +182,12 @@
         };
       }
       function getScoreList() {
-        return $('input.score-input').map(function () {
-          return {
-            st_num: parseInt($(this).data('st-num')),
-            value: parseInt($(this).val())
-          };
-        }).get();
+        const list = [];
+        $('input[name^="scoreList["]').each(function () {
+          const id = $(this).attr('name').match(/\[(\d+)]/)[1];
+          list.push({ st_num: parseInt(id), value: parseInt($(this).val()) });
+        });
+        return list;
       }
       function getFileList(files) {
         const fileList = [];
@@ -227,7 +227,7 @@
               new bootstrap.Modal('#previewModal').show();
             } else {
               alert("리뷰 등록 완료!");
-              location.href = "/user/review/view";
+              location.href = "/user/review/list";
             }
           },
           error: xhr => {

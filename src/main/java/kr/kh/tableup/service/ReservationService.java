@@ -136,4 +136,12 @@ public class ReservationService {
 			return businessHourDAO.updateCurrentSeat(businessHour.getBh_num(), businessHour.getBh_seat_current() - dbReservation.getRes_person());
 		}
 
+		//자기 매장에 등록된 예약 리스트 출력
+		public List<ReservationVO> getReservations(int rt_num) {
+			if(rt_num == 0){
+				return null;
+			}
+			return reservationDAO.selectReservations(rt_num);
+		}
+
 }

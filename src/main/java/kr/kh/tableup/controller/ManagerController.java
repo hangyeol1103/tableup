@@ -1182,7 +1182,11 @@ public class ManagerController {
 		List<PaymentVO> paymentList = paymentService.getPaymentList(manager.getManager().getRm_rt_num());
 		RestaurantVO restaurant = managerService.getRestaurantByNum(manager.getManager().getRm_rt_num());
 		List<BusinessDateVO> operTimeList =managerService.getOperTimeList(manager.getManager().getRm_rt_num());
+		System.out.println("-------------------");
 		System.out.println("예약 결제 내역"+paymentList);
+		System.out.println("-------------------");
+		System.out.println("영업 일자"+operTimeList);
+		System.out.println("-------------------");
 
 		model.addAttribute("operTimeList", operTimeList);
 		model.addAttribute("restaurant", restaurant);
@@ -1219,4 +1223,32 @@ public class ManagerController {
 		return map;
 	}
 
+	@GetMapping("/reservation/reservationlist")
+	public String reservationList(Model model,  @AuthenticationPrincipal CustomManager manager, Principal principal) {
+		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
+			 manager == null || manager.getManager() == null){
+			return "redirect:/manager/login";
+		}
+		int rt_num = manager.getManager().getRm_rt_num();
+		List<BusinessDateVO> operTimeList = managerService.getOperTimeList(rt_num);
+		List<ReservationVO> reservationList = reservationService.getReservations(rt_num);
+		System.out.println("manager : "+manager.getManager());
+		
+		System.out.println("---------------------");
+		System.out.println("operTimeList"+operTimeList);
+		System.out.println("---------------------");
+		System.out.println("reservationList"+reservationList);
+		System.out.println("---------------------");
+		
+		model.addAttribute("manager", manager);
+		model.addAttribute("operTimeList", operTimeList);
+		model.addAttribute("reservationList", reservationList);
+		return "/manager/reservation/reservationlist";
+	}
+
 }
+	
+
+
+
+

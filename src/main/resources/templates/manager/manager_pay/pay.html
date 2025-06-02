@@ -11,36 +11,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<title>매장 메뉴 리스트</title>
 	
   <style>
-    .calendar-cell {
-      width: 120px;
-      height: 100px;
-      border: 1px solid #ccc;
-      margin: 5px;
-      padding: 5px;
-      display: inline-block;
-      vertical-align: top;
-      position: relative;
-      cursor: pointer;
-    }
-    .calendar-row {
-      display: flex;
-    }
-    .calendar-month {
-      margin-bottom: 2rem;
-    }
-    .calendar-navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    .opertime-info {
-      font-size: 0.8em;
-      margin-top: 5px;
-    }
+    
   </style>
 </head>
 <body>
@@ -50,6 +25,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		<div class="">
 			<h3 class="mb-3" th:text="${restaurant.rt_name + '의 매출'}"></h3>
 		</div>
+		<div class="mb-3">
+			<label for="methodFilter" class="form-label">결제 수단 선택:</label>
+			<select id="methodFilter" class="form-select" style="max-width: 200px;">
+				<option value="all">전체</option>
+			</select>
+		</div>
 		<div class="mb-3 row">
       <label class="col-md-3 form-label">이번 달 매출:</label>
       <div class="col-md-9" id="monthly-total">총 매출</div>
@@ -58,119 +39,173 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       <label class="col-md-3 form-label">일일 매출:</label>
       <div class="col-md-9" id="daily-total">일별 매출 매출</div>
     </div> -->
-		
 		<div class="calendar-navigation">
-			<button id="prevMonth" class="btn btn-outline-primary">이전달</button>
+			<button id="prevWeekly" class="btn btn-outline-primary">저번 주</button>
 			<span id="calendarTitle" class="fw-bold"></span>
-			<button id="nextMonth" class="btn btn-outline-primary">다음달</button>
+			<button id="nextWeekly" class="btn btn-outline-primary">다음 주</button>
 		</div>
-		<div id="calendar"></div>
-
-			
+		<div class="mb-3">
+			<label for="datePicker" class="form-label">날짜 선택:</label>
+			<input type="date" id="datePicker" class="form-control" style="max-width: 200px;" />
+		</div>
+		<canvas id="dailySalesChart" height="150"></canvas>
+    
 		<a th:href="@{/manager}" class="btn btn-outline-secondary col-12 mb-3">매니저 메인 화면으로 돌아가기</a>
 		<!-- 요번달 총 매출 출력 스크립트 -->
 		<script th:inline="javascript">
-			const today = new Date();
-			let currentMonth = today.getMonth();
-			let currentYear = today.getFullYear();
+		const today = new Date();
+		const paymentList = [[${paymentList}]];
+		let baseDate = new Date();
+		let selectedMethod = "all";
 
-			const paymentList=[[${paymentList}]];
-			const opertimelist = /*[[${opertimelist}]]*/[];
+		// 결제 수단 목록 생성
+		const methodSet = new Set(paymentList.map(p => p.pay_method));
+		methodSet.forEach(method => {
+			$('#methodFilter').append(`<option value="${method}">${method}</option>`);
+		});
 
-			function renderCalendar(year, month) {
-				$('#calendar').empty();
-				const container = $('<div class="calendar-month"></div>');
-				const daysInMonth = new Date(year, month + 1, 0).getDate();
-				const firstDay = new Date(year, month, 1).getDay();
+		console.log("paymentList: ", paymentList);
 
-				$('#calendarTitle').text(`${year}년 ${month + 1}월`);
-				const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-				let row = $('<div class="calendar-row"></div>');
-				weekdays.forEach(day => row.append(`<div class="calendar-cell"><strong>${day}</strong></div>`));
-				container.append(row);
+		// 날짜 범위 계산
+		// const dateRange = [];
+		// for (let i = -3; i <= 3; i++) {
+		// 	const d = new Date(today);
+		// 	d.setDate(d.getDate() + i);
+		// 	const dateStr = d.toISOString().split("T")[0];
+		// 	dateRange.push(dateStr);
+		// }
 
-				row = $('<div class="calendar-row"></div>');
-				for (let i = 0; i < firstDay; i++) row.append('<div class="calendar-cell"></div>');
+		// 매출 집계
+		// const dailyTotals = dateRange.map(date => {
+		// 	let total = 0;
+		// 	paymentList.forEach(p => {
+		// 		const payDate = new Date(p.pay_time).toISOString().split("T")[0];
+		// 		if (payDate === date) {
+		// 			total += p.pay_amount;
+		// 		}
+		// 	});
+		// 	return total;
+		// });
 
-				for (let i = 1; i <= daysInMonth; i++) {
-					const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-					const match = opertimelist.find(op => op.bd_date === dateStr);
+		// 날짜 범위 생성 함수(기준일 전후 3일)
+		function generateDateRange(base) {
+			const range = [];
+			for (let i = -3; i <= 3; i++) {
+				const d = new Date(base);
+				d.setDate(base.getDate() + i);
+				range.push(d.toISOString().split("T")[0]);
+			}
+			return range;
+		}
 
-					const cell = $(`
-						<div class="calendar-cell" data-date="${dateStr}">
-							<strong>${i}</strong>
-							${match ? `
-								<div class="opertime-info">
-									${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
-									${match.bd_off ? '쉬는날' : '여는날'}
-								</div>
-							` : ''}
-						</div>
-					`);
+		//초기 차트 데이터 계산
+		const dateRange = generateDateRange(baseDate);
+		const dailyTotals = dateRange.map(date => {
+			let total = 0;
+			paymentList.forEach(p => {
+				const payDate = new Date(p.pay_time).toISOString().split("T")[0];
+				if (payDate === date) {
+					total += p.pay_amount;
+				}
+			});
+			return total;
+		});
 
-					if (match) {
-						cell.click(() => {
-							location.href = `/manager/opertime/remake_opertime/${match.bd_num}`;
-						});
-					}
-
-					row.append(cell);
-					if ((firstDay + i) % 7 === 0) {
-						container.append(row);
-						row = $('<div class="calendar-row"></div>');
+		// 차트 출력
+		const ctx = document.getElementById('dailySalesChart').getContext('2d');
+		let chart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: dateRange,
+				datasets: [{
+					label: '일일 매출',
+					data: dailyTotals,
+					borderWidth: 1
+				}]
+			},
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						ticks: {
+							callback: value => value.toLocaleString() + '원'
+						}
 					}
 				}
-				container.append(row);
-				$('#calendar').append(container);
 			}
+		});
 
-			function getCurrentMonthTotal(payment){
-				const now = new Date();
-				const month= now.getMonth();
-				const year = now.getFullYear();
+		// 월 총 매출 계산 함수
+		function getCurrentMonthTotal(payment){
+			const now = new Date();
+			const month = now.getMonth();
+			const year = now.getFullYear();
+			let total = 0;
 
+			payment.forEach(p => {
+				if (!p.pay_time) return;
+				const date = new Date(p.pay_time);
+				if (date.getFullYear() === year && date.getMonth() === month) {
+					total += p.pay_amount;
+				}
+			});
+			return total;
+		}
+
+		// 초기 월 매출 표시
+		const total = getCurrentMonthTotal(paymentList);
+		const formatted = total.toLocaleString() + ' 원';
+		document.getElementById('monthly-total').innerText = formatted;
+
+		// 차트 업데이트 함수 (결제 수단, 날짜 기반 필터링)
+		function updateChart() {
+			const dateRange = generateDateRange(baseDate);
+			const filtered = selectedMethod === "all"
+				? paymentList
+				: paymentList.filter(p => p.pay_method === selectedMethod);
+
+			const dailyTotals = dateRange.map(date => {
 				let total = 0;
-
-				payment.forEach(p => {
-					if (!p.pay_time) return;
-
-					const date = new Date(p.pay_time); 
-					if (date.getFullYear() === year && date.getMonth() === month) {
-						total += p.pay_amount;
-					}
+				filtered.forEach(p => {
+					const payDate = new Date(p.pay_time).toISOString().split("T")[0];
+					if (payDate === date) total += p.pay_amount;
 				});
-				
 				return total;
+			});
+
+			chart.data.labels = dateRange;
+			chart.data.datasets[0].data = dailyTotals;
+			chart.update();
+		}
+
+		// 이벤트: 결제 수단 변경
+		$('#methodFilter').on('change', function() {
+			selectedMethod = $(this).val();
+			updateChart();
+		});
+
+		// 이벤트: 날짜 선택
+		$('#datePicker').on('change', function () {
+			const selectedDate = new Date($(this).val());
+			if (!isNaN(selectedDate)) {
+				baseDate = selectedDate;
+				updateChart();
 			}
+		});
 
-			console.log(paymentList);
-			const total = getCurrentMonthTotal(paymentList);
-			const formatted = total.toLocaleString() + ' 원';
-			document.getElementById('monthly-total').innerText = formatted;
+		// 이벤트: 주 이동 버튼
+		$('#prevWeekly').click(() => {
+			baseDate.setDate(baseDate.getDate() - 7);
+			updateChart();
+		});
+		$('#nextWeekly').click(() => {
+			baseDate.setDate(baseDate.getDate() + 7);
+			updateChart();
+		});
 
-			 $('#prevMonth').click(() => {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-      }
-      renderCalendar(currentYear, currentMonth);
-    });
+	</script>
 
-    $('#nextMonth').click(() => {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-      renderCalendar(currentYear, currentMonth);
-    });
-
-			$(document).ready(() => {
-      renderCalendar(currentYear, currentMonth);
-    });
 		
-		</script>
 	</main>
 </body>
 </html>

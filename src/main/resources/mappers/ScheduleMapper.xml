@@ -36,5 +36,9 @@
 		value(#{bh_start}, #{bh_end}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
 	</insert>
 
+	<select id="checkResTime" resultType="BusinessHourVO">
+		select * from businesshour where bh_rt_num = #{bh_rt_num} and bh_start = #{bh_start} and bh_end = #{bh_end}
+	</select>
+
 	
 </mapper>

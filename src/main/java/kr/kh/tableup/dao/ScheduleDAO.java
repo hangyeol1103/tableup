@@ -21,5 +21,7 @@ public interface ScheduleDAO {
 	boolean updateBdOff(BusinessDateVO date);
 
 	boolean insertResTime(BusinessHourVO res);
+
+	BusinessHourVO checkResTime(int bh_rt_num, String bh_start, String bh_end);
 	
 }

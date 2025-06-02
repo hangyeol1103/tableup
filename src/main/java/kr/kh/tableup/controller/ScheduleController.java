@@ -199,7 +199,7 @@ public class ScheduleController {
 				res.setBh_state(false);
 				res.setBh_rt_num(manager.getManager().getRm_rt_num());
 
-				boolean result = scheduleService.insertRestime(res);
+				boolean result = scheduleService.insertRestime(res ,date);
 
 				return result ? ResponseEntity.ok().build()
 							: ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

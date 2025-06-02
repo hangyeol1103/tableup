@@ -114,7 +114,7 @@ INSERT INTO reservation (
 )
 VALUES (
   1, 1, now(), 2,
-  '요청사항', now(), 0--  DATE_ADD(now(), INTERVAL 2 HOUR) -- 예: 2시간 후 종료
+  '요청사항', now(), 0   -- DATE_ADD(now(), INTERVAL 2 HOUR) -- 예: 2시간 후 종료
 );
 
 -- 디폴트 리뷰

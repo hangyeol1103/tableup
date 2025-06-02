@@ -96,4 +96,17 @@
     select * from restaurantdetail where rd_rt_num = #{rt_num}
   </select>
 
+  <select id="countScoreByRtNum">
+    SELECT ROUND(IFNULL(AVG(rs.rs_score), 0), 2)
+      FROM review rev
+      JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
+      WHERE rev.rev_rt_num = #{rt_num};
+  </select>
+
+  <select id="countReviewByRtNum">
+    SELECT COUNT(*)
+      FROM review rev
+      WHERE rev.rev_rt_num = #{rt_num};
+  </select>
+
 </mapper>

@@ -19,4 +19,10 @@ public interface RestaurantDAO {
 	List<RestaurantDetailVO> selectRestaurantDetailList(@Param("rt_num") int rt_num);
 
 	List<ReviewVO> selectReviewListbyNum(@Param("rt_num") int rt_num);
+
+    int countScoreByRtNum(int rt_num);
+
+    int countReviewByRtNum(int rt_num);
 }
+
+

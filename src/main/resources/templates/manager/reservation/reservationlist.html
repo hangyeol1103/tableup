@@ -107,6 +107,19 @@
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const match = opertimelist.find(op => op.bd_date === dateStr);
 
+        // 해당 날짜의 예약 수 계산
+        const reservationCount = reservationlist.filter(r => r.res_time?.substring(0, 10) === dateStr).length;
+
+        // 예약 수가 있을 때만 출력
+        let reservationInfo = '';
+        if (reservationCount > 0) {
+          reservationInfo = `
+            <div class="mt-1 text-primary fw-semibold" style="font-size: 0.75rem;">
+              총 예약: ${reservationCount}건
+            </div>
+          `;
+        }
+
         const cell = $(`
           <div class="calendar-cell" data-date="${dateStr}">
             <strong>${i}</strong>
@@ -116,6 +129,7 @@
                 ${match.bd_off ? '쉬는날' : '여는날'}
               </div>
             ` : ''}
+            ${reservationInfo}
           </div>
         `);
 

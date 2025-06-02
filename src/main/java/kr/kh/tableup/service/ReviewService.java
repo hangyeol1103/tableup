@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.NestedExceptionUtils;
@@ -13,6 +11,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import kr.kh.tableup.dao.FileDAO;
 import kr.kh.tableup.dao.ReviewDAO;
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.DTO.FileDTO;
@@ -32,6 +31,9 @@ public class ReviewService {
 	@Autowired
 	UserDAO userDAO;
 
+	@Autowired
+	FileDAO fileDAO;
+
   @Value("${spring.path.upload}")
   String uploadPath;
 	
@@ -45,7 +47,7 @@ public class ReviewService {
 		List<FileDTO> fileList = reviewDTO.getFileList();
 
 		int rev_num = 0;
-		int[] rs_num;
+		int[] rs_num = new int[scoreList.size()];
 		
 
 		System.out.println(review);
@@ -87,8 +89,8 @@ public class ReviewService {
 			}
 		}catch(RuntimeException e){
 			reviewDAO.deleteReview(rev_num);
-			throw new RuntimeException("점수 저장에 실패했습니다.");
 			for(int i = 0; i<rs_num.length;i++ )reviewDAO.deleteReviewScore(rs_num[i]);
+			throw new RuntimeException("점수 저장에 실패했습니다.");
 		}
 
 		// 파일 업로드
@@ -96,7 +98,12 @@ public class ReviewService {
 		if (fileList != null && !fileList.isEmpty()) {
 			for (int i = 0; i < fileList.size(); i++) {
 				if (fileList.get(i)!=null) {
-					fileNum[i] = reviewDAO.insertFile("REVIEW",);
+					FileDTO fileDTO = fileList.get(i);
+					fileDTO.setFile_foreign(String.valueOf(rev_num));
+					fileDTO.setFile_type("REVIEW");
+
+					fileNum[i] = reviewDAO.insertFile(fileDTO);
+					
 					// FileDTO fileDTO = new FileDTO;
 					
 					// fileNum[i] = reviewDAO.insertReviewFile(review.getRev_num(), fileList.get(i), fileNames.get(i), fileTags.get(i));
@@ -105,15 +112,7 @@ public class ReviewService {
 			}
 		}
 
-		if(rev_num > 0 && rs_num > 0 && fileNum.length > 0) {
-			reviewDAO.updateReviewFileForeign(review.getRev_num(), fileNum);
-		}
-		else {
-			
-			
-			throw new RuntimeException("리뷰 등록에 실패했습니다.");
-		}
-
+	
 
 
 	}
@@ -129,31 +128,18 @@ public class ReviewService {
 
 
 	
-	private void uploadFile(MultipartFile file, int po_key) {
-		String fi_ori_name = file.getOriginalFilename();
-		//파일명이 없으면
-		if(fi_ori_name == null || fi_ori_name.length() == 0) {
-			return;
-		}
-		try {
-			String fi_name = UploadFileUtils.uploadFile(uploadPath, fi_ori_name, file.getBytes());
-			FileVO fileVo = new FileDTO(fi_ori_name, fi_name, po_key);
-			postDao.insertFile(fileVo);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
-	private void deleteFile(FileVO fileVo) {
-		if(fileVo == null) {
-			return;
-		}
-		//실제 첨부파일을 삭제
-		UploadFileUtils.deleteFile(uploadPath, fileVo.getFi_name());
-		
-		//db에서 해당 첨부파일을 삭제
-		postDao.deleteFile(fileVo.getFi_key());
-	}
 	
+  private String getSuffix(String fileName) {
+    int index = fileName.lastIndexOf(".");
+    return index < 0 ? null : fileName.substring(index);
+  }
+
+
+
+	public int insertReviewAndScore(ReviewDTO reviewDTO) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'insertReviewAndScore'");
+	}
 
 }

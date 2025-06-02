@@ -31,7 +31,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import kr.kh.tableup.model.DTO.FileDTO;
 import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
@@ -48,15 +47,15 @@ import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
-import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
+import kr.kh.tableup.service.FileService;
 import kr.kh.tableup.service.ManagerService;
-import kr.kh.tableup.service.ReviewService;
 import kr.kh.tableup.service.RestaurantService;
+import kr.kh.tableup.service.ReviewService;
 import kr.kh.tableup.service.UserService;
 
 @Controller
@@ -74,6 +73,9 @@ public class UserController {
 
   @Autowired
   private ReviewService reviewService;
+
+  @Autowired
+  private FileService fileService;
 
   @Value("${my-api-key}")
   private String apiKey;
@@ -670,6 +672,37 @@ public class UserController {
         
     }
 
+
+    @PostMapping("/review/insertReviewAndScore")
+    @ResponseBody
+    public int insertReviewAndScore(@RequestBody ReviewDTO reviewDTO,@AuthenticationPrincipal CustomUser user) {
+        try {
+            reviewDTO.getReview().setRev_us_num(user.getUser().getUs_num()); // 사용자 ID 또는 번호를 수동 세팅
+            reviewDTO.getReview().setUs_name(user.getUser().getUs_name()); // 사용자 이름 세팅
+            int rev_num = reviewService.insertReviewAndScore(reviewDTO);
+            return rev_num; 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1; 
+        }
+    }
+
+    @PostMapping("/review/uploadFile")
+    @ResponseBody
+    public String uploadFile(String rev_num,
+                            String file_name,
+                            String file_tag,
+                            MultipartFile file) {
+        try {
+   
+            fileService.insertFile(rev_num,file_name,file_tag,file);
+
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+    }
 
 
   

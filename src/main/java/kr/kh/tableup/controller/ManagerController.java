@@ -1181,15 +1181,17 @@ public class ManagerController {
 
 		List<PaymentVO> paymentList = paymentService.getPaymentList(manager.getManager().getRm_rt_num());
 		RestaurantVO restaurant = managerService.getRestaurantByNum(manager.getManager().getRm_rt_num());
+		List<BusinessDateVO> operTimeList =managerService.getOperTimeList(manager.getManager().getRm_rt_num());
 		System.out.println("예약 결제 내역"+paymentList);
 
+		model.addAttribute("operTimeList", operTimeList);
 		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("manager",manager.getManager());
 		model.addAttribute("paymentList", paymentList);
 		return "/manager/manager_pay/pay";
 	}
 	
-	
+	//매니저 예약 관리
 	@GetMapping("/manager/manager_reservation")
 	public String reservateionManager(Model model) {
 		
@@ -1216,4 +1218,5 @@ public class ManagerController {
 		}
 		return map;
 	}
+
 }

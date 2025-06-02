@@ -10,8 +10,37 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<title>매장 메뉴 리스트</title>
 	
+  <style>
+    .calendar-cell {
+      width: 120px;
+      height: 100px;
+      border: 1px solid #ccc;
+      margin: 5px;
+      padding: 5px;
+      display: inline-block;
+      vertical-align: top;
+      position: relative;
+      cursor: pointer;
+    }
+    .calendar-row {
+      display: flex;
+    }
+    .calendar-month {
+      margin-bottom: 2rem;
+    }
+    .calendar-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .opertime-info {
+      font-size: 0.8em;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -25,15 +54,75 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       <label class="col-md-3 form-label">이번 달 매출:</label>
       <div class="col-md-9" id="monthly-total">총 매출</div>
     </div>
-		<div class="mb-3 row">
+		<!-- <div class="mb-3 row">
       <label class="col-md-3 form-label">일일 매출:</label>
       <div class="col-md-9" id="daily-total">일별 매출 매출</div>
-    </div>
+    </div> -->
+		
+		<div class="calendar-navigation">
+			<button id="prevMonth" class="btn btn-outline-primary">이전달</button>
+			<span id="calendarTitle" class="fw-bold"></span>
+			<button id="nextMonth" class="btn btn-outline-primary">다음달</button>
+		</div>
+		<div id="calendar"></div>
+
 			
 		<a th:href="@{/manager}" class="btn btn-outline-secondary col-12 mb-3">매니저 메인 화면으로 돌아가기</a>
 		<!-- 요번달 총 매출 출력 스크립트 -->
 		<script th:inline="javascript">
-			const paymentList=/*[[${paymentList}]]*/[];
+			const today = new Date();
+			let currentMonth = today.getMonth();
+			let currentYear = today.getFullYear();
+
+			const paymentList=[[${paymentList}]];
+			const opertimelist = /*[[${opertimelist}]]*/[];
+
+			function renderCalendar(year, month) {
+				$('#calendar').empty();
+				const container = $('<div class="calendar-month"></div>');
+				const daysInMonth = new Date(year, month + 1, 0).getDate();
+				const firstDay = new Date(year, month, 1).getDay();
+
+				$('#calendarTitle').text(`${year}년 ${month + 1}월`);
+				const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+				let row = $('<div class="calendar-row"></div>');
+				weekdays.forEach(day => row.append(`<div class="calendar-cell"><strong>${day}</strong></div>`));
+				container.append(row);
+
+				row = $('<div class="calendar-row"></div>');
+				for (let i = 0; i < firstDay; i++) row.append('<div class="calendar-cell"></div>');
+
+				for (let i = 1; i <= daysInMonth; i++) {
+					const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+					const match = opertimelist.find(op => op.bd_date === dateStr);
+
+					const cell = $(`
+						<div class="calendar-cell" data-date="${dateStr}">
+							<strong>${i}</strong>
+							${match ? `
+								<div class="opertime-info">
+									${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
+									${match.bd_off ? '쉬는날' : '여는날'}
+								</div>
+							` : ''}
+						</div>
+					`);
+
+					if (match) {
+						cell.click(() => {
+							location.href = `/manager/opertime/remake_opertime/${match.bd_num}`;
+						});
+					}
+
+					row.append(cell);
+					if ((firstDay + i) % 7 === 0) {
+						container.append(row);
+						row = $('<div class="calendar-row"></div>');
+					}
+				}
+				container.append(row);
+				$('#calendar').append(container);
+			}
 
 			function getCurrentMonthTotal(payment){
 				const now = new Date();
@@ -53,10 +142,33 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				
 				return total;
 			}
+
 			console.log(paymentList);
 			const total = getCurrentMonthTotal(paymentList);
 			const formatted = total.toLocaleString() + ' 원';
 			document.getElementById('monthly-total').innerText = formatted;
+
+			 $('#prevMonth').click(() => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    $('#nextMonth').click(() => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+			$(document).ready(() => {
+      renderCalendar(currentYear, currentMonth);
+    });
 		
 		</script>
 	</main>

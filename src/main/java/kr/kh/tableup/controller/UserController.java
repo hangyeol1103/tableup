@@ -523,6 +523,8 @@ public class UserController {
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
     TagVO tag = userService.getTagByRestaurant(rt_num);
+    double starScore = restaurantService.getCountScoreByRtNum(rt_num);
+    int countReview = restaurantService.getCountReviewByRtNum(rt_num);
     // List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
     List<ResNewsVO> resNewsList = userService.getResNewsList(rt_num);
@@ -531,6 +533,7 @@ public class UserController {
     List<DefaultResTimeVO> defaultResTimeList = userService.getDefaultResTimeList(rt_num);
     List<RestaurantDetailVO> restaurantDetailList = restaurantService.getRestaurantDetailList(rt_num);
     List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
+    
 
     //System.out.println(apiKey);
     System.out.println("restaurant: " + restaurant);
@@ -539,6 +542,8 @@ public class UserController {
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
+    model.addAttribute("starScore", starScore);
+    model.addAttribute("countReview", countReview);
     // model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
 

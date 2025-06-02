@@ -20,9 +20,9 @@ public interface RestaurantDAO {
 
 	List<ReviewVO> selectReviewListbyNum(@Param("rt_num") int rt_num);
 
-    int countScoreByRtNum(int rt_num);
+    double countScoreByRtNum(@Param("rt_num") int rt_num);
 
-    int countReviewByRtNum(int rt_num);
+    int countReviewByRtNum(@Param("rt_num") int rt_num);
     
     int countReviewByUsNum(int rt_num, int us_num);
 }

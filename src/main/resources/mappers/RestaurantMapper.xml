@@ -3,6 +3,32 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.RestaurantDAO">
 
+	<resultMap id="reviewMap" type="ReviewVO">
+		<id property="rev_num" column="rev_num"/>
+		<result property="rev_us_num" column="rev_us_num"/>
+		<result property="rev_rt_num" column="rev_rt_num"/>
+		<result property="rev_content" column="rev_content"/>
+		<result property="rev_created" column="rev_created"/>
+		<result property="rev_updated" column="rev_updated"/>
+		<result property="rev_state" column="rev_state"/>
+		<result property="rev_visit" column="rev_visit"/>
+		<result property="rev_visitor" column="rev_visitor"/>
+		
+		<result property="us_name" column="us_name"/>
+		<result property="rt_name" column="rt_name"/>
+
+		<association property="score" javaType="ReviewScoreVO">
+			<id property="rs_num" column="rs_num"/>
+			<result property="rs_rev_num" column="rs_rev_num"/>
+			<result property="rs_st_num" column="rs_st_num"/>
+			<result property="rs_score" column="rs_score"/>
+
+			<result property="st_num" column="st_num"/>
+			<result property="st_category" column="st_category"/>
+			<result property="rt_num" column="rt_num_for_score"/>
+		</association>
+	</resultMap>
+
   <!-- ReviewScoreVO + ReviewVO -->
 	<resultMap id="ReviewMap" type="ReviewVO">
 		<!-- ReviewVO -->
@@ -97,14 +123,14 @@
     select * from restaurantdetail where rd_rt_num = #{rt_num}
   </select>
 
-  <select id="countScoreByRtNum">
+  <select id="countScoreByRtNum" resultType="Double">
     SELECT ROUND(IFNULL(AVG(rs.rs_score), 0), 2)
       FROM review rev
       JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
       WHERE rev.rev_rt_num = #{rt_num};
   </select>
 
-  <select id="countReviewByRtNum">
+  <select id="countReviewByRtNum" resultType="Integer">
     SELECT COUNT(*)
       FROM review rev
       WHERE rev.rev_rt_num = #{rt_num};

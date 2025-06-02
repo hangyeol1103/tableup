@@ -38,6 +38,14 @@ public class RestaurantService {
 		return restaurantDAO.selectReviewListbyNum(rt_num);
 	}
 
+	public double getCountScoreByRtNum(int rt_num) {
+		return restaurantDAO.countScoreByRtNum(rt_num);
+	}
+
+	public int getCountReviewByRtNum(int rt_num) {
+		return restaurantDAO.countReviewByRtNum(rt_num);
+	}
+
 	
 	
 }

@@ -164,8 +164,8 @@
       <input type="hidden" id="rt-num" th:value="${restaurant.rt_num}" />
       <div class="d-flex align-items-center mb-2">
         <span class="text-warning me-1">★</span>
-        <span class="fw-bold me-2">4.7</span>
-        <span class="text-muted small">리뷰 123개</span>
+        <span class="fw-bold me-2" th:text="${starScore}"></span>
+        <span class="text-muted small" th:text="'리뷰 ' + ${countReview} + '개'"></span>
       </div>
       <!-- 설명 -->
       <p class="text-muted mb-1" th:text="${restaurant.rt_description}"></p>

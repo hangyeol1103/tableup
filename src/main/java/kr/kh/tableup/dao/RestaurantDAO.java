@@ -23,6 +23,8 @@ public interface RestaurantDAO {
     int countScoreByRtNum(int rt_num);
 
     int countReviewByRtNum(int rt_num);
+    
+    int countReviewByUsNum(int rt_num, int us_num);
 }
 
 

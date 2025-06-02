@@ -108,5 +108,14 @@
       FROM review rev
       WHERE rev.rev_rt_num = #{rt_num};
   </select>
+  
+
+  <select id="countReviewByUsNum">
+    SELECT COUNT(*)
+      FROM review rev
+      WHERE rev.rev_rt_num = #{rt_num} AND rev.rev_us_num = #{us_num};
+  </select>
+
+  
 
 </mapper>

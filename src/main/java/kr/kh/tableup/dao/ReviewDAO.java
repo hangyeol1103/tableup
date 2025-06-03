@@ -14,7 +14,9 @@ public interface ReviewDAO {
 
 	void deleteReviewScore(int rs_num);
 
-	ReviewVO selectReview(Integer res_num);
+	ReviewVO selectReviewByReservation(Integer res_num);
+
+	ReviewVO selectReview(int rev_num);
 
 	//int insertFile(FileVO fileVO);
 

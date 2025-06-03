@@ -162,9 +162,15 @@ public class ReviewService {
   }
 
 
-	public ReviewVO getReview(Integer res_num) {
+	public ReviewVO getReviewByReservation(int res_num) {
 		
-		return reviewDAO.selectReview(res_num);
+		return reviewDAO.selectReviewByReservation(res_num);
+	}
+
+
+	public ReviewVO getReview(int rev_num) {
+		
+		return reviewDAO.selectReview(rev_num);
 	}
 
 /*/

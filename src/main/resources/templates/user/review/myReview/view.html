@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>리뷰 상세</title>
+</head>
+
+<body>
+<main layout:fragment="content" class="container mt-5">
+  <h2 class="mb-4">리뷰 상세 정보</h2>
+
+  <div class="card mb-4">
+    <div class="card-header fw-bold">
+      리뷰 번호 #<span th:text="${review.rev_num}">24</span>
+    </div>
+    <div class="card-body">
+      <dl class="row">
+        <dt class="col-sm-3">작성자</dt>
+        <dd class="col-sm-9" th:text="${review.us_name}">홍길동</dd>
+
+        <dt class="col-sm-3">작성 매장</dt>
+        <dd class="col-sm-9" th:text="${review.rt_name}">디폴트 매장</dd>
+
+        <dt class="col-sm-3">방문 일자</dt>
+        <dd class="col-sm-9" th:text="${review.rev_visit}">2025-06-11</dd>
+
+        <dt class="col-sm-3">방문 인원</dt>
+        <dd class="col-sm-9" th:text="${review.rev_visitor}">1명</dd>
+
+        <dt class="col-sm-3">작성일</dt>
+        <dd class="col-sm-9" th:text="${#dates.format(review.rev_created, 'yyyy-MM-dd HH:mm')}">2025-06-03</dd>
+
+        <dt class="col-sm-3">수정일</dt>
+        <dd class="col-sm-9" th:text="${#dates.format(review.rev_updated, 'yyyy-MM-dd HH:mm')}">2025-06-03</dd>
+
+        <dt class="col-sm-3">리뷰 상태</dt>
+        <dd class="col-sm-9" th:text="${review.rev_state == 0 ? '정상' : '비공개/삭제'}">정상</dd>
+      </dl>
+
+      <hr>
+
+      <h5>리뷰 내용</h5>
+      <div class="border rounded p-3" th:utext="${review.rev_content}">
+        리뷰 내용
+      </div>
+    </div>
+  </div>
+
+  <!-- 항목별 점수 -->
+  <div th:if="${review.scoreList != null}">
+    <h4 class="mt-4">항목별 평점</h4>
+    <ul class="list-group mb-4">
+      <li class="list-group-item" th:each="score : ${review.scoreList}">
+        <strong th:text="${score.st_category}">맛</strong>:
+        <span th:text="${score.rs_score}">5</span>점
+      </li>
+    </ul>
+  </div>
+
+  <!-- 첨부 이미지 -->
+  <div th:if="${review.fileList != null and #lists.size(review.fileList) > 0}">
+    <h4 class="mt-4">첨부 이미지</h4>
+    <div class="row">
+      <div class="col-md-4 mb-3" th:each="file : ${review.fileList}">
+        <img th:src="@{${file.file_path}}" class="img-fluid rounded shadow-sm" alt="첨부 이미지">
+        <p class="mt-1 text-muted" th:text="'태그: ' + ${file.file_tag}">내부</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 하단 이동 버튼 -->
+  <div class="mt-4 text-end">
+    <a th:href="@{/user/review/list}" class="btn btn-secondary">리뷰 목록으로</a>
+  </div>
+</main>
+</body>
+</html>

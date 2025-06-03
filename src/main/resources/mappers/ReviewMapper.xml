@@ -29,6 +29,16 @@
 			<result property="st_num" column="st_num" />
 			<result property="st_category" column="st_category" />
 		</collection>
+		<!-- fileList -->
+		<collection property="fileList" ofType="FileVO">
+			<id property="file_num" column="file_num"/>
+			<result property="file_path" column="file_path"/>
+			<result property="file_name" column="file_name"/>
+			<result property="file_type" column="file_type"/>
+			<result property="file_foreign" column="file_foreign"/>
+			<result property="file_tag" column="file_tag"/>
+			<result property="file_res_num" column="file_res_num"/>
+		</collection>
 	</resultMap>
 
 
@@ -56,13 +66,33 @@
 		
 	</update>
 	
-	<select id="selectReview" resultType="ReviewVO">
+	<select id="selectReviewByReservation" resultType="ReviewVO">
 		SELECT * FROM review 
 		LEFT JOIN revres USING (rev_num)
 		LEFT JOIN reservation USING	(res_num)
 		WHERE res_num = #{res_num}
 	</select>
 
+	<select id="selectReview" resultMap="ReviewMap" parameterType="int">
+		SELECT 
+			r.rev_num, r.rev_us_num, r.rev_rt_num, r.rev_content, r.rev_created,
+			r.rev_updated, r.rev_state, r.rev_visit, r.rev_visitor,
+			u.us_name, rt.rt_name,
+
+			rs.rs_num, rs.rs_rev_num, rs.rs_st_num, rs.rs_score,
+			st.st_num, st.st_category,
+
+			f.file_num, f.file_path, f.file_name, f.file_type, f.file_foreign, f.file_tag, f.file_res_num
+
+		FROM review r
+		LEFT JOIN user u ON r.rev_us_num = u.us_num
+		LEFT JOIN restaurant rt ON r.rev_rt_num = rt.rt_num
+		LEFT JOIN reviewscore rs ON r.rev_num = rs.rs_rev_num
+		LEFT JOIN scoretype st ON rs.rs_st_num = st.st_num
+		LEFT JOIN file f ON r.rev_num = f.file_foreign AND f.file_type = 'REVIEW'
+
+		WHERE r.rev_num = #{rev_num}
+	</select>
 	<!-- <insert id="insertFile" useGeneratedKeys="true" keyProperty="file_num">
 
 	</insert> -->

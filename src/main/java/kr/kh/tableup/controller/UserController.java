@@ -515,6 +515,15 @@ public class UserController {
       System.out.println("리뷰 리스트 : " + reviewList);
       return "user/review/view";
   }
+
+  @GetMapping("/review/view/{rev_num}")
+  public String myReview(Model model, @PathVariable("rev_num") int rev_num) {
+      
+      ReviewVO review = reviewService.getReview(rev_num);
+      model.addAttribute("review", review);
+      System.out.println(review);
+      return "user/review/myReview/view";
+  }
   
   @GetMapping("/list/detail/outline")
   public String outline() {

@@ -20,7 +20,7 @@ CREATE TABLE `revres` (
 -- 트리거 로그 테이블
 CREATE TABLE `review_trigger_log` (
    log_id INT AUTO_INCREMENT PRIMARY KEY,
-   log_type ENUM('BLOCKED', 'INSERTED') NOT NULL,
+   log_type ENUM('BLOCKED', 'INSERTED', 'DELETED') NOT NULL,
    us_num INT,
    rt_num INT,
    rev_num INT,
@@ -60,7 +60,7 @@ BEGIN
   FROM reservation
   WHERE res_us_num = NEW.rev_us_num
     AND res_rt_num = NEW.rev_rt_num
-  ORDER BY res_date DESC
+  ORDER BY res_time DESC
   LIMIT 1;
 
   -- 중복 체크
@@ -99,7 +99,7 @@ BEGIN
   FROM reservation
   WHERE res_us_num = NEW.rev_us_num
     AND res_rt_num = NEW.rev_rt_num
-  ORDER BY res_date DESC
+  ORDER BY res_time DESC
   LIMIT 1;
 
   -- revres에 매핑 정보 삽입
@@ -117,6 +117,46 @@ BEGIN
     reservation_id,
     '리뷰 등록됨.'
   );
+END$$
+
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS trg_before_review_delete;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_before_review_delete
+BEFORE UPDATE ON review
+FOR EACH ROW
+BEGIN
+  DECLARE target_res_num INT;
+
+  -- 삭제 조건 확인
+  IF OLD.rev_state != -1 AND NEW.rev_state = -1 THEN
+	IF EXISTS (SELECT 1 FROM revres WHERE rev_num = NEW.rev_num) THEN
+    -- 삭제 전 관련 예약 번호 확보
+		SELECT res_num INTO target_res_num
+		FROM revres
+		WHERE rev_num = NEW.rev_num
+		LIMIT 1;
+
+		-- 로그 기록
+		INSERT INTO review_trigger_log (
+		  log_type, us_num, rt_num, rev_num, res_num, log_message
+		) VALUES (
+		  'DELETED',
+		  OLD.rev_us_num,
+		  OLD.rev_rt_num,
+		  OLD.rev_num,
+		  target_res_num,
+		  '리뷰가 삭제되어 revres에서 제거됨.'
+		);
+
+		-- 매핑 정보 제거
+		DELETE FROM revres WHERE rev_num = OLD.rev_num;
+
+	  END IF;
+  END IF;
 END$$
 
 DELIMITER ;

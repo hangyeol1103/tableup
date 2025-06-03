@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import kr.kh.tableup.model.DTO.FileDTO;
 import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
@@ -47,15 +47,15 @@ import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
-import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
+import kr.kh.tableup.service.FileService;
 import kr.kh.tableup.service.ManagerService;
-import kr.kh.tableup.service.ReviewService;
 import kr.kh.tableup.service.RestaurantService;
+import kr.kh.tableup.service.ReviewService;
 import kr.kh.tableup.service.UserService;
 
 @Controller
@@ -73,6 +73,9 @@ public class UserController {
 
   @Autowired
   private ReviewService reviewService;
+
+  @Autowired
+  private FileService fileService;
 
   @Value("${my-api-key}")
   private String apiKey;
@@ -311,6 +314,7 @@ public class UserController {
     } else {
       model.addAttribute("review", new ReviewVO()); // 빈 리뷰 객체
     }
+    
 
     return "user/review/insert";
   }
@@ -623,7 +627,7 @@ public class UserController {
   @PostMapping("/review/insertSamplePost")
     public String insertSample(
           RedirectAttributes rttr,
-          @RequestBody ReviewDTO reviewDTO,
+          @RequestPart ReviewDTO reviewDTO,
           boolean preview,
           @AuthenticationPrincipal CustomUser user) {
         if (preview) {
@@ -640,28 +644,32 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<?> insertFinal(
           RedirectAttributes rttr,
-          @RequestBody ReviewDTO reviewDTO,
+          @RequestPart ReviewDTO reviewDTO,
+          @RequestPart(value = "files", required = false)List<MultipartFile> fileList,
           boolean preview,
           @AuthenticationPrincipal CustomUser user) {
       System.out.println("리뷰 최종 저장 요청: " + reviewDTO.getReview() + " " + reviewDTO.getScoreList());
       System.out.println("파일리스트: " +  reviewDTO.getFileList());
       if(user.getUser() == null) return ResponseEntity.badRequest().body("확인되지 않은 이용자 접근");
+
       reviewDTO.getReview().setRev_us_num(user.getUser().getUs_num()); // 사용자 ID 또는 번호를 수동 세팅
       reviewDTO.getReview().setUs_name(user.getUser().getUs_name()); // 사용자 이름 세팅
       System.out.println("리뷰 작성자 번호 : " + reviewDTO.getReview().getRev_us_num());           
-    
       //if (!preview) {/*일단 false로 받아오긴 하는데*/ }
+
+
+      if(fileList!=null)for(int i=0; i<fileList.size();i++)reviewDTO.getFileList().get(i).setUploadFile(fileList.get(i));
+
       try{
           rttr.addFlashAttribute("review", reviewDTO.getReview());
           rttr.addFlashAttribute("scores", reviewDTO.getScoreList());
 
-          //reviewService.insertReview(reviewDTO);
+          reviewService.insertReview(reviewDTO);
         }catch (RuntimeException e) {
           System.out.println("리뷰 저장 중 오류 발생: " + e.getMessage());
           rttr.addFlashAttribute("errorMsg", e.getMessage());
           return ResponseEntity.badRequest().body("잘못된 요청");
         }catch (Exception e) {
-
           return ResponseEntity.badRequest().body("알수없는 오류");
         }
         System.out.println("리뷰 저장 완료");

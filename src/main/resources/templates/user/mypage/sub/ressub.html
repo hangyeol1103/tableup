@@ -21,13 +21,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
       <th:block th:each="r : ${reservations}">
         <li class="list-group-item">
-          <strong th:text="${r.res_rt_num}">식당 번호</strong><br>
-        </li>
-        <li class="list-group-item">
-          <strong th:text="${r.rt_name}">식당이름</strong><br>
-        </li>
-        <li class="list-group-item">
-          <strong th:text="${r.us_name}">유저이름</strong><br>
+          <strong>식당 번호:</strong> <span th:text="${r.res_rt_num}"></span><br>
+          <strong>식당 이름:</strong> <span th:text="${r.rt_name}"></span><br>
+          <strong>유저 이름:</strong> <span th:text="${r.us_name}"></span><br>
+
+          <div class="mt-2">
+            <!-- 리뷰가 있는 경우 -->
+            <a th:if="${r.rev_num != null}"
+              th:href="@{/review/view/{rev_num}(rev_num=${r.rev_num})}"
+              class="btn btn-outline-primary btn-sm">
+              내 리뷰 보기
+            </a>
+
+            <!-- 리뷰가 없는 경우 -->
+            <a th:if="${r.rev_num == null}"
+              th:href="@{/review/write/{res_num}(res_num=${r.res_num})}"
+              class="btn btn-primary btn-sm">
+              리뷰 작성
+            </a>
+          </div>
         </li>
       </th:block>
     </ul>

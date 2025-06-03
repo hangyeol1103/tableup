@@ -142,11 +142,8 @@
             <span class="badge">1834</span></a>
           </li>
           <li class="tab-item">
-            <a class="tab-link" href="#">리뷰
+            <a class="tab-link review" href="javascript:void(0)">리뷰
             <span class="badge">74</span></a>
-          </li>
-            <li class="tab-item">
-              <a class="tab-link" href="#">매장정보</a>
           </li>
         </ul>
       </div>
@@ -347,6 +344,22 @@
 
           $.ajax({
             url : "/user/list/picture/[[${rt_num}]] ",
+            method : "post",
+            success : function(data){
+
+              $(".container-content").html(data)
+            }
+
+          })
+        })
+
+        //리뷰 클릭시
+        $(".review").on("click", function(e){
+          e.preventDefault();
+          
+
+          $.ajax({
+            url : "/user/list/review/[[${rt_num}]] ",
             method : "post",
             success : function(data){
 

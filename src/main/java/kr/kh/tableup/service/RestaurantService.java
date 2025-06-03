@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
@@ -63,6 +64,10 @@ public class RestaurantService {
 
 	public List<MenuVO> getMenuDivList(int rt_num) {
 		return restaurantDAO.selectMenuDivList(rt_num);
+	}
+
+	public List<FileVO> getTapFileList(int rt_num) {
+		return restaurantDAO.selectTapFileList(rt_num);
 	}
 	
 	

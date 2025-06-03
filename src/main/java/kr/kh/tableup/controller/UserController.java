@@ -539,9 +539,25 @@ public class UserController {
 
   @PostMapping("/list/picture/{rt_num}")
   public String postrestaurantpicture(@PathVariable("rt_num") int rt_num, Model model) {
-    
+    // 전체 파일 목록 가져오기
+    List<FileVO> tapFileList = restaurantService.getTapFileList(rt_num);
+
+    // file_tag 기준으로 그룹핑
+    Map<String, List<FileVO>> groupedFiles = tapFileList.stream()
+        .collect(Collectors.groupingBy(FileVO::getFile_tag));
+
+    // 모델에 추가
+    model.addAttribute("groupedFiles", groupedFiles);
+    model.addAttribute("tapFileList", tapFileList);
     return "user/detail/picture";
   }
+
+  @PostMapping("/list/review/{rt_num}")
+  public String postMethodName(@PathVariable("rt_num") int rt_num, Model model) {
+      
+    return "user/detail/review";
+  }
+  
   
   @PostMapping("/list/home/{rt_num}")
   public String listHome(@PathVariable("rt_num") int rt_num, Model model) {

@@ -180,4 +180,8 @@
 		from menu where mn_rt_num = #{rt_num}
 	</select>
 
+	<select id="selectTapFileList" resultType="FileVO">
+		select * from file where file_tag = '내부' and file_res_num = #{rt_num}
+	</select>
+
 </mapper>

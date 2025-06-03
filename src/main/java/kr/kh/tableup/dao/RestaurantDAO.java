@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
@@ -36,6 +37,8 @@ public interface RestaurantDAO {
 		List<MenuTypeVO> selectMenuTypeList(@Param("rt_num") int rt_num);
 
 		List<MenuVO> selectMenuDivList(@Param("rt_num") int rt_num);
+
+		List<FileVO> selectTapFileList(@Param("rt_num") int rt_num);
 
 }
 

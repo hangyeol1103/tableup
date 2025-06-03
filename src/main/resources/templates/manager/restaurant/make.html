@@ -71,11 +71,18 @@
         <label for="rt_price_dinner" class="form-label">저녁 가격대</label>
         <input type="text" class="form-control" name="rt_price_dinner" id="rt_price_dinner" required>
       </div>
-			<div class="mb-3 form-group box">
+			<!-- <div class="mb-3 form-group box">
         <label for="fileList" class="form-label">대표 이미지(여러장? 가능)</label>
         <input type="file" class="form-control" name="fileList" id="fileList" multiple>
         <input type="file" class="form-control" name="fileList" id="fileList" multiple>
         <input type="file" class="form-control" name="fileList" id="fileList" multiple>     
+      </div> -->
+      <div class="mb-3 form-group box">
+        <label class="form-label">대표 이미지 추가</label>
+        <div id="file-input-container">
+          <input type="file" class="form-control mb-2" name="fileList" />
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="add-file-input">+ 이미지 추가</button>
       </div>
       <div class="mb-3 form-group box">
         <label for="rt_description" class="form-label">매장 설명 요약</label>
@@ -164,6 +171,16 @@
         });
       });
     </script>
+
+    <script>
+      $(document).ready(function () {
+        $('#add-file-input').on('click', function () {
+          const newInput = $('<input type="file" class="form-control mb-2" name="fileList">');
+          $('#file-input-container').append(newInput);
+        });
+      });
+    </script>
+
   </main>
   
 

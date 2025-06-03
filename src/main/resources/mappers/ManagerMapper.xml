@@ -361,7 +361,7 @@
 
 	<!-- 매장에 등록된 대표이미지 삭제-->
 	<delete id="deletefile">
-		delete from file where file_res_num = #{rt_num}
+		delete from file where file_res_num = #{rt_num} and file_type="RESTAURANTDETAIL"
 	</delete>
 
 	<update id="updateRestaurant">

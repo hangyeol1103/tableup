@@ -54,6 +54,7 @@ import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.FileService;
 import kr.kh.tableup.service.ManagerService;
+import kr.kh.tableup.service.ReservationService;
 import kr.kh.tableup.service.RestaurantService;
 import kr.kh.tableup.service.ReviewService;
 import kr.kh.tableup.service.UserService;
@@ -67,6 +68,9 @@ public class UserController {
 
   @Autowired
   private RestaurantService restaurantService;
+
+  @Autowired
+  private ReservationService reservationService;
 
   @Autowired
   private ManagerService managerService;
@@ -290,17 +294,20 @@ public class UserController {
     return "user/detail/detail";
   }
 
-  @GetMapping("/review/insert")
-  public String reviewpage(Model model, @RequestParam(required = false) Integer rt_num, @ModelAttribute String errorMsg,
+  @GetMapping("/review/insert/{res_num}")
+  public String reviewpage(Model model,@PathVariable Integer res_num, @ModelAttribute String errorMsg,
       @ModelAttribute ReviewVO review, @AuthenticationPrincipal CustomUser customUser) {
+        
+        // model.addAttribute("errorMsg", "에러입니다."); //post에서 이런식으로 에러 넘기면 될듯
+    //if(res_num == null) return "redirect:/user/mypage";
     model.addAttribute("user", customUser.getUser());
 
-    // model.addAttribute("errorMsg", "에러입니다."); //post에서 이런식으로 에러 넘기면 될듯
-    
-    if (rt_num != null) {
-      model.addAttribute("restaurant", managerService.getResDetail(rt_num)); // 식당 정보
-      model.addAttribute("rev_rt_num", rt_num); // 식당 번호 (만약 내 리뷰나 식당 페이지에서 넘어올땐 이거 이용해서 식당 번호 띄우기)
-    }
+    int rt_num = reservationService.getReservation(res_num).getRes_rt_num();
+
+
+    model.addAttribute("restaurant", managerService.getResDetail(rt_num)); // 식당 정보
+    model.addAttribute("rev_rt_num", rt_num); // 식당 번호 (만약 내 리뷰나 식당 페이지에서 넘어올땐 이거 이용해서 식당 번호 띄우기)
+
     List<ScoreTypeVO> scoreTypeList = userService.getScoreType();
     System.out.println("scoreTypeList: " + scoreTypeList);
     model.addAttribute("scoreTypeList", scoreTypeList); // 평점 항목

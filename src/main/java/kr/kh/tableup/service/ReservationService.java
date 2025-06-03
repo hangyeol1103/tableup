@@ -136,4 +136,8 @@ public class ReservationService {
 			return businessHourDAO.updateCurrentSeat(businessHour.getBh_num(), businessHour.getBh_seat_current() - dbReservation.getRes_person());
 		}
 
+		public ReservationVO getReservation(int res_num) {
+			return reservationDAO.selectReservation(res_num);		
+		}
+
 }

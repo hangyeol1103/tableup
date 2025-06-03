@@ -55,6 +55,13 @@
 	<update id="updateReview">
 		
 	</update>
+	
+	<select id="selectReview" resultType="ReviewVO">
+		SELECT * FROM review 
+		LEFT JOIN revres USING (rev_num)
+		LEFT JOIN reservation USING	(res_num)
+		WHERE res_num = #{res_num}
+	</select>
 
 	<!-- <insert id="insertFile" useGeneratedKeys="true" keyProperty="file_num">
 

@@ -80,4 +80,5 @@
 	<select id="selectReservation">
 		select * from reservation where res_num = #{res_num}
 	</select>
+
 </mapper>

@@ -645,7 +645,7 @@ public class UserController {
     public ResponseEntity<?> insertFinal(
           RedirectAttributes rttr,
           @RequestPart ReviewDTO reviewDTO,
-          List<MultipartFile> fileList,
+          @RequestPart(value = "files", required = false)List<MultipartFile> fileList,
           boolean preview,
           @AuthenticationPrincipal CustomUser user) {
       System.out.println("리뷰 최종 저장 요청: " + reviewDTO.getReview() + " " + reviewDTO.getScoreList());

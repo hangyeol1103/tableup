@@ -60,7 +60,7 @@ BEGIN
   FROM reservation
   WHERE res_us_num = NEW.rev_us_num
     AND res_rt_num = NEW.rev_rt_num
-  ORDER BY res_date DESC
+  ORDER BY res_time DESC
   LIMIT 1;
 
   -- 중복 체크
@@ -99,7 +99,7 @@ BEGIN
   FROM reservation
   WHERE res_us_num = NEW.rev_us_num
     AND res_rt_num = NEW.rev_rt_num
-  ORDER BY res_date DESC
+  ORDER BY res_time DESC
   LIMIT 1;
 
   -- revres에 매핑 정보 삽입

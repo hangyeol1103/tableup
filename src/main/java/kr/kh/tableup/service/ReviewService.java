@@ -1,6 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +73,7 @@ public class ReviewService {
 				if (rootCause != null && rootCause.getMessage().contains("이미 이 예약에 대한 리뷰가 존재합니다")) {
 						throw new RuntimeException("이미 작성한 리뷰가 존재합니다.");
 				} else {
-						throw new RuntimeException("알 수 없는 DB 오류가 발생했습니다.");
+						throw new RuntimeException(rootCause != null ? rootCause.getMessage() : "알 수 없는 DB 오류가 발생했습니다.");
 				}
 		}
 
@@ -82,41 +83,66 @@ public class ReviewService {
 
 		// 리뷰 점수 등록
 		try{
-			for(int i = 0; i<=scoreList.size(); i++){	// map 말고 리뷰스코어vo 쓸건데 일단 우선 맵으로 
-				if(scoreList.get(i).getRs_score()>5||scoreList.get(i).getRs_score()<5) throw new RuntimeException();
-				scoreList.get(i).setRs_rev_num(rev_num);
+			for(int i = 0; i<scoreList.size(); i++){	// map 말고 리뷰스코어vo 쓸건데 일단 우선 맵으로 
+				ReviewScoreVO score = scoreList.get(i);
+				if(score.getRs_score()>5||score.getRs_score()<1) throw new RuntimeException("점수가 범위 밖입니다");
+				
+				score.setRs_rev_num(rev_num);
+				score.setRs_st_num(score.getSt_num());
 				rs_num[i] = reviewDAO.insertReviewScore(scoreList.get(i));
 			}
 		}catch(RuntimeException e){
 			reviewDAO.deleteReview(rev_num);
 			for(int i = 0; i<rs_num.length;i++ )reviewDAO.deleteReviewScore(rs_num[i]);
-			throw new RuntimeException("점수 저장에 실패했습니다.");
+			throw new RuntimeException(e.getMessage()+"점수 저장에 실패했습니다.");
 		}
 
 		// 파일 업로드
+		List<String> uploadedPaths = new ArrayList<>();
 		int[] fileNum = new int[fileList.size()];	//파일리스트 말고 파일dto 쓸건데 일단 우선 리스트로
 		if (fileList != null && !fileList.isEmpty()) {
 			for (int i = 0; i < fileList.size(); i++) {
 				if (fileList.get(i)!=null) {
 					FileDTO fileDTO = fileList.get(i);
-					fileDTO.setFile_foreign(String.valueOf(rev_num));
-					fileDTO.setFile_type("REVIEW");
+			MultipartFile file = fileDTO.getUploadFile();
 
-					fileNum[i] = reviewDAO.insertFile(fileDTO);
-					
-					// FileDTO fileDTO = new FileDTO;
-					
-					// fileNum[i] = reviewDAO.insertReviewFile(review.getRev_num(), fileList.get(i), fileNames.get(i), fileTags.get(i));
-				}else continue;
+		if (file == null || file.isEmpty()) continue;
 
-			}
+		try {
+			String filePath = UploadFileUtils.uploadFile(uploadPath, file.getOriginalFilename(), file.getBytes());
+			uploadedPaths.add(filePath);
+
+			// 파일 VO 생성
+			FileVO fileVO = new FileVO();
+			fileVO.setFile_path(filePath); 
+			fileVO.setFile_name(fileDTO.getFile_name()); 
+			fileVO.setFile_type("REVIEW"); 
+			fileVO.setFile_foreign(rev_num); 
+			fileVO.setFile_tag(fileDTO.getFile_tag()); 
+			fileVO.setFile_res_num(review.getRev_rt_num());
+
+			// DB 저장
+			fileNum[i] = fileDAO.insertFile(fileVO);
+		} catch (Exception e) {
+			System.out.println("파일 업로드 실패: " + e.getMessage());
+			for (String path : uploadedPaths) {
+        UploadFileUtils.delteFile(uploadPath, path);
+      }
+			reviewDAO.deleteReview(rev_num);
+      for (int j = 0; j < rs_num.length; j++) {
+        reviewDAO.deleteReviewScore(rs_num[j]);
+      }
+			throw new RuntimeException("첨부파일 업로드 실패" + e.getMessage());
 		}
+	}
+}
 
 	
 
 
-	}
+}
 
+	}
 
 
 	public void insertReview(ReviewVO review, Map<String,String> scores) {
@@ -135,7 +161,7 @@ public class ReviewService {
     return index < 0 ? null : fileName.substring(index);
   }
 
-
+/*/
 
 	public int insertReviewAndScore(ReviewDTO reviewDTO) {
 			// 리뷰 등록
@@ -161,7 +187,9 @@ public class ReviewService {
 		review.setRev_content(review.getRev_content().trim());
 
 		if(reviewError.length()>0) throw new RuntimeException(reviewError);
+		System.out.println("저기까진 왔습니다.");
 		try{
+			System.out.println("여기까진 왔습니다.");
 			rev_num = reviewDAO.insertReview(review) ? review.getRev_num() : 0;
 			if(rev_num < 1) throw new RuntimeException("리뷰 등록에 실패했습니다.");
 		} catch (DataAccessException e) {
@@ -195,5 +223,5 @@ public class ReviewService {
 
 		return rev_num;
 	}
-
+*/
 }

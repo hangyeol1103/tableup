@@ -1,6 +1,6 @@
 package kr.kh.tableup.dao;
 
-import kr.kh.tableup.model.DTO.FileDTO;
+import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 
@@ -14,7 +14,7 @@ public interface ReviewDAO {
 
 	void deleteReviewScore(int rs_num);
 
-	int insertFile(FileDTO fileDTO);
+	//int insertFile(FileVO fileVO);
 
 	
 

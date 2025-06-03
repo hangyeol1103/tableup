@@ -47,7 +47,16 @@
 			WHERE rev_num = #{rev_num}
 	</update>
 
+	<delete id="deleteReviewScore">
+		DELETE FROM `reviewscore`
+		WHERE rs_num = #{rs_num}
+	</delete>
+
 	<update id="updateReview">
 		
 	</update>
+
+	<!-- <insert id="insertFile" useGeneratedKeys="true" keyProperty="file_num">
+
+	</insert> -->
 </mapper>

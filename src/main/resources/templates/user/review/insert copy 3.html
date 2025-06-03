@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>리뷰 작성</title>
   <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     .form-label { font-weight: bold; }
     .score-input { width: 80px; text-align: center; }
@@ -131,7 +131,7 @@
 
         const $group = $(`
           <div class="file-upload-group mb-2">
-            <input type="file" class="form-control mb-1" name="files" accept="image/*">
+            <input type="file" class="form-control mb-1" accept="image/*">
           </div>
         `);
         $file_upload_area.append($group);
@@ -183,27 +183,17 @@
       }
       function getFileList(files) {
         const fileList = [];
-
-        $('#file-upload-area .file-upload-group').each(function () {
-          const fileInput = this.querySelector('input[type="file"]');
-          const file = fileInput.files[0];
-
-          const fileNameInput = this.querySelector('input[name="fileNames"]');
-          const tagSelect = this.querySelector('select[name="fileTags"]');
-
-          if (file && fileNameInput && tagSelect && fileNameInput.value && tagSelect.value) {
-            files.push(file); // MultipartFile 목록에 추가
-
-            fileList.push({
-              file_name: fileNameInput.value,
-              file_tag: tagSelect.value
-            });
-          }
+        $file_upload_area.find('.file-upload-group').each(function () {
+          const f = this.querySelector('input[type="file"]').files[0];
+          let name = this.querySelector('input[name="fileNames"]')?.value;
+          const tag = this.querySelector('select[name="fileTags"]')?.value;
+          if (f && name && tag) {
+            files.push(f);
+            fileList.push({ file_name: name, file_tag: tag });
+          }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
         });
-
         return fileList;
       }
-
 
       function submitReview(preview, url) {
         const files = [];

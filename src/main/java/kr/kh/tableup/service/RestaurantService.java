@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
+import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.vo.MenuTypeVO;
+import kr.kh.tableup.model.vo.MenuVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.RestaurantDetailVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 
@@ -38,6 +42,33 @@ public class RestaurantService {
 		return restaurantDAO.selectReviewListbyNum(rt_num);
 	}
 
+	public double getCountScoreByRtNum(int rt_num) {
+		return restaurantDAO.countScoreByRtNum(rt_num);
+	}
+
+	public int getCountReviewByRtNum(int rt_num) {
+		return restaurantDAO.countReviewByRtNum(rt_num);
+	}
+
+	public List<ResNewsVO> getTapResNewsList(int rt_num) {
+		return restaurantDAO.selectTapResNewsList(rt_num);
+	}
+
+	// public List<MenuVO> getTapMenuList(int rt_num) {
+	// 	return restaurantDAO.selectTapMenuList(rt_num);
+	// }
+
+	public List<MenuTypeVO> getMenuTypeList(int rt_num) {
+		return restaurantDAO.selectMenuTypeList(rt_num);
+	}
+
+	public List<MenuVO> getMenuDivList(int rt_num) {
+		return restaurantDAO.selectMenuDivList(rt_num);
+	}
+
+	public List<FileVO> getTapFileList(int rt_num) {
+		return restaurantDAO.selectTapFileList(rt_num);
+	}
 	
 	
 }

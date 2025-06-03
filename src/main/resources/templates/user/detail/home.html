@@ -134,6 +134,11 @@
       font-weight: normal;
       color: #000;
     }
+
+    .category-label{
+      color: #6c757d; /* Bootstrap의 .text-muted 색상 */
+      font-size: 0.875rem; /* Bootstrap의 .small */
+    }
   </style>
   </head>
 
@@ -164,8 +169,8 @@
       <input type="hidden" id="rt-num" th:value="${restaurant.rt_num}" />
       <div class="d-flex align-items-center mb-2">
         <span class="text-warning me-1">★</span>
-        <span class="fw-bold me-2">4.7</span>
-        <span class="text-muted small">리뷰 123개</span>
+        <span class="fw-bold me-2" th:text="${starScore}"></span>
+        <span class="text-muted small" th:text="'리뷰 ' + ${countReview} + '개'"></span>
       </div>
       <!-- 설명 -->
       <p class="text-muted mb-1" th:text="${restaurant.rt_description}"></p>
@@ -269,7 +274,8 @@
         <h5 class="fw-bold">메뉴</h5>
         <div class="d-flex justify-content-between align-items-start border-bottom py-3" th:each="menu : ${menuList}">
           <!-- 왼쪽 메뉴 정보 -->
-          <div class="flex-grow-1 me-3"> 
+          <div class="flex-grow-1 me-3">
+            <div class="text-muted small category-label mb-1" th:text="${menu.mn_div}"></div>
             <div class="d-flex align-items-center">
               <h5 class="mb-2" th:text="${menu.mn_name}"></h5>
             </div>
@@ -278,8 +284,8 @@
           </div>
           <!-- 오른쪽 사진 -->
           <div>
-            <img th:src="@{/resources/static/img/menu/{path}(path=${menu.mn_img})}" alt="메뉴 사진"
-            style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+            <img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="메뉴 사진"
+              style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
           </div>
 
         </div>
@@ -289,9 +295,8 @@
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">사진</h5>
       <div class="img-grid">
-        <span th:each="files : ${fileList}">
-          <img th:src="@{/files{path}(path=${files.file_path})}" alt="식당 사진">
-        </span>
+        <span th:each="file : ${restaurantFileList}">
+          <img th:src="@{/file{path}(path=${file.file_path})}" alt="식당 사진">
       </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
@@ -311,9 +316,9 @@
           </span>
         </div>
         <div th:each="file : ${rvl.fileList}">
-          <span th:text="${file}"></span>
-          <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진">
+          <img th:src="@{/file/{path}(path=${file.file_path})}" alt="사진">
         </div>
+        <p th:utext="${#strings.replace(rvl.rev_content, '\n', '<br/>')}"></p>
       </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
@@ -322,27 +327,19 @@
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <div th:each="rdl : ${restaurantDetailList}">
-        <h5 class="fw-bold">상세정보</h5>
-        <h5 class="fw-bold mt-3">전화번호</h5>
+        <h4 class="fw-bold">상세정보</h4>
+        <h6 class="fw-bold mt-3">전화번호</h6>
         <i class="bi bi-telephone me-2 text-secondary"></i>
         <span th:text="${rdl.rd_phone}"></span>
-        <h5 class="fw-bold mt-3">정기휴무</h5>
+        <h6 class="fw-bold mt-3">정기휴무</h6>
         <span th:text="${rdl.rd_closed_days}"></span>
-        <h5 class="fw-bold mt-3">안내 및 유의사항</h5>
+        <h6 class="fw-bold mt-3">안내 및 유의사항</h6>
         <!-- db에 \n값을 <br/>로 치환한다. -->
         <p th:utext="${#strings.replace(rdl.rd_info, '\n', '<br/>')}"></p>
-        <h5 class="fw-bold mt-3">홈페이지</h5>
+        <h6 class="fw-bold mt-3">홈페이지</h6>
         <a th:href="${rdl.rd_home}" th:text="${rdl.rd_home}" target="_blank"></a>
-        <h5 class="fw-bold mt-3">매장 주소</h5>
+        <h6 class="fw-bold mt-3">매장 주소</h6>
         <span th:text="${rdl.rd_addr}"></span>
-      </div>
-      <div class="d-grid mt-3">
-        <button
-          type="button"
-          class="btn btn-outline-dark btn-block fw-bold"
-        >
-          매장정보 전체보기
-        </button>
       </div>
     </div>
 

@@ -3,6 +3,49 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.RestaurantDAO">
 
+	<resultMap id="reviewMap" type="ReviewVO">
+		<id property="rev_num" column="rev_num"/>
+		<result property="rev_us_num" column="rev_us_num"/>
+		<result property="rev_rt_num" column="rev_rt_num"/>
+		<result property="rev_content" column="rev_content"/>
+		<result property="rev_created" column="rev_created"/>
+		<result property="rev_updated" column="rev_updated"/>
+		<result property="rev_state" column="rev_state"/>
+		<result property="rev_visit" column="rev_visit"/>
+		<result property="rev_visitor" column="rev_visitor"/>
+		
+		<result property="us_name" column="us_name"/>
+		<result property="rt_name" column="rt_name"/>
+		<!-- 리뷰와 리뷰 스코어 -->
+		<association property="score" javaType="ReviewScoreVO">
+			<id property="rs_num" column="rs_num"/>
+			<result property="rs_rev_num" column="rs_rev_num"/>
+			<result property="rs_st_num" column="rs_st_num"/>
+			<result property="rs_score" column="rs_score"/>
+
+			<result property="st_num" column="st_num"/>
+			<result property="st_category" column="st_category"/>
+			<result property="rt_num" column="rt_num_for_score"/>
+		</association>
+	</resultMap>
+
+	<!-- 메뉴와 메뉴타입 -->
+	<resultMap id="MenuMap" type="MenuVO">
+		<id property="mn_num" column="mn_num"/>
+		<result property="mn_name" column="mn_name"/>
+		<result property="mn_img" column="mn_img"/>
+		<result property="mn_price" column="mn_price"/>
+		<result property="mn_content" column="mn_content"/>
+		<result property="mn_mt_num" column="mn_mt_num"/>
+		<result property="mn_rt_num" column="mn_rt_num"/>
+		<result property="mn_div" column="mn_div"/>
+
+		<association property="menuType" javaType="MenuTypeVO">
+			<id property="mt_num" column="mt_num"/>
+			<result property="mt_name" column="mt_name"/>
+		</association>
+	</resultMap>
+
   <!-- ReviewScoreVO + ReviewVO -->
 	<resultMap id="ReviewMap" type="ReviewVO">
 		<!-- ReviewVO -->
@@ -49,7 +92,8 @@
 			user.us_name,
 			restaurant.rt_name,
 			reviewscore.*,
-			scoretype.st_num, scoretype.st_category
+			scoretype.st_num, scoretype.st_category,
+			f.*
 		FROM review
 		LEFT JOIN user ON review.rev_us_num = user.us_num
 		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
@@ -96,26 +140,48 @@
     select * from restaurantdetail where rd_rt_num = #{rt_num}
   </select>
 
-  <select id="countScoreByRtNum">
+  <select id="countScoreByRtNum" resultType="Double">
     SELECT ROUND(IFNULL(AVG(rs.rs_score), 0), 2)
       FROM review rev
       JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
       WHERE rev.rev_rt_num = #{rt_num};
   </select>
 
-  <select id="countReviewByRtNum">
+  <select id="countReviewByRtNum" resultType="Integer">
     SELECT COUNT(*)
       FROM review rev
       WHERE rev.rev_rt_num = #{rt_num};
   </select>
   
 
-  <select id="countReviewByUsNum">
+  <!-- <select id="countReviewByUsNum">
     SELECT COUNT(*)
       FROM review rev
       WHERE rev.rev_rt_num = #{rt_num} AND rev.rev_us_num = #{us_num};
-  </select>
+  </select> -->
 
-  
+	<select id="selectTapResNewsList" resultType="ResNewsVO">
+		select * from resnews where rn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectMenuTypeList" resultType="MenuTypeVO">
+		select DISTINCT menuType.* from menu
+		join menutype on mt_num = mn_mt_num
+		where mn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectMenuDivList" resultType="MenuVO">
+		select mn_num, 
+			mn_name, 
+			mn_content, 
+			mn_price, 
+			mn_img, 
+			mn_div
+		from menu where mn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectTapFileList" resultType="FileVO">
+		select * from file where file_tag = '내부' and file_res_num = #{rt_num}
+	</select>
 
 </mapper>

@@ -109,14 +109,71 @@
         background-color: #fff;
         margin-top: 10px;
       }
+
+      .custom-tab-button {
+        background-color: #adb5bd; /* 회색 */
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 8px 20px;
+        font-weight: bold;
+        margin-right: 0.5rem;
+      }
+      .custom-tab-button:hover {
+        background-color: #5a6268; /* hover 시 어두운 회색 */
+      }
+
+      .menu-group-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #404040;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+      }
     </style>
   </head>
 
   <body>
     <main layout:fragment="content" class="container">
-      <div class="news-box" th:each="trn : ${tapResNewsList}">소식
-        <p th:utext="${#strings.replace(trn.rn_content, '\n', '<br/>')}"></p>
+      <div class="mt-3 p-3 bg-white rounded shadow-sm">
+        <div class="container mt-4">
+          <!-- 등록한 메뉴 타입만 뿌려준다. -->
+          <div class="mb-3">
+            <button type="button" class="custom-tab-button me-2" th:each="tmtl : ${tapMenuTypeList}"
+            th:attr="onclick=|scrollToGroup('${tmtl.mt_name}')|" th:text="${tmtl.mt_name}"></button>
+          </div>
+          <div class="container mt-4">
+            <div th:each="gm : ${groupedMenu}" class="menu-group mb-5">
+              <div class="menu-group-title" th:id="${gm.key}" th:text="${gm.key}"></div>
+              <!-- 메뉴 색인 -->
+                <!-- 메뉴 항목 반복 -->
+                <div th:each="menu : ${gm.value}" class="d-flex justify-content-between align-items-start border-bottom py-3">
+                  <!-- 왼쪽 메뉴 정보 -->
+                  <div class="flex-grow-1 me-3">
+                    <div class="fw-semibold mb-2" th:text="${menu.mn_name}"></div>
+                    <p class="mb-2 text-muted small text-truncate" style="max-width: 330px;" th:text="${menu.mn_content}"></p>
+                    <div class="fw-bold mt-2" th:text="${#numbers.formatInteger(menu.mn_price, 0, 'COMMA')} + '원'"></div>
+                  </div>
+                  <!-- 오른쪽 사진 -->
+                  <div th:if="${menu != null}">
+                    <img th:if="${menu.mn_img != null}" th:src="@{/file/{path}(path=${menu.mn_img})}" alt="메뉴 사진"
+                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
+    <script>
+      function scrollToGroup(groupId) {
+        const target = document.getElementById(groupId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else{
+          console.warn("Element not found:", groupId);
+        }
+      }
+    </script>
   </body>
 </html>

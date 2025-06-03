@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,7 @@ import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
@@ -514,10 +516,53 @@ public class UserController {
       return "user/detail/outline";
   }
   @PostMapping("/list/news/{rt_num}")
-  public String postrestaurantDetail(@PathVariable("rt_num") int rt_num) {
-    System.out.println(rt_num);
+  public String postrestaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
+    List<ResNewsVO> tapResNewsList = restaurantService.getTapResNewsList(rt_num);
+
+    model.addAttribute("tapResNewsList", tapResNewsList);
     return "user/detail/news";
   }
+  
+  @PostMapping("/list/menu/{rt_num}")
+  public String postrestaurantmenu(@PathVariable("rt_num") int rt_num, Model model) {
+    //List<MenuVO> tapMenuList = restaurantService.getTapMenuList(rt_num);
+    List<MenuTypeVO> tapMenuTypeList = restaurantService.getMenuTypeList(rt_num);
+    List<MenuVO> menuDivList = restaurantService.getMenuDivList(rt_num);
+    Map<String, List<MenuVO>> groupedMenu = menuDivList.stream()
+        .collect(Collectors.groupingBy(
+          MenuVO::getMn_div,
+          LinkedHashMap::new,
+          Collectors.toList()          
+          ));
+
+    model.addAttribute("groupedMenu", groupedMenu);
+    // model.addAttribute("tapMenuList", tapMenuList);
+    model.addAttribute("tapMenuTypeList", tapMenuTypeList);
+    return "user/detail/menu";
+  }
+
+  @PostMapping("/list/picture/{rt_num}")
+  public String postrestaurantpicture(@PathVariable("rt_num") int rt_num, Model model) {
+    // 전체 파일 목록 가져오기
+    List<FileVO> tapFileList = restaurantService.getTapFileList(rt_num);
+
+    // file_tag 기준으로 그룹핑
+    Map<String, List<FileVO>> groupedFiles = tapFileList.stream()
+        .collect(Collectors.groupingBy(FileVO::getFile_tag));
+
+    // 모델에 추가
+    model.addAttribute("groupedFiles", groupedFiles);
+    model.addAttribute("tapFileList", tapFileList);
+    return "user/detail/picture";
+  }
+
+  @PostMapping("/list/review/{rt_num}")
+  public String postMethodName(@PathVariable("rt_num") int rt_num, Model model) {
+      
+    return "user/detail/review";
+  }
+  
+  
   @PostMapping("/list/home/{rt_num}")
   public String listHome(@PathVariable("rt_num") int rt_num, Model model) {
     String today = new SimpleDateFormat("E", Locale.KOREA).format(new Date());
@@ -527,6 +572,8 @@ public class UserController {
     FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
     TagVO tag = userService.getTagByRestaurant(rt_num);
+    double starScore = restaurantService.getCountScoreByRtNum(rt_num);
+    int countReview = restaurantService.getCountReviewByRtNum(rt_num);
     // List<FacilityVO> facilityList = userService.getFacilityList(rt_num);
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
     List<ResNewsVO> resNewsList = userService.getResNewsList(rt_num);
@@ -535,6 +582,7 @@ public class UserController {
     List<DefaultResTimeVO> defaultResTimeList = userService.getDefaultResTimeList(rt_num);
     List<RestaurantDetailVO> restaurantDetailList = restaurantService.getRestaurantDetailList(rt_num);
     List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
+    
 
     //System.out.println(apiKey);
     System.out.println("restaurant: " + restaurant);
@@ -543,12 +591,14 @@ public class UserController {
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
+    model.addAttribute("starScore", starScore);
+    model.addAttribute("countReview", countReview);
     // model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
 
     // model.addAttribute("apiKey", apiKey); // API 키
     model.addAttribute("resNewsList", resNewsList);
-    model.addAttribute("fileList", fileList);
+    model.addAttribute("restaurantFileList", fileList);
     model.addAttribute("menuList", menuList);
     model.addAttribute("defaultResTimeList", defaultResTimeList);
     model.addAttribute("restaurantDetailList", restaurantDetailList);

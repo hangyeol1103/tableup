@@ -132,19 +132,18 @@
             <a class="tab-link active home" href="javascript:void(0)">홈</a>
           </li>
           <li class="tab-item">
-            <a class="tab-link news" href="#">소식</a>
+            <a class="tab-link news" href="javascript:void(0)">소식</a>
           </li>
-            <li class="tab-item"><a class="tab-link" href="#">메뉴</a>
+            <li class="tab-item">
+              <a class="tab-link menu" href="javascript:void(0)">메뉴</a>
           </li>
           <li class="tab-item">
-            <a class="tab-link" href="#">사진
+            <a class="tab-link picture" href="javascript:void(0)">사진
             <span class="badge">1834</span></a>
           </li>
           <li class="tab-item">
-            <a class="tab-link" href="#">리뷰
+            <a class="tab-link review" href="javascript:void(0)">리뷰
             <span class="badge">74</span></a>
-          </li>
-            <li class="tab-item"><a class="tab-link" href="#">매장정보</a>
           </li>
         </ul>
       </div>
@@ -321,6 +320,55 @@
 
           })
         })
+
+        //메뉴 클릭시
+        $(".menu").on("click", function(e){
+          e.preventDefault();
+          
+
+          $.ajax({
+            url : "/user/list/menu/[[${rt_num}]] ",
+            method : "post",
+            success : function(data){
+
+              $(".container-content").html(data)
+            }
+
+          })
+        })
+
+        //사진 클릭시
+        $(".picture").on("click", function(e){
+          e.preventDefault();
+          
+
+          $.ajax({
+            url : "/user/list/picture/[[${rt_num}]] ",
+            method : "post",
+            success : function(data){
+
+              $(".container-content").html(data)
+            }
+
+          })
+        })
+
+        //리뷰 클릭시
+        $(".review").on("click", function(e){
+          e.preventDefault();
+          
+
+          $.ajax({
+            url : "/user/list/review/[[${rt_num}]] ",
+            method : "post",
+            success : function(data){
+
+              $(".container-content").html(data)
+            }
+
+          })
+        })
+
         //화면 로딩 시 홈 내용이 보이게 하는 비동기 통신
         $(".home").on("click", function(e){
           e.preventDefault();

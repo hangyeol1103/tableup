@@ -6,7 +6,8 @@
 <head>
   <meta charset="utf-8">
   <title>리뷰 작성</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <style>
     .form-label { font-weight: bold; }
     .score-input { width: 80px; text-align: center; }
@@ -17,30 +18,36 @@
   <h2 class="mb-4">리뷰 작성</h2>
 
   <div th:if="${errorMsg != null}" class="alert alert-danger" role="alert" th:text="${errorMsg}"></div>
+  <input type="hidden" name="us_name" th:value="${user.us_name}" />
+
+  <div class="mt-4 text-end">
+    <button type="button" class="btn btn-info" id="btn-resinfo">식당 조회</button>
+  </div>
 
   <form id="form-review" onsubmit="return false;">
+    <!-- 리뷰 기본 정보 -->
     <div class="row mb-3">
       <div class="col-md-6">
         <label class="form-label">식당 번호</label>
-        <input type="number" class="form-control" name="rev_rt_num" th:value="${rev_rt_num}" required>
+        <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reviewDTO?.review?.rev_rt_num}" required>
       </div>
       <div class="col-md-6">
         <label class="form-label">방문 일자</label>
-        <input type="date" class="form-control" name="rev_visit" th:value="${reviewDTO?.review?.rev_visit}" required>
+        <input type="date" class="form-control" name="review.rev_visit" th:value="${reviewDTO?.review?.rev_visit}" required>
       </div>
     </div>
 
     <div class="mb-3">
       <label class="form-label">방문 인원</label>
-      <input type="number" class="form-control" name="rev_visitor" th:value="${reviewDTO?.review?.rev_visitor}" required>
+      <input type="number" class="form-control" name="review.rev_visitor" min="1" max="99" th:value="${reviewDTO?.review?.rev_visitor}" required>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">리뷰 내용</label>
-      <textarea name="rev_content" class="form-control" rows="8"
-                th:text="${reviewDTO?.review?.rev_content}" placeholder="리뷰 내용을 입력하세요."></textarea>
+      <label for="rev_content" class="form-label">리뷰 내용</label>
+      <textarea class="form-control" name="review.rev_content" id="rev_content" th:text="${reviewDTO?.review?.rev_content}"></textarea>
     </div>
 
+    <!-- 평점 입력 -->
     <div class="mb-4">
       <label class="form-label">평점</label>
       <div class="d-flex flex-wrap gap-3">
@@ -54,111 +61,177 @@
       </div>
     </div>
 
+    <!-- 파일 첨부 -->
     <div class="mb-3">
       <label class="form-label">사진 첨부</label>
       <div id="file-upload-area"></div>
       <button type="button" class="btn btn-outline-secondary mt-2" id="add-file-btn">파일 추가</button>
+      <div class="form-text">사진을 첨부하면 이름과 태그 입력창이 나타납니다.</div>
     </div>
 
+    <!-- 제출 버튼 -->
     <div class="d-flex gap-2">
+      <button type="button" class="btn btn-primary btn-sample">미리보기</button>
       <button type="button" class="btn btn-success btn-submit">리뷰 제출</button>
-      <a th:href="@{/user/review/view}" class="btn btn-outline-dark ms-auto">리뷰 목록</a>
+      <button type="reset" class="btn btn-outline-secondary">초기화</button>
+      <a th:href="@{/user/mypage}" class="btn btn-outline-dark ms-auto">마이페이지로</a>
+      <a th:href="@{/user/review/view}" class="btn btn-outline-dark">리뷰 목록</a>
     </div>
   </form>
 
+  <!-- 식당 조회 모달 -->
+  <div class="modal fade" id="resModal" tabindex="-1" aria-labelledby="resModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resModalLabel">식당 정보</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body" id="resModalBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 미리보기 모달 -->
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">리뷰 미리보기</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body" id="previewBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-success btn-submit">리뷰 제출</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    $(function () {
+  $(function () {
+      const $rev_rt_num = $('input[name="review.rev_rt_num"]');
+      const $rev_visit = $('input[name="review.rev_visit"]');
+      const $rev_visitor = $('input[name="review.rev_visitor"]');
+      const $rev_content = $('#rev_content');
+      const $file_upload_area = $('#file-upload-area');
+
+
+      $('#btn-resinfo').click(() => {
+        const rtNum = $rev_rt_num.val();
+        if (!rtNum) return alert("식당 번호를 입력하세요.");
+        window.open(`/user/list/detail/${rtNum}`, '_blank');
+      });
+
       $('#add-file-btn').click(() => {
-        const group = $(`
+        const incomplete = [...$file_upload_area.find('input[type="file"]')]
+          .some(input => !input.files.length);
+        if (incomplete) return alert("기존 파일 입력을 먼저 완료하세요.");
+
+        const $group = $(`
           <div class="file-upload-group mb-2">
-            <input type="file" class="form-control mb-1" accept="image/*" required>
+            <input type="file" class="form-control mb-1" accept="image/*">
+          </div>
+        `);
+        $file_upload_area.append($group);
+
+        $group.find('input[type="file"]').change(function () {
+          if ($group.find('input[name="fileNames"]').length) return;
+
+          const file = this.files[0];
+          if (!file) return;
+
+          let name2 = file.name;
+          const index = name2.lastIndexOf('.');
+          if (index > 0) name2 = name2.substring(0, index);
+
+
+          $group.append(`
+            <input type="text" class="form-control mb-1" name="fileNames" value="${name2}" placeholder="파일 이름" required>
             <select class="form-select mb-1" name="fileTags" required>
               <option value="">태그 선택</option>
               <option value="내부">내부</option>
               <option value="외부">외부</option>
-              <option value="음식">음식</option>
               <option value="메뉴판">메뉴판</option>
+              <option value="음식">음식</option>
               <option value="기타">기타</option>
             </select>
             <button type="button" class="btn btn-sm btn-danger">삭제</button>
-          </div>
-        `);
-        $('#file-upload-area').append(group);
-        group.find('button').click(() => group.remove());
+          `);
+          $group.find('button').click(() => $group.remove());
+        });
       });
 
       function getReviewData() {
         return {
-          rev_rt_num: $('input[name="rev_rt_num"]').val(),
-          rev_visit: $('input[name="rev_visit"]').val(),
-          rev_visitor: $('input[name="rev_visitor"]').val(),
-          rev_content: $('textarea[name="rev_content"]').val()
+          rev_rt_num: $rev_rt_num.val(),
+          rev_visit: $rev_visit.val(),
+          rev_visitor: $rev_visitor.val(),
+          rev_content: $rev_content.val()
         };
       }
-
       function getScoreList() {
-        return $('input[name="rs_scores"]').map(function () {
-          return {
-            st_num: $(this).data('st-num'),
-            value: $(this).val()
-          };
+        return $('.score-input').map(function () {
+          const $input = $(this);
+          const st_num = parseInt($input.data('st-num'));
+          const st_category = $input.closest('div.d-flex').find('label').first().text().trim(); // 해당 라벨의 텍스트
+          const rs_score = parseInt($input.val());
+
+          return { st_num, st_category, rs_score };
         }).get();
       }
+      function getFileList(files) {
+        const fileList = [];
+        $file_upload_area.find('.file-upload-group').each(function () {
+          const f = this.querySelector('input[type="file"]').files[0];
+          let name = this.querySelector('input[name="fileNames"]')?.value;
+          const tag = this.querySelector('select[name="fileTags"]')?.value;
+          if (f && name && tag) {
+            files.push(f);
+            fileList.push({ file_name: name, file_tag: tag });
+          }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+        });
+        return fileList;
+      }
 
-      function uploadFiles(revNum) {
-        const groups = $('#file-upload-area .file-upload-group');
-        let uploaded = 0;
-        if (groups.length === 0) return location.href = "/user/review/view";
+      function submitReview(preview, url) {
+        const files = [];
+        const dto = {
+          review: getReviewData(),
+          scoreList: getScoreList(),
+          fileList: getFileList(files)
+        };
+        const formData = new FormData();
+        formData.append("preview", preview ? "true" : "false");
+        formData.append("reviewDTO", new Blob([JSON.stringify(dto)], { type: "application/json" }));
+        files.forEach(f => formData.append("files", f));
 
-        groups.each(function () {
-          const formData = new FormData();
-          const file = $(this).find('input[type="file"]')[0].files[0];
-          const tag = $(this).find('select[name="fileTags"]').val();
-
-          formData.append("rev_num", revNum);
-          formData.append("file_tag", tag);
-          formData.append("file", file);
-
-          $.ajax({
-            url: '/user/review/uploadFile',
-            method: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: () => {
-              uploaded++;
-              if (uploaded === groups.length) {
-                alert("모든 파일 업로드 완료!");
-                location.href = "/user/review/view";
-              }
-            },
-            error: () => alert("파일 업로드 실패")
-          });
+        $.ajax({
+          url,
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: res => {
+            if (preview) {
+              $('#previewBody').html(res);
+              new bootstrap.Modal('#previewModal').show();
+            } else {
+              alert("리뷰 등록 완료!");
+              location.href = "/user/review/view";
+            }
+          },
+          error: xhr => {
+            alert(preview ? "미리보기 실패" : "등록 실패");
+            console.error(xhr.responseText);
+          }
         });
       }
 
-      $('.btn-submit').click(() => {
-        const dto = {
-          review: getReviewData(),
-          scoreList: getScoreList()
-        };
-
-        $.ajax({
-          url: '/user/review/insertReviewAndScore',
-          method: 'POST',
-          contentType: 'application/json',
-          data: JSON.stringify(dto),
-          success: revNum => {
-            if (revNum > 0) {
-              uploadFiles(revNum);
-            } else {
-              alert("리뷰 등록 실패 (revNum 오류)");
-            }
-          },
-          error: () => alert("리뷰 등록 실패")
-        });
-      });
-    });
+      $('.btn-sample').click(() => submitReview(true, '/user/review/insertSamplePost'));
+      $('.btn-submit').click(() => submitReview(false, '/user/review/insertFinalPost'));
+  });
   </script>
 </main>
 </body>

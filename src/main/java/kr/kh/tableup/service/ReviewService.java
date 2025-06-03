@@ -138,8 +138,62 @@ public class ReviewService {
 
 
 	public int insertReviewAndScore(ReviewDTO reviewDTO) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'insertReviewAndScore'");
+			// 리뷰 등록
+		ReviewVO review = reviewDTO.getReview();
+		List<ReviewScoreVO> scoreList = reviewDTO.getScoreList();
+		List<FileDTO> fileList = reviewDTO.getFileList();
+
+		int rev_num = 0;
+		int[] rs_num = new int[scoreList.size()];
+		
+
+		System.out.println(review);
+		String reviewError = "";
+		if (review.getRev_rt_num() <= 0 || review.getRev_visit() == null || review.getRev_visitor() <= 0 || review.getRev_us_num() < 1 ) {
+			reviewError += "입력 정보에 누락이 있어 리뷰 등록에 실패했습니다. \n";
+    }
+		if(review.getRev_rt_num() <= 0 ) reviewError += "매장이 선택되지 않았습니다. \n";
+		if(review.getRev_visit() == null) review.setRev_visit(LocalDate.now().toString());			//날짜 없으면 일단 오늘로
+		if(review.getRev_visitor() <= 0) reviewError += "인원수가 없습니다.\n";
+		if(review.getRev_us_num() <= 0) reviewError += "현재 유저 정보를 찾을 수 없습니다.\n";
+		else if((UserVO)userDAO.selectUser(review.getRev_us_num()) == null) reviewError += "해당하는 유저 정보를 찾을 수 없습니다.\n";
+		if(review.getRev_content() == null) review.setRev_content("내용 없음");
+		review.setRev_content(review.getRev_content().trim());
+
+		if(reviewError.length()>0) throw new RuntimeException(reviewError);
+		try{
+			rev_num = reviewDAO.insertReview(review) ? review.getRev_num() : 0;
+			if(rev_num < 1) throw new RuntimeException("리뷰 등록에 실패했습니다.");
+		} catch (DataAccessException e) {
+				Throwable rootCause = NestedExceptionUtils.getRootCause(e); 
+				if (rootCause != null && rootCause.getMessage().contains("이미 이 예약에 대한 리뷰가 존재합니다")) {
+						throw new RuntimeException("이미 작성한 리뷰가 존재합니다.");
+				} else {
+						throw new RuntimeException("알 수 없는 DB 오류가 발생했습니다.");
+				}
+
+
+		}
+
+
+
+
+
+		// 리뷰 점수 등록
+		try{
+			for(int i = 0; i<scoreList.size(); i++){	// map 말고 리뷰스코어vo 쓸건데 일단 우선 맵으로 
+				int score = scoreList.get(i).getRs_score();
+				if (score < 1 || score > 5) throw new RuntimeException("점수는 1~5 사이여야 합니다.");
+				scoreList.get(i).setRs_rev_num(rev_num);
+				rs_num[i] = reviewDAO.insertReviewScore(scoreList.get(i));
+			}
+		}catch(RuntimeException e){
+			reviewDAO.deleteReview(rev_num);
+			for(int i = 0; i<rs_num.length;i++ )reviewDAO.deleteReviewScore(rs_num[i]);
+			throw new RuntimeException("점수 저장에 실패했습니다.");
+		}
+
+		return rev_num;
 	}
 
 }

@@ -645,15 +645,21 @@ public class UserController {
     public ResponseEntity<?> insertFinal(
           RedirectAttributes rttr,
           @RequestPart ReviewDTO reviewDTO,
+          List<MultipartFile> fileList,
           boolean preview,
           @AuthenticationPrincipal CustomUser user) {
       System.out.println("리뷰 최종 저장 요청: " + reviewDTO.getReview() + " " + reviewDTO.getScoreList());
       System.out.println("파일리스트: " +  reviewDTO.getFileList());
       if(user.getUser() == null) return ResponseEntity.badRequest().body("확인되지 않은 이용자 접근");
+
       reviewDTO.getReview().setRev_us_num(user.getUser().getUs_num()); // 사용자 ID 또는 번호를 수동 세팅
       reviewDTO.getReview().setUs_name(user.getUser().getUs_name()); // 사용자 이름 세팅
       System.out.println("리뷰 작성자 번호 : " + reviewDTO.getReview().getRev_us_num());           
       //if (!preview) {/*일단 false로 받아오긴 하는데*/ }
+
+
+      if(fileList!=null)for(int i=0; i<fileList.size();i++)reviewDTO.getFileList().get(i).setUploadFile(fileList.get(i));
+
       try{
           rttr.addFlashAttribute("review", reviewDTO.getReview());
           rttr.addFlashAttribute("scores", reviewDTO.getScoreList());
@@ -672,37 +678,6 @@ public class UserController {
         
     }
 
-
-    @PostMapping("/review/insertReviewAndScore")
-    @ResponseBody
-    public int insertReviewAndScore(@RequestBody ReviewDTO reviewDTO,@AuthenticationPrincipal CustomUser user) {
-        try {
-            reviewDTO.getReview().setRev_us_num(user.getUser().getUs_num()); // 사용자 ID 또는 번호를 수동 세팅
-            reviewDTO.getReview().setUs_name(user.getUser().getUs_name()); // 사용자 이름 세팅
-            int rev_num = reviewService.insertReviewAndScore(reviewDTO);
-            return rev_num; 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -1; 
-        }
-    }
-
-    @PostMapping("/review/uploadFile")
-    @ResponseBody
-    public String uploadFile(String rev_num,
-                            String file_name,
-                            String file_tag,
-                            MultipartFile file) {
-        try {
-   
-            fileService.insertFile(rev_num,file_name,file_tag,file);
-
-            return "success";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "fail";
-        }
-    }
 
 
   

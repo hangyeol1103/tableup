@@ -11,8 +11,8 @@
   <title>테이블업 - 매니저페이지</title>
   <style>
     .calendar-cell {
-      width: 120px;
-      height: 100px;
+      width: 170px;
+      height: 150px;
       border: 1px solid #ccc;
       margin: 5px;
       padding: 5px;
@@ -93,6 +93,7 @@
       const container = $('<div class="calendar-month"></div>');
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const firstDay = new Date(year, month, 1).getDay();
+      const todayStr = new Date().toISOString().substring(0, 10);
 
       $('#calendarTitle').text(`${year}년 ${month + 1}월`);
       const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -105,40 +106,35 @@
 
       for (let i = 1; i <= daysInMonth; i++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        const match = opertimelist.find(op => op.bd_date === dateStr);
+        const match = opertimelist.find(op => op.bd_date?.substring(0, 10) === dateStr);
 
-        // 해당 날짜의 예약 수 계산
+        // 영업일자 미등록이면 정보 출력 없이 빈 셀로
+        const openTime = match?.bd_open ? match.bd_open.substring(11, 16) : '-';
+        const closeTime = match?.bd_close ? match.bd_close.substring(11, 16) : '-';
+        const operInfo = match ? `<div class="opertime-info">${openTime} ~ ${closeTime}<br>${match.bd_off ? '쉬는날' : '여는날'}</div>` : '';
+
         const reservationCount = reservationlist.filter(r => r.res_time?.substring(0, 10) === dateStr).length;
 
-        // 예약 수가 있을 때만 출력
-        let reservationInfo = '';
-        if (reservationCount > 0) {
-          reservationInfo = `
-            <div class="mt-1 text-primary fw-semibold" style="font-size: 0.75rem;">
-              총 예약: ${reservationCount}건
-            </div>
-          `;
-        }
+        const reservationInfo = reservationCount > 0
+          ? `<div class="mt-1 text-primary fw-semibold" style="font-size: 0.75rem;">총 예약: ${reservationCount}건</div>`
+          : '';
 
         const cell = $(`
           <div class="calendar-cell" data-date="${dateStr}">
             <strong>${i}</strong>
-            ${match ? `
-              <div class="opertime-info">
-                ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
-                ${match.bd_off ? '쉬는날' : '여는날'}
-              </div>
-            ` : ''}
+            ${operInfo}
             ${reservationInfo}
           </div>
         `);
 
-        cell.click(() => {
-          currentDateStr = dateStr;
-          $('#selectedDate').text(dateStr);
-          renderTimeButtons(dateStr);
-          $('#dateModal').modal('show');
-        });
+        if (match && !match.bd_off) {
+          cell.click(() => {
+            currentDateStr = dateStr;
+            $('#selectedDate').text(dateStr);
+            renderTimeButtons(dateStr);
+            $('#dateModal').modal('show');
+          });
+        }
 
         row.append(cell);
         if ((firstDay + i) % 7 === 0) {
@@ -150,6 +146,7 @@
       container.append(row);
       $('#calendar').append(container);
     }
+
 
     function renderTimeButtons(dateStr) {
       $('#modalBody').empty().removeClass('d-none');

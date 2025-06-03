@@ -1248,7 +1248,7 @@ public class ManagerController {
 		model.addAttribute("resTimeList", resTimeList);
 		model.addAttribute("reservationList", reservationList);
 		//return "/manager/reservation/reservationlist";
-		return "manager/reservation/reservationlist";
+		return "/manager/reservation/reservationlist";
 	}
 
 }

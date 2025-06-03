@@ -144,4 +144,11 @@ public class ReservationService {
 			return reservationDAO.selectReservations(rt_num);
 		}
 
+		public ReservationVO getUserReservation(int res_num) {
+			if(res_num==0){
+				return null;
+			}
+			return reservationDAO.selectReservation(res_num);
+		}
+
 }

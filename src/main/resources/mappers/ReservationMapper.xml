@@ -88,4 +88,6 @@
 		where res_rt_num=#{rt_num} and res_state = 1
 	</select>
 
+	
+
 </mapper>

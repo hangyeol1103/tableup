@@ -134,6 +134,11 @@
       font-weight: normal;
       color: #000;
     }
+
+    .category-label{
+      color: #6c757d; /* Bootstrap의 .text-muted 색상 */
+      font-size: 0.875rem; /* Bootstrap의 .small */
+    }
   </style>
   </head>
 
@@ -269,7 +274,8 @@
         <h5 class="fw-bold">메뉴</h5>
         <div class="d-flex justify-content-between align-items-start border-bottom py-3" th:each="menu : ${menuList}">
           <!-- 왼쪽 메뉴 정보 -->
-          <div class="flex-grow-1 me-3"> 
+          <div class="flex-grow-1 me-3">
+            <div class="text-muted small category-label mb-1" th:text="${menu.mn_div}"></div>
             <div class="d-flex align-items-center">
               <h5 class="mb-2" th:text="${menu.mn_name}"></h5>
             </div>
@@ -278,8 +284,8 @@
           </div>
           <!-- 오른쪽 사진 -->
           <div>
-            <img th:src="@{/resources/static/img/menu/{path}(path=${menu.mn_img})}" alt="메뉴 사진"
-            style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+            <img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="메뉴 사진"
+              style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
           </div>
 
         </div>

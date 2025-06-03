@@ -114,9 +114,7 @@
 
   <body>
     <main layout:fragment="content" class="container">
-      <div class="news-box" th:each="trn : ${tapResNewsList}">소식
-        <p th:utext="${#strings.replace(trn.rn_content, '\n', '<br/>')}"></p>
-      </div>
+      
     </main>
   </body>
 </html>

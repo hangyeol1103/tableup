@@ -14,7 +14,14 @@ public class MenuVO {
 	int mn_rt_num;
 	String mn_div;
 
+	private MenuTypeVO menuType;
+
 	public void setMn_img(String mn_img) {
-    this.mn_img = mn_img;
-}
+		this.mn_img = mn_img;
+	}
+
+	public String getMn_div() {
+		return mn_div;
+	}
+
 }

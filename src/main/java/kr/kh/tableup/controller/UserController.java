@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,7 @@ import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
 import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
@@ -510,10 +512,37 @@ public class UserController {
       return "user/detail/outline";
   }
   @PostMapping("/list/news/{rt_num}")
-  public String postrestaurantDetail(@PathVariable("rt_num") int rt_num) {
-    System.out.println(rt_num);
+  public String postrestaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
+    List<ResNewsVO> tapResNewsList = restaurantService.getTapResNewsList(rt_num);
+
+    model.addAttribute("tapResNewsList", tapResNewsList);
     return "user/detail/news";
   }
+  
+  @PostMapping("/list/menu/{rt_num}")
+  public String postrestaurantmenu(@PathVariable("rt_num") int rt_num, Model model) {
+    //List<MenuVO> tapMenuList = restaurantService.getTapMenuList(rt_num);
+    List<MenuTypeVO> tapMenuTypeList = restaurantService.getMenuTypeList(rt_num);
+    List<MenuVO> menuDivList = restaurantService.getMenuDivList(rt_num);
+    Map<String, List<MenuVO>> groupedMenu = menuDivList.stream()
+        .collect(Collectors.groupingBy(
+          MenuVO::getMn_div,
+          LinkedHashMap::new,
+          Collectors.toList()          
+          ));
+
+    model.addAttribute("groupedMenu", groupedMenu);
+    // model.addAttribute("tapMenuList", tapMenuList);
+    model.addAttribute("tapMenuTypeList", tapMenuTypeList);
+    return "user/detail/menu";
+  }
+
+  @PostMapping("/list/picture/{rt_num}")
+  public String postrestaurantpicture(@PathVariable("rt_num") int rt_num, Model model) {
+    
+    return "user/detail/picture";
+  }
+  
   @PostMapping("/list/home/{rt_num}")
   public String listHome(@PathVariable("rt_num") int rt_num, Model model) {
     String today = new SimpleDateFormat("E", Locale.KOREA).format(new Date());

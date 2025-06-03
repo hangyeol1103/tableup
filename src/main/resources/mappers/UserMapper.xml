@@ -194,10 +194,12 @@
 	</select>
 
 	<select id="selectReservationByUser" resultType="ReservationVO">
-		SELECT * FROM Reservation 
+		SELECT Reservation.*, user.*,restaurant.rt_name,review.rev_num FROM Reservation 
 		LEFT JOIN user ON us_num = res_us_num
 		LEFT JOIN restaurant ON rt_num = res_rt_num
-		WHERE res_us_num = #{us_num}
+		LEFT JOIN revres USING (res_num)
+		LEFT JOIN review USING (rev_num)
+		WHERE res_us_num = #{us_num} and res_state = 1
 	</select>
 
 	<select id="selectFollowedRestaurant" resultType="RestaurantVO">

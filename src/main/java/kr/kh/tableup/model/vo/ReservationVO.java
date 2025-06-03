@@ -20,4 +20,6 @@ public class ReservationVO {
 	
 	private String us_name;
 	private String rt_name;
+
+	private int  rev_num;
 }

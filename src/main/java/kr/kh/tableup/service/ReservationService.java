@@ -1,10 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
-
-import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -134,6 +131,10 @@ public class ReservationService {
 			}
 			//예약 확정에서 취소 후 현재 예약 좌석을 줄임
 			return businessHourDAO.updateCurrentSeat(businessHour.getBh_num(), businessHour.getBh_seat_current() - dbReservation.getRes_person());
+		}
+
+		public ReservationVO getReservation(int res_num) {
+			return reservationDAO.selectReservation(res_num);		
 		}
 
 }

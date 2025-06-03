@@ -161,6 +161,12 @@ public class ReviewService {
     return index < 0 ? null : fileName.substring(index);
   }
 
+
+	public ReviewVO getReview(Integer res_num) {
+		
+		return reviewDAO.selectReview(res_num);
+	}
+
 /*/
 
 	public int insertReviewAndScore(ReviewDTO reviewDTO) {

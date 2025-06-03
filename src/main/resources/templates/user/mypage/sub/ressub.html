@@ -27,19 +27,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
           <div class="mt-2">
             <!-- 리뷰가 있는 경우 -->
-            <a th:if="${r.rev_num != null}"
-              th:href="@{/review/view/{rev_num}(rev_num=${r.rev_num})}"
+            <a th:if="${r.rev_num != 0}"
+              th:href="@{/user/review/view/{rev_num}(rev_num=${r.rev_num})}"
               class="btn btn-outline-primary btn-sm">
               내 리뷰 보기
             </a>
 
             <!-- 리뷰가 없는 경우 -->
-            <a th:if="${r.rev_num == null}"
-              th:href="@{/review/write/{res_num}(res_num=${r.res_num})}"
+            <a th:if="${r.rev_num == 0}"
+              th:href="@{/user/review/insert/{res_num}(res_num=${r.res_num})}"
               class="btn btn-primary btn-sm">
               리뷰 작성
             </a>
           </div>
+          
         </li>
       </th:block>
     </ul>

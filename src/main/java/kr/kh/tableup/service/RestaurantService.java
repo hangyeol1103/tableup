@@ -70,5 +70,4 @@ public class RestaurantService {
 		return restaurantDAO.selectTapFileList(rt_num);
 	}
 	
-	
 }

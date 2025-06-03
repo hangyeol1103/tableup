@@ -99,7 +99,7 @@
 		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
 		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
 		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
-    LEFT JOIN (select * from file where file_type = "REVIEW") f ON rev_num = file_res_num 
+    LEFT JOIN (select * from file where file_type = "REVIEW") f ON rev_num = file_foreign 
 		WHERE review.rev_rt_num = #{rt_num}
 		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
 	</select>
@@ -181,7 +181,8 @@
 	</select>
 
 	<select id="selectTapFileList" resultType="FileVO">
-		select * from file where file_tag = '내부' and file_res_num = #{rt_num}
+		select DISTINCT file_tag from file where file_type = 'review' and file_res_num = #{rt_num}
+		ORDER BY FIELD(file_tag, '음식', '내부', '외부', '메뉴판', '기타')
 	</select>
 
 </mapper>

@@ -315,10 +315,12 @@
             <span th:text="${score.rs_score}"></span>
           </span>
         </div>
-        <div th:each="file : ${rvl.fileList}">
-          <img th:src="@{/file/{path}(path=${file.file_path})}" alt="사진">
+        <div th:if="${rvl.fileList != null and !rvl.fileList.isEmpty()}">
+          <div th:each="file : ${rvl.fileList}" class="mt-2" th:if="${file.file_path != null and !#strings.isEmpty(file.file_path)}">
+            <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진">
+          </div>
         </div>
-        <p th:utext="${#strings.replace(rvl.rev_content, '\n', '<br/>')}"></p>
+        <p th:utext="${#strings.replace(rvl.rev_content, '\n', '<br/>')}" class="mt-3"></p>
       </div>
     </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">

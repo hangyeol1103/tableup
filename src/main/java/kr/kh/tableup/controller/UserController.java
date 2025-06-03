@@ -2,6 +2,7 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -554,11 +555,11 @@ public class UserController {
     model.addAttribute("groupedFiles", groupedFiles);
     model.addAttribute("tapFileList", tapFileList);
     return "user/detail/picture";
-  }
+  } 
 
   @PostMapping("/list/review/{rt_num}")
   public String postMethodName(@PathVariable("rt_num") int rt_num, Model model) {
-      
+    
     return "user/detail/review";
   }
   

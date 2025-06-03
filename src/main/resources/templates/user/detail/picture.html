@@ -109,13 +109,55 @@
         background-color: #fff;
         margin-top: 10px;
       }
+
+      .custom-tab-button {
+        background-color: #adb5bd; /* 회색 */
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 8px 20px;
+        font-weight: bold;
+        margin-right: 0.5rem;
+      }
+      .custom-tab-button:hover {
+        background-color: #5a6268; /* hover 시 어두운 회색 */
+      }
+
     </style>
   </head>
 
   <body>
     <main layout:fragment="content" class="container">
-      <div th:text="${groupedFiles}"></div>
-      <div th:text="${tapFileList}"></div>
+      <div class="mt-3 p-3 bg-white rounded shadow-sm">
+        <div class="container mt-4">
+          <!-- 등록한 메뉴 타입만 뿌려준다. -->
+          <div class="mb-3">
+            <button type="button" class="custom-tab-button me-2" th:each="tf : ${tapFileList}" th:text="${tf.file_tag}"></button>
+          </div>
+          <div class="container mt-4">
+            <div th:each="gf : ${groupedFiles}" class="menu-group mb-5">
+              <div class="menu-group-title" th:id="${gf.key}" th:text="${gf.key}"></div>
+              
+              <div th:each="file : ${gf.value}">
+                <img th:src="@{/file/{path}(path=${file.file_path})}" alt="메뉴 사진"
+                style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
+
+    <script>
+      function scrollToGroup(groupId) {
+        const target = document.getElementById(groupId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else{
+          console.warn("Element not found:", groupId);
+        }
+      }
+    </script>
+
   </body>
 </html>

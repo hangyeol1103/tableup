@@ -69,5 +69,7 @@ public class RestaurantService {
 	public List<FileVO> getTapFileList(int rt_num) {
 		return restaurantDAO.selectTapFileList(rt_num);
 	}
+
+	
 	
 }

@@ -139,7 +139,7 @@
             <button class="filter-btn btn btn-outline-secondary me-2" data-tag="기타">기타</button>
           </div>
           <div class="row" id="imageContainer">
-            <div class="col-md-3 mb-3" th:each="tl : ${tapFileList}" th:data-tag="${tl.file_tag}">
+            <div class="col-md-4 mb-3" th:each="tl : ${tapFileList}" th:data-tag="${tl.file_tag}">
               <img th:src="@{/file{path}(path=${tl.file_path})}" class="img-fluid rounded"
                   alt="메뉴 사진" style="width: 100%; height: 200px; object-fit: cover;">
             </div>
@@ -161,20 +161,24 @@
 
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        const buttons = document.querySelectorAll('.filter-btn');
-        const images = document.querySelectorAll('#imageContainer > div');
+      const buttons = document.querySelectorAll('.filter-btn');
+      const images = document.querySelectorAll('#imageContainer > div');
 
-        buttons.forEach(button => {
-          button.addEventListener('click', () => {
-            const selectedTag = button.dataset.tag;
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          const selectedTag = button.dataset.tag;
 
-            images.forEach(image => {
-              const imageTag = image.dataset.tag;
-              image.style.display = (imageTag === selectedTag) ? 'block' : 'none';
-            });
+          images.forEach(image => {
+            const imageTag = image.dataset.tag;
+            if (imageTag === selectedTag) {
+              image.classList.remove('d-none');
+            } else {
+              image.classList.add('d-none');
+            }
           });
         });
       });
+    });
     </script>
 
     <script>

@@ -485,6 +485,14 @@ public class UserController {
     TagVO tag = userService.getTagByRestaurant(rt_num);
     List<FacilityVO> facilityList = userService.getFacilityList();
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
+    List<FileVO> tapFileList = restaurantService.getTapFileList(rt_num);
+    List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
+
+    int photoCount = tapFileList.size();
+    int reviewCount = reviewList.size();
+
+    model.addAttribute("photoCount", photoCount);
+    model.addAttribute("reviewCount", reviewCount);
 
     //System.out.println(apiKey);
     System.out.println("restaurant: " + restaurant);
@@ -586,10 +594,6 @@ public class UserController {
     List<RestaurantDetailVO> restaurantDetailList = restaurantService.getRestaurantDetailList(rt_num);
     List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
     
-
-    //System.out.println(apiKey);
-    System.out.println("restaurant: " + restaurant);
-
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);

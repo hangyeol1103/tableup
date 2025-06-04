@@ -39,6 +39,8 @@ public interface RestaurantDAO {
 		List<MenuVO> selectMenuDivList(@Param("rt_num") int rt_num);
 
 		List<FileVO> selectTapFileList(@Param("rt_num") int rt_num);
+		
+		List<FileVO> selectTapFileListCount(@Param("rt_num") int rt_num);
 
 }
 

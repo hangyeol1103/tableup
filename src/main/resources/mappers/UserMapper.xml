@@ -138,7 +138,9 @@
 	</select>
 
 	<select id="selectUser" resultType="userVO">
-		select * from User where us_num = #{us_num}
+		select * from User 
+		LEFT JOIN userprofileimage ON upi_us_num = us_num
+		where us_num = #{us_num}
 	</select>
 	<select id="selectUserById" resultType="userVO">
 		select * from User where us_id = #{us_id}

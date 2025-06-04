@@ -1,5 +1,6 @@
 package kr.kh.tableup.controller;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,11 +8,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.RegionVO;
@@ -33,13 +36,13 @@ public class HomeController {
 	ReservationService reservationService;
 
 	@GetMapping("/")
-	public String home(Model model) {
+	public String home(Model model, @AuthenticationPrincipal CustomUser customUser) {
 
-		UserVO user = userService.getUserById("123");
+		// UserVO user = userService.getUserById("123");
 		//System.out.println(user);
 
-		model.addAttribute("sample", user.getUs_name());
-		model.addAttribute("url", "/");
+		// model.addAttribute("sample", user.getUs_name());
+		// model.addAttribute("url", "/");
 
 		// 지역
 		//Map<String, List<DetailRegionVO>> regionMap = userService.getRegionMap();
@@ -54,7 +57,8 @@ public class HomeController {
 		model.addAttribute("foodList", foodList);
 		model.addAttribute("favoriteFood", favoriteFood);
 		model.addAttribute("favoriteRegion", favoriteRegion);
-
+		
+		if(customUser != null && customUser.getUser() != null) model.addAttribute("user", customUser.getUser());
 		//System.out.println(regionList);
 		System.out.println("foodList: " + foodList);
 		System.out.println("favoriteFood: "+ Arrays.toString(favoriteFood));	//sysout favorite하면 안되는구나...신기

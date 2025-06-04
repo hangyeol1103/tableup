@@ -375,7 +375,7 @@ public class UserController {
     
     return "user/review/insertsub";
   }
-
+/*
   @PostMapping("/review/insertPost")
   //@ResponseBody
   public String insertReview(
@@ -431,7 +431,7 @@ public class UserController {
 
     return "redirect:/user/review/view";
   }
-
+*/
 
   
     @GetMapping("/list")
@@ -553,13 +553,13 @@ public class UserController {
       return "user/review/view";
   }
 
-  @GetMapping("/review/view/{rev_num}")
+  @GetMapping("/review/detail/{rev_num}")
   public String myReview(Model model, @PathVariable int rev_num) {
       
       ReviewVO review = reviewService.getReview(rev_num);
       model.addAttribute("review", review);
       System.out.println(review);
-      return "user/review/myReview/view";
+      return "user/review/detail/view";
   }
   
   @GetMapping("/list/detail/outline")

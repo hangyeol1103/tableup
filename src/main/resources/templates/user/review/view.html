@@ -17,35 +17,37 @@
 
   <div class="row g-4" th:each="review : ${reviewList}">
     <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">
-            <span class="text-primary" th:text="${review.rt_name}">식당명</span>
-            <small class="text-muted ms-2" th:text="|by ${review.us_name}|">작성자</small>
-          </h5>
+      <a th:href="@{/user/review/detail/{rev_num}(rev_num=${review.rev_num})}" class="text-decoration-none text-dark">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">
+              <span class="text-primary" th:text="${review.rt_name}">식당명</span>
+              <small class="text-muted ms-2" th:text="|by ${review.us_name}|">작성자</small>
+            </h5>
 
-          <p class="card-text mt-2">
-            <strong>방문일:</strong> <span th:text="${review.rev_visit}">2025-01-01</span><br>
-            <strong>내용:</strong><br>
-            <span th:text="${review.rev_content}">리뷰 내용</span>
-          </p>
+            <p class="card-text mt-2">
+              <strong>방문일:</strong> <span th:text="${review.rev_visit}">2025-01-01</span><br>
+              <strong>내용:</strong><br>
+              <span th:text="${review.rev_content}">리뷰 내용</span>
+            </p>
 
-          <div th:if="${review.scoreList != null}">
-            <strong>항목별 점수:</strong>
-            <ul class="list-inline mt-2 mb-0">
-              <li class="list-inline-item me-4"
-                  th:each="score : ${review.scoreList}"
-                  th:text="|${score.st_category} : ${score.rs_score}|">
-                맛 : 4
-              </li>
-            </ul>
+            <div th:if="${review.scoreList != null}">
+              <strong>항목별 점수:</strong>
+              <ul class="list-inline mt-2 mb-0">
+                <li class="list-inline-item me-4"
+                    th:each="score : ${review.scoreList}"
+                    th:text="|${score.st_category} : ${score.rs_score}|">
+                  맛 : 4
+                </li>
+              </ul>
+            </div>
+
+            <p class="text-muted mt-3" th:text="|작성일: ${#dates.format(review.rev_created, 'yyyy-MM-dd')}|">
+              작성일: 2025-01-01
+            </p>
           </div>
-
-          <p class="text-muted mt-3" th:text="|작성일: ${#dates.format(review.rev_created, 'yyyy-MM-dd')}|">
-            작성일: 2025-01-01
-          </p>
         </div>
-      </div>
+      </a>
     </div>
   </div>
 </main>

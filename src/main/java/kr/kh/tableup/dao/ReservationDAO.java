@@ -28,5 +28,7 @@ public interface ReservationDAO {
 	
 	int[] selectFavorateCategory();
 
+	int[] selectFavorateRegion();
+
 
 }

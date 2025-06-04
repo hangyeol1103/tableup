@@ -47,16 +47,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 							</div>
 							<div class="modal-body" th:if="${regionList != null and #lists.size(regionList) > 0}">
-								<!-- 인기 지역 (동그란 이미지/버튼) -->
-								<div class="mb-3">
-									<strong>인기 지역</strong>
-									<div class="d-flex flex-row mt-2">
-										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">전국</button>
-										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">잠실</button>
-										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">서초</button>
-										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">제주</button>
+							<!-- 인기 지역 (동그란 이미지/버튼) -->
+							<div class="mb-3" th:if="${favoriteRegion != null}">
+								<strong>인기 지역</strong>
+								<div class="d-flex flex-wrap mt-2">
+									<!-- 전국 버튼은 항상 고정 -->
+									<button class="btn btn-outline-primary rounded-circle m-1 region-btn"
+													style="width:60px; height:60px;" data-dreg="0" data-reg="0">전국</button>
+
+									<!-- 동적으로 인기 지역 버튼 출력 -->
+									<div th:each="favRegion : ${favoriteRegion}">
+										<div th:each="r : ${regionList}" th:if="${r.dreg_num == favRegion}" class="d-inline-block">
+											<button class="btn btn-outline-primary rounded-circle m-1 region-btn"
+															style="width:60px; height:60px;"
+															th:attr="data-dreg=${r.dreg_num}, data-reg=${r.reg_num}"
+															 th:text="${#strings.length(r.dreg_sub) > 2 ? #strings.substring(r.dreg_sub, 0, 2) : r.dreg_sub}">지역명</button>
+										</div>
 									</div>
 								</div>
+							</div>
 								
 								<div class="row">
 
@@ -212,7 +221,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				<div class="container mt-4">
 					<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
 					<div class="d-flex gap-4">
-						<div th:each="favNum : ${favorite}">
+						<div th:each="favNum : ${favoriteFood}">
 							<div class="text-center" th:each="f : ${foodList}" th:if="${f.dfc_num == favNum}">
 								<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
 									<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 

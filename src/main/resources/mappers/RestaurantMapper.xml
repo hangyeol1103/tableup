@@ -181,7 +181,7 @@
 	</select>
 
 	<select id="selectTapFileList" resultType="FileVO">
-		select DISTINCT file_tag from file where file_type = 'review' and file_res_num = #{rt_num}
+		select DISTINCT * from file where file_type = 'review' and file_res_num = #{rt_num}
 		ORDER BY FIELD(file_tag, '음식', '내부', '외부', '메뉴판', '기타')
 	</select>
 

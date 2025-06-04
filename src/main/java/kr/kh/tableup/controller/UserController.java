@@ -548,11 +548,11 @@ public class UserController {
     List<FileVO> tapFileList = restaurantService.getTapFileList(rt_num);
 
     // file_tag 기준으로 그룹핑
-    Map<String, List<FileVO>> groupedFiles = tapFileList.stream()
-        .collect(Collectors.groupingBy(FileVO::getFile_tag));
+    // Map<String, List<FileVO>> groupedFiles = tapFileList.stream()
+    //     .collect(Collectors.groupingBy(FileVO::getFile_tag));
 
     // 모델에 추가
-    model.addAttribute("groupedFiles", groupedFiles);
+    // model.addAttribute("groupedFiles", groupedFiles);
     model.addAttribute("tapFileList", tapFileList);
     return "user/detail/picture";
   } 

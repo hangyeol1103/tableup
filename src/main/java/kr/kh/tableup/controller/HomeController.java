@@ -48,14 +48,16 @@ public class HomeController {
 
 		List<DetailRegionVO> regionList = userService.getRegionListWithWhole();
 		List<DetailFoodCategoryVO> foodList = userService.getFoodCategoryListWithWhole();
-		int[] favorite = reservationService.favoriteCategory();
+		int[] favoriteFood = reservationService.favoriteCategory();
+		int[] favoriteRegion = reservationService.favoriteRegion();
 		model.addAttribute("regionList", regionList);
 		model.addAttribute("foodList", foodList);
-		model.addAttribute("favorite", favorite);
+		model.addAttribute("favoriteFood", favoriteFood);
+		model.addAttribute("favoriteRegion", favoriteRegion);
 
 		//System.out.println(regionList);
 		System.out.println("foodList: " + foodList);
-		System.out.println("favorite: "+ Arrays.toString(favorite));	//sysout favorite하면 안되는구나...신기
+		System.out.println("favoriteFood: "+ Arrays.toString(favoriteFood));	//sysout favorite하면 안되는구나...신기
 		return "index";
 	}
 

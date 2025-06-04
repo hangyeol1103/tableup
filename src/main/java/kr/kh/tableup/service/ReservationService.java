@@ -141,4 +141,8 @@ public class ReservationService {
 			return reservationDAO.selectFavorateCategory();
 		}
 
+		public int[] favoriteRegion() {
+			return reservationDAO.selectFavorateRegion();
+		}
+
 }

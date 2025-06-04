@@ -134,7 +134,7 @@ public class ManagerService {
 			System.out.println("수정 실패!");
 			return false;
 		}
-		managerDAO.deletefile(restaurant.getRt_num());
+		managerDAO.deletefileByForeign(restaurant.getRt_num(), "RESTAURANTDETAIL");
 		//매장 이미지 작업
 		uploadFileList(restaurant.getRt_num(), fileList);
 		

@@ -139,11 +139,11 @@
           </li>
           <li class="tab-item">
             <a class="tab-link picture" href="javascript:void(0)">사진
-            <span class="badge">1834</span></a>
+            <span class="badge" th:text="${photoCount}"></span></a>
           </li>
           <li class="tab-item">
             <a class="tab-link review" href="javascript:void(0)">리뷰
-            <span class="badge">74</span></a>
+            <span class="badge" th:text="${reviewCount}"></span></a>
           </li>
         </ul>
       </div>
@@ -296,19 +296,24 @@
       </script>
 
       <script>
-        document.querySelectorAll('.tab-link').forEach(tab => {
-          tab.addEventListener('click', function (e) {
-            document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-          });
-        });
+        // document.querySelectorAll('.tab-link').forEach(tab => {
+        //   tab.addEventListener('click', function (e) {
+        //     document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+        //     this.classList.add('active');
+        //   });
+        // });
+        $(document).on("click", ".tab-link", function(){
+         
+        })
+       
       </script>
 
       <script th:inline="javascript">
         //새소식 클릭시
         $(".news").on("click", function(e){
           e.preventDefault();
-          
+          $(".tab-link").removeClass("active");
+          $(this).addClass("active");
 
           $.ajax({
             url : "/user/list/news/[[${rt_num}]] ",
@@ -320,13 +325,16 @@
 
           })
         })
-
+        
         //메뉴 클릭시
-        $(".menu").on("click", function(e){
+        $(document).on("click",".menu", clickMenu)
+        function clickMenu(e){
           e.preventDefault();
-          
+          $(".tab-link").removeClass("active");
+          $(".tab-link.menu").addClass("active");
 
           $.ajax({
+            async : false,
             url : "/user/list/menu/[[${rt_num}]] ",
             method : "post",
             success : function(data){
@@ -335,12 +343,12 @@
             }
 
           })
-        })
-
+        }
         //사진 클릭시
         $(".picture").on("click", function(e){
           e.preventDefault();
-          
+          $(".tab-link").removeClass("active");
+          $(this).addClass("active");
 
           $.ajax({
             url : "/user/list/picture/[[${rt_num}]] ",
@@ -354,9 +362,11 @@
         })
 
         //리뷰 클릭시
-        $(".review").on("click", function(e){
+        $(document).on("click", ".review", clickReview)
+        function clickReview(e){
           e.preventDefault();
-          
+          $(".tab-link").removeClass("active");
+          $(".tab-link.review").addClass("active");
 
           $.ajax({
             url : "/user/list/review/[[${rt_num}]] ",
@@ -367,12 +377,13 @@
             }
 
           })
-        })
+        }
 
         //화면 로딩 시 홈 내용이 보이게 하는 비동기 통신
         $(".home").on("click", function(e){
           e.preventDefault();
-          
+          $(".tab-link").removeClass("active");
+          $(this).addClass("active");
 
           $.ajax({
             url : "/user/list/home/[[${rt_num}]] ",
@@ -389,6 +400,8 @@
           });
         });
         $(".home").click();
+
+       
       </script>
 
 

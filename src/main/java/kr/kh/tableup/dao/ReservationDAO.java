@@ -28,4 +28,5 @@ public interface ReservationDAO {
 	
 	List<ReservationVO> selectReservations(int rt_num);
 
+
 }

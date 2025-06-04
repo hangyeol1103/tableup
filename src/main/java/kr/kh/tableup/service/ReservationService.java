@@ -40,10 +40,10 @@ public class ReservationService {
 				res.getRes_rt_num(), res.getRes_time(), res.getRes_end_time());
 
 		// 좌석 누적 갱신
-		for (BusinessHourVO  bh : bhList) {
-			int updated = bh.getBh_seat_current() + res.getRes_person();
-			businessHourDAO.updateCurrentSeat(bh.getBh_num(), updated);
-		}
+		// for (BusinessHourVO  bh : bhList) {
+		// 	int updated = bh.getBh_seat_current() + res.getRes_person();
+		// 	businessHourDAO.updateCurrentSeat(bh.getBh_num(), updated);
+		// }
 
 		return true;
 	}
@@ -97,6 +97,9 @@ public class ReservationService {
 			//예약 가능 정보를 가져옴
 			BusinessHourVO  businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
 			if(businessHour == null){
+				//예약 자동 취소
+				reservationDAO.updateReservationState(reservation.getRes_num(), -1);
+				
 				throw new RuntimeException("예약 가능한 시간대가 아닙니다.");
 			}
 			int count = businessHour.getBh_seat_max() - businessHour.getBh_seat_current();

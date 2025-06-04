@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,6 +179,17 @@ public class UserController {
 
     UserVO user = userService.getUserById(principal.getName());
     model.addAttribute("user", user);
+    
+    String token = UUID.randomUUID().toString().substring(0, 6); // 인증번호 6자리
+
+    // QR 코드용 URI
+    String smsUri = "sms:01012345678?body=" + 100000000 + " " + token;
+
+    // QR 코드 생성 후 base64로 인코딩된 이미지 반환
+    String qrImage = userService.generateQrBase64(smsUri);
+
+    model.addAttribute("map", Map.of("token", token, "qr", qrImage));
+
     return "user/mypage/edit";
   }
 
@@ -190,6 +202,7 @@ public class UserController {
     boolean result = userService.updateUser(user);
 
     ra.addFlashAttribute("msg", result ? "회원정보가 수정되었습니다." : "수정에 실패했습니다.");
+
     return "redirect:/user/mypage";
   }
 

@@ -1,7 +1,9 @@
 package kr.kh.tableup.service;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -10,12 +12,20 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.PageMaker;
@@ -560,6 +570,17 @@ public class UserService {
   }
 
 
+  public String generateQrBase64(String content) {
+      try {
+          BitMatrix matrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, 200, 200);
+          BufferedImage image = MatrixToImageWriter.toBufferedImage(matrix);
 
+          ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          ImageIO.write(image, "png", baos);
+          return Base64.getEncoder().encodeToString(baos.toByteArray());
+      } catch (Exception e) {
+          throw new RuntimeException("QR 생성 실패", e);
+      }
+  }
 
 }

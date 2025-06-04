@@ -3,6 +3,7 @@ package kr.kh.tableup.controller;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -678,9 +680,11 @@ public class ManagerController {
 
 		List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
 		List<BusinessDateVO> opertimelist= managerService.getOperTimeList(rt_num);
+		List<BusinessHourTemplateVO> templateList =managerService.getTemplateList(rt_num);
 
 		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("restimelist", restimelist);
+		model.addAttribute("templateList", templateList);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
 		return "manager/restime/restimelist";
@@ -702,10 +706,12 @@ public class ManagerController {
 		int rt_num = manager.getManager().getRm_rt_num();
 		List<BusinessDateVO> opertimelist= managerService.getOperTimeList(rt_num);
 		List<BusinessHourVO> restimelist = managerService.getResTimeList(rt_num);
+		List<BusinessHourTemplateVO> templateList =managerService.getTemplateList(rt_num);
 
 		model.addAttribute("manager", manager.getManager());
 		model.addAttribute("restimelist", restimelist);
 		model.addAttribute("opertimelist", opertimelist);
+		model.addAttribute("templateList", templateList);
 		model.addAttribute("url", "/make_restime");
 		return "/manager/restime/make_restime";
 	}
@@ -1260,14 +1266,30 @@ public class ManagerController {
 		}
 
 		List<BusinessDateVO> opertimeList = managerService.getOperTimeList(rt_num);
+		List<BusinessHourTemplateVO> templateList =managerService.getTemplateList(rt_num);
 		System.out.println("opertimeList : "+opertimeList);
 		if (!opertimeList.isEmpty()) {
 				System.out.println("첫 번째 open: " + opertimeList.get(0).getBd_open());
 		}
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("opertimeList", opertimeList);
+		model.addAttribute("templateList", templateList != null ? templateList : new ArrayList<>());
 		model.addAttribute("manager", manager.getManager());
 		return "/manager/restime/restimetemplate";
+	}
+
+	//예약 시간 템플릿 저장
+	@PostMapping("/restime/restimetemplate/save")
+	@ResponseBody
+	public ResponseEntity<?> saveTemplate(@RequestBody List<BusinessHourTemplateVO> templateList) {
+			try {
+					System.out.println("받은 데이터: " + templateList);
+					managerService.saveTemplates(templateList);
+					return ResponseEntity.ok().build();
+			} catch (Exception e) {
+					e.printStackTrace();  // 로그 출력
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장 실패: " + e.getMessage());
+			}
 	}
 	
 

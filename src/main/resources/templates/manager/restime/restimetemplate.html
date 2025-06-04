@@ -37,6 +37,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                 <button type="button" class="btn btn-outline-primary" data-day="토">토</button>
                 <button type="button" class="btn btn-outline-primary" data-day="일">일</button>
             </div>
+            <div class="mb-2">
+                <button type="button" class="btn btn-success me-2" id="activate-all">전체 활성화</button>
+                <button type="button" class="btn btn-secondary" id="deactivate-all">전체 비활성화</button>
+            </div>
             <div id="time-template-area"></div>
             <button class="btn btn-primary mt-3 mb-3" id="save-template-btn">저장</button>
         </div>
@@ -49,16 +53,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         
         <script th:inline="javascript">
             const opertimelist = [[${opertimeList}]];
+            const savedTemplates = [[${templateList}]];
             const open = /*[['${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_open, 11, 16) : "09:00"}']]*/ '09:00';
             const close = /*[['${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_close, 11, 16) : "18:00"}']]*/ '18:00';
 
             console.log("opertime : ",opertimelist);
+            console.log("savedTemplates : ", savedTemplates);
             console.log("open:", open, "close:", close);
 
             function generateTimeTable(day) {
                 const container = document.getElementById("time-template-area");
                 container.innerHTML = "";
+                console.log("클릭된 요일:", day, typeof day);
 
+                console.log("savedTemplates:", savedTemplates.map(t => [t.bhd_date, typeof t.bhd_date]));
                 const table = document.createElement("table");
                 table.className = "table table-bordered text-center align-middle";
 
@@ -80,15 +88,38 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     const row = document.createElement("tr");
                     row.setAttribute("data-day", day);
                     row.setAttribute("data-hour", hour);
-                    row.setAttribute("data-active", true); // 항상 true
+
+                    const hourStr = `${String(hour).padStart(2, '0')}:00`;
+                    console.log("검사 대상 시간:", hourStr);
+                    console.log("savedTemplates 중 일치하는 항목:", savedTemplates.filter(t => t.bhd_date === day));
+                    
+                    // 저장된 값 있는지 확인
+                    const match = savedTemplates.find(t => {
+                    const savedTime = t.bhd_timeStart?.substring(0, 5); // "HH:mm"만 사용
+                    return t.bhd_date === day && savedTime === hourStr;
+                    });
+
+                    savedTemplates.forEach(t => {
+                        console.log(`[비교] 요일: '${t.bhd_date}' === '${day}'?`, t.bhd_date === day);
+                        console.log(`[비교] 시간: '${t.bhd_timeStart}' === '${hourStr}'?`, t.bhd_timeStart === hourStr);
+                    });
+
+                    const isActive = !!match;
+                    row.setAttribute("data-active", isActive);
+
+                    const seat = match ? match.bhd_seat : 0;
+                    const tableCount = match ? match.bhd_table : 0;
 
                     row.innerHTML = `
                         <td>${hour}시</td>
-                        <td class="status-cell table-success" style="cursor:pointer;" data-active="true">활성화</td>
-                        <td><input type="number" class="form-control seat-input" min="0" value="0" style="width:80px;"></td>
-                        <td><input type="number" class="form-control table-input" min="0" value="0" style="width:80px;"></td>
+                        <td class="status-cell ${isActive ? 'table-success' : 'table-secondary'}" 
+                            style="cursor:pointer;" 
+                            data-active="${isActive}">
+                            ${isActive ? '활성화' : '비활성화'}
+                        </td>
+                        <td><input type="number" class="form-control seat-input" min="0" value="${seat}" style="width:80px;" ${!isActive ? 'disabled' : ''}></td>
+                        <td><input type="number" class="form-control table-input" min="0" value="${tableCount}" style="width:80px;" ${!isActive ? 'disabled' : ''}></td>
                     `;
-
                     tbody.appendChild(row);
                 }
 
@@ -123,9 +154,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                 });
             }
 
-
-
-
             document.getElementById("save-template-btn").addEventListener("click", () => {
                 const rt_num = /* Thymeleaf로 전달된 값 */ [[${rt_num}]];
                 const templates = [];
@@ -146,10 +174,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                         bhd_table: parseInt(table),
                         bhd_rt_num: rt_num
                     });
+                    
                 });
 
                 $.ajax({
-                    url: '/restime/restimetemplate/save',
+                    url: '/manager/restime/restimetemplate/save',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(templates),
@@ -167,12 +196,46 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             document.querySelectorAll('button[data-day]').forEach(button => {
                 button.addEventListener('click', () => {
                     const day = button.getAttribute('data-day');
+                    console.log('선택된 요일:', day);
                     generateTimeTable(day);
                 });
             });
 
+            //전체 활성화 비활성화 버튼
+            document.getElementById("activate-all").addEventListener("click", () => {
+                document.querySelectorAll("#time-template-area tr[data-hour]").forEach(row => {
+                    row.setAttribute("data-active", "true");
+                    const cell = row.querySelector(".status-cell");
+                    const seatInput = row.querySelector(".seat-input");
+                    const tableInput = row.querySelector(".table-input");
 
-            
+                    cell.classList.remove("table-secondary");
+                    cell.classList.add("table-success");
+                    cell.innerText = "활성화";
+                    cell.setAttribute("data-active", "true");
+
+                    seatInput.disabled = false;
+                    tableInput.disabled = false;
+                });
+            });
+
+            document.getElementById("deactivate-all").addEventListener("click", () => {
+                document.querySelectorAll("#time-template-area tr[data-hour]").forEach(row => {
+                    row.setAttribute("data-active", "false");
+                    const cell = row.querySelector(".status-cell");
+                    const seatInput = row.querySelector(".seat-input");
+                    const tableInput = row.querySelector(".table-input");
+
+                    cell.classList.remove("table-success");
+                    cell.classList.add("table-secondary");
+                    cell.innerText = "비활성화";
+                    cell.setAttribute("data-active", "false");
+
+                    seatInput.disabled = true;
+                    tableInput.disabled = true;
+                });
+            });
+
         </script>
         
     </main>

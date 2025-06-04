@@ -370,9 +370,10 @@ public class ManagerService {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-		LocalTime resStart = LocalTime.parse(restime.getBh_start());
-    LocalTime resEnd = LocalTime.parse(restime.getBh_end());
-    LocalTime open = LocalDateTime.parse(day.getBd_open(), formatter).toLocalTime();
+		LocalDate bhDate = LocalDate.parse(restime.getBh_date().substring(0, 10));
+		LocalTime resStart = LocalTime.parse(restime.getBh_start().substring(11));
+		LocalTime resEnd = LocalTime.parse(restime.getBh_end().substring(11));
+		LocalTime open = LocalDateTime.parse(day.getBd_open(), formatter).toLocalTime();
 		LocalTime close = LocalDateTime.parse(day.getBd_close(), formatter).toLocalTime();
 		
 		System.out.println("----------------------");
@@ -396,7 +397,7 @@ public class ManagerService {
     }
 
 		//중복 체크
-		BusinessHourVO check = managerDAO.checkResTime(restime.getBh_rt_num(), restime.getBh_start_ts(), restime.getBh_end_ts());
+		BusinessHourVO check = managerDAO.checkResTime(restime.getBh_rt_num(), restime.getBh_start(), restime.getBh_end());
 		System.out.println("check : " + check);
     if (check != null) {
         System.out.println("중복 예약 시간");
@@ -486,7 +487,7 @@ public class ManagerService {
     }
 
 		//중복 체크
-		BusinessHourVO check = managerDAO.checkResTime(restime.getBh_rt_num(), restime.getBh_start_ts(), restime.getBh_end_ts());
+		BusinessHourVO check = managerDAO.checkResTime(restime.getBh_rt_num(), restime.getBh_start(), restime.getBh_end());
 		System.out.println("check : " + check);
     if (check != null) {
         System.out.println("중복 예약 시간");
@@ -697,6 +698,19 @@ public class ManagerService {
 			managerDAO.updateCouponState(c);
 		}
 	}
+
+	public void saveTemplates(List<BusinessHourTemplateVO> list) {
+			for (BusinessHourTemplateVO vo : list) {
+					int count = managerDAO.existsTemplate(vo);
+					if (count > 0) {
+							managerDAO.updateTemplate(vo);
+					} else {
+							managerDAO.insertTemplate(vo);
+					}
+			}
+	}
+
+
 
 
 

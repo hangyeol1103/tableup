@@ -2,6 +2,8 @@ package kr.kh.tableup.model.vo;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Data
@@ -20,7 +22,9 @@ public class BusinessHourVO {
 	String bh_date; // "yyyy-MM-dd"
 
 	// DB 저장용 timestamp (자동 생성)
+
 	Timestamp bh_start_ts;
+	
 	Timestamp bh_end_ts;
 
 	// bh_date, bh_start, bh_end 셋 중 하나가 설정될 때마다 timestamp 자동 계산

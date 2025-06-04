@@ -102,15 +102,15 @@ public class ReservationController {
 		return "redirect:/";
 	}
 
-	@GetMapping("/resdetail/{res_num}")
-	public String reservationDetail(Model model, Principal principal, @AuthenticationPrincipal CustomUser user, @PathVariable int res_num) {
-		if(principal == null || user ==null){
-			return "redirect:/user/login";
-		}
-		ReservationVO reservation = reservationService.getUserReservation(res_num);
-		model.addAttribute("reservation", reservation);
-		return "user/reservation/resdetail";
-	}
+	// @GetMapping("/resdetail/{res_num}")
+	// public String reservationDetail(Model model, Principal principal, @AuthenticationPrincipal CustomUser user, @PathVariable int res_num) {
+	// 	if(principal == null || user ==null){
+	// 		return "redirect:/user/login";
+	// 	}
+	// 	ReservationVO reservation = reservationService.getUserReservation(res_num);
+	// 	model.addAttribute("reservation", reservation);
+	// 	return "user/reservation/resdetail";
+	// }
 	
 
 

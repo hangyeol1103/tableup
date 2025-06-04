@@ -80,7 +80,7 @@ public interface ManagerDAO {
 
 	List<BusinessHourVO> selectResTimeList(int rt_num);
 
-	BusinessHourVO checkResTime(int bh_rt_num, Timestamp bh_start, Timestamp bh_end);
+	BusinessHourVO checkResTime(int bh_rt_num, String bh_start, String bh_end);
 
 	boolean insertResTime(BusinessHourVO restime);
 
@@ -150,6 +150,14 @@ public interface ManagerDAO {
 	void updateCouponState(ResCouponVO c);
 
 	RestaurantVO selectRestaurantByNum(int rt_num);
+
+	void deleteTemplate(int bhd_rt_num);
+
+	void insertTemplate(BusinessHourTemplateVO vo);
+
+	int existsTemplate(BusinessHourTemplateVO vo);
+
+	void updateTemplate(BusinessHourTemplateVO vo);
 
 
 

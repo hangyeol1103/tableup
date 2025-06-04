@@ -214,7 +214,7 @@
 	<insert id="insertResTime" useGeneratedKeys="true" keyProperty="bh_num">
 		insert into businesshour
 			(bh_start, bh_end, bh_seat_max, bh_seat_current, bh_table_max, bh_table_current, bh_state, bh_rt_num)
-		value(#{bh_start_ts}, #{bh_end_ts}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
+		value(#{bh_start}, #{bh_end}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
 	</insert>
 
 	<select id="selectBusinessHour" resultType="BusinessHourVO">
@@ -388,6 +388,36 @@
 		where rec_period =#{rec_period} 
 	</update>
 
+	<delete id="deleteTemplate">
+		delete from businesshourtemplate where bhd_rt_num=#{bhd_rt_num}
+	</delete>
+
+	<insert id="insertTemplate" useGeneratedKeys="true" keyProperty="bhd_num">
+		INSERT INTO businesshourtemplate (
+      bhd_date, bhd_timeStart, bhd_timeEnd, bhd_seat, bhd_table, bhd_rt_num
+    )
+    VALUES (
+      #{bhd_date}, #{bhd_timeStart}, #{bhd_timeEnd}, #{bhd_seat}, #{bhd_table}, #{bhd_rt_num}
+    )
+	</insert>
+	
+	<select id="existsTemplate" parameterType="BusinessHourTemplateVO" resultType="int">
+		SELECT COUNT(*)
+		FROM businesshourtemplate
+		WHERE bhd_rt_num = #{bhd_rt_num}
+			AND bhd_date = #{bhd_date}
+			AND bhd_timeStart = #{bhd_timeStart}
+	</select>
+
+	<update id="updateTemplate">
+		update businesshourtemplate set
+			bhd_seat = #{bhd_seat}, 
+			bhd_table = #{bhd_table}
+		where 
+			bhd_rt_num = #{bhd_rt_num} and 
+			bhd_date = #{bhd_date} and 
+			bhd_timeStart = #{bhd_timeStart}
+	</update>
 	
 
 	

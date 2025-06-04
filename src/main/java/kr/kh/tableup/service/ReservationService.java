@@ -137,4 +137,8 @@ public class ReservationService {
 			return reservationDAO.selectReservation(res_num);		
 		}
 
+		public int[] favoriteCategory() {
+			return reservationDAO.selectFavorateCategory();
+		}
+
 }

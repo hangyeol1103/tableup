@@ -25,5 +25,8 @@ public interface ReservationDAO {
 	List<ReservationVO> selectReservationList(int rt_num, String date);
 	
 	ReservationVO selectReservation(int res_num);
+	
+	int[] selectFavorateCategory();
+
 
 }

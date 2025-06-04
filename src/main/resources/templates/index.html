@@ -212,26 +212,17 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				<div class="container mt-4">
 					<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
 					<div class="d-flex gap-4">
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/Sushi.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">스시</div>
+						<div th:each="favNum : ${favorite}">
+							<div class="text-center" th:each="f : ${foodList}" th:if="${f.dfc_num == favNum}">
+								<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
+									<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
+											onerror="this.src='/resources/static/img/index/default.jpg'" 
+											class="rounded" style="width:110px; height:110px; object-fit:cover;">
+									<div class="mt-2" th:text="${f.dfc_sub}">카테고리명</div>
+								</a>
+							</div>
 						</div>
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">예시</div>
-						</div>
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">예시</div>
-						</div>
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">예시</div>
-						</div>
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">예시</div>
-						</div>
+
 					</div>
 				</div>
 		

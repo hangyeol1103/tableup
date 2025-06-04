@@ -16,6 +16,7 @@ import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.RegionVO;
 import kr.kh.tableup.model.vo.UserVO;
+import kr.kh.tableup.service.ReservationService;
 import kr.kh.tableup.service.UserService;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -27,6 +28,9 @@ public class HomeController {
 	
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	ReservationService reservationService;
 
 	@GetMapping("/")
 	public String home(Model model) {
@@ -44,10 +48,14 @@ public class HomeController {
 
 		List<DetailRegionVO> regionList = userService.getRegionListWithWhole();
 		List<DetailFoodCategoryVO> foodList = userService.getFoodCategoryListWithWhole();
+		int[] favorite = reservationService.favoriteCategory();
 		model.addAttribute("regionList", regionList);
 		model.addAttribute("foodList", foodList);
+		model.addAttribute("favorite", favorite);
+
 		//System.out.println(regionList);
 		System.out.println("foodList: " + foodList);
+		System.out.println("favorite: "+ Arrays.toString(favorite));	//sysout favorite하면 안되는구나...신기
 		return "index";
 	}
 

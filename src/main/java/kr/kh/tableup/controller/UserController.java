@@ -297,6 +297,18 @@ public class UserController {
   }
 
   @GetMapping("/review/insert/{res_num}")
+  public String prepareReview(@PathVariable int res_num, @AuthenticationPrincipal CustomUser customUser, RedirectAttributes redirect) {
+      try {
+          int us_num = userService.getUserById(customUser.getUsername()).getUs_num();
+          int rev_num = reviewService.revres(res_num, us_num);  
+          return "redirect:/user/review/insert/post/" + res_num;
+      } catch (IllegalStateException e) {
+          redirect.addFlashAttribute("msg", e.getMessage());
+          return "redirect:/mypage/reservation";
+      }
+  }
+/*
+  @GetMapping("/review/insert/post/{res_num}")
   public String reviewpage(Model model,@PathVariable Integer res_num, @ModelAttribute String errorMsg,
       @ModelAttribute ReviewVO review, @AuthenticationPrincipal CustomUser customUser) {
         
@@ -326,7 +338,32 @@ public class UserController {
     
 
     return "user/review/insert";
+  }*/
+
+
+  @GetMapping("/review/insert/post/{res_num}")
+  public String showReviewForm(@PathVariable int res_num, Model model, @AuthenticationPrincipal CustomUser customUser, RedirectAttributes redirect, @ModelAttribute String errorMsg, @RequestParam(required = false) ReviewDTO reviewDTO) {
+      ReservationVO reservation = reservationService.getReservation(res_num);
+      if (reservation == null) {
+          redirect.addFlashAttribute("msg", "예약 정보가 없습니다.");
+          return "redirect:/mypage/reservation";
+        }
+      if(reviewDTO != null) model.addAttribute("reviewDTO", reviewDTO);
+      
+      if(errorMsg != null && !errorMsg.isEmpty()) model.addAttribute("errorMsg", errorMsg);
+      
+      List<ScoreTypeVO> scoreTypeList = userService.getScoreType();
+      System.out.println("scoreTypeList: " + scoreTypeList);
+      model.addAttribute("scoreTypeList", scoreTypeList); 
+
+
+      model.addAttribute("user", customUser.getUser());
+      model.addAttribute("reservation", reservation); 
+      return "user/review/insert";
   }
+
+
+  
 
   @GetMapping("/review/insertsub")
   public String getRestaurantInfo(int rt_Num, Model model) {
@@ -361,7 +398,7 @@ public class UserController {
     if (!userService.insertReview(review)) {
       rttr.addFlashAttribute("errorMsg", "빈 내용이 있거나 문제가 생겨 리뷰 저장에 실패했습니다.");
       rttr.addFlashAttribute("review", review);
-      return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
+      return "redirect:/user/review/insert/post?rt_num=" + review.getRev_rt_num();
     }
 
     // 점수 저장
@@ -375,12 +412,12 @@ public class UserController {
           if (!userService.insertReviewScore(review, rs_st_num, rs_score)) {
             rttr.addFlashAttribute("errorMsg", "리뷰는 등록됐지만 점수 저장에 실패했습니다.");
             rttr.addFlashAttribute("review", review);
-            return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
+            return "redirect:/user/review/insert/post?rt_num=" + review.getRev_rt_num();
           }
         } catch (NumberFormatException e) {
           rttr.addFlashAttribute("errorMsg", "잘못된 점수 형식이 입력되었습니다.");
           rttr.addFlashAttribute("review", review);
-          return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
+          return "redirect:/user/review/insert/post?rt_num=" + review.getRev_rt_num();
         }
       }
     }
@@ -391,7 +428,7 @@ public class UserController {
       System.out.println(errorMsg);
       rttr.addFlashAttribute("errorMsg", "리뷰는 등록됐지만 파일 저장에 실패했습니다.");
       rttr.addFlashAttribute("review", review);
-      return "redirect:/user/review/insert?rt_num=" + review.getRev_rt_num();
+      return "redirect:/user/review/insert/post?rt_num=" + review.getRev_rt_num();
     }
 
     return "redirect:/user/review/view";
@@ -475,7 +512,7 @@ public class UserController {
   }
 
   @GetMapping("/list/detail/{rt_num}")
-  public String restaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
+  public String restaurantDetail(@PathVariable int rt_num, Model model) {
     // RestaurantVO restaurant = userService.getRestaurantDetail(rt_num);
     // FoodCategoryVO foodCategory = userService.getFoodCategoryByRestaurant(rt_num);
     // DetailFoodCategoryVO detailFoodCategory = userService.getDetailFoodCategoryByRestaurant(rt_num);
@@ -517,13 +554,22 @@ public class UserController {
       System.out.println("리뷰 리스트 : " + reviewList);
       return "user/review/view";
   }
+
+  @GetMapping("/review/view/{rev_num}")
+  public String myReview(Model model, @PathVariable int rev_num) {
+      
+      ReviewVO review = reviewService.getReview(rev_num);
+      model.addAttribute("review", review);
+      System.out.println(review);
+      return "user/review/myReview/view";
+  }
   
   @GetMapping("/list/detail/outline")
   public String outline() {
       return "user/detail/outline";
   }
   @PostMapping("/list/news/{rt_num}")
-  public String postrestaurantDetail(@PathVariable("rt_num") int rt_num, Model model) {
+  public String postrestaurantDetail(int rt_num, Model model) {
     List<ResNewsVO> tapResNewsList = restaurantService.getTapResNewsList(rt_num);
 
     model.addAttribute("tapResNewsList", tapResNewsList);
@@ -531,7 +577,7 @@ public class UserController {
   }
   
   @PostMapping("/list/menu/{rt_num}")
-  public String postrestaurantmenu(@PathVariable("rt_num") int rt_num, Model model) {
+  public String postrestaurantmenu(int rt_num, Model model) {
     //List<MenuVO> tapMenuList = restaurantService.getTapMenuList(rt_num);
     List<MenuTypeVO> tapMenuTypeList = restaurantService.getMenuTypeList(rt_num);
     List<MenuVO> menuDivList = restaurantService.getMenuDivList(rt_num);
@@ -571,7 +617,7 @@ public class UserController {
   
   
   @PostMapping("/list/home/{rt_num}")
-  public String listHome(@PathVariable("rt_num") int rt_num, Model model) {
+  public String listHome(@PathVariable int rt_num, Model model) {
     String today = new SimpleDateFormat("E", Locale.KOREA).format(new Date());
     model.addAttribute("today", today);
     

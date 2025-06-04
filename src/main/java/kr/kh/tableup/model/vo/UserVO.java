@@ -53,4 +53,8 @@ public class UserVO{
   private String upi_file_path;
   private Date upi_upload_date;
 
+  public boolean hasUPI() {
+    return upi_file_path != null && upi_file_path.length()>0;
+}
+
 }

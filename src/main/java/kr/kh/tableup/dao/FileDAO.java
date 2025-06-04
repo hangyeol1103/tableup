@@ -6,7 +6,7 @@ public interface FileDAO {
 
 	int insertFile(FileVO fileVO);
 
-	void deleteFile(int file_num);
+	boolean deleteFile(int file_num);
 
 	
 }

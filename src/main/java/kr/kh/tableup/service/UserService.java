@@ -583,4 +583,49 @@ public class UserService {
       }
   }
 
+
+  public void updateUserProfileImage(UserVO user, MultipartFile file, RedirectAttributes redirect) {
+    try {
+        if (file == null || file.isEmpty()) {
+            redirect.addFlashAttribute("errorMsg", "업로드할 파일이 없습니다.");
+            return;
+        }
+
+        UserVO dbImg = getUserProfileImage(user.getUs_num());
+        if (dbImg != null && dbImg.hasUPI()) {
+            UploadFileUtils.delteFile(uploadPath, dbImg.getUpi_file_path());
+        }
+
+
+        String fileName = file.getOriginalFilename();
+        String filePath = UploadFileUtils.uploadFile(uploadPath, fileName, file.getBytes());
+
+        UserVO userImg = new UserVO();
+        userImg.setUs_num(user.getUs_num());
+        System.out.println("유저 번호 출력 : "+user.getUs_num());
+        userImg.setUpi_us_num(user.getUs_num());
+        userImg.setUpi_file_name(fileName);
+        userImg.setUpi_file_path(filePath);
+
+        if (dbImg == null || !dbImg.hasUPI()) {
+            System.out.println("기존에 사진이 존재하지 않아 새 이미지 등록");
+            userDAO.insertUserProfileImage(userImg);
+        } else {
+            System.out.println("기존에 존재하는 이미지를 변경");
+            userImg.setUpi_num(dbImg.getUpi_num());
+            userDAO.updateUserProfileImage(userImg);
+        }
+
+        redirect.addFlashAttribute("msg", "프로필 이미지가 변경되었습니다.");
+    } catch (Exception e) {
+        redirect.addFlashAttribute("errorMsg", "파일 업로드 중 오류가 발생했습니다.");
+    }
+  }
+
+
+
+
+  public UserVO getUserProfileImage(int us_num) {
+    return userDAO.selectUserProfileImage(us_num);
+  }
 }

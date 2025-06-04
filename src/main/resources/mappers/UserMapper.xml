@@ -556,4 +556,23 @@
 	<select id="selectDefaultResTimeList" resultType="DefaultResTimeVO">
 		select * from defaultrestime where drt_rt_num = #{rt_num}
 	</select>
+
+	<select id="selectUserProfileImage" resultType="UserVO">
+		select * from user
+		LEFT JOIN userprofileimage ON us_num = upi_us_num
+		where us_num = #{us_num}
+	</select>
+
+	<insert id="insertUserProfileImage" >
+		INSERT INTO userprofileimage (upi_us_num, upi_file_name, upi_file_path, upi_upload_date)
+		VALUES (#{upi_us_num},#{upi_file_name},#{upi_file_path}, NOW())
+	</insert>
+
+	<update id="updateUserProfileImage" >
+		UPDATE userprofileimage
+			SET upi_file_name = #{upi_file_name},
+					upi_file_path = #{upi_file_path},
+					upi_upload_date = NOW()
+		WHERE upi_num = #{upi_num}
+	</update>
 </mapper>

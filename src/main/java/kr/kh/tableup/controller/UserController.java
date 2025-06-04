@@ -295,8 +295,10 @@ public class UserController {
 
   @GetMapping("/info")
   public String myinfo(Model model, @AuthenticationPrincipal CustomUser customUser) {
-    model.addAttribute("user", customUser.getUser());
 
+    //어차피 user null이면 못들어오잖아
+    model.addAttribute("user", userService.getUserProfileImage(customUser.getUser().getUs_num()));
+    System.out.println(userService.getUserProfileImage(customUser.getUser().getUs_num()));
     // model.addAttribute("errorMsg", "에러입니다."); //post에서 이런식으로 에러 넘기면 될듯
 
     return "user/mypage/info";
@@ -747,4 +749,13 @@ public class UserController {
 
 
   
+
+    @PostMapping("/uploadProfile")
+    public String uploadProfile(@AuthenticationPrincipal CustomUser customUser,
+                                @RequestParam("profileImage") MultipartFile file,
+                                RedirectAttributes redirect) {
+        userService.updateUserProfileImage(customUser.getUser(), file, redirect);
+        return "redirect:/user/info";
+    }
+
 }

@@ -13,12 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.dao.FileDAO;
+import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.ReviewDAO;
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.DTO.FileDTO;
 import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.UserVO;
@@ -34,6 +36,9 @@ public class ReviewService {
 
 	@Autowired
 	FileDAO fileDAO;
+
+	@Autowired
+	ReservationDAO reservationDAO;
 
   @Value("${spring.path.upload}")
   String uploadPath;
@@ -172,6 +177,21 @@ public class ReviewService {
 		
 		return reviewDAO.selectReview(rev_num);
 	}
+
+
+	public int revres(int res_num, int us_num) {
+		ReservationVO reservation = reservationDAO.selectReservation(res_num);
+    if (reservation == null || reservation.getRes_us_num() != us_num) {
+        throw new IllegalStateException("해당 예약을 찾을 수 없습니다.");
+    }
+
+    ReviewVO review = reviewDAO.selectReviewByReservation(res_num);
+    if (review == null || review.getRev_num() < 0) {
+			return res_num; // 이 res_num 그대로 insert 페이지 URL에 사용
+		}
+		
+		throw new IllegalStateException("이미 리뷰를 작성한 예약입니다.");
+}
 
 /*/
 

@@ -26,4 +26,5 @@ public interface ReservationDAO {
 	
 	ReservationVO selectReservation(int res_num);
 
+
 }

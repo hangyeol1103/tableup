@@ -6,9 +6,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <head>
 	<meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>mypage_index</title>
 </head>
 <body>
@@ -36,7 +35,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             <!-- 리뷰가 없는 경우 -->
             <a th:if="${r.rev_num == 0}"
               th:href="@{/user/review/insert/{res_num}(res_num=${r.res_num})}"
-              class="btn btn-primary btn-sm">
+              class="btn btn-primary btn-sm btn-rev-input">
               리뷰 작성
             </a>
           </div>
@@ -45,6 +44,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       </th:block>
     </ul>
 
+    <script>
+      $('.btn-rev-input').click(() => {
+        
+      });
+
+    </script>
 
 
 	</main>

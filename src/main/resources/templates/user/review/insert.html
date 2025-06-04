@@ -26,20 +26,20 @@
 
   <form id="form-review" onsubmit="return false;">
     <!-- 리뷰 기본 정보 -->
+    <div class="col-md-6">
+      <label class="form-label">식당 번호</label>
+      <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reservation.res_rt_num}" readonly>
+    </div>
     <div class="row mb-3">
       <div class="col-md-6">
-        <label class="form-label">식당 번호</label>
-        <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reviewDTO?.review?.rev_rt_num}" required>
-      </div>
-      <div class="col-md-6">
         <label class="form-label">방문 일자</label>
-        <input type="date" class="form-control" name="review.rev_visit" th:value="${reviewDTO?.review?.rev_visit}" required>
+        <input type="text" class="form-control" name="review.rev_visit" th:value="${#strings.substring(reservation.res_time, 0, 10)}" readonly>
       </div>
     </div>
 
     <div class="mb-3">
       <label class="form-label">방문 인원</label>
-      <input type="number" class="form-control" name="review.rev_visitor" min="1" max="99" th:value="${reviewDTO?.review?.rev_visitor}" required>
+      <input type="number" class="form-control" name="review.rev_visitor" min="0" max="99" th:value="${reservation.res_person}" required>
     </div>
 
     <div class="mb-3">

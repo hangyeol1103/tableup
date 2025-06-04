@@ -178,7 +178,7 @@ public class UserController {
 
     UserVO user = userService.getUserById(principal.getName());
     model.addAttribute("user", user);
-    return "user/edit";
+    return "user/mypage/edit";
   }
 
   @PostMapping("/edit")

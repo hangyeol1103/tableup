@@ -43,6 +43,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 						url: url,
 						type: 'post',
 						success: function (data) {
+							console.log(data);
 							$target.html(data).data('loaded', true);
 						},
 						error: function () {

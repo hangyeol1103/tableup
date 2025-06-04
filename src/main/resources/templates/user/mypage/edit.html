@@ -36,6 +36,9 @@
             <li class="list-group-item">
                 가입일: <span th:text="${#dates.format(user.us_created, 'yyyy-MM-dd HH:mm')}"></span>
             </li>
+
+            <img th:src="'data:image/png;base64,' + ${map.qr}" alt="QR코드" style="width: 120px; height: 120px;" />
+
         </ul>
         <button type="submit" class="btn btn-success w-100">수정하기</button>
     </form>

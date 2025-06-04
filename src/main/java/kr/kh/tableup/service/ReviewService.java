@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import kr.kh.tableup.dao.FileDAO;
 import kr.kh.tableup.dao.ReservationDAO;
@@ -43,6 +44,7 @@ public class ReviewService {
   @Value("${spring.path.upload}")
   String uploadPath;
 	
+	private static final Logger logger = LoggerFactory.getLogger(ReviewService.class);
 
 
 	public void insertReview(ReviewDTO reviewDTO) {
@@ -83,9 +85,6 @@ public class ReviewService {
 		}
 
 
-
-
-
 		// 리뷰 점수 등록
 		try{
 			for(int i = 0; i<scoreList.size(); i++){	// map 말고 리뷰스코어vo 쓸건데 일단 우선 맵으로 
@@ -104,48 +103,40 @@ public class ReviewService {
 
 		// 파일 업로드
 		List<String> uploadedPaths = new ArrayList<>();
-		int[] fileNum = new int[fileList.size()];	//파일리스트 말고 파일dto 쓸건데 일단 우선 리스트로
+		int[] fileNum = new int[(fileList != null) ? fileList.size() : 0];
 		if (fileList != null && !fileList.isEmpty()) {
 			for (int i = 0; i < fileList.size(); i++) {
-				if (fileList.get(i)!=null) {
-					FileDTO fileDTO = fileList.get(i);
-			MultipartFile file = fileDTO.getUploadFile();
+				FileDTO fileDTO = fileList.get(i);
+				if (fileDTO == null || fileDTO.getUploadFile() == null || fileDTO.getUploadFile().isEmpty()) continue;
 
-		if (file == null || file.isEmpty()) continue;
+				try {
+					String filePath = UploadFileUtils.uploadFile(uploadPath, fileDTO.getUploadFile().getOriginalFilename(), fileDTO.getUploadFile().getBytes());
+					uploadedPaths.add(filePath);
 
-		try {
-			String filePath = UploadFileUtils.uploadFile(uploadPath, file.getOriginalFilename(), file.getBytes());
-			uploadedPaths.add(filePath);
+					FileVO fileVO = new FileVO();
+					fileVO.setFile_path(filePath);
+					fileVO.setFile_name(fileDTO.getFile_name());
+					fileVO.setFile_type("REVIEW");
+					fileVO.setFile_foreign(rev_num);
+					fileVO.setFile_tag(fileDTO.getFile_tag());
+					fileVO.setFile_res_num(review.getRev_rt_num());
 
-			// 파일 VO 생성
-			FileVO fileVO = new FileVO();
-			fileVO.setFile_path(filePath); 
-			fileVO.setFile_name(fileDTO.getFile_name()); 
-			fileVO.setFile_type("REVIEW"); 
-			fileVO.setFile_foreign(rev_num); 
-			fileVO.setFile_tag(fileDTO.getFile_tag()); 
-			fileVO.setFile_res_num(review.getRev_rt_num());
-
-			// DB 저장
-			fileNum[i] = fileDAO.insertFile(fileVO);
-		} catch (Exception e) {
-			System.out.println("파일 업로드 실패: " + e.getMessage());
-			for (String path : uploadedPaths) {
-        UploadFileUtils.delteFile(uploadPath, path);
-      }
-			reviewDAO.deleteReview(rev_num);
-      for (int j = 0; j < rs_num.length; j++) {
-        reviewDAO.deleteReviewScore(rs_num[j]);
-      }
-			throw new RuntimeException("첨부파일 업로드 실패" + e.getMessage());
+					fileNum[i] = fileDAO.insertFile(fileVO);
+				} catch (Exception e) {
+					System.out.println("파일 업로드 실패: " + e.getMessage());
+					for (String path : uploadedPaths) UploadFileUtils.delteFile(uploadPath, path);
+					reviewDAO.deleteReview(rev_num);
+					for (int j = 0; j < rs_num.length; j++) reviewDAO.deleteReviewScore(rs_num[j]);
+					for (int j = 0; j < fileNum.length; j++) if (fileNum[j] > 0) fileDAO.deleteFile(fileNum[j]);
+					throw new RuntimeException("첨부파일 업로드 실패: " + e.getMessage());
+				}
+			}
 		}
-	}
-}
 
 	
 
 
-}
+
 
 	}
 

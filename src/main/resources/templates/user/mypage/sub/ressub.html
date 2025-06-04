@@ -6,9 +6,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <head>
 	<meta charset="utf-8">
-  <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>mypage_index</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mypage_index</title>
 </head>
 <body>
 	<main layout:fragment="content">
@@ -27,7 +26,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
           <div class="mt-2">
             <!-- 리뷰가 있는 경우 -->
             <a th:if="${r.rev_num != 0}"
-              th:href="@{/user/review/view/{rev_num}(rev_num=${r.rev_num})}"
+              th:href="@{/user/review/detail/{rev_num}(rev_num=${r.rev_num})}"
               class="btn btn-outline-primary btn-sm">
               내 리뷰 보기
             </a>

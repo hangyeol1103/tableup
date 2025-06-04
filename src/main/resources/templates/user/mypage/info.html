@@ -23,7 +23,8 @@
   <div class="card-body">
     <div class="row mb-3">
       <div class="col-md-4 text-center">
-        <img src="/img/default_profile.png" class="rounded-circle" width="120" height="120">
+        <img th:src="@{${user.upi_file_path != null ? '/upload/' + user.upi_file_path : '/img/default_profile.png'}}" class="rounded-circle" width="120" height="120"
+     data-bs-toggle="modal" data-bs-target="#uploadProfileModal" style="cursor:pointer;">
         <h5 class="mt-2" th:text="${user.us_nickname} + '님의 개인정보'"></h5>
       </div>
       <div class="col-md-8">
@@ -91,12 +92,37 @@
   </div>
 </div>
 
+
+
+
+<div class="modal fade" id="uploadProfileModal" tabindex="-1" aria-labelledby="uploadProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form th:action="@{/user/uploadProfile}" method="post" enctype="multipart/form-data" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadProfileModalLabel">프로필 사진 변경</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body">
+        <input type="file" name="profileImage" class="form-control" accept="image/*" required>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">업로드</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 <script>
 function toggleEdit() {
   const form = document.getElementById('editForm');
   form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
 </script>
+
+
+
 
 </main>
 </body>

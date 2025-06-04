@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,7 +181,18 @@ public class UserController {
 
     UserVO user = userService.getUserById(principal.getName());
     model.addAttribute("user", user);
-    return "user/edit";
+    
+    String token = UUID.randomUUID().toString().substring(0, 6); // 인증번호 6자리
+
+    // QR 코드용 URI
+    String smsUri = "sms:01012345678?body=" + 100000000 + " " + token;
+
+    // QR 코드 생성 후 base64로 인코딩된 이미지 반환
+    String qrImage = userService.generateQrBase64(smsUri);
+
+    model.addAttribute("map", Map.of("token", token, "qr", qrImage));
+
+    return "user/mypage/edit";
   }
 
   @PostMapping("/edit")
@@ -192,6 +204,7 @@ public class UserController {
     boolean result = userService.updateUser(user);
 
     ra.addFlashAttribute("msg", result ? "회원정보가 수정되었습니다." : "수정에 실패했습니다.");
+
     return "redirect:/user/mypage";
   }
 
@@ -284,8 +297,10 @@ public class UserController {
 
   @GetMapping("/info")
   public String myinfo(Model model, @AuthenticationPrincipal CustomUser customUser) {
-    model.addAttribute("user", customUser.getUser());
 
+    //어차피 user null이면 못들어오잖아
+    model.addAttribute("user", userService.getUserProfileImage(customUser.getUser().getUs_num()));
+    System.out.println(userService.getUserProfileImage(customUser.getUser().getUs_num()));
     // model.addAttribute("errorMsg", "에러입니다."); //post에서 이런식으로 에러 넘기면 될듯
 
     return "user/mypage/info";
@@ -377,7 +392,7 @@ public class UserController {
     
     return "user/review/insertsub";
   }
-
+/*
   @PostMapping("/review/insertPost")
   //@ResponseBody
   public String insertReview(
@@ -433,7 +448,7 @@ public class UserController {
 
     return "redirect:/user/review/view";
   }
-
+*/
 
   
     @GetMapping("/list")
@@ -555,13 +570,13 @@ public class UserController {
       return "user/review/view";
   }
 
-  @GetMapping("/review/view/{rev_num}")
+  @GetMapping("/review/detail/{rev_num}")
   public String myReview(Model model, @PathVariable int rev_num) {
       
       ReviewVO review = reviewService.getReview(rev_num);
       model.addAttribute("review", review);
       System.out.println(review);
-      return "user/review/myReview/view";
+      return "user/review/detail/view";
   }
   
   @GetMapping("/list/detail/outline")
@@ -784,4 +799,13 @@ public class UserController {
 
 
   
+
+    @PostMapping("/uploadProfile")
+    public String uploadProfile(@AuthenticationPrincipal CustomUser customUser,
+                                @RequestParam("profileImage") MultipartFile file,
+                                RedirectAttributes redirect) {
+        userService.updateUserProfileImage(customUser.getUser(), file, redirect);
+        return "redirect:/user/info";
+    }
+
 }

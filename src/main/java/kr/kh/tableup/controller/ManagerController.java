@@ -1252,6 +1252,25 @@ public class ManagerController {
 		return "/manager/reservation/reservationlist";
 	}
 
+	//매니저 예약 시간 템플릿
+	@GetMapping("/restime/restimetemplate/{rt_num}")
+	public String restimeTemplate(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager,Principal principal) {
+		if(principal == null || manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+			return "redirect:/manager/login";
+		}
+
+		List<BusinessDateVO> opertimeList = managerService.getOperTimeList(rt_num);
+		System.out.println("opertimeList : "+opertimeList);
+		if (!opertimeList.isEmpty()) {
+				System.out.println("첫 번째 open: " + opertimeList.get(0).getBd_open());
+		}
+		model.addAttribute("rt_num", rt_num);
+		model.addAttribute("opertimeList", opertimeList);
+		model.addAttribute("manager", manager.getManager());
+		return "/manager/restime/restimetemplate";
+	}
+	
+
 }
 	
 

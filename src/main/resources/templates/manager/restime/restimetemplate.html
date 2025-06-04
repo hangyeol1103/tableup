@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html 
+lang="en" 
+xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/manager_layout.html}"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- jquery 코드 임시 추가 -->
+  <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+ 
+  <title>테이블업 - 매니저페이지 - 예약 시간 템플릿</title>
+
+</head>
+<body>
+	<main layout:fragment="content" class="mt-3">
+		<!-- 매장 정보가 등록이 되어 있으면-->
+		<th:block 
+            th:with="openTime=${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_open, 11, 16) : '09:00'},
+                    closeTime=${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_close, 11, 16) : '18:00'}">
+        </th:block>      
+        <div class="container">
+            <h3>예약 시간 템플릿</h3>
+            
+            <div class="btn-group mb-3" role="group">
+                <button type="button" class="btn btn-outline-primary" data-day="월">월</button>
+                <button type="button" class="btn btn-outline-primary" data-day="화">화</button>
+                <button type="button" class="btn btn-outline-primary" data-day="수">수</button>
+                <button type="button" class="btn btn-outline-primary" data-day="목">목</button>
+                <button type="button" class="btn btn-outline-primary" data-day="금">금</button>
+                <button type="button" class="btn btn-outline-primary" data-day="토">토</button>
+                <button type="button" class="btn btn-outline-primary" data-day="일">일</button>
+            </div>
+            <div id="time-template-area"></div>
+            <button class="btn btn-primary mt-3 mb-3" id="save-template-btn">저장</button>
+        </div>
+
+		<!-- 매장 정보가 등록이 되어 있지 않으면-->
+		<div th:unless="${opertimeList != null}">
+			<h3>아직 식당정보를 입력하지 않앗습니다.</h3>
+		</div>
+        <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+        
+        <script th:inline="javascript">
+            const opertimelist = [[${opertimeList}]];
+            const open = /*[['${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_open, 11, 16) : "09:00"}']]*/ '09:00';
+            const close = /*[['${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_close, 11, 16) : "18:00"}']]*/ '18:00';
+
+            console.log("opertime : ",opertimelist);
+            console.log("open:", open, "close:", close);
+
+            function generateTimeTable(day) {
+                const container = document.getElementById("time-template-area");
+                container.innerHTML = "";
+
+                const table = document.createElement("table");
+                table.className = "table table-bordered text-center align-middle";
+
+                const thead = `
+                    <thead>
+                        <tr><th colspan="4">${day} 요일 시간표</th></tr>
+                        <tr>
+                            <th>시간</th>
+                            <th>상태</th>
+                            <th>좌석 수</th>
+                            <th>테이블 수</th>
+                        </tr>
+                    </thead>`;
+                table.innerHTML = thead;
+
+                const tbody = document.createElement("tbody");
+
+                for (let hour = 0; hour < 24; hour++) {
+                    const row = document.createElement("tr");
+                    row.setAttribute("data-day", day);
+                    row.setAttribute("data-hour", hour);
+                    row.setAttribute("data-active", true); // 항상 true
+
+                    row.innerHTML = `
+                        <td>${hour}시</td>
+                        <td class="status-cell table-success" style="cursor:pointer;" data-active="true">활성화</td>
+                        <td><input type="number" class="form-control seat-input" min="0" value="0" style="width:80px;"></td>
+                        <td><input type="number" class="form-control table-input" min="0" value="0" style="width:80px;"></td>
+                    `;
+
+                    tbody.appendChild(row);
+                }
+
+                table.appendChild(tbody);
+                container.appendChild(table);
+                // 상태 셀 클릭 시 활성화/비활성화 토글
+                table.querySelectorAll(".status-cell").forEach(cell => {
+                    cell.addEventListener("click", () => {
+                        const row = cell.closest("tr");
+                        const isActive = cell.getAttribute("data-active") === "true";
+                        const seatInput = row.querySelector(".seat-input");
+                        const tableInput = row.querySelector(".table-input");
+
+                        if (isActive) {
+                            cell.classList.remove("table-success");
+                            cell.classList.add("table-secondary");
+                            cell.innerText = "비활성화";
+                            cell.setAttribute("data-active", "false");
+                            seatInput.disabled = true;
+                            tableInput.disabled = true;
+                            row.setAttribute("data-active", "false");
+                        } else {
+                            cell.classList.remove("table-secondary");
+                            cell.classList.add("table-success");
+                            cell.innerText = "활성화";
+                            cell.setAttribute("data-active", "true");
+                            seatInput.disabled = false;
+                            tableInput.disabled = false;
+                            row.setAttribute("data-active", "true");
+                        }
+                    });
+                });
+            }
+
+
+
+
+            document.getElementById("save-template-btn").addEventListener("click", () => {
+                const rt_num = /* Thymeleaf로 전달된 값 */ [[${rt_num}]];
+                const templates = [];
+
+                document.querySelectorAll("tr[data-active='true']").forEach(row => {
+                    const day = row.dataset.day;
+                    const hour = parseInt(row.dataset.hour);
+                    const start = `${String(hour).padStart(2, '0')}:00`;
+                    const end = `${String(hour + 1).padStart(2, '0')}:00`;
+                    const seat = row.querySelector(".seat-input").value;
+                    const table = row.querySelector(".table-input").value;
+
+                    templates.push({
+                        bhd_date: day,
+                        bhd_timeStart: start,
+                        bhd_timeEnd: end,
+                        bhd_seat: parseInt(seat),
+                        bhd_table: parseInt(table),
+                        bhd_rt_num: rt_num
+                    });
+                });
+
+                $.ajax({
+                    url: '/restime/restimetemplate/save',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(templates),
+                    success: function () {
+                        alert('저장 완료!');
+                    },
+                    error: function () {
+                        alert('저장 중 오류가 발생했습니다.');
+                    }
+                });
+            });
+
+
+            // 요일 버튼 클릭 시 처리
+            document.querySelectorAll('button[data-day]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const day = button.getAttribute('data-day');
+                    generateTimeTable(day);
+                });
+            });
+
+
+            
+        </script>
+        
+    </main>
+</body>
+</html>

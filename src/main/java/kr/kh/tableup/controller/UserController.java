@@ -559,7 +559,9 @@ public class UserController {
 
   @PostMapping("/list/review/{rt_num}")
   public String postMethodName(@PathVariable("rt_num") int rt_num, Model model) {
-    
+    List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
+
+    model.addAttribute("reviewList", reviewList);
     return "user/detail/review";
   }
   

@@ -81,4 +81,15 @@
 		select * from reservation where res_num = #{res_num}
 	</select>
 
+	<select id="selectFavorateCategory" resultType="int">
+		SELECT r.rt_dfc_num
+			FROM reservation rs
+				JOIN restaurant r ON rs.res_rt_num = r.rt_num
+					WHERE rs.res_time >= NOW() - INTERVAL 1 MONTH
+						AND rs.res_state != -1
+				GROUP BY r.rt_dfc_num
+			ORDER BY COUNT(*) DESC
+		LIMIT 10
+	</select>
+
 </mapper>

@@ -102,13 +102,38 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border: 1px solid #ccc;
       }
+      .flatpickr-day {
+        position: relative;
+        font-size: 14px;
+      }
+
+      .flatpickr-day .custom-badge {
+        position: absolute;
+        top: 12px; 
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        background-color: rgba(255, 255, 255, 0.0); /* 숫자와 구분 */
+        padding: 1px 4px;
+        border-radius: 8px;
+        color: green;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 5;
+        transition: transform 0.2s ease;
+      }
+
+      .flatpickr-day:hover .custom-badge {
+        transform: translateX(-50%) scale(1.3);
+        font-weight: bold;
+      }
+
     </style>
   </head>
 
   <body>
     <main layout:fragment="content" class="container">
       <!-- <div class="row text-center">
-        <div class="col-1 border">1</div>
         <div class="col-1 border">2</div>
         <div class="col-1 border">3</div>
         <div class="col-1 border">4</div>
@@ -212,6 +237,11 @@
           </div>
         </div>
       </div>
+
+      <script th:inline="javascript">
+        const remain = /*[[${remain}]]*/ {}; 
+      </script>
+      
       <script>
         flatpickr("#reservation-calendar", {
           inline: true,
@@ -219,6 +249,26 @@
           defaultDate: "today",
           dateFormat: "Y-m-d",
           locale: "ko",
+
+          enable: Object.keys(remain).filter(date => remain[date] > 0),
+
+          onDayCreate: function (dObj, dStr, fp, dayElem) {
+            const existing = dayElem.querySelector('.custom-badge');
+            if (existing) existing.remove();
+
+            const date = dayElem.dateObj.toLocaleDateString('sv-SE'); // ex) 2025-06-28
+
+            if (remain[date] != null) {
+              const badge = document.createElement("span");
+              badge.className = "custom-badge";
+              badge.textContent = remain[date] > 0 ? `${remain[date]}자리` : "마감";
+              badge.style.color = remain[date] > 0 ? "green" : "red";
+
+              dayElem.appendChild(badge);
+            }
+          },
+
+
 
           onReady: function (selectedDates, dateStr, instance) {
             document.getElementById("selected-date").textContent = dateStr;

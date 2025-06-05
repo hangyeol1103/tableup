@@ -38,6 +38,7 @@ import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -547,6 +548,8 @@ public class UserController {
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
     List<FileVO> tapFileList = restaurantService.getTapFileList(rt_num);
     List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
+    List<BusinessHourVO> businessHour = restaurantService.getBusinessHour(rt_num);
+    Map<String, Integer> remain = restaurantService.remain(rt_num);
 
     int photoCount = tapFileList.size();
     int reviewCount = reviewList.size();
@@ -557,13 +560,17 @@ public class UserController {
     //System.out.println(apiKey);
     System.out.println("restaurant: " + restaurant);
 
+    System.out.println("businessHour: "+ businessHour);
+    System.out.println("remain: "+ remain);
+
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
     model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
-
+    model.addAttribute("businessHour", businessHour);
+    model.addAttribute("remain", remain);
 
 
     model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가

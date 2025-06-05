@@ -1,28 +1,23 @@
 package kr.kh.tableup.model.vo;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 
 import lombok.Data;
 
 @Data
 public class BusinessHourVO {
-	int bh_num;
+	private int bh_num;
 	
 	@DateTimeFormat(pattern = "HH:mm")
-	LocalDateTime bh_start;
+	private LocalDateTime bh_start;
 	@DateTimeFormat(pattern = "HH:mm")
-	LocalDateTime bh_end;
-	int bh_seat_max;
-	int bh_seat_current;
-	int bh_table_max;
-	int bh_table_current;
-	boolean bh_state;
-	int bh_rt_num;
+	private LocalDateTime bh_end;
+	private int bh_seat_max;
+	private int bh_seat_current;
+	private int bh_table_max;
+	private int bh_table_current;
+	private boolean bh_state;
+	private int bh_rt_num;
 }

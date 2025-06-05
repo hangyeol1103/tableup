@@ -202,6 +202,7 @@
 		LEFT JOIN revres USING (res_num)
 		LEFT JOIN review USING (rev_num)
 		WHERE res_us_num = #{us_num} and res_state = 1
+		ORDER BY res_num DESC
 	</select>
 
 	<select id="selectFollowedRestaurant" resultType="RestaurantVO">

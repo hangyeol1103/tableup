@@ -2,6 +2,7 @@ package kr.kh.tableup.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
 import kr.kh.tableup.model.vo.MenuVO;
@@ -69,6 +71,24 @@ public class RestaurantService {
 	public List<FileVO> getTapFileList(int rt_num) {
 		return restaurantDAO.selectTapFileList(rt_num);
 	}
+
+	public List<BusinessHourVO> getBusinessHour(int rt_num) {
+		
+		return restaurantDAO.selectBusinessHour(rt_num);
+	}
+
+
+	public Map<String, Integer> remain(int rt_num) {
+    List<BusinessHourVO> list = getBusinessHour(rt_num);
+		
+		Map<String, Integer> result = new TreeMap<>();
+    for (BusinessHourVO hourVO : list) {
+			String dateKey = hourVO.getBh_start().toLocalDate().toString(); 
+			int remain = hourVO.getBh_seat_max() - hourVO.getBh_seat_current();
+			result.put(dateKey, result.getOrDefault(dateKey, 0) + remain);
+    }
+    return result;
+}
 
 	
 	

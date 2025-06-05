@@ -172,55 +172,66 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             }
 
             document.getElementById("save-template-btn").addEventListener("click", () => {
-                const rt_num = /* Thymeleaf로 전달된 값 */ [[${rt_num}]];
-                const templates = [];
+            const rt_num = [[${rt_num}]];
+            const templates = [];
 
-                document.querySelectorAll("tr[data-active='true']").forEach(row => {
-                    const day = row.dataset.day;
+            const selectedDays = Array.from(document.querySelectorAll('button[data-day].active'))
+                                    .map(btn => btn.getAttribute('data-day'));
+
+            if (selectedDays.length === 0) {
+                alert("요일을 선택하세요.");
+                return;
+            }
+
+            selectedDays.forEach(day => {
+                document.querySelectorAll("tr[data-day]").forEach(row => {
                     const hour = parseInt(row.dataset.hour);
-                    const start = `${String(hour).padStart(2, '0')}:00`;
-                    const end = `${String(hour + 1).padStart(2, '0')}:00`;
+                    const isActive = row.getAttribute("data-active") === "true";
+                    if (!isActive) return;
+
                     const seat = row.querySelector(".seat-input").value;
                     const table = row.querySelector(".table-input").value;
 
                     templates.push({
                         bhd_date: day,
-                        bhd_timeStart: start,
-                        bhd_timeEnd: end,
+                        bhd_timeStart: `${String(hour).padStart(2, '0')}:00`,
+                        bhd_timeEnd: `${String(hour + 1).padStart(2, '0')}:00`,
                         bhd_seat: parseInt(seat),
                         bhd_table: parseInt(table),
                         bhd_rt_num: rt_num
                     });
-                    
-                });
-
-                $.ajax({
-                    url: '/manager/restime/restimetemplate/save',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(templates),
-                    success: function () {
-                        alert('저장 완료!');
-                        location.reload();
-                    },
-                    error: function () {
-                        alert('저장 중 오류가 발생했습니다.');
-                    }
                 });
             });
+
+            $.ajax({
+                url: '/manager/restime/restimetemplate/save',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(templates),
+                success: function () {
+                    alert('선택된 요일 전체에 저장 완료!');
+                    location.reload();
+                },
+                error: function () {
+                    alert('저장 중 오류가 발생했습니다.');
+                }
+            });
+        });
+
 
 
             // 요일 버튼 클릭 시 처리
             document.querySelectorAll('button[data-day]').forEach(button => {
                 button.addEventListener('click', () => {
-                    document.querySelectorAll('button[data-day]').forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    const day = button.getAttribute('data-day');
-                    console.log('선택된 요일:', day);
-                    generateTimeTable(day);
-
-                     // 버튼 영역 보이기
-                    document.getElementById("bulk-control-buttons").classList.remove("d-none");
+                    button.classList.toggle('active');
+                    const selectedDays = Array.from(document.querySelectorAll('button[data-day].active'))
+                                            .map(btn => btn.getAttribute('data-day'));
+                    console.log("선택된 요일들:", selectedDays);
+                    if (selectedDays.length === 1) {
+                        generateTimeTable(selectedDays[0]); // 첫 클릭 시 하나만 띄우기
+                    } else {
+                        alert("화면에서는 하나만 편집 가능하지만, 저장은 선택된 요일 전체에 적용됩니다.");
+                    }
                 });
             });
             let currentDay = '';

@@ -55,7 +55,7 @@
     <span id="calendarTitle" class="fw-bold"></span>
     <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
   </div>
-  <button class="btn btn-outline-primary mb-3" id="openTemplateApply">영업일에 예약시간 추가</button>
+  <button class="btn btn-outline-primary mb-3" id="openTemplateApply">영업일자에 예약시간 추가</button>
   <div id="calendar"></div>
    <!-- 날짜 클릭 시 뜨는 모달 창 -->
   <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
@@ -522,6 +522,12 @@
       });
     }
 
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.body.classList.remove('modal-open');
+      document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
+    });
   </script>
 </main>
 </body>

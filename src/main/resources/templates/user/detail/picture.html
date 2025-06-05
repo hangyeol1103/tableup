@@ -109,14 +109,88 @@
         background-color: #fff;
         margin-top: 10px;
       }
+
+      .custom-tab-button {
+        background-color: #adb5bd; /* 회색 */
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 8px 20px;
+        font-weight: bold;
+        margin-right: 0.5rem;
+      }
+      .custom-tab-button:hover {
+        background-color: #5a6268; /* hover 시 어두운 회색 */
+      }
+
     </style>
   </head>
 
   <body>
     <main layout:fragment="content" class="container">
-      <div class="news-box" th:each="trn : ${tapResNewsList}">소식
-        <p th:utext="${#strings.replace(trn.rn_content, '\n', '<br/>')}"></p>
+      <div class="mt-3 p-3 bg-white rounded shadow-sm">
+        <div class="container mt-4">
+          <!-- 등록한 메뉴 타입만 뿌려준다. -->
+          <div class="mt-5 mb-3">
+            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="음식">음식</button>
+            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="내부">내부</button>
+            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="외부">외부</button>
+            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="메뉴판">메뉴판</button>
+            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="기타">기타</button>
+          </div>
+          <div class="row" id="imageContainer">
+            <div class="col-md-4 mb-3" th:each="tl : ${tapFileList}" th:data-tag="${tl.file_tag}">
+              <img th:src="@{/file{path}(path=${tl.file_path})}" class="img-fluid rounded"
+                  alt="메뉴 사진" style="width: 100%; height: 200px; object-fit: cover;">
+            </div>
+          </div>
+        </div>
       </div>
     </main>
+
+    <script>
+      function scrollToGroup(groupId) {
+        const target = document.getElementById(groupId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else{
+          console.warn("Element not found:", groupId);
+        }
+      }
+    </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+      const buttons = document.querySelectorAll('.filter-btn');
+      const images = document.querySelectorAll('#imageContainer > div');
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          const selectedTag = button.dataset.tag;
+
+          images.forEach(image => {
+            const imageTag = image.dataset.tag;
+            if (imageTag === selectedTag) {
+              image.classList.remove('d-none');
+            } else {
+              image.classList.add('d-none');
+            }
+          });
+        });
+      });
+    });
+    </script>
+
+    <script>
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tag = btn.dataset.tag;
+          document.querySelectorAll('#imageContainer > div').forEach(div => {
+            div.style.display = div.dataset.tag === tag ? 'block' : 'none';
+          });
+        });
+      });
+    </script>
+
   </body>
 </html>

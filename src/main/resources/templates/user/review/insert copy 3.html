@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>리뷰 작성</title>
   <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     .form-label { font-weight: bold; }
     .score-input { width: 80px; text-align: center; }
@@ -26,21 +26,20 @@
 
   <form id="form-review" onsubmit="return false;">
     <!-- 리뷰 기본 정보 -->
-    <div class="col-md-6">
-      <label class="form-label">식당 번호</label>
-      <input type="number" class="form-control d-none" name="review.res_num" th:value="${reservation.res_num}" readonly>
-      <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reservation.res_rt_num}" readonly>
-    </div>
     <div class="row mb-3">
       <div class="col-md-6">
+        <label class="form-label">식당 번호</label>
+        <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reviewDTO?.review?.rev_rt_num}" required>
+      </div>
+      <div class="col-md-6">
         <label class="form-label">방문 일자</label>
-        <input type="text" class="form-control" name="review.rev_visit" th:value="${#strings.substring(reservation.res_time, 0, 10)}" readonly>
+        <input type="date" class="form-control" name="review.rev_visit" th:value="${reviewDTO?.review?.rev_visit}" required>
       </div>
     </div>
 
     <div class="mb-3">
       <label class="form-label">방문 인원</label>
-      <input type="number" class="form-control" name="review.rev_visitor" min="0" max="99" th:value="${reservation.res_person}" required>
+      <input type="number" class="form-control" name="review.rev_visitor" min="1" max="99" th:value="${reviewDTO?.review?.rev_visitor}" required>
     </div>
 
     <div class="mb-3">
@@ -117,7 +116,6 @@
       const $rev_visitor = $('input[name="review.rev_visitor"]');
       const $rev_content = $('#rev_content');
       const $file_upload_area = $('#file-upload-area');
-      const $res_num = $('input[name="review.res_num"]');
 
 
       $('#btn-resinfo').click(() => {
@@ -133,7 +131,7 @@
 
         const $group = $(`
           <div class="file-upload-group mb-2">
-            <input type="file" class="form-control mb-1" name="files" accept="image/*">
+            <input type="file" class="form-control mb-1" accept="image/*">
           </div>
         `);
         $file_upload_area.append($group);
@@ -170,8 +168,7 @@
           rev_rt_num: $rev_rt_num.val(),
           rev_visit: $rev_visit.val(),
           rev_visitor: $rev_visitor.val(),
-          rev_content: $rev_content.val(),
-          res_num: $res_num.val()
+          rev_content: $rev_content.val()
         };
       }
       function getScoreList() {
@@ -186,27 +183,17 @@
       }
       function getFileList(files) {
         const fileList = [];
-
-        $('#file-upload-area .file-upload-group').each(function () {
-          const fileInput = this.querySelector('input[type="file"]');
-          const file = fileInput.files[0];
-
-          const fileNameInput = this.querySelector('input[name="fileNames"]');
-          const tagSelect = this.querySelector('select[name="fileTags"]');
-
-          if (file && fileNameInput && tagSelect && fileNameInput.value && tagSelect.value) {
-            files.push(file); // MultipartFile 목록에 추가
-
-            fileList.push({
-              file_name: fileNameInput.value,
-              file_tag: tagSelect.value
-            });
-          }
+        $file_upload_area.find('.file-upload-group').each(function () {
+          const f = this.querySelector('input[type="file"]').files[0];
+          let name = this.querySelector('input[name="fileNames"]')?.value;
+          const tag = this.querySelector('select[name="fileTags"]')?.value;
+          if (f && name && tag) {
+            files.push(f);
+            fileList.push({ file_name: name, file_tag: tag });
+          }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
         });
-
         return fileList;
       }
-
 
       function submitReview(preview, url) {
         const files = [];

@@ -143,7 +143,7 @@ public interface ManagerDAO {
 
 	List<FileVO> selectFileList(int rm_rt_num);
 
-	void deletefile(int rt_num);
+	void deletefileByForeign(int foreign, String type);
 
 	boolean updateRestaurant(RestaurantVO restaurant);
 

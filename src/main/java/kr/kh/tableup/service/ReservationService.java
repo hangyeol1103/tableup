@@ -1,10 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
-
-import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,19 +136,16 @@ public class ReservationService {
 			return businessHourDAO.updateCurrentSeat(businessHour.getBh_num(), businessHour.getBh_seat_current() - dbReservation.getRes_person());
 		}
 
-		//자기 매장에 등록된 예약 리스트 출력
-		public List<ReservationVO> getReservations(int rt_num) {
-			if(rt_num == 0){
-				return null;
-			}
-			return reservationDAO.selectReservations(rt_num);
+		public ReservationVO getReservation(int res_num) {
+			return reservationDAO.selectReservation(res_num);		
 		}
 
-		public ReservationVO getUserReservation(int res_num) {
-			if(res_num==0){
-				return null;
-			}
-			return reservationDAO.selectReservation(res_num);
+		public int[] favoriteCategory() {
+			return reservationDAO.selectFavorateCategory();
+		}
+
+		public int[] favoriteRegion() {
+			return reservationDAO.selectFavorateRegion();
 		}
 
 }

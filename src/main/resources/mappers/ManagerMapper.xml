@@ -368,12 +368,12 @@
 
 	<!-- 등록한 매장 대표 이미지 모두 출력 -->
 	<select id="selectFileList" resultType = "FileVO">
-		select * from file where file_res_num = #{rm_rt_num}
+		select * from file where file_res_num = #{rm_rt_num} AND File_type = 'RESTAURANTDETAIL'
 	</select>
 
 	<!-- 매장에 등록된 대표이미지 삭제-->
-	<delete id="deletefile">
-		delete from file where file_res_num = #{rt_num} and file_type="RESTAURANTDETAIL"
+	<delete id="deletefileByForeign">
+		delete from file where file_res_num = #{foreign} and file_type = #{type}
 	</delete>
 
 	<update id="updateRestaurant">

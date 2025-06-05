@@ -109,13 +109,47 @@
         background-color: #fff;
         margin-top: 10px;
       }
+
+      .img-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3장씩 정렬 */
+        gap: 15px;
+      }
+
+      .img-grid img {
+        width: 100%;
+        aspect-ratio: 1 / 1;       /* 정사각형 비율 유지 */
+        object-fit: cover;         /* 이미지 비율 유지하며 잘라냄 */
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
     </style>
   </head>
 
   <body>
     <main layout:fragment="content" class="container">
-      <div class="news-box" th:each="trn : ${tapResNewsList}">소식
-        <p th:utext="${#strings.replace(trn.rn_content, '\n', '<br/>')}"></p>
+      <div th:each="rvl : ${reviewList}" class="mb-4">
+        <!-- 사용자명 -->
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="fw-bold" th:text="${rvl.us_name}"></div>
+          <div class="text-muted small" th:text="${#dates.format(rvl.rev_created, 'yyyy.MM.dd')}"></div>
+        </div>
+        <!-- 별점 리스트 -->
+        <div class="d-flex flex-wrap mt-2">
+          <span th:each="score : ${rvl.scoreList}" class="me-4">
+            <span th:text="${score.st_category}"></span>
+            <i class="bi bi-star-fill text-warning"></i>
+            <span th:text="${score.rs_score}"></span>
+          </span>
+        </div>
+        <div th:if="${rvl.fileList != null and !rvl.fileList.isEmpty()}">
+          <div class="img-grid">
+            <div th:each="file : ${rvl.fileList}" class="mt-2" th:if="${file.file_path != null and !#strings.isEmpty(file.file_path)}">
+              <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진">
+            </div>
+          </div>
+        </div>
+        <p th:utext="${#strings.replace(rvl.rev_content, '\n', '<br/>')}" class="mt-3"></p>
       </div>
     </main>
   </body>

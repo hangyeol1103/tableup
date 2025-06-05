@@ -123,7 +123,7 @@ public class ManagerService {
 			//파일 업로드
 			String uploadfilename=UploadFileUtils.uploadFile(uploadPath, fi_ori_name, file.getBytes());
 			
-			FileVO fileVO =new FileVO(uploadfilename, fi_ori_name , "RESTAURANTDETAIL", String.valueOf(rt_num), "내부", rt_num);
+			FileVO fileVO =new FileVO(0,uploadfilename, fi_ori_name , "RESTAURANTDETAIL", /*String.valueOf(rt_num)*/rt_num, "내부", rt_num);
 			managerDAO.insertFile(fileVO);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -139,7 +139,7 @@ public class ManagerService {
 			System.out.println("수정 실패!");
 			return false;
 		}
-		managerDAO.deletefile(restaurant.getRt_num());
+		managerDAO.deletefileByForeign(restaurant.getRt_num(), "RESTAURANTDETAIL");
 		//매장 이미지 작업
 		uploadFileList(restaurant.getRt_num(), fileList);
 		

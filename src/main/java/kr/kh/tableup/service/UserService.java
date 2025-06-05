@@ -1,7 +1,9 @@
 package kr.kh.tableup.service;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -10,12 +12,20 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.PageMaker;
@@ -267,7 +277,7 @@ public class UserService {
         String uploadFileName = UploadFileUtils.uploadFile(uploadPath, newFileName, file.getBytes(), "review");
 
         // DB에 넣을 FileVO 생성
-        FileVO fileVO = new FileVO(uploadFileName, inputFileName, "REVIEW", String.valueOf(review.getRev_num()), fileTag, review.getRev_rt_num());
+        FileVO fileVO = new FileVO(0,uploadFileName, inputFileName, "REVIEW", /*String.valueOf(review.getRev_num())*/review.getRev_num(), fileTag, review.getRev_rt_num());
         // fileVO.setFile_name(inputFileName); // 사용자가 입력한 이름
         // fileVO.setFile_path(uploadFileName); // 서버 저장 경로
         // fileVO.setFile_type("REVIEW");
@@ -560,6 +570,62 @@ public class UserService {
   }
 
 
+  public String generateQrBase64(String content) {
+      try {
+          BitMatrix matrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, 200, 200);
+          BufferedImage image = MatrixToImageWriter.toBufferedImage(matrix);
+
+          ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          ImageIO.write(image, "png", baos);
+          return Base64.getEncoder().encodeToString(baos.toByteArray());
+      } catch (Exception e) {
+          throw new RuntimeException("QR 생성 실패", e);
+      }
+  }
 
 
+  public void updateUserProfileImage(UserVO user, MultipartFile file, RedirectAttributes redirect) {
+    try {
+        if (file == null || file.isEmpty()) {
+            redirect.addFlashAttribute("errorMsg", "업로드할 파일이 없습니다.");
+            return;
+        }
+
+        UserVO dbImg = getUserProfileImage(user.getUs_num());
+        if (dbImg != null && dbImg.hasUPI()) {
+            UploadFileUtils.delteFile(uploadPath, dbImg.getUpi_file_path());
+        }
+
+
+        String fileName = file.getOriginalFilename();
+        String filePath = UploadFileUtils.uploadFile(uploadPath, fileName, file.getBytes());
+
+        UserVO userImg = new UserVO();
+        userImg.setUs_num(user.getUs_num());
+        System.out.println("유저 번호 출력 : "+user.getUs_num());
+        userImg.setUpi_us_num(user.getUs_num());
+        userImg.setUpi_file_name(fileName);
+        userImg.setUpi_file_path(filePath);
+
+        if (dbImg == null || !dbImg.hasUPI()) {
+            System.out.println("기존에 사진이 존재하지 않아 새 이미지 등록");
+            userDAO.insertUserProfileImage(userImg);
+        } else {
+            System.out.println("기존에 존재하는 이미지를 변경");
+            userImg.setUpi_num(dbImg.getUpi_num());
+            userDAO.updateUserProfileImage(userImg);
+        }
+
+        redirect.addFlashAttribute("msg", "프로필 이미지가 변경되었습니다.");
+    } catch (Exception e) {
+        redirect.addFlashAttribute("errorMsg", "파일 업로드 중 오류가 발생했습니다.");
+    }
+  }
+
+
+
+
+  public UserVO getUserProfileImage(int us_num) {
+    return userDAO.selectUserProfileImage(us_num);
+  }
 }

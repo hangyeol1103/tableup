@@ -6,8 +6,10 @@
 <head>
   <meta charset="utf-8">
   <title>리뷰 작성</title>
-  <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/summernote/summernote-bs5.js"></script>
+  <link rel="stylesheet" href="/summernote/summernote-bs5.css">
+  <script src="/summernote/lang/summernote-ko-KR.js"></script>
   <style>
     .form-label { font-weight: bold; }
     .score-input { width: 80px; text-align: center; }
@@ -26,21 +28,20 @@
 
   <form id="form-review" onsubmit="return false;">
     <!-- 리뷰 기본 정보 -->
-    <div class="col-md-6">
-      <label class="form-label">식당 번호</label>
-      <input type="number" class="form-control d-none" name="review.res_num" th:value="${reservation.res_num}" readonly>
-      <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reservation.res_rt_num}" readonly>
-    </div>
     <div class="row mb-3">
       <div class="col-md-6">
+        <label class="form-label">식당 번호</label>
+        <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reviewDTO?.review?.rev_rt_num}" required>
+      </div>
+      <div class="col-md-6">
         <label class="form-label">방문 일자</label>
-        <input type="text" class="form-control" name="review.rev_visit" th:value="${#strings.substring(reservation.res_time, 0, 10)}" readonly>
+        <input type="date" class="form-control" name="review.rev_visit" th:value="${reviewDTO?.review?.rev_visit}" required>
       </div>
     </div>
 
     <div class="mb-3">
       <label class="form-label">방문 인원</label>
-      <input type="number" class="form-control" name="review.rev_visitor" min="0" max="99" th:value="${reservation.res_person}" required>
+      <input type="number" class="form-control" name="review.rev_visitor" min="1" max="99" th:value="${reviewDTO?.review?.rev_visitor}" required>
     </div>
 
     <div class="mb-3">
@@ -50,14 +51,16 @@
 
     <!-- 평점 입력 -->
     <div class="mb-4">
-      <label class="form-label">평점</label>
+      <label class="form-label">평점 입력</label>
       <div class="d-flex flex-wrap gap-3">
         <div th:each="scoreType : ${scoreTypeList}" class="d-flex align-items-center me-3">
-          <label th:for="'st_' + ${scoreType.st_num}" th:text="${scoreType.st_category}" class="me-2"></label>
-          <input type="number" class="form-control score-input"
-                 th:id="'st_' + ${scoreType.st_num}"
-                 th:name="rs_scores"
-                 th:attr="data-st-num=${scoreType.st_num}" value="5" min="1" max="5" required>
+          <label th:for="'scoreList[' + ${scoreType.st_num} + '].value'" th:text="${scoreType.st_category}" class="me-2"></label>
+          <input type="number"
+                class="form-control score-input"
+                th:id="'scoreList[' + ${scoreType.st_num} + '].value'"
+                th:name="'scoreList[' + ${scoreType.st_num} + '].value'"
+                min="1" max="5" value="5" required>
+
         </div>
       </div>
     </div>
@@ -110,33 +113,43 @@
     </div>
   </div>
 
+  <!-- 📜 스크립트 -->
   <script>
-  $(function () {
-      const $rev_rt_num = $('input[name="review.rev_rt_num"]');
-      const $rev_visit = $('input[name="review.rev_visit"]');
-      const $rev_visitor = $('input[name="review.rev_visitor"]');
-      const $rev_content = $('#rev_content');
-      const $file_upload_area = $('#file-upload-area');
-      const $res_num = $('input[name="review.res_num"]');
+    $(function () {
+      const $revRtNum = $('input[name="review.rev_rt_num"]');
+      const $revVisit = $('input[name="review.rev_visit"]');
+      const $revVisitor = $('input[name="review.rev_visitor"]');
+      const $revContent = $('#rev_content');
+      const $fileUploadArea = $('#file-upload-area');
 
+      $revContent.summernote({
+        placeholder: '내용을 입력하세요.',
+        height: 400,
+        lang: 'ko-KR'
+      });
 
       $('#btn-resinfo').click(() => {
-        const rtNum = $rev_rt_num.val();
+        const rtNum = $revRtNum.val();
         if (!rtNum) return alert("식당 번호를 입력하세요.");
-        window.open(`/user/list/detail/${rtNum}`, '_blank');
+        fetch(`/user/review/insertsub?rt_num=${rtNum}`)
+          .then(res => res.text())
+          .then(html => {
+            $('#resModalBody').html(html);
+            new bootstrap.Modal('#resModal').show();
+          });
       });
 
       $('#add-file-btn').click(() => {
-        const incomplete = [...$file_upload_area.find('input[type="file"]')]
+        const incomplete = [...$fileUploadArea.find('input[type="file"]')]
           .some(input => !input.files.length);
         if (incomplete) return alert("기존 파일 입력을 먼저 완료하세요.");
 
         const $group = $(`
           <div class="file-upload-group mb-2">
-            <input type="file" class="form-control mb-1" name="files" accept="image/*">
+            <input type="file" class="form-control mb-1" accept="image/*">
           </div>
         `);
-        $file_upload_area.append($group);
+        $fileUploadArea.append($group);
 
         $group.find('input[type="file"]').change(function () {
           if ($group.find('input[name="fileNames"]').length) return;
@@ -144,13 +157,8 @@
           const file = this.files[0];
           if (!file) return;
 
-          let name2 = file.name;
-          const index = name2.lastIndexOf('.');
-          if (index > 0) name2 = name2.substring(0, index);
-
-
           $group.append(`
-            <input type="text" class="form-control mb-1" name="fileNames" value="${name2}" placeholder="파일 이름" required>
+            <input type="text" class="form-control mb-1" name="fileNames" value="${file.name}" placeholder="파일 이름" required>
             <select class="form-select mb-1" name="fileTags" required>
               <option value="">태그 선택</option>
               <option value="내부">내부</option>
@@ -167,46 +175,33 @@
 
       function getReviewData() {
         return {
-          rev_rt_num: $rev_rt_num.val(),
-          rev_visit: $rev_visit.val(),
-          rev_visitor: $rev_visitor.val(),
-          rev_content: $rev_content.val(),
-          res_num: $res_num.val()
+          rev_rt_num: $revRtNum.val(),
+          rev_visit: $revVisit.val(),
+          rev_visitor: $revVisitor.val(),
+          rev_content: $revContent.summernote('code')
         };
       }
       function getScoreList() {
-        return $('.score-input').map(function () {
-          const $input = $(this);
-          const st_num = parseInt($input.data('st-num'));
-          const st_category = $input.closest('div.d-flex').find('label').first().text().trim(); // 해당 라벨의 텍스트
-          const rs_score = parseInt($input.val());
-
-          return { st_num, st_category, rs_score };
-        }).get();
+        const list = [];
+        $('input[name^="scoreList["]').each(function () {
+          const id = $(this).attr('name').match(/\[(\d+)]/)[1];
+          list.push({ st_num: parseInt(id), value: parseInt($(this).val()) });
+        });
+        return list;
       }
       function getFileList(files) {
         const fileList = [];
-
-        $('#file-upload-area .file-upload-group').each(function () {
-          const fileInput = this.querySelector('input[type="file"]');
-          const file = fileInput.files[0];
-
-          const fileNameInput = this.querySelector('input[name="fileNames"]');
-          const tagSelect = this.querySelector('select[name="fileTags"]');
-
-          if (file && fileNameInput && tagSelect && fileNameInput.value && tagSelect.value) {
-            files.push(file); // MultipartFile 목록에 추가
-
-            fileList.push({
-              file_name: fileNameInput.value,
-              file_tag: tagSelect.value
-            });
-          }
+        $fileUploadArea.find('.file-upload-group').each(function () {
+          const f = this.querySelector('input[type="file"]').files[0];
+          const name = this.querySelector('input[name="fileNames"]')?.value;
+          const tag = this.querySelector('select[name="fileTags"]')?.value;
+          if (f && name && tag) {
+            files.push(f);
+            fileList.push({ file_name: name, file_tag: tag });
+          }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
         });
-
         return fileList;
       }
-
 
       function submitReview(preview, url) {
         const files = [];
@@ -232,7 +227,7 @@
               new bootstrap.Modal('#previewModal').show();
             } else {
               alert("리뷰 등록 완료!");
-              location.href = "/user/review/view";
+              location.href = "/user/review/list";
             }
           },
           error: xhr => {
@@ -244,7 +239,7 @@
 
       $('.btn-sample').click(() => submitReview(true, '/user/review/insertSamplePost'));
       $('.btn-submit').click(() => submitReview(false, '/user/review/insertFinalPost'));
-  });
+    });
   </script>
 </main>
 </body>

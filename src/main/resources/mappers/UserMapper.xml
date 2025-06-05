@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.UserDAO">
 	
-	
 	<!-- ReviewScoreVO + ReviewVO -->
 	<resultMap id="ReviewMap" type="ReviewVO">
 		<!-- ReviewVO -->
@@ -138,7 +137,9 @@
 	</select>
 
 	<select id="selectUser" resultType="userVO">
-		select * from User where us_num = #{us_num}
+		select * from User 
+		LEFT JOIN userprofileimage ON upi_us_num = us_num
+		where us_num = #{us_num}
 	</select>
 	<select id="selectUserById" resultType="userVO">
 		select * from User where us_id = #{us_id}
@@ -195,10 +196,12 @@
 	</select>
 
 	<select id="selectReservationByUser" resultType="ReservationVO">
-		SELECT * FROM Reservation 
+		SELECT Reservation.*, user.*,restaurant.rt_name,review.rev_num FROM Reservation 
 		LEFT JOIN user ON us_num = res_us_num
 		LEFT JOIN restaurant ON rt_num = res_rt_num
-		WHERE res_us_num = #{us_num}
+		LEFT JOIN revres USING (res_num)
+		LEFT JOIN review USING (rev_num)
+		WHERE res_us_num = #{us_num} and res_state = 1
 	</select>
 
 	<select id="selectFollowedRestaurant" resultType="RestaurantVO">
@@ -552,4 +555,23 @@
 	<select id="selectDefaultResTimeList" resultType="DefaultResTimeVO">
 		select * from defaultrestime where drt_rt_num = #{rt_num}
 	</select>
+
+	<select id="selectUserProfileImage" resultType="UserVO">
+		select * from user
+		LEFT JOIN userprofileimage ON us_num = upi_us_num
+		where us_num = #{us_num}
+	</select>
+
+	<insert id="insertUserProfileImage" >
+		INSERT INTO userprofileimage (upi_us_num, upi_file_name, upi_file_path, upi_upload_date)
+		VALUES (#{upi_us_num},#{upi_file_name},#{upi_file_path}, NOW())
+	</insert>
+
+	<update id="updateUserProfileImage" >
+		UPDATE userprofileimage
+			SET upi_file_name = #{upi_file_name},
+					upi_file_path = #{upi_file_path},
+					upi_upload_date = NOW()
+		WHERE upi_num = #{upi_num}
+	</update>
 </mapper>

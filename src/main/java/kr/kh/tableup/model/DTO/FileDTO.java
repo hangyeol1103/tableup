@@ -15,5 +15,5 @@ public class FileDTO {
 	
 	int file_res_num;
 
-	MultipartFile file;
+	MultipartFile uploadFile;
 }

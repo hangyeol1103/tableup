@@ -98,6 +98,12 @@ public interface UserDAO {
 
 	List<DefaultResTimeVO> selectDefaultResTimeList(@Param("rt_num") int rt_num);
 
+	UserVO selectUserProfileImage(int us_num);
+
+	void insertUserProfileImage(UserVO user);
+
+	void updateUserProfileImage(UserVO user);
+
 
 
 }

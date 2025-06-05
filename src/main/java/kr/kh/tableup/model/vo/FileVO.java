@@ -1,32 +1,20 @@
 package kr.kh.tableup.model.vo;
 
-import org.springframework.web.multipart.MultipartFile;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class FileVO {
 	int file_num;
 	String file_path;
 	String file_name;
 	String file_type;
-	String file_foreign;
+	int file_foreign;
 	String file_tag;
 	
 	int file_res_num;
 
-	//MultipartFile file; // 파일 업로드를 위한 MultipartFile 객체
-
-	public FileVO(String file_path, String file_name, 
-								String file_type, String file_foreign,
-								String file_tag, int file_res_num){
-		this.file_path = file_path;
-		this.file_name = file_name;
-		this.file_type = file_type;
-		this.file_foreign = file_foreign;
-		this.file_tag = file_tag;
-		this.file_res_num = file_res_num;
-	}
 }

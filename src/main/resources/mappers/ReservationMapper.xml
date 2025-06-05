@@ -104,6 +104,7 @@
 			ORDER BY COUNT(*) DESC
 		LIMIT 10
 	</select>
+	
 	<!-- 매장의 기본키를 가진 예약 정보를 가져오는 쿼리 -->
 	<select id="selectReservationsList" resultMap="ReservationMap">
 		select * from reservation

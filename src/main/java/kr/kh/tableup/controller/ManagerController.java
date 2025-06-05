@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
@@ -95,17 +96,36 @@ public class ManagerController {
 
 	@GetMapping("/signup")
 	public String manager_signup(Model model) {
+		List<RestaurantManagerVO> managerList = managerService.getManagerList();
+		
+		model.addAttribute("managerList", managerList);
 		model.addAttribute("url", "/signup");
 		return "/manager/signup";
 	}
 	
 	@PostMapping("/signup")
-	public String postMethodName(RestaurantManagerVO rm) {
-		if(managerService.insertManager(rm)){
+	public String postMethodName(RestaurantManagerVO rm, RedirectAttributes ra) {
+		String signUp = managerService.insertManager(rm);
+		if(signUp == null){
 			return "redirect:/manager/login";
 		}
+		System.out.println(signUp);
+		ra.addFlashAttribute("signupError",signUp);
 		return "redirect:/manager/signup";
 	}
+
+	//아이디 중복 체크
+	@GetMapping("/check/id")
+  public boolean checkId(@RequestParam("id") String id) {
+      return !managerService.isExistId(id); // true: 사용 가능
+  }
+
+	//사업자 번호 중복 체크
+  @GetMapping("/check/business")
+  public boolean checkBusiness(@RequestParam("business") String business) {
+      return !managerService.isExistBusiness(business); // true: 사용 가능
+  }
+
 	
 	@GetMapping("/restaurant/restaurant/{rm_id}")
 	public String restaurantPage(@PathVariable("rm_id") String rm_id,Model model, Principal principal) {

@@ -46,9 +46,9 @@ public class ManagerService {
 	@Autowired
   PasswordEncoder passwordEncoder;
 	
-	public boolean insertManager(RestaurantManagerVO rm) {
+	public String insertManager(RestaurantManagerVO rm) {
 		if(rm == null){
-			return false;
+			return "잘못된 접근입니다.";
 		}
 		List<RestaurantManagerVO> dbManager = managerDAO.selectManagerList();
 
@@ -56,22 +56,27 @@ public class ManagerService {
 			// 아이디 중복 체크
 			if(db.getRm_id().equals(rm.getRm_id())){
 				System.out.println("중복된 아이디 입니다.");
-				return false;
+				return "중복된 아이디 입니다.";
 			}
 			// 사업자 번호 중복 체크
 			if(db.getRm_business().equals(rm.getRm_business())){
 				System.out.println("중복된 사업자 번호 입니다.");
-				return false;
+				return "중복된 사업자 번호 입니다.";
 			}
 			// 전화 번호 중복 체크
 			if(db.getRm_phone().equals(rm.getRm_phone())){
 				System.out.println("중복된 전화 번호 입니다.");
-				return false;
+				return "중복된 전화 번호 입니다.";
 			}
 		}
 
 		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
-		return managerDAO.insertManager(rm);
+		boolean res=managerDAO.insertManager(rm);
+		return res ? null : "회원가입에 실패했습니다.";
+	}
+
+	public List<RestaurantManagerVO> getManagerList() {
+		return managerDAO.selectManagerList();
 	}
 
 	public RestaurantManagerVO getManagerId(String rm_id) {
@@ -738,17 +743,16 @@ public class ManagerService {
 			}
 	}
 
+	public boolean isExistId(String id) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'isExistId'");
+	}
+
+	public boolean isExistBusiness(String business) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'isExistBusiness'");
+	}
 
 
-
-
-
-
-
-	
-
-	
-
-	
 
 }

@@ -23,8 +23,11 @@
   <div class="card-body">
     <div class="row mb-3">
       <div class="col-md-4 text-center">
-        <img th:src="@{${user.upi_file_path != null ? '/upload/' + user.upi_file_path : '/img/default_profile.png'}}" class="rounded-circle" width="120" height="120"
-     data-bs-toggle="modal" data-bs-target="#uploadProfileModal" style="cursor:pointer;">
+        <img th:src="${user.upi_file_path != null && !#strings.isEmpty(user.upi_file_path) 
+                    ? '/file' + user.upi_file_path 
+                    : '/resources/static/img/index/profile.png'}"
+          class="rounded-circle" width="120" height="120"
+          data-bs-toggle="modal" data-bs-target="#uploadProfileModal" style="cursor:pointer;">
         <h5 class="mt-2" th:text="${user.us_nickname} + '님의 개인정보'"></h5>
       </div>
       <div class="col-md-8">

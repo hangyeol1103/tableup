@@ -38,6 +38,8 @@ import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -510,6 +512,7 @@ public class UserController {
     // System.out.println(cri.getMaxPrice());
     // System.out.println(cri.getOrderBy());
     List<RestaurantVO> list = userService.getRestaurantList(cri);
+    System.out.println("filepath:"+list.get(0).getFile_path());
     //System.out.println(list);
     // 서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청
     PageMaker pm = userService.getPageMaker(cri);
@@ -544,27 +547,35 @@ public class UserController {
     TagVO tag = userService.getTagByRestaurant(rt_num);
     List<FacilityVO> facilityList = userService.getFacilityList();
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
+
+
+
     List<FileVO> tapFileList = restaurantService.getTapFileList(rt_num);
     List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
+    List<BusinessHourVO> businessHour = restaurantService.getBusinessHour(rt_num);
+    List<BusinessDateVO> businessDate = restaurantService.getBusinessDate(rt_num);
+    Map<String, Integer> remain = restaurantService.remain(rt_num);
 
     int photoCount = tapFileList.size();
     int reviewCount = reviewList.size();
-
-    model.addAttribute("photoCount", photoCount);
-    model.addAttribute("reviewCount", reviewCount);
-
+    
     //System.out.println(apiKey);
-    System.out.println("restaurant: " + restaurant);
-
+    // System.out.println("restaurant: " + restaurant);
+    // System.out.println("businessHour: "+ businessHour);
+    // System.out.println("remain: "+ remain);
+    
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
     model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
+    model.addAttribute("businessHour", businessHour);
+    model.addAttribute("businessDate", businessDate);
+    model.addAttribute("remain", remain);
 
-
-
+    model.addAttribute("photoCount", photoCount);
+    model.addAttribute("reviewCount", reviewCount);
     model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가
     return "user/detail/detail";
   }

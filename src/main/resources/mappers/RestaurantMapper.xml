@@ -185,4 +185,17 @@
 		ORDER BY FIELD(file_tag, '음식', '내부', '외부', '메뉴판', '기타')
 	</select>
 
+	<select id="selectBusinessHour" resultType="BusinessHourVO">
+		select * from BusinessHour 
+		where bh_rt_num = #{rt_num}
+		and bh_start &gt;= NOW()
+		and bh_start &lt;= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+		and bh_state = 0
+	</select>
+
+	<select id="selectBusinessDate" resultType="BusinessDateVO">
+		select * from businessdate 
+		where bd_rt_num = #{rt_num}
+	</select>
+
 </mapper>

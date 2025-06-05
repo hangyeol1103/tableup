@@ -510,6 +510,7 @@ public class UserController {
     // System.out.println(cri.getMaxPrice());
     // System.out.println(cri.getOrderBy());
     List<RestaurantVO> list = userService.getRestaurantList(cri);
+    System.out.println("filepath:"+list.get(0).getFile_path());
     //System.out.println(list);
     // 서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청
     PageMaker pm = userService.getPageMaker(cri);

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.MenuTypeVO;
@@ -44,6 +45,8 @@ public interface RestaurantDAO {
 		List<FileVO> selectTapFileListCount(@Param("rt_num") int rt_num);
 
 		List<BusinessHourVO> selectBusinessHour(int rt_num);
+
+		List<BusinessDateVO> selectBusinessDate(int rt_num);
 
 }
 

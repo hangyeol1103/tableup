@@ -38,6 +38,7 @@ import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
@@ -546,23 +547,23 @@ public class UserController {
     TagVO tag = userService.getTagByRestaurant(rt_num);
     List<FacilityVO> facilityList = userService.getFacilityList();
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
+
+
+
     List<FileVO> tapFileList = restaurantService.getTapFileList(rt_num);
     List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
     List<BusinessHourVO> businessHour = restaurantService.getBusinessHour(rt_num);
+    List<BusinessDateVO> businessDate = restaurantService.getBusinessDate(rt_num);
     Map<String, Integer> remain = restaurantService.remain(rt_num);
 
     int photoCount = tapFileList.size();
     int reviewCount = reviewList.size();
-
-    model.addAttribute("photoCount", photoCount);
-    model.addAttribute("reviewCount", reviewCount);
-
+    
     //System.out.println(apiKey);
-    System.out.println("restaurant: " + restaurant);
-
-    System.out.println("businessHour: "+ businessHour);
-    System.out.println("remain: "+ remain);
-
+    // System.out.println("restaurant: " + restaurant);
+    // System.out.println("businessHour: "+ businessHour);
+    // System.out.println("remain: "+ remain);
+    
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
@@ -570,9 +571,11 @@ public class UserController {
     model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
     model.addAttribute("businessHour", businessHour);
+    model.addAttribute("businessDate", businessDate);
     model.addAttribute("remain", remain);
 
-
+    model.addAttribute("photoCount", photoCount);
+    model.addAttribute("reviewCount", reviewCount);
     model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가
     return "user/detail/detail";
   }

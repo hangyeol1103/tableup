@@ -193,4 +193,9 @@
 		and bh_state = 0
 	</select>
 
+	<select id="selectBusinessDate" resultType="BusinessDateVO">
+		select * from businessdate 
+		where bd_rt_num = #{rt_num}
+	</select>
+
 </mapper>

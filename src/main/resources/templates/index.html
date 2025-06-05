@@ -60,16 +60,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 						<button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center gap-2" type="button"
 										id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
 							<span th:if="${user != null}">
-								<img th:if="${user.upi_file_path != null and !#strings.isEmpty(user.upi_file_path)}"
-											th:src="@{'/uploads/' + ${user.upi_file_path}}"
-											alt="프로필 이미지"
-											class="rounded-circle"
-											style="width:30px; height:30px; object-fit:cover;">
-								<i th:if="${user.upi_file_path == null or #strings.isEmpty(user.upi_file_path)}"
-									class="bi bi-person-circle fs-4"></i>
+								<img th:src="@{/file{path}(path=${user.upi_file_path})}" onerror="this.onerror=null;this.src='/resources/static/img/index/profile.png';"
+									class="rounded-circle" style="width:30px; height:30px; object-fit:cover;">
+								<i th:if="${user.upi_file_path == null or #strings.isEmpty(user.upi_file_path)}" class="bi bi-person-circle fs-4"></i>
 							</span>
 							<span th:if="${user != null}" class="fw-bold">[[${user.us_name}]]님</span>
-
 						</button>
 							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="max-height: 300px; overflow-y: auto;">
 								<li><a class="dropdown-item" th:href="@{/user/mypage}">프로필</a></li>

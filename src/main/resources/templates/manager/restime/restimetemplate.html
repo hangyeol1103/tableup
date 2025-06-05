@@ -172,7 +172,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             }
 
             document.getElementById("save-template-btn").addEventListener("click", () => {
-                const rt_num = /* Thymeleaf로 전달된 값 */ [[${rt_num}]];
+                const rt_num = [[${rt_num}]];
                 const templates = [];
 
                 document.querySelectorAll("tr[data-active='true']").forEach(row => {
@@ -184,14 +184,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     const table = row.querySelector(".table-input").value;
 
                     templates.push({
-                        bhd_date: day,
-                        bhd_timeStart: start,
-                        bhd_timeEnd: end,
-                        bhd_seat: parseInt(seat),
-                        bhd_table: parseInt(table),
-                        bhd_rt_num: rt_num
+                    bhd_date: day,
+                    bhd_timeStart: start,
+                    bhd_timeEnd: end,
+                    bhd_seat: parseInt(seat),
+                    bhd_table: parseInt(table),
+                    bhd_rt_num: rt_num
                     });
-                    
                 });
 
                 $.ajax({
@@ -200,46 +199,180 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     contentType: 'application/json',
                     data: JSON.stringify(templates),
                     success: function () {
-                        alert('저장 완료!');
-                        location.reload();
+                    alert('저장 완료!');
+                    location.reload();
                     },
                     error: function () {
-                        alert('저장 중 오류가 발생했습니다.');
+                    alert('저장 중 오류가 발생했습니다.');
                     }
                 });
-            });
+                });
 
 
+            let currentDay = '';
+            let selectedDays = new Set();
             // 요일 버튼 클릭 시 처리
             document.querySelectorAll('button[data-day]').forEach(button => {
                 button.addEventListener('click', () => {
-                    document.querySelectorAll('button[data-day]').forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
                     const day = button.getAttribute('data-day');
-                    console.log('선택된 요일:', day);
-                    generateTimeTable(day);
+                    if(selectedDays.has(day)){
+                        //선택 해제
+                        selectedDays.delete(day);
+                        button.classList.remove('active');
+                        const oldTable = document.getElementById(`time-table-${day}`);
+                        if(oldTable){
+                            oldTable.remove();
+                        }
+                    }
+                    else{
+                        //선택 추가
+                        selectedDays.add(day);
+                        button.classList.add('active');
+                         renderTimeTable(day); // 요일별 테이블 추가
+                    }
+                    //console.log('선택된 요일:', day);
+                    //generateTimeTable(day);
 
-                     // 버튼 영역 보이기
-                    document.getElementById("bulk-control-buttons").classList.remove("d-none");
+                    // 버튼 영역 보이기
+                    //document.getElementById("bulk-control-buttons").classList.remove("d-none");
+                    
+                    // 버튼 영역 토글
+                    document.getElementById("bulk-control-buttons").classList.toggle("d-none", selectedDays.size === 0);
                 });
             });
-            let currentDay = '';
-
+            
             // 요일 선택 시 저장
-            document.querySelectorAll('button[data-day]').forEach(button => {
-                button.addEventListener('click', () => {
-                    currentDay = button.getAttribute('data-day');
+            // document.querySelectorAll('button[data-day]').forEach(button => {
+            //     button.addEventListener('click', () => {
+            //         const clickedDay = button.getAttribute('data-day');
+
+            //         if (currentDay === clickedDay) {
+            //             // 이미 선택된 요일을 다시 클릭 → 초기 상태로 되돌리기
+            //             currentDay = '';
+            //             document.querySelectorAll('button[data-day]').forEach(btn => btn.classList.remove('active'));
+            //             document.getElementById("time-template-area").innerHTML = '';
+            //             document.getElementById("bulk-control-buttons").classList.add("d-none");
+            //             return;
+            //         }
+
+            //         // 새로운 요일 클릭
+            //         currentDay = clickedDay;
+            //         document.querySelectorAll('button[data-day]').forEach(btn => btn.classList.remove('active'));
+            //         button.classList.add('active');
+            //         generateTimeTable(currentDay);
+            //         document.getElementById("bulk-control-buttons").classList.remove("d-none");
+            //                 });
+            // });
+
+            function renderTimeTable(day) {
+            const container = document.getElementById("time-template-area");
+
+            // 요일별 구분 div 생성
+            const wrapper = document.createElement("div");
+            wrapper.id = `time-table-${day}`;
+            wrapper.className = "mb-4";
+
+            const title = document.createElement("h5");
+            title.className = "text-primary";
+            title.innerText = `${day} 요일 시간표`;
+            wrapper.appendChild(title);
+
+            const table = document.createElement("table");
+            table.className = "table table-bordered text-center align-middle";
+
+            const thead = `
+                <thead>
+                <tr>
+                    <th>시간</th>
+                    <th>상태</th>
+                    <th>좌석 수</th>
+                    <th>테이블 수</th>
+                </tr>
+                </thead>`;
+            table.innerHTML = thead;
+
+            const tbody = document.createElement("tbody");
+            for (let hour = 0; hour < 24; hour++) {
+                const hourStr = `${String(hour).padStart(2, '0')}:00`;
+                const match = savedTemplates.find(t => {
+                return t.bhd_date === day && t.bhd_timeStart?.substring(0, 5) === hourStr;
+                });
+
+                const isActive = !!match;
+                const seat = match ? match.bhd_seat : 0;
+                const tableCount = match ? match.bhd_table : 0;
+
+                const row = document.createElement("tr");
+                row.dataset.day = day;
+                row.dataset.hour = hour;
+                row.dataset.active = isActive;
+
+                row.innerHTML = `
+                <td>${hourStr}</td>
+                <td class="status-cell ${isActive ? 'table-success' : 'table-secondary'}" 
+                    style="cursor:pointer;" data-active="${isActive}">
+                    ${isActive ? '활성화' : '비활성화'}
+                </td>
+                <td><input type="number" class="form-control seat-input" value="${seat}" style="width:80px;" ${!isActive ? 'disabled' : ''}></td>
+                <td><input type="number" class="form-control table-input" value="${tableCount}" style="width:80px;" ${!isActive ? 'disabled' : ''}></td>
+                `;
+                tbody.appendChild(row);
+            }
+
+            table.appendChild(tbody);
+            wrapper.appendChild(table);
+            container.appendChild(wrapper);
+
+            // 상태 셀 클릭 토글
+            wrapper.querySelectorAll(".status-cell").forEach(cell => {
+                cell.addEventListener("click", () => {
+                const row = cell.closest("tr");
+                const isActive = cell.dataset.active === "true";
+                const seatInput = row.querySelector(".seat-input");
+                const tableInput = row.querySelector(".table-input");
+
+                if (isActive) {
+                    cell.classList.remove("table-success");
+                    cell.classList.add("table-secondary");
+                    cell.innerText = "비활성화";
+                    seatInput.disabled = true;
+                    tableInput.disabled = true;
+                    cell.dataset.active = "false";
+                    row.dataset.active = "false";
+                } else {
+                    cell.classList.remove("table-secondary");
+                    cell.classList.add("table-success");
+                    cell.innerText = "활성화";
+                    seatInput.disabled = false;
+                    tableInput.disabled = false;
+                    cell.dataset.active = "true";
+                    row.dataset.active = "true";
+                }
                 });
             });
+            }
 
             document.getElementById("reset-day").addEventListener("click", () => {
-                if (!currentDay) {
-                    alert("먼저 요일을 선택해 주세요.");
+                if (selectedDays.size === 0) {
+                    alert("선택된 요일이 없습니다.");
                     return;
                 }
-                if (confirm(`${currentDay} 요일의 모든 시간 데이터를 초기화하시겠습니까?`)) {
-                    generateTimeTable(currentDay);
+
+                if (!confirm("선택된 요일의 모든 시간표를 초기화하시겠습니까?")) {
+                    return;
                 }
+
+                // 선택된 요일 전체 초기화
+                selectedDays.forEach(day => {
+                    // HTML 요소 제거
+                    const oldTable = document.getElementById(`time-table-${day}`);
+                    if (oldTable) oldTable.remove();
+
+                    // 다시 렌더링
+                    renderTimeTable(day);
+                });
+
+                alert("선택된 요일이 초기화되었습니다.");
             });
 
             //전체 활성화 비활성화 버튼

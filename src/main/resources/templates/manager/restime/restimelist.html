@@ -286,6 +286,11 @@
     $(document).ready(() => {
       renderCalendar(currentYear, currentMonth);
 
+      // 모달 닫힐 때 정리
+      document.addEventListener('hidden.bs.modal', function () {
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+      });
       //템플릿 추가 이벤트
       $('#openTemplateApply').click(() => new bootstrap.Modal($('#templateApplyModal')).show());
       $('#templateApplyModal button[data-day]').click(function () {
@@ -525,8 +530,10 @@
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      document.body.classList.remove('modal-open');
-      document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
+      document.addEventListener('hidden.bs.modal', function () {
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
+      });
     });
   </script>
 </main>

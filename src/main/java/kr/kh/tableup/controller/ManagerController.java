@@ -2,11 +2,13 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -726,98 +728,158 @@ public class ManagerController {
 		return "/manager/restime/make_restime_sub";
 	}
 
-	// @PostMapping("/restime/make_restime")
-	// public String insertResTime(BusinessHourVO restime,  @AuthenticationPrincipal CustomManager manager) {
-	// 	restime.setBh_rt_num(manager.getManager().getRm_rt_num());
-	// 	System.out.println(manager.getManager());
-	// 	System.out.println(restime);
-		
-	// 	int rtNum = manager.getManager().getRm_rt_num();
-  //   System.out.println("매니저의 매장 번호: " + rtNum);
-  //   restime.setBh_rt_num(rtNum);
+	// @PostMapping("/restime/make_restime_list")
+	// @ResponseBody
+	// public String insertResTimeList(
+	// 	@RequestBody List<BusinessHourVO> resList	, @AuthenticationPrincipal CustomManager manager) {
+	// 		// List<BusinessDateVO> operList = new ArrayList<>();
+	// 		System.out.println("ajax 수신");
+	// 		System.out.println("받은 데이터: " + resList);
+	// 		//매장에 등록된 영업일자 리스트 모두 가져오기
+	// 		List<BusinessDateVO> opertimeList = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
+			
+	// 		//날짜만 추출
+	// 		Set<String> businessDateSet = opertimeList.stream()
+	// 								.map(bd -> bd.getBd_date().substring(0, 10)) // "yyyy-MM-dd" 추출
+	// 								.collect(Collectors.toSet());
+	// 		System.out.println("등록되어 있는 날짜 : "+ businessDateSet);
+			
+	// 		if (manager == null || manager.getManager() == null) {
+	// 				return "로그인 정보가 없습니다.";
+	// 		}
+	// 		if (resList == null || resList.isEmpty()) {
+	// 				return "등록할 예약 일자가 없습니다.";
+	// 		}
 
-  //   if (rtNum <= 0) {
-  //       // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-  //       return "redirect:/manager/make";
-  //   }
+	// 		//영업날짜와 예약 가능 시간대의 날짜와 비교
+	// 		boolean hasInvalidDate = resList.stream()
+	// 				.map(restime -> {
+	// 						if (restime.getBh_start_ts() == null) {
+	// 							return null;
+	// 						}
+	// 						return restime.getBh_start_ts().toLocalDateTime().toLocalDate().toString();
+	// 				})
+	// 				.filter(Objects::nonNull)
+	// 				.anyMatch(dateStr -> !businessDateSet.contains(dateStr));
 
-	// 	if(managerService.makeResTiem(restime)){
-	// 		System.out.println("bh_start = " + restime.getBh_start());
-	// 		System.out.println("bh_state = " + restime.isBh_state());
-	// 		return "redirect:/manager/restime/restimelist/"+rtNum;
-	// 	}
+	// 		if (hasInvalidDate) {
+	// 				System.out.println("영업일자가 등록되지 않은 날짜가 포함되어 있습니다.");
+	// 				return "영업일자가 등록되지 않은 날짜가 포함되어 있습니다.";
+	// 		}
+	// 		System.out.println("restimelist: " + resList);
+			
+	// 		int rtNum = manager.getManager().getRm_rt_num();
+	// 		System.out.println("매니저의 매장 번호: " + rtNum);
 
-	// 	return "/manager/restime/make_restime/";
+	// 		//영업일자 맵으로 정리
+	// 		Map<String, BusinessDateVO> operDateMap = opertimeList.stream()
+  //       .collect(Collectors.toMap(bd -> bd.getBd_date().substring(0, 10), bd -> bd));
+
+	// 		System.out.println("operDateMap : " + operDateMap);
+	// 		//예약 시간 유효성 검사
+	// 		int result = 0; // 성공횟수
+	// 		int result1 = 0; // 실패횟수
+	// 		for (BusinessHourVO restime : resList) {
+				
+	// 			restime.setBh_rt_num(rtNum); 
+	// 			if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
+	// 					continue; 
+	// 			}
+	// 			 // insert 로직 호출
+	// 			if(!managerService.makeResTiem(restime, operDateMap)){
+	// 				result1++;
+	// 				continue;
+	// 			}
+	// 			result++;
+	// 		}
+
+	// 		return "등록 성공 " + result + "건" +
+	// 					 "등록 실패 " + result1 + "건";
 	// }
 
 	@PostMapping("/restime/make_restime_list")
 	@ResponseBody
-	public String insertResTimeList(
-		@RequestBody List<BusinessHourVO> resList	, @AuthenticationPrincipal CustomManager manager) {
-			// List<BusinessDateVO> operList = new ArrayList<>();
-			System.out.println("ajax 수신");
-			System.out.println("받은 데이터: " + resList);
-			//매장에 등록된 영업일자 리스트 모두 가져오기
-			List<BusinessDateVO> opertimeList = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
-			
-			//날짜만 추출
-			Set<String> businessDateSet = opertimeList.stream()
-									.map(bd -> bd.getBd_date().substring(0, 10)) // "yyyy-MM-dd" 추출
-									.collect(Collectors.toSet());
-			System.out.println("등록되어 있는 날짜 : "+ businessDateSet);
-			
+	public String insertResTimeList(@RequestBody Map<String, Object> payload,
+																	@AuthenticationPrincipal CustomManager manager) {
+
 			if (manager == null || manager.getManager() == null) {
 					return "로그인 정보가 없습니다.";
 			}
-			if (resList == null || resList.isEmpty()) {
+
+			boolean overwrite = Boolean.parseBoolean(payload.get("overwrite").toString());
+
+			List<LinkedHashMap<String, Object>> rawList = (List<LinkedHashMap<String, Object>>) payload.get("list");
+
+			if (rawList == null || rawList.isEmpty()) {
 					return "등록할 예약 일자가 없습니다.";
 			}
 
-			//영업날짜와 예약 가능 시간대의 날짜와 비교
+			List<BusinessHourVO> resList = new ArrayList<>();
+			for (Map<String, Object> map : rawList) {
+					BusinessHourVO vo = new BusinessHourVO();
+					vo.setBh_date((String) map.get("bh_date"));
+					vo.setBh_start((String) map.get("bh_start"));
+					vo.setBh_end((String) map.get("bh_end"));
+					vo.setBh_seat_max((int) map.get("bh_seat_max"));
+					vo.setBh_table_max((int) map.get("bh_table_max"));
+					vo.setBh_rt_num((int) map.get("bh_rt_num"));
+					resList.add(vo);
+			}
+
+			System.out.println("resList : "+resList);
+
+			List<BusinessDateVO> opertimeList = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
+
+			Set<String> businessDateSet = opertimeList.stream()
+							.map(bd -> bd.getBd_date().substring(0, 10))
+							.collect(Collectors.toSet());
+
 			boolean hasInvalidDate = resList.stream()
-					.map(restime -> {
-							if (restime.getBh_start_ts() == null) {
-								return null;
-							}
-							return restime.getBh_start_ts().toLocalDateTime().toLocalDate().toString();
-					})
-					.filter(Objects::nonNull)
-					.anyMatch(dateStr -> !businessDateSet.contains(dateStr));
+							.filter(rt -> rt.getBh_start_ts() != null)
+							.map(rt -> rt.getBh_start_ts().toLocalDateTime().toLocalDate().toString())
+							.anyMatch(dateStr -> !businessDateSet.contains(dateStr));
 
 			if (hasInvalidDate) {
-					System.out.println("영업일자가 등록되지 않은 날짜가 포함되어 있습니다.");
 					return "영업일자가 등록되지 않은 날짜가 포함되어 있습니다.";
 			}
-			System.out.println("restimelist: " + resList);
-			
-			int rtNum = manager.getManager().getRm_rt_num();
-			System.out.println("매니저의 매장 번호: " + rtNum);
 
-			//영업일자 맵으로 정리
 			Map<String, BusinessDateVO> operDateMap = opertimeList.stream()
-        .collect(Collectors.toMap(bd -> bd.getBd_date().substring(0, 10), bd -> bd));
+							.collect(Collectors.toMap(bd -> bd.getBd_date().substring(0, 10), bd -> bd));
 
-			System.out.println("operDateMap : " + operDateMap);
-			//예약 시간 유효성 검사
-			int result = 0; // 성공횟수
-			int result1 = 0; // 실패횟수
+			int rtNum = manager.getManager().getRm_rt_num();
+			int success = 0, fail = 0;
+
 			for (BusinessHourVO restime : resList) {
-				
-				restime.setBh_rt_num(rtNum); 
-				if (restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() == 0) {
-						continue; 
-				}
-				 // insert 로직 호출
-				if(!managerService.makeResTiem(restime, operDateMap)){
-					result1++;
-					continue;
-				}
-				result++;
+					restime.setBh_rt_num(rtNum);
+
+					String dateKey = restime.getBh_date();
+					if (dateKey == null || dateKey.isBlank()) {
+							continue; // 또는 오류 처리
+					}
+					System.out.println("------------------");
+					System.out.println("overwrite : "+ overwrite);
+					System.out.println("dateKey : "+ dateKey);
+					System.out.println("------------------");
+
+					if (overwrite && dateKey != null) {
+							System.out.println("덮어쓰기: 기존 데이터 삭제 시도 " + dateKey);
+
+    					managerService.deleteRestimesByDate(rtNum, restime.getBh_start(), restime.getBh_end());
+					}
+
+					if (!overwrite) {
+							boolean exists =  managerService.existsRestime(rtNum, restime.getBh_start(), restime.getBh_date());
+							if (exists) continue;
+					}
+
+					if (managerService.makeResTiem(restime, operDateMap)) success++;
+					else fail++;
 			}
 
-			return "등록 성공 " + result + "건" +
-						 "등록 실패 " + result1 + "건";
+			return "등록 성공 " + success + "건 / 실패 " + fail + "건";
 	}
+
+
 	//예약 시간 변경
 	@GetMapping("/restime/remake_restime/{bh_num}")
 	public String reMakeResTimePage(Model model, @AuthenticationPrincipal CustomManager manager, @PathVariable int bh_num) {
@@ -885,6 +947,19 @@ public class ManagerController {
     }
 		return "redirect:/manager/restime/restimelist/"+rtNum;
 	}
+
+	//요일에 저장된 예약 가능 시간 전체 삭제
+	@PostMapping("/restime/delete_by_date")
+	@ResponseBody
+	public boolean deleteByDate(@RequestBody Map<String, Object> data) {
+		int rt_num = Integer.parseInt(data.get("rt_num").toString());
+    String date = (String) data.get("date");
+    if (rt_num == 0 || date == null){ 
+			return false;
+		}
+    return managerService.deleteAllRestimes(rt_num, date);
+	}
+	
 
 	//날짜 입력 처리(HH:mm)
 	@InitBinder

@@ -208,7 +208,11 @@
 	</select>
 
 	<select id="checkResTime" resultType="BusinessHourVO">
-		select * from businesshour where bh_rt_num = #{bh_rt_num} and bh_start = #{bh_start} and bh_end = #{bh_end}
+		select * from businesshour 
+		where bh_rt_num = #{bh_rt_num} and
+				  bh_start = #{bh_start} and 
+					bh_end = #{bh_end}
+		limit 1
 	</select>
 
 	<insert id="insertResTime" useGeneratedKeys="true" keyProperty="bh_num">
@@ -226,10 +230,18 @@
 		where bd_rt_num = #{rt_num} and date(bd_date) = #{date}
 	</select>
 
+	<select id="checkUpdateResTime" resultType="BusinessHourVO">
+		select * from businesshour 
+		where bh_rt_num = #{bh_rt_num} and 
+					bh_start = #{bh_start} and 
+					bh_end = #{bh_end} and 
+					bh_num != #{bh_num}
+	</select>
+
 	<update id="updateResTime">
 		update businesshour set
-			bh_start = #{bh_start_ts}, 
-			bh_end = #{bh_end_ts}, 
+			bh_start = #{bh_start}, 
+			bh_end = #{bh_end}, 
 			bh_seat_max = #{bh_seat_max}, 
 			bh_table_max = #{bh_table_max},
 			bh_state = #{bh_state}
@@ -418,6 +430,27 @@
 			bhd_date = #{bhd_date} and 
 			bhd_timeStart = #{bhd_timeStart}
 	</update>
+
+	<delete id="deleteRestimesByDate">
+		DELETE FROM businesshour
+		WHERE bh_rt_num = #{rt_num}
+			AND bh_start = #{bh_start}
+	</delete>
+
+	<select id="existsRestime" resultType="boolean">
+		SELECT EXISTS (
+			SELECT 1
+			FROM businesshour
+			WHERE bh_rt_num = #{rtNum}
+				AND bh_start = #{bh_start}
+		)
+	</select>
+
+	<delete id="deleteAllRestimes">
+		delete from businesshour
+		where bh_rt_num = #{rt_num}
+			and DATE(bh_start) = #{date}
+	</delete>
 	
 
 	

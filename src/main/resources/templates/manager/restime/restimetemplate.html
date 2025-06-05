@@ -37,9 +37,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                 <button type="button" class="btn btn-outline-primary" data-day="토">토</button>
                 <button type="button" class="btn btn-outline-primary" data-day="일">일</button>
             </div>
-            <div class="mb-2">
-                <button type="button" class="btn btn-success me-2" id="activate-all">전체 활성화</button>
-                <button type="button" class="btn btn-secondary" id="deactivate-all">전체 비활성화</button>
+            <div class="row g-2 mb-3 align-items-center">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-success" id="activate-all">전체 활성화</button>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-secondary" id="deactivate-all">전체 비활성화</button>
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <label for="bulk-seat" class="form-label mb-0 me-1">좌석 수:</label>
+                    <input type="number" id="bulk-seat" min="0" class="form-control me-3" style="width:80px;">
+                    <label for="bulk-table" class="form-label mb-0 me-1">테이블 수:</label>
+                    <input type="number" id="bulk-table" min="0" class="form-control me-3" style="width:80px;">
+                    <button type="button" class="btn btn-outline-primary" id="apply-bulk-values">적용</button>
+                </div>
             </div>
             <div id="time-template-area"></div>
             <button class="btn btn-primary mt-3 mb-3" id="save-template-btn">저장</button>
@@ -56,6 +67,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             const savedTemplates = [[${templateList}]];
             const open = /*[['${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_open, 11, 16) : "09:00"}']]*/ '09:00';
             const close = /*[['${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_close, 11, 16) : "18:00"}']]*/ '18:00';
+            const tempInputCache = {};
 
             console.log("opertime : ",opertimelist);
             console.log("savedTemplates : ", savedTemplates);
@@ -184,6 +196,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     data: JSON.stringify(templates),
                     success: function () {
                         alert('저장 완료!');
+                        location.reload();
                     },
                     error: function () {
                         alert('저장 중 오류가 발생했습니다.');
@@ -235,6 +248,41 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                     tableInput.disabled = true;
                 });
             });
+
+            document.getElementById("apply-bulk-values").addEventListener("click", () => {
+            const seatValue = document.getElementById("bulk-seat").value;
+            const tableValue = document.getElementById("bulk-table").value;
+
+            const hasSeat = seatValue !== '' && !isNaN(parseInt(seatValue));
+            const hasTable = tableValue !== '' && !isNaN(parseInt(tableValue));
+
+            if (!hasSeat && !hasTable) {
+                alert("좌석 수 또는 테이블 수 중 하나 이상을 입력해 주세요.");
+                return;
+            }
+
+            document.querySelectorAll("#time-template-area tr[data-active='true']").forEach(row => {
+                const day = row.dataset.day;
+                const hour = row.dataset.hour;
+
+                if (hasSeat) {
+                const seatInput = row.querySelector(".seat-input");
+                seatInput.value = parseInt(seatValue);
+                if (!tempInputCache[`${day}-${hour}`]) tempInputCache[`${day}-${hour}`] = {};
+                tempInputCache[`${day}-${hour}`].seat = parseInt(seatValue);
+                }
+
+                if (hasTable) {
+                const tableInput = row.querySelector(".table-input");
+                tableInput.value = parseInt(tableValue);
+                if (!tempInputCache[`${day}-${hour}`]) tempInputCache[`${day}-${hour}`] = {};
+                tempInputCache[`${day}-${hour}`].table = parseInt(tableValue);
+                }
+            });
+
+            alert("입력된 값이 적용되었습니다.");
+            });
+
 
         </script>
         

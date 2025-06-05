@@ -71,6 +71,7 @@
             
         </div>
         <div class="modal-footer">
+          <button class="btn btn-danger" id="deleteAllTimesForDateBtn">예약시간 전체 삭제</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
         </div>
       </div>
@@ -173,7 +174,7 @@
     </div>
   </div>
 
-  <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/restime/make_restime'">예약 시간 등록</button>
+  <!-- <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/restime/make_restime'">예약 시간 등록</button> -->
   <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 
   <script th:inline="javascript">
@@ -203,7 +204,7 @@
       const container = $('<div class="calendar-month"></div>');
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const firstDay = new Date(year, month, 1).getDay();
-
+      
       $('#calendarTitle').text(`${year}년 ${month + 1}월`);
       const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
       let row = $('<div class="calendar-row"></div>');
@@ -222,6 +223,10 @@
           .map(res => res.bh_start?.substring(11,16))
           .sort();
 
+        const maxDisplay = 2;
+        const displayedTimes = res.slice(0, maxDisplay);
+        const hiddenCount = res.length - maxDisplay;
+
         const cell = $(`
           <div class="calendar-cell" data-date="${dateStr}">
             <strong>${i}</strong>
@@ -229,14 +234,16 @@
               <div class="opertime-info">
                 ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
                 ${match.bd_off ? '쉬는날' : '여는날'}
-              </div>
-            ` : ''}
-            ${res.length > 0 ? `
-            <div class="opertime-info text-primary mt-1">
-              <strong>예약:</strong><br>
-              ${res.join(', ')}
-            </div>
-          ` : ''}
+              </div>` : ''
+            }
+            ${displayedTimes.length > 0 ? `
+              <div class="opertime-info text-primary mt-1">
+                <strong>예약:</strong><br>
+                ${displayedTimes.join(', ')}${
+                  hiddenCount > 0 ? `, <span class="more-btn text-decoration-underline text-primary" style="cursor:pointer" data-date="${dateStr}">+외 ${hiddenCount}건</span>` : ''
+                }
+              </div>` : ''
+            }
           </div>
         `);
 
@@ -307,7 +314,33 @@
           });
         }
       });
+      //요일 예약 시간 전체 삭제버튼 
+      $('#deleteAllTimesForDateBtn').click(() => {
+        const date = $('#selectedDate').text(); // yyyy-MM-dd
 
+        if (!confirm(`${date}의 모든 예약 가능 시간을 삭제하시겠습니까?`)) return;
+
+        $.ajax({
+          url: '/manager/restime/delete_by_date',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ rt_num: rtNum, date }),
+          success: () => {
+            alert("해당 날짜의 예약 가능 시간이 삭제되었습니다.");
+            $('#dateModal').modal('hide');
+            // $.get('/manager/restime/restimelist_json/' + rtNum, function(data) {
+            //   restimelist = data;
+            //   renderCalendar(currentYear, currentMonth);
+            // });
+            location.reload();
+          },
+          error: (xhr) => {
+            console.error(xhr.responseText);
+            alert("삭제 중 오류 발생");
+          }
+        });
+      });
+      console.log("overwrite : ", overwrite);
       $('input[name="overwrite"]').change(function () {
         overwrite = $(this).val() === 'true';
       });
@@ -325,6 +358,7 @@
           bh_table_max : $(this).find('input[name="bh_table_max"]').val(),
           bh_state : $(this).find('select[name="bh_state"]').val()
         };
+        
 
         $.ajax({
           async : true,
@@ -369,6 +403,10 @@
           }
         });
       })
+      $(document).on('click', '.more-btn', function() {
+        const date = $(this).data('date');
+        showTimeModal(date); // 기존 함수 재사용
+      });
     });
 
     function showTimeModal(dateStr) {
@@ -449,7 +487,6 @@
               bh_table_max: t.bhd_table,
               bh_rt_num: t.bhd_rt_num,
 
-              // ✅ Timestamp는 ISO 8601 포맷으로 맞춰야 서버에서 파싱됨
               bh_start_ts: `${dateOnly}T${start}`,  // 예: 2025-06-23T12:00:00
               bh_end_ts: `${dateOnly}T${end}`
             });
@@ -464,13 +501,20 @@
 
       // 💡 전송 직전 로그 확인용
       console.log("전송 데이터:", JSON.stringify(resultList, null, 2));
+      // 중복 여부
+      console.log("overwrite : ", overwrite);
 
       $.ajax({
         url: '/manager/restime/make_restime_list',
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(resultList),
-        success: () => location.reload(),
+        data: JSON.stringify({
+          overwrite: overwrite,
+          list : resultList}),
+        success: () => {
+          alert("예약 가능 시간이 성공적으로 저장되었습니다.");
+          location.reload();
+        },
         error: (xhr) => {
           console.error("전송 실패:", xhr.responseText);
           alert("오류가 발생했습니다.");

@@ -88,6 +88,8 @@ public interface ManagerDAO {
 	
 	BusinessDateVO selectOperTimeByDate(int rt_num, String date);
 
+	BusinessHourVO checkUpdateResTime(int bh_rt_num, String bh_start, String bh_end, int bh_num);
+
 	boolean updateResTime(BusinessHourVO restime);
 
 	boolean deleteResTime(int bh_num);
@@ -158,6 +160,12 @@ public interface ManagerDAO {
 	int existsTemplate(BusinessHourTemplateVO vo);
 
 	void updateTemplate(BusinessHourTemplateVO vo);
+
+	void deleteRestimesByDate(int rt_num, String bh_start, String bh_end);
+
+	boolean existsRestime(int rtNum, String bh_start, String bh_date);
+
+	boolean deleteAllRestimes(Integer rt_num, String date);
 
 
 

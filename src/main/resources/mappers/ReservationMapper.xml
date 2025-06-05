@@ -81,6 +81,8 @@
 		select * from reservation where res_num = #{res_num}
 	</select>
 
+
+
 	<select id="selectFavorateCategory" resultType="int">
 		SELECT r.rt_dfc_num
 			FROM reservation rs
@@ -102,5 +104,11 @@
 			ORDER BY COUNT(*) DESC
 		LIMIT 10
 	</select>
+	<!-- 매장의 기본키를 가진 예약 정보를 가져오는 쿼리 -->
+	<select id="selectReservationsList" resultMap="ReservationMap">
+		select * from reservation
+		join user on us_num = res_us_num
+		where res_rt_num=#{rt_num} and res_state = 1
+	</select> 
 
 </mapper>

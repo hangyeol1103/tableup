@@ -28,6 +28,7 @@
     <!-- 리뷰 기본 정보 -->
     <div class="col-md-6">
       <label class="form-label">식당 번호</label>
+      <input type="number" class="form-control d-none" name="review.res_num" th:value="${reservation.res_num}" readonly>
       <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reservation.res_rt_num}" readonly>
     </div>
     <div class="row mb-3">
@@ -116,6 +117,7 @@
       const $rev_visitor = $('input[name="review.rev_visitor"]');
       const $rev_content = $('#rev_content');
       const $file_upload_area = $('#file-upload-area');
+      const $res_num = $('input[name="review.res_num"]');
 
 
       $('#btn-resinfo').click(() => {
@@ -168,7 +170,8 @@
           rev_rt_num: $rev_rt_num.val(),
           rev_visit: $rev_visit.val(),
           rev_visitor: $rev_visitor.val(),
-          rev_content: $rev_content.val()
+          rev_content: $rev_content.val(),
+          res_num: $res_num.val()
         };
       }
       function getScoreList() {

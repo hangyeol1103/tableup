@@ -19,6 +19,7 @@
 		<!-- 유저와 식당 이름 -->
 		<result property="us_name" column="us_name" />
 		<result property="rt_name" column="rt_name" />
+		<result property="res_num" column="res_num" />
 
 		<!-- ReviewScoreVO 리스트 -->
 		<collection property="scoreList" ofType="ReviewScoreVO">
@@ -62,15 +63,30 @@
 		WHERE rs_num = #{rs_num}
 	</delete>
 
-	<update id="updateReview">
-		
-	</update>
-	
-	<select id="selectReviewByReservation" resultType="ReviewVO">
-		SELECT * FROM review 
-		LEFT JOIN revres USING (rev_num)
-		LEFT JOIN reservation USING	(res_num)
-		WHERE res_num = #{res_num}
+
+	<select id="selectReviewByReservation" resultMap="ReviewMap">
+		SELECT 
+			r.rev_num, r.rev_us_num, r.rev_rt_num, r.rev_content, r.rev_created,
+			r.rev_updated, r.rev_state, r.rev_visit, r.rev_visitor,
+			u.us_name, rt.rt_name,
+
+			rs.rs_num, rs.rs_rev_num, rs.rs_st_num, rs.rs_score,
+			st.st_num, st.st_category,
+
+			f.file_num, f.file_path, f.file_name, f.file_type, f.file_foreign, f.file_tag, f.file_res_num,
+
+			revres.res_num
+
+		FROM review r
+		LEFT JOIN revres ON r.rev_num = revres.rev_num
+		LEFT JOIN reservation res ON revres.res_num = res.res_num
+		LEFT JOIN user u ON r.rev_us_num = u.us_num
+		LEFT JOIN restaurant rt ON r.rev_rt_num = rt.rt_num
+		LEFT JOIN reviewscore rs ON r.rev_num = rs.rs_rev_num
+		LEFT JOIN scoretype st ON rs.rs_st_num = st.st_num
+		LEFT JOIN file f ON r.rev_num = f.file_foreign AND f.file_type = 'REVIEW'
+
+		WHERE revres.res_num = #{res_num}
 	</select>
 
 	<select id="selectReview" resultMap="ReviewMap" parameterType="int">
@@ -96,4 +112,18 @@
 	<!-- <insert id="insertFile" useGeneratedKeys="true" keyProperty="file_num">
 
 	</insert> -->
+
+	<insert id="insertRevres">
+		INSERT INTO revres (rt_num, us_num, rev_num, res_num)
+		VALUES (#{rt_num}, #{us_num}, #{rev_num}, #{res_num})
+	</insert>
+
+	<update id="updateReview" parameterType="ReviewVO">
+		UPDATE review
+		SET rev_content = #{rev_content},
+				rev_updated = NOW(),
+				rev_visit = #{rev_visit},
+				rev_visitor = #{rev_visitor}
+		WHERE rev_num = #{rev_num}
+	</update>
 </mapper>

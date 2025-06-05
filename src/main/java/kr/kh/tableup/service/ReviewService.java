@@ -46,7 +46,7 @@ public class ReviewService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ReviewService.class);
 
-
+/*
 	public void insertReview(ReviewDTO reviewDTO) {
 
 		// 리뷰 등록
@@ -138,7 +138,91 @@ public class ReviewService {
 
 
 
-	}
+	}*/
+
+
+		public void insertReview(ReviewDTO reviewDTO) {
+			ReviewVO review = reviewDTO.getReview();
+			List<ReviewScoreVO> scoreList = reviewDTO.getScoreList();
+			List<FileDTO> fileList = reviewDTO.getFileList();
+
+
+			StringBuilder reviewError = new StringBuilder();
+			if (review.getRev_rt_num() <= 0) reviewError.append("매장이 선택되지 않았습니다.\n");
+			if (review.getRev_us_num() <= 0 || userDAO.selectUser(review.getRev_us_num()) == null) 
+					reviewError.append("유저 정보가 없습니다.\n");
+			if (review.getRev_visit() == null) review.setRev_visit(LocalDate.now().toString());
+			if (review.getRev_visitor() <= 0) reviewError.append("방문 인원이 없습니다.\n");
+			if (review.getRev_content() == null || review.getRev_content().trim().isEmpty()) 
+					review.setRev_content("내용 없음");
+			if (reviewError.length() > 0) throw new RuntimeException(reviewError.toString());
+
+			int rev_num = 0;
+			try {
+					boolean inserted = reviewDAO.insertReview(review);
+					if (!inserted || review.getRev_num() <= 0) throw new RuntimeException("리뷰 등록 실패");
+					rev_num = review.getRev_num();
+			} catch (DataAccessException e) {
+					Throwable root = NestedExceptionUtils.getRootCause(e);
+					String message = (root != null) ? root.getMessage() : "DB 오류";
+					if (message.contains("uq_resnum")) {
+							throw new RuntimeException("해당 예약에 리뷰가 존재합니다.");
+					}
+					throw new RuntimeException("리뷰 저장 중 오류: " + message);
+			}
+
+			//reves rt us rev res
+			if (!reviewDAO.insertRevres(review.getRev_rt_num(),review.getRev_us_num(),rev_num,review.getRes_num())) {
+					reviewDAO.deleteReview(rev_num);
+					throw new RuntimeException("DB 예약-리뷰 연결 실패");
+			}
+
+			int[] rs_num = new int[scoreList.size()];
+			try {
+					for (int i = 0; i < scoreList.size(); i++) {
+							ReviewScoreVO score = scoreList.get(i);
+							if (score.getRs_score() < 1 || score.getRs_score() > 5)
+									throw new RuntimeException("1~5를 벗어난 점수를 입력받았습니다.");
+							score.setRs_rev_num(rev_num);
+							score.setRs_st_num(score.getSt_num());
+							rs_num[i] = reviewDAO.insertReviewScore(score);
+					}
+			} catch (RuntimeException e) {
+					reviewDAO.deleteReview(rev_num);
+					for (int rs : rs_num) reviewDAO.deleteReviewScore(rs);
+					throw new RuntimeException("평점 저장 실패: " + e.getMessage());
+			}
+
+			List<String> uploadedPaths = new ArrayList<>();
+			int[] fileNum = new int[fileList != null ? fileList.size() : 0];
+			if (fileList != null && !fileList.isEmpty()) {
+					for (int i = 0; i < fileList.size(); i++) {
+							FileDTO fileDTO = fileList.get(i);
+							if (fileDTO == null || fileDTO.getUploadFile() == null || fileDTO.getUploadFile().isEmpty()) continue;
+							try {
+									String filePath = UploadFileUtils.uploadFile(uploadPath, fileDTO.getUploadFile().getOriginalFilename(), fileDTO.getUploadFile().getBytes());
+									uploadedPaths.add(filePath);
+
+									FileVO fileVO = new FileVO();
+									fileVO.setFile_path(filePath);
+									fileVO.setFile_name(fileDTO.getFile_name());
+									fileVO.setFile_type("REVIEW");
+									fileVO.setFile_foreign(rev_num);
+									fileVO.setFile_tag(fileDTO.getFile_tag());
+									fileVO.setFile_res_num(review.getRev_rt_num());
+
+									fileNum[i] = fileDAO.insertFile(fileVO);
+							} catch (Exception e) {
+									for (String path : uploadedPaths) UploadFileUtils.delteFile(uploadPath, path);
+									reviewDAO.deleteReview(rev_num);
+									for (int rs : rs_num) reviewDAO.deleteReviewScore(rs);
+									for (int fn : fileNum) if (fn > 0) fileDAO.deleteFile(fn);
+									throw new RuntimeException("파일 업로드 실패: " + e.getMessage());
+							}
+					}
+			}
+		}
+
 
 
 	public void insertReview(ReviewVO review, Map<String,String> scores) {

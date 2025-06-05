@@ -62,7 +62,7 @@ public class SecurityConfig{
       //로그아웃 처리
       .logout(logout -> logout
           .logoutUrl("/manager/logout")
-          .logoutSuccessUrl("/manager/")
+          .logoutSuccessUrl("/manager/login")
           .clearAuthentication(true)
           .invalidateHttpSession(true)
           .permitAll());

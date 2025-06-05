@@ -148,4 +148,9 @@ public class ReservationService {
 			return reservationDAO.selectFavorateRegion();
 		}
 
+		public List<ReservationVO> getReservations(int rt_num) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException("Unimplemented method 'getReservations'");
+		}
+
 }

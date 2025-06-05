@@ -593,7 +593,7 @@ public class UserController {
       return "user/detail/outline";
   }
   @PostMapping("/list/news/{rt_num}")
-  public String postrestaurantDetail(int rt_num, Model model) {
+  public String postrestaurantDetail(@PathVariable int rt_num, Model model) {
     List<ResNewsVO> tapResNewsList = restaurantService.getTapResNewsList(rt_num);
 
     model.addAttribute("tapResNewsList", tapResNewsList);
@@ -601,7 +601,7 @@ public class UserController {
   }
   
   @PostMapping("/list/menu/{rt_num}")
-  public String postrestaurantmenu(int rt_num, Model model) {
+  public String postrestaurantmenu(@PathVariable int rt_num, Model model) {
     //List<MenuVO> tapMenuList = restaurantService.getTapMenuList(rt_num);
     List<MenuTypeVO> tapMenuTypeList = restaurantService.getMenuTypeList(rt_num);
     List<MenuVO> menuDivList = restaurantService.getMenuDivList(rt_num);
@@ -662,6 +662,15 @@ public class UserController {
     List<RestaurantDetailVO> restaurantDetailList = restaurantService.getRestaurantDetailList(rt_num);
     List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
     
+    DefaultResTimeVO todayResTime = null;
+    for (DefaultResTimeVO drt : defaultResTimeList) {
+        if (drt.getDrt_date().equals(today)) {
+            todayResTime = drt;
+            break;
+        }
+    }
+    model.addAttribute("todayResTime", todayResTime);
+
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);

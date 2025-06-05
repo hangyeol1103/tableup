@@ -109,6 +109,20 @@
         background-color: #fff;
         margin-top: 10px;
       }
+
+      .img-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3장씩 정렬 */
+        gap: 15px;
+      }
+
+      .img-grid img {
+        width: 100%;
+        aspect-ratio: 1 / 1;       /* 정사각형 비율 유지 */
+        object-fit: cover;         /* 이미지 비율 유지하며 잘라냄 */
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
     </style>
   </head>
 
@@ -129,8 +143,10 @@
           </span>
         </div>
         <div th:if="${rvl.fileList != null and !rvl.fileList.isEmpty()}">
-          <div th:each="file : ${rvl.fileList}" class="mt-2" th:if="${file.file_path != null and !#strings.isEmpty(file.file_path)}">
-            <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진">
+          <div class="img-grid">
+            <div th:each="file : ${rvl.fileList}" class="mt-2" th:if="${file.file_path != null and !#strings.isEmpty(file.file_path)}">
+              <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진">
+            </div>
           </div>
         </div>
         <p th:utext="${#strings.replace(rvl.rev_content, '\n', '<br/>')}" class="mt-3"></p>

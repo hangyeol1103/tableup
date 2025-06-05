@@ -119,12 +119,12 @@
 
     .img-grid img {
       width: 100%;
-      height: 200px;
-      object-fit: cover;        /* 비율 유지하면서 잘라냄 */
-      border-radius: 8px;
+      aspect-ratio: 1 / 1;       /* 정사각형 비율 유지 */
+      object-fit: cover;         /* 이미지 비율 유지하며 잘라냄 */
+      border-radius: 0.5rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-
+    
     .today-time {
       font-weight: bold;
       color: #000;
@@ -215,15 +215,14 @@
           <!-- 시계 아이콘 -->
           <i class="bi bi-clock me-2"></i>
           휴무일 :&nbsp;<span th:text="${restaurant.rt_closed_days}"></span>&nbsp;/ 오늘
-          <span th:if="${defaultResTimeList != null and !defaultResTimeList.isEmpty()}" 
-                th:with="firstDrt=${defaultResTimeList[0]}">
-            (<span th:text="${firstDrt.drt_date}"></span>)
+          <span th:if="${todayResTime != null}">
+            (<span th:text="${todayResTime.drt_date}"></span>)
             <!-- 점 -->
             <svg width="14" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg"
               color="#E4E4E4" style="vertical-align: middle;"><path d="M1.5625 3.06836C0.728516 3.06836 0.0449219 2.39844 0.0449219 1.55078C0.0449219 0.703125 0.728516 0.0195312 1.5625 0.0195312C2.41016 0.0195312 3.09375 0.703125 3.09375 1.55078C3.09375 2.39844 2.41016 3.06836 1.5625 3.06836Z" fill="currentColor"></path>
             </svg>
-            <span th:text="${#strings.substring(firstDrt.drt_open, 0, 5)}"></span>&nbsp;~
-            <span th:text="${#strings.substring(firstDrt.drt_close, 0, 5)}"></span>
+            <span th:text="${#strings.substring(todayResTime.drt_open, 0, 5)}"></span>&nbsp;~
+            <span th:text="${#strings.substring(todayResTime.drt_close, 0, 5)}"></span>
           </span>
             
           <!-- 드롭 아이콘 -->
@@ -319,11 +318,12 @@
 
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold">대표이미지</h5>
+      <!-- 썸네일 이미지 출력 -->
       <div class="img-grid">
         <div th:each="file : ${restaurantFileList}">
-          <img th:src="@{/file{path}(path=${file.file_path})}" alt="식당 사진">
+          <img th:src="@{/file{path}(path=${file.file_path})}" alt="식당 사진"/>
+        </div>
       </div>
-    </div>
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <h5 class="fw-bold mb-3">리뷰</h5>
       <div class="mb-4" th:each="rvl, iterStat : ${reviewList}" th:if="${iterStat.index < 3}">
@@ -341,10 +341,8 @@
           </span>
         </div>
         <div th:if="${rvl.fileList != null and !rvl.fileList.isEmpty()}">
-          <div class="img-grid">
-            <div th:each="file : ${rvl.fileList}" class="mt-2" th:if="${file.file_path != null and !#strings.isEmpty(file.file_path)}">
-              <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진">
-            </div>
+          <div th:each="file : ${rvl.fileList}" class="mt-2" th:if="${file.file_path != null and !#strings.isEmpty(file.file_path)}">
+            <img th:src="@{/file{path}(path=${file.file_path})}" alt="사진">
           </div>
         </div>
         <p th:utext="${#strings.replace(rvl.rev_content, '\n', '<br/>')}" class="mt-3"></p>
@@ -419,7 +417,6 @@
         }
       };
     </script>
-
 
   </body>
 </html>

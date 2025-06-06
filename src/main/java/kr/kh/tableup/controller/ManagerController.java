@@ -107,6 +107,7 @@ public class ManagerController {
 	public String postMethodName(RestaurantManagerVO rm, RedirectAttributes ra) {
 		String signUp = managerService.insertManager(rm);
 		if(signUp == null){
+			ra.addFlashAttribute("signupError","회원가입에 완료했습니다.");
 			return "redirect:/manager/login";
 		}
 		System.out.println(signUp);
@@ -114,19 +115,75 @@ public class ManagerController {
 		return "redirect:/manager/signup";
 	}
 
-	//아이디 중복 체크
-	@GetMapping("/check/id")
-  public boolean checkId(@RequestParam("id") String id) {
-      return !managerService.isExistId(id); // true: 사용 가능
-  }
-
-	//사업자 번호 중복 체크
-  @GetMapping("/check/business")
-  public boolean checkBusiness(@RequestParam("business") String business) {
-      return !managerService.isExistBusiness(business); // true: 사용 가능
-  }
-
+	//아이디 찾기(이름, 전화번호 확인)
+	@GetMapping("/findId")
+	public String findManagerId(Model model) {
+		List<RestaurantManagerVO> managerList = managerService.getManagerList();		
+		model.addAttribute("managerList", managerList);
+		return "/manager/findId";
+	}
 	
+
+	//비밀번호 재설정(아이디, 이메일 확인)
+	@GetMapping("/findPw")
+	public String findManagerPw(Model model) {
+		List<RestaurantManagerVO> managerList = managerService.getManagerList();
+		System.out.println("등록된 매니저 계정 : " + managerList);		
+		model.addAttribute("managerList", managerList);
+		return "/manager/findPw";
+	}
+
+	// 1. 아이디 + 이메일 확인
+	@PostMapping("/findPw")
+	public String checkManagerInfo(@RequestParam String rm_id, @RequestParam String rm_email, Model model) {
+		System.out.println(rm_id);
+		System.out.println(rm_email);
+		RestaurantManagerVO manager = managerService.findIdAndEmail(rm_id, rm_email);
+		if (manager == null) {
+			System.out.println("아이디 또는 이메일이 일치하지 않습니다.");
+			model.addAttribute("error", "아이디 또는 이메일이 일치하지 않습니다.");
+			return "manager/findPw"; // 여기만 변경됨!
+		}
+		System.out.println("rm_num : "+manager.getRm_num());
+		System.out.println("변경할 계정 : "+manager);
+		model.addAttribute("rm_num", manager.getRm_num());
+		model.addAttribute("manager", manager);
+		return "redirect:/manager/updatePw?rm_num=" + manager.getRm_num(); // 비번 재설정 화면으로 이동
+	}
+
+	//비밀번호 재설정(새 비밀번호 입력)
+	@GetMapping("/updatePw")
+	public String updateManagerPw(@RequestParam int rm_num, Model model) {
+		System.out.println("변경할 매니저의 기본키 : " + rm_num);
+		model.addAttribute("rm_num", rm_num);
+		return "manager/updatePw"; 
+	}
+
+	@PostMapping("path")
+	public String updateManagerPwInfo(@RequestParam int rm_num, @RequestParam String rm_pw, @RequestParam String confirmPw,
+    								  RedirectAttributes redirectAttributes) {
+		System.out.println("변경할 매니저의 기본키 : " + rm_num);
+		System.out.println("변경할 매니저의 비번 : " + rm_pw);
+		System.out.println("비밀번호 확인 : " + confirmPw);
+		// 비밀번호 불일치 체크
+		if (!rm_pw.equals(confirmPw)) {
+			redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+			return "redirect:/manager/updatePw?rm_num=" + rm_num;
+		}
+
+		RestaurantManagerVO manager =managerService.getManager(rm_num);
+		manager.setRm_pw(rm_pw);
+		boolean res = managerService.updateManagerPW(manager);
+		if(!res){
+			System.out.println("변경 실패했습니다.");
+			redirectAttributes.addFlashAttribute("error", "비밀번호 변경에 실패했습니다.");
+			return "redirect:/manager/updatePw?rm_num=" + rm_num;
+		}
+		return "redirect:/manager/login";
+	}
+	
+	
+	//매장 페이지
 	@GetMapping("/restaurant/restaurant/{rm_id}")
 	public String restaurantPage(@PathVariable("rm_id") String rm_id,Model model, Principal principal) {
 		String loginId = principal.getName();

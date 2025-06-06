@@ -58,6 +58,16 @@
 		select * from restaurantmanager where rm_id=#{rm_id}
 	</select>
 
+	<select id="selectResManager" resultType="RestaurantManagerVO">
+		select * from restaurantmanager where rm_num=#{rm_num}
+	</select>
+
+	<update id="updateManagerPassWord">
+		update restaurantmanager set
+			rm_pw = #{rm_pw}
+		where rm_num=#{rm_num}
+	</update> 
+
 	<select id="selectRestaurant" resultType="RestaurantVO">
 		select * from restaurant 
 		join restaurantmanager on rm_rt_num = rt_num
@@ -451,6 +461,10 @@
 		where bh_rt_num = #{rt_num}
 			and DATE(bh_start) = #{date}
 	</delete>
+
+	<select id="selectFindIdAndEmail" resultType="RestaurantManagerVO">
+		select * from restaurantmanager where rm_id = #{rm_id} and rm_email = #{rm_email}
+	</select>
 	
 
 	

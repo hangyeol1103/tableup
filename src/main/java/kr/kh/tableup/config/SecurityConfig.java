@@ -41,7 +41,7 @@ public class SecurityConfig{
       .securityMatcher("/manager/**", "/schedule/**")
       .csrf(csrf ->csrf.disable())
       .authorizeHttpRequests(auth -> auth
-          .requestMatchers("/manager/signup", "/manager/register").permitAll()
+          .requestMatchers("/manager/signup", "/manager/register", "/manager/findId", "/manager/findPw","/manager/updatePw").permitAll()
           .anyRequest().authenticated()
       )
       .formLogin(form -> form

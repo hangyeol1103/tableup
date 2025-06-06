@@ -30,6 +30,10 @@ public interface ManagerDAO {
 
 	boolean insertManager(RestaurantManagerVO rm);
 
+	RestaurantManagerVO selectResManager(int rm_num);
+	
+	boolean updateManagerPassWord(RestaurantManagerVO manager);
+
 	RestaurantManagerVO findById(String username);
 
 	RestaurantManagerVO selectManager(String rm_id);
@@ -166,6 +170,10 @@ public interface ManagerDAO {
 	boolean existsRestime(int rtNum, String bh_start, String bh_date);
 
 	boolean deleteAllRestimes(Integer rt_num, String date);
+
+    RestaurantManagerVO selectFindIdAndEmail(String rm_id, String rm_email);
+
+
 
 
 

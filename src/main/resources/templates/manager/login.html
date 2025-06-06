@@ -45,6 +45,7 @@
         <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/findPw'">비밀번호 찾기</button>
         <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/signup'">회원가입</button>
       </div>
+      <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
       
     </form>
   </div>

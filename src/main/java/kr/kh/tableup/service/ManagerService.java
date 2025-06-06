@@ -75,6 +75,23 @@ public class ManagerService {
 		return res ? null : "회원가입에 실패했습니다.";
 	}
 
+	// 비밀번호 변경할 계정 가져오기
+	public RestaurantManagerVO getManager(int rm_num) {
+		if(rm_num == 0){
+			return null;
+		}
+		return managerDAO.selectResManager(rm_num);
+	}
+
+	// 변경할 계정 비밀번호 재설정
+	public boolean updateManagerPW(RestaurantManagerVO manager) {
+        if(manager == null){
+			return false;
+		}
+		manager.setRm_pw(passwordEncoder.encode(manager.getRm_pw()));
+        return managerDAO.updateManagerPassWord(manager);
+    }
+
 	public List<RestaurantManagerVO> getManagerList() {
 		return managerDAO.selectManagerList();
 	}
@@ -743,15 +760,14 @@ public class ManagerService {
 			}
 	}
 
-	public boolean isExistId(String id) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'isExistId'");
-	}
+	// 비밀번호 재설정할 계정 확인하기 위한 
+    public RestaurantManagerVO findIdAndEmail(String rm_id, String rm_email) {
+        if(rm_id == null || rm_email == null){
+			return null;
+		}
+		return managerDAO.selectFindIdAndEmail(rm_id,rm_email);
+    }
 
-	public boolean isExistBusiness(String business) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'isExistBusiness'");
-	}
 
 
 

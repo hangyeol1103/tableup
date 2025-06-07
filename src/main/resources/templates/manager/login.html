@@ -21,12 +21,12 @@
 
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text">아이디</span>
-        <input type="text" class="form-control" id="rm_id" name="username">
+        <input type="text" class="form-control" id="rm_id" name="username"  th:value="${param.username}" required>
       </div>
 
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text">비밀번호</span>
-        <input type="password" class="form-control" id="rm_pw" name="password">
+        <input type="password" class="form-control" id="rm_pw" name="password" required>
       </div>
 
       <div class="form-check mb-3">
@@ -52,16 +52,21 @@
   <script>
     const usIdInput = document.getElementById("rm_id");
     const saveIdCheck = document.getElementById("saveId");
+    const savedId = localStorage.getItem("savedId");
 
     // 저장된 ID 불러오기
-    window.addEventListener("load", function () {
-      const savedId = localStorage.getItem("savedId");
-      if (savedId) {
-        usIdInput.value = savedId;
-        saveIdCheck.checked = true;
-      }
-    });
-
+    // window.addEventListener("load", function () {
+    //   const savedId = localStorage.getItem("savedId");
+    //   if (savedId) {
+    //     usIdInput.value = savedId;
+    //     saveIdCheck.checked = true;
+    //   }
+    // });
+    if (savedId) {
+      usIdInput.value = savedId;
+      saveIdCheck.checked = true;
+    }
+    
     // 로그인 시 저장 여부 확인
     document.getElementById("loginForm").addEventListener("submit", function () {
       if (saveIdCheck.checked) {

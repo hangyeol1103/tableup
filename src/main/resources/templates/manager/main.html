@@ -122,7 +122,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         $('#todaySummaryBody').html('<p>로딩 중...</p>');
 
         $.ajax({
-          url: '/schedule/daily/summary',
+          url: 'manager/schedule/daily',
           method: 'GET',
           success: function(data) {
             if (data && data.length > 0) {

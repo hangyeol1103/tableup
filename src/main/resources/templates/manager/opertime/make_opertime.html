@@ -66,6 +66,8 @@
   <div id="calendar"></div>
 
   <button id="submitCalendar" class="btn btn-success w-100 mt-3">등록하기</button>
+  <a th:href="@{/manager/opertime/opertimelist/{rm_rt_num}(rm_rt_num=${manager.rm_rt_num})}" 
+  class="btn btn-secondary col-12 mb-3 mt-3">영업일자 목록으로 돌아가기</a>
 
   <script th:inline="javascript">
 
@@ -97,24 +99,24 @@
 
         let cellHtml;
 
-        if (match) {
-          // 등록된 날짜면 drop 불가 + 상세 링크
-          cellHtml = `
-            <div class="calendar-cell bg-light text-muted" data-date="${dateStr}" style="cursor: pointer;" onclick="location.href='/manager/opertime/remake_opertime/${match.bd_num}'">
-              <strong>${i}</strong>
-              <div class="drop-content">
-                ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
-                ${match.bd_off ? '쉬는날' : '여는날'}
-              </div>
-            </div>`;
-        } else {
-          // 등록 안 된 날짜는 드래그앤드롭 가능
-          cellHtml = `
-            <div class="calendar-cell" data-date="${dateStr}" ondrop="drop(event)" ondragover="allowDrop(event)">
-              <strong>${i}</strong>
-              <div class="drop-content"></div>
-            </div>`;
-        }
+         if (match) {
+            cellHtml = `
+              <div class="calendar-cell bg-light text-muted" data-date="${dateStr}" 
+                  style="cursor: pointer;" 
+                  onclick="location.href='/manager/opertime/remake_opertime/${match.bd_num}'">
+                <strong>${i}</strong>
+                <div class="drop-content">
+                  ${match.bd_open ? match.bd_open.substring(11, 16) : '-'} ~ ${match.bd_close ? match.bd_close.substring(11, 16) : '-'}<br>
+                  ${match.bd_off ? '쉬는날' : '영업중'}
+                </div>
+              </div>`;
+          } else {
+            cellHtml = `
+              <div class="calendar-cell" data-date="${dateStr}" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <strong>${i}</strong>
+                <div class="drop-content"></div>
+              </div>`;
+          }
 
         row.append(cellHtml);
 

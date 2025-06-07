@@ -58,6 +58,14 @@
 		select * from restaurantmanager where rm_id=#{rm_id}
 	</select>
 
+	<select id="selectfindManager" resultType="RestaurantManagerVO">
+		select * from restaurantmanager
+		where 
+			rm_name = #{rm_name} and
+			rm_phone = #{rm_phone} and
+			rm_business = #{rm_business} 
+	</select>
+
 	<select id="selectResManager" resultType="RestaurantManagerVO">
 		select * from restaurantmanager where rm_num=#{rm_num}
 	</select>

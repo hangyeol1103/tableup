@@ -87,19 +87,65 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
         <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/restaurant/restaurant'|">매장 관리</div>
         <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">매장 관리</div>
-
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/manager_pay/pay'|">매출 관리</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">매출 관리</div>
+        
 			</div>
 			<div class="sub-box">
         <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/schedule/manager_schedulelist'|">일정 관리</div>
         <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">일정 관리</div>
 
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/schedule/daily'|">오늘 일정 요약</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">오늘 일정 요약</div>
-
+        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/manager_pay/pay'|">매출 관리</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">매출 관리</div>
+        <!-- <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/schedule/daily'|">오늘 일정 요약</div> -->
+        <!-- <div class="new-reserve" sec:authorize="isAuthenticated()" onclick="showTodaySummaryModal()">오늘 일정 요약</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">오늘 일정 요약</div> -->
 			</div>
 		</div>
+    <!-- 오늘의 일정 요약 모달 -->
+    <div class="modal fade" id="todaySummaryModal" tabindex="-1" aria-labelledby="todaySummaryModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="todaySummaryModalLabel">오늘의 일정 요약</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body" id="todaySummaryBody">
+            <!-- 데이터 비동기로 출력 -->
+            <p>로딩 중...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script th:inline="javascript">
+      function showTodaySummaryModal() {
+        const modal = new bootstrap.Modal(document.getElementById('todaySummaryModal'));
+        $('#todaySummaryBody').html('<p>로딩 중...</p>');
+
+        $.ajax({
+          url: '/schedule/daily/summary',
+          method: 'GET',
+          success: function(data) {
+            if (data && data.length > 0) {
+              let html = '<ul class="list-group">';
+              data.forEach(item => {
+                html += `<li class="list-group-item">
+                  ${item.time} - 예약 ${item.reservationCount}건, 테이블 ${item.tableUsed}/${item.tableMax}
+                </li>`;
+              });
+              html += '</ul>';
+              $('#todaySummaryBody').html(html);
+            } else {
+              $('#todaySummaryBody').html('<p>오늘 등록된 일정이 없습니다.</p>');
+            }
+          },
+          error: function() {
+            $('#todaySummaryBody').html('<p class="text-danger">일정을 불러오지 못했습니다.</p>');
+          }
+        });
+
+        modal.show();
+      }
+    </script>
 	</main>
 </body>
 </html>

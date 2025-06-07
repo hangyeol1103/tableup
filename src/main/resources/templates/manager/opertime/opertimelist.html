@@ -8,33 +8,50 @@
   <title>영업일자 달력 보기</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     .calendar-cell {
-      width: 120px;
-      height: 100px;
-      border: 1px solid #ccc;
-      margin: 5px;
-      padding: 5px;
+      width: 140px;
+      height: 110px;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      margin: 6px;
+      padding: 8px;
       display: inline-block;
       vertical-align: top;
       position: relative;
       cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      background-color: #fff;
+      box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .calendar-cell:hover {
+      background-color: #f1f3f5;
+      transform: scale(1.02);
+    }
+    .calendar-cell strong {
+      display: block;
+      font-size: 1.2em;
+      margin-bottom: 5px;
+      color: #212529;
     }
     .calendar-row {
       display: flex;
-    }
-    .calendar-month {
-      margin-bottom: 2rem;
-    }
-    .calendar-navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
+      flex-wrap: nowrap;
     }
     .opertime-info {
-      font-size: 0.8em;
-      margin-top: 5px;
+      font-size: 0.75em;
+      color: #495057;
+    }
+    .opertime-info span.badge {
+      font-size: 0.7em;
+      margin-right: 4px;
+    }
+    .opertime-info span.badge.open {
+      background-color: #198754;
+    }
+    .opertime-info span.badge.closed {
+      background-color: #dc3545;
     }
   </style>
 </head>
@@ -47,6 +64,25 @@
     <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
   </div>
   <div id="calendar"></div>
+  <!-- 영업일자 상세 모달 -->
+  <div class="modal fade" id="daySummaryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">영업일자 상세</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="modal-body-content">
+          <!-- JavaScript로 날짜별 정보 삽입 -->
+        </div>
+        <div class="modal-footer">
+          <a id="edit-link" class="btn btn-primary">수정하기</a>
+          <button type="button" class="btn btn-danger" id="delete-btn">삭제</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/opertime/make_opertime'">영업시간 등록</button>
   <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
@@ -55,10 +91,10 @@
     const today = new Date();
     let currentMonth = today.getMonth();
     let currentYear = today.getFullYear();
+    let selectedBdNum = null;
 
     const opertimelist = /*[[${opertimelist}]]*/ [];
 
-    console.log("opertimelist", opertimelist);
     function renderCalendar(year, month) {
       $('#calendar').empty();
       const container = $('<div class="calendar-month"></div>');
@@ -76,15 +112,22 @@
 
       for (let i = 1; i <= daysInMonth; i++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        const match = opertimelist.find(op => op.bd_date === dateStr);
+        const match = opertimelist.find(op => op.bd_date?.substring(0, 10) === dateStr);
 
         const cell = $(`
           <div class="calendar-cell" data-date="${dateStr}">
             <strong>${i}</strong>
             ${match ? `
               <div class="opertime-info">
-                ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
-                ${match.bd_off ? '쉬는날' : '여는날'}
+                <span class="badge ${match.bd_off ? 'closed' : 'open'}">
+                  ${match.bd_off ? '쉬는날' : '영업중'}
+                </span><br>
+                ${match.bd_open && match.bd_close ? `
+                  <small>
+                    ${match.bd_open.substring(11, 16)} ~ ${match.bd_close.substring(11, 16)}
+                     ${match.bd_brstart && match.bd_brend ? `(브레이크: ${match.bd_brstart.substring(11, 16)}~${match.bd_brend.substring(11, 16)})` : ''}
+                  </small>
+                ` : ''}
               </div>
             ` : ''}
           </div>
@@ -92,7 +135,22 @@
 
         if (match) {
           cell.click(() => {
-            location.href = `/manager/opertime/remake_opertime/${match.bd_num}`;
+            // location.href = `/manager/opertime/remake_opertime/${match.bd_num}`;
+            selectedBdNum = match.bd_num; // 모달 열기 전에 bd_num 저장
+            const infoHtml = `
+              <p><strong>날짜:</strong> ${dateStr}</p>
+              <p><strong>상태:</strong> ${match.bd_off ? '쉬는날' : '영업일'}</p>
+              <p><strong>시간:</strong> ${match.bd_open?.substring(11, 16)} ~ ${match.bd_close?.substring(11, 16)}</p>
+              ${match.bd_brstart ? `<p><strong>브레이크:</strong> ${match.bd_brstart.substring(11, 16)} ~ ${match.bd_brend.substring(11, 16)}</p>` : ''}
+              ${match.bd_loam ? `<p><strong>라스트오더(점심):</strong> ${match.bd_loam.substring(11, 16)}</p>` : ''}
+              ${match.bd_lopm ? `<p><strong>라스트오더(저녁):</strong> ${match.bd_lopm.substring(11, 16)}</p>` : ''}
+            `;
+            $('#modal-body-content').html(infoHtml);
+            $('#edit-link').attr('href', `/manager/opertime/remake_opertime/${match.bd_num}`);
+            
+            // 모달 띄우기
+            const modal = new bootstrap.Modal(document.getElementById('daySummaryModal'));
+            modal.show();
           });
         }
 
@@ -124,9 +182,33 @@
       renderCalendar(currentYear, currentMonth);
     });
 
+    $('#delete-btn').off('click').on('click', function () {
+      if (selectedBdNum && confirm("정말 이 영업일자를 삭제하시겠습니까?")) {
+        $.ajax({
+          url: `/manager/opertime/delete_opertime/${selectedBdNum}`,
+          type: 'POST',
+          success: function (res) {
+            if (res === 'success') {
+              alert("삭제 완료");
+              location.reload();
+            } else {
+              alert("삭제 실패");
+            }
+          },
+          error: function () {
+            alert("서버 오류로 삭제 요청에 실패했습니다.");
+          }
+        });
+      }
+    });
+
     $(document).ready(() => {
       renderCalendar(currentYear, currentMonth);
     });
+
+    
+
+
   </script>
 </main>
 </body>

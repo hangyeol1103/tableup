@@ -29,6 +29,8 @@ public interface ManagerDAO {
 	List<RestaurantManagerVO> selectManagerList();
 
 	boolean insertManager(RestaurantManagerVO rm);
+	
+	RestaurantManagerVO selectfindManager(String rm_name, String rm_phone, String rm_business);
 
 	RestaurantManagerVO selectResManager(int rm_num);
 	
@@ -172,7 +174,6 @@ public interface ManagerDAO {
 	boolean deleteAllRestimes(Integer rt_num, String date);
 
     RestaurantManagerVO selectFindIdAndEmail(String rm_id, String rm_email);
-
 
 
 

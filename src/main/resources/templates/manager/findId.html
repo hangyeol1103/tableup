@@ -15,15 +15,19 @@
   </head>
 <body>
   <main div class="container mt-4"layout:fragment="content" >
-    <h3>비밀번호 재설정</h3>
-    <form th:action="@{/manager/reset-check}" method="post">
+    <h3>아이디 찾기</h3>
+    <form th:action="@{/manager/findId}" method="post">
       <div class="mb-3">
-        <label class="form-label">아이디</label>
-        <input type="text" class="form-control" name="rm_id" required>
+        <label class="form-label">이름</label>
+        <input type="text" class="form-control" name="rm_name" required>
       </div>
       <div class="mb-3">
-        <label class="form-label">이메일</label>
-        <input type="email" class="form-control" name="rm_email" required>
+        <label class="form-label">전화번호</label>
+        <input type="text" class="form-control" name="rm_phone" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">사업자 번호</label>
+        <input type="text" class="form-control" name="rm_business" required>
       </div>
       <button type="submit" class="btn btn-primary w-100">확인</button>
     </form>

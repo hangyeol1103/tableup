@@ -75,6 +75,14 @@ public class ManagerService {
 		return res ? null : "회원가입에 실패했습니다.";
 	}
 
+	// 조회할 아이디 가져오기
+	public RestaurantManagerVO findManager(String rm_name, String rm_phone, String rm_business) {
+		if(rm_name == null || rm_phone ==null || rm_business==null){
+			return null;
+		}
+		return managerDAO.selectfindManager(rm_name, rm_phone, rm_business);
+	}
+
 	// 비밀번호 변경할 계정 가져오기
 	public RestaurantManagerVO getManager(int rm_num) {
 		if(rm_num == 0){
@@ -617,9 +625,33 @@ public class ManagerService {
 
 	//영업일자 변경
 	public boolean remakeOperTime(BusinessDateVO opertime) {
-	if(opertime==null){
+		if(opertime==null){
 			return false;
 		}
+		// 날짜
+		String date = opertime.getBd_date();
+
+		// 날짜 + 시간 합치기
+		if (opertime.getBd_open() != null)
+			opertime.setBd_open(date + " " + opertime.getBd_open() + ":00");
+
+		if (opertime.getBd_close() != null)
+			opertime.setBd_close(date + " " + opertime.getBd_close() + ":00");
+
+		if (opertime.getBd_brstart() != null)
+			opertime.setBd_brstart(date + " " + opertime.getBd_brstart() + ":00");
+
+		if (opertime.getBd_brend() != null)
+			opertime.setBd_brend(date + " " + opertime.getBd_brend() + ":00");
+
+		if (opertime.getBd_loam() != null)
+			opertime.setBd_loam(date + " " + opertime.getBd_loam() + ":00");
+
+		if (opertime.getBd_lopm() != null)
+			opertime.setBd_lopm(date + " " + opertime.getBd_lopm() + ":00");
+		
+		System.out.println("수정된 영업일짜 : " + opertime);
+
 		boolean res =managerDAO.updateOperTime(opertime);
 		if(!res){
 			System.out.println("수정 실패");
@@ -767,6 +799,7 @@ public class ManagerService {
 		}
 		return managerDAO.selectFindIdAndEmail(rm_id,rm_email);
     }
+
 
 
 

@@ -115,13 +115,43 @@ public class ManagerController {
 		return "redirect:/manager/signup";
 	}
 
-	//아이디 찾기(이름, 전화번호 확인)
+	//아이디 찾기(이름, 전화번호, 사업자 번호 확인)
 	@GetMapping("/findId")
 	public String findManagerId(Model model) {
 		List<RestaurantManagerVO> managerList = managerService.getManagerList();		
 		model.addAttribute("managerList", managerList);
 		return "/manager/findId";
 	}
+
+	@PostMapping("/findId")
+	public String findManagerIdInfo(@RequestParam String rm_name, @RequestParam String rm_phone, @RequestParam String rm_business, Model model) {
+		System.out.println("rm_name : "+rm_name);
+		System.out.println("rm_phone : "+rm_phone);
+		System.out.println("rm_business : "+rm_business);
+		RestaurantManagerVO manager = managerService.findManager(rm_name, rm_phone, rm_business);
+		
+		if (manager == null) {
+			System.out.println("아직 회원 가입한 계정이 아닙니다. ");
+			model.addAttribute("error", "아직 회원 가입한 계정이 아닙니다.");
+			return "manager/findId"; 
+		}
+
+		System.out.println("아이디 : " + manager.getRm_id());
+		model.addAttribute("foundId", manager.getRm_id());
+		model.addAttribute("rm_num", manager.getRm_num()); // 비번 찾기 연동용
+		return "manager/showIdResult"; // <- 결과 페이지로 이동
+
+	}
+
+	// 아이디 찾기 결과 페이지
+	@GetMapping("/showIdResult")
+	public String findManagerIdShow(@RequestParam int rm_num, @RequestParam int foundId, Model model) {
+		model.addAttribute("foundId", foundId);
+		model.addAttribute("rm_num", rm_num);
+		return "manager/showIdResult";
+	}
+	
+	
 	
 
 	//비밀번호 재설정(아이디, 이메일 확인)
@@ -1071,9 +1101,20 @@ public class ManagerController {
 	//영업 일자 등록 페이지
 	@GetMapping("/opertime/make_opertime")
 	public String makeOperTimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
-		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
-		
+		if (manager == null || manager.getManager() == null) {
+			return "redirect:/manager/login";
+		}
+
+		int rt_num = manager.getManager().getRm_rt_num();
+		List<BusinessDateVO> opertimelist = new ArrayList<>();
+		try {
+			opertimelist = managerService.getOperTimeList(rt_num);
+		} catch (Exception e) {
+			e.printStackTrace(); // 에러 로그 확인
+		}
+
 		model.addAttribute("opertimelist", opertimelist);
+		model.addAttribute("manager", manager.getManager());
 		model.addAttribute("url", "/make_opertime");
 		return "/manager/opertime/make_opertime";
 	}
@@ -1174,31 +1215,33 @@ public class ManagerController {
 	public String updateOpertime(BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager ) {
 		opertime.setBd_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager);
-		System.out.println(opertime);
+		System.out.println("변경된 영업일자 정보 : "+opertime);
 		
 		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    opertime.setBd_rt_num(rtNum);
+    	System.out.println("매니저의 매장 번호: " + rtNum);
+    	opertime.setBd_rt_num(rtNum);
 		System.out.println("수정할 bd_num = " + opertime.getBd_num());
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
-		 if(managerService.remakeOperTime(opertime)){
-		 	return "redirect:/manager/opertime/opertimelist/"+rtNum;
-		 }
-		return "/manager/opertime/remake_opertime";
+		if (rtNum <= 0) {
+			// 매장 정보가 없는 매니저 → 매장 등록 페이지로
+			return "redirect:/manager/make";
+		}
+			if(managerService.remakeOperTime(opertime)){
+				return "redirect:/manager/opertime/opertimelist/"+rtNum;
+			}
+			return "/manager/opertime/remake_opertime";
 	}
 
 	//영업 시간 삭제
 	@PostMapping("/opertime/delete_opertime/{bd_num}")
+	@ResponseBody
 	public String deleteOperTime(@AuthenticationPrincipal CustomManager manager, @PathVariable int bd_num) {
-		int rtNum = manager.getManager().getRm_rt_num();
-		 if(managerService.deleteOperTime(bd_num)) {
-        return "redirect:/manager/opertime/opertimelist/"+rtNum;
-    }
-		return "redirect:/manager/opertime/opertimelist/"+rtNum;
+		//int rtNum = manager.getManager().getRm_rt_num();
+		System.out.println("삭제할 날짜의 기본키 : " + bd_num);
+		if(managerService.deleteOperTime(bd_num)) {
+			return "success";
+		}
+		return "fail";
 	}
 
 	//매니저페이지

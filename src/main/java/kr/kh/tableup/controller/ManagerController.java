@@ -655,26 +655,16 @@ public class ManagerController {
 	}
 	
 	@PostMapping("/coupon/remake_coupon")
-	public String updateCoupon(ResCouponVO coupon,  @AuthenticationPrincipal CustomManager manager) {
-		coupon.setRec_rt_num(manager.getManager().getRm_rt_num());
-		System.out.println(manager);
-		System.out.println(coupon);
-		
+	@ResponseBody
+	public boolean updateCouponAjax(@RequestBody ResCouponVO coupon, @AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    coupon.setRec_rt_num(rtNum);
+		if (rtNum <= 0) return false;
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
+		coupon.setRec_rt_num(rtNum);
 
-		if(managerService.updateCoupon(coupon)){
-			return "redirect:/manager/coupon/couponlist/"+rtNum;
-		}
-		
-		return "/manager/coupon/remake_coupon";
+		return managerService.updateCoupon(coupon);
 	}
+
 
 	//쿠폰 삭제
 	@PostMapping("/delete_coupon/{rec_num}")
@@ -1354,25 +1344,26 @@ public class ManagerController {
 	}
 	
 	@PostMapping("/resfacility/remake_resfacility")
-	public String updateResFacility(RestaurantFacilityVO resfacility,  @AuthenticationPrincipal CustomManager manager ) {
-		resfacility.setRf_rt_num(manager.getManager().getRm_rt_num());
-		System.out.println(manager.getManager());
-		System.out.println(resfacility);
-		
+	@ResponseBody
+	public ResponseEntity<String> updateResFacility(@RequestBody RestaurantFacilityVO resfacility, 
+													@AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-		System.out.println("-------------------------");
-  	//resfacility.setRf_rt_num(rtNum);
-		System.out.println("수정할 rf_num = " + resfacility.getRf_num());
+		resfacility.setRf_rt_num(rtNum);
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
-		 if(managerService.remakeResFacility(resfacility)){
-		 	return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;
-		 }
-		return "/manager/resfacility/remake_resfacility";
+		System.out.println("매니저: " + manager.getManager());
+		System.out.println("수정 요청된 시설: " + resfacility);
+
+		if (rtNum <= 0) {
+			return ResponseEntity.badRequest().body("매장 정보 없음");
+		}
+
+		boolean result = managerService.remakeResFacility(resfacility);
+
+		if (result) {
+			return ResponseEntity.ok("success");
+		} else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("fail");
+		}
 	}
 
 	@PostMapping("/resfacility/delete_resfacility/{rf_num}")

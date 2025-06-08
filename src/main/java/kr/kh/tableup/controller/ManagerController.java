@@ -624,15 +624,9 @@ public class ManagerController {
 
 	@PostMapping("/coupon/make_coupon")
 	@ResponseBody
-	public boolean insertCoupon(ResCouponVO coupon, @AuthenticationPrincipal CustomManager manager) {
+	public boolean insertCoupon(@RequestBody ResCouponVO coupon, @AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
 		coupon.setRec_rt_num(rtNum);
-
-		if (rtNum <= 0) {
-			System.out.println("매장 정보가 없습니다.");
-			return false;
-		}
-
 		return managerService.makeCoupon(coupon);
 	}
 
@@ -1213,24 +1207,39 @@ public class ManagerController {
 	}
 	
 	@PostMapping("/opertime/remake_opertime")
-	public String updateOpertime(BusinessDateVO opertime,  @AuthenticationPrincipal CustomManager manager ) {
-		opertime.setBd_rt_num(manager.getManager().getRm_rt_num());
-		System.out.println(manager);
-		System.out.println("변경된 영업일자 정보 : "+opertime);
-		
-		int rtNum = manager.getManager().getRm_rt_num();
-    	System.out.println("매니저의 매장 번호: " + rtNum);
-    	opertime.setBd_rt_num(rtNum);
-		System.out.println("수정할 bd_num = " + opertime.getBd_num());
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateOpertime(
+			@RequestBody BusinessDateVO opertime,
+			@AuthenticationPrincipal CustomManager manager) {
 
-		if (rtNum <= 0) {
-			// 매장 정보가 없는 매니저 → 매장 등록 페이지로
-			return "redirect:/manager/make";
+		Map<String, Object> response = new HashMap<>();
+
+		if (manager == null || manager.getManager() == null) {
+			response.put("success", false);
+			response.put("message", "로그인 정보가 없습니다.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		}
-			if(managerService.remakeOperTime(opertime)){
-				return "redirect:/manager/opertime/opertimelist/"+rtNum;
-			}
-			return "/manager/opertime/remake_opertime";
+
+		int rtNum = manager.getManager().getRm_rt_num();
+		if (rtNum <= 0) {
+			response.put("success", false);
+			response.put("message", "매장 정보가 없습니다.");
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		opertime.setBd_rt_num(rtNum);
+		System.out.println("수정할 영업일자: " + opertime);
+
+		boolean result = managerService.remakeOperTime(opertime);
+
+		if (result) {
+			response.put("success", true);
+		} else {
+			response.put("success", false);
+			response.put("message", "영업일자 수정에 실패했습니다.");
+		}
+
+		return ResponseEntity.ok(response);
 	}
 
 	//영업 시간 삭제

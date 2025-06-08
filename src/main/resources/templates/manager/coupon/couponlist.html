@@ -113,7 +113,8 @@
       $.ajax({
         type: 'POST',
         url: '/manager/coupon/make_coupon',
-        data: formData,
+        data: JSON.stringify(formData), // ← JSON 문자열로 변환
+        contentType: 'application/json', // ← JSON 타입 명시
         success: function (res) {
           if (res === true || res === 'true') {
             alert("등록 성공");

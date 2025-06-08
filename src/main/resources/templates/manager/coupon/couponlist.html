@@ -89,50 +89,51 @@
       <i class="bi bi-arrow-left"></i> 매장 관리 화면으로 돌아가기
     </a>
   </div>
-</main>
-
-<script>
-  $(document).ready(function () {
-    const today = new Date();
-    today.setDate(today.getDate() + 7);
-    const yyyy = today.getFullYear();
-    const MM = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const defaultDate = `${yyyy}-${MM}-${dd}`;
-    $("#rec_period").attr("min", defaultDate).val(defaultDate);
-  });
-
-  // ✅ 반드시 document.on 으로 바꾸세요
-  $(document).on('click', '#couponSubmitBtn', function () {
-    const formData = {
-      rec_content: $('#rec_content').val(),
-      rec_state: $('#rec_state').val() === 'true',
-      rec_period: $('#rec_period').val()
-    };
-
-    console.log("보낼 데이터:", formData);
-
-    $.ajax({
-      type: 'POST',
-      url: '/manager/coupon/make_coupon',
-      data: JSON.stringify(formData),
-      contentType: 'application/json',
-      success: function (res) {
-        console.log("응답:", res);
-        if (res === true || res === 'true') {
-          alert("등록 성공");
-          location.reload();
-        } else {
-          alert("등록 실패");
-        }
-      },
-      error: function (xhr) {
-        console.error("에러 상태:", xhr.status);
-        console.error("응답 본문:", xhr.responseText);
-        alert("서버 오류 발생");
-      }
+  <script>
+    $(document).ready(function () {
+      const today = new Date();
+      today.setDate(today.getDate() + 7);
+      const yyyy = today.getFullYear();
+      const MM = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const defaultDate = `${yyyy}-${MM}-${dd}`;
+      $("#rec_period").attr("min", defaultDate).val(defaultDate);
     });
-  });
-</script>
+
+    
+    $(document).on('click', '#couponSubmitBtn', function () {
+      console.log("버튼 클릭 이벤트 연결됨");
+      const formData = {
+        rec_content: $('#rec_content').val(),
+        rec_state: $('#rec_state').val() === 'true',
+        rec_period: $('#rec_period').val()
+      };
+
+      console.log("보낼 데이터:", formData);
+
+      $.ajax({
+        async : true,
+        type: 'POST',
+        url: '/manager/coupon/make_coupon',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        success: function (res) {
+          console.log("응답:", res);
+          if (res === true || res === 'true') {
+            alert("등록 성공");
+            location.reload();
+          } else {
+            alert("등록 실패");
+          }
+        },
+        error: function (xhr) {
+          console.error("에러 상태:", xhr.status);
+          console.error("응답 본문:", xhr.responseText);
+          alert("서버 오류 발생");
+        }
+      });
+    });
+  </script>
+</main>
 </body>
 </html>

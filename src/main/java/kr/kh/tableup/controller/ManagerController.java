@@ -626,6 +626,7 @@ public class ManagerController {
 	@ResponseBody
 	public boolean insertCoupon(@RequestBody ResCouponVO coupon, @AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
+		if (coupon == null || manager == null || manager.getManager() == null) return false;
 		coupon.setRec_rt_num(rtNum);
 		return managerService.makeCoupon(coupon);
 	}

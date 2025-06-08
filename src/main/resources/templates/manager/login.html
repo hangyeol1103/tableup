@@ -50,31 +50,28 @@
     </form>
   </div>
   <script>
-    const usIdInput = document.getElementById("rm_id");
-    const saveIdCheck = document.getElementById("saveId");
-    const savedId = localStorage.getItem("savedId");
+      document.addEventListener("DOMContentLoaded", function () {
+        const usIdInput = document.getElementById("rm_id");
+        const saveIdCheck = document.getElementById("saveId");
 
-    // 저장된 ID 불러오기
-    // window.addEventListener("load", function () {
-    //   const savedId = localStorage.getItem("savedId");
-    //   if (savedId) {
-    //     usIdInput.value = savedId;
-    //     saveIdCheck.checked = true;
-    //   }
-    // });
-    if (savedId) {
-      usIdInput.value = savedId;
-      saveIdCheck.checked = true;
-    }
-    
-    // 로그인 시 저장 여부 확인
-    document.getElementById("loginForm").addEventListener("submit", function () {
-      if (saveIdCheck.checked) {
-        localStorage.setItem("savedId", usIdInput.value);
-      } else {
-        localStorage.removeItem("savedId");
-      }
-    });
+        // 쿠키에서 savedId 읽기
+        const cookies = document.cookie.split(";").map(cookie => cookie.trim());
+        const savedIdCookie = cookies.find(c => c.startsWith("savedId="));
+        if (savedIdCookie) {
+          const savedId = savedIdCookie.split("=")[1];
+          usIdInput.value = savedId;
+          saveIdCheck.checked = true;
+        }
+
+        // 로그인 시 쿠키 저장/삭제
+        document.getElementById("loginForm").addEventListener("submit", function () {
+          if (saveIdCheck.checked) {
+            document.cookie = `savedId=${usIdInput.value}; path=/; max-age=2592000`; // 30일
+          } else {
+            document.cookie = `savedId=; path=/; max-age=0`; // 삭제
+          }
+        });
+      });
   </script>
 </body>
 </html>

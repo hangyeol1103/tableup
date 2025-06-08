@@ -372,7 +372,10 @@ public class ManagerController {
 
 		System.out.println("menulist rt_num: " + rt_num);
 		List<MenuVO> menulist = managerService.getMenuList(rt_num);
+		List<MenuTypeVO> menutype = managerService.getMenuTypeList();
+		
 		model.addAttribute("menulist", menulist);
+		model.addAttribute("menutype", menutype);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
 		System.out.println(manager.getManager());
@@ -419,7 +422,8 @@ public class ManagerController {
 			return "redirect:/manager/menu/menulist/"+rtNum;
 		}
 
-		return "/manager/menu/make_menu/";
+		// return "/manager/menu/make_menu/";
+		return "redirect:/manager/menu/menulist/"+rtNum;
 	}
 	
 	//메뉴 상세 페이지
@@ -432,7 +436,10 @@ public class ManagerController {
 
 		MenuVO menu = managerService.getMenu(mn_num);
 		MenuTypeVO menutype =managerService.getMenuType(menu.getMn_mt_num());
+		
+		List<MenuTypeVO> menutypeList = managerService.getMenuTypeList();
 		model.addAttribute("menu", menu);
+		model.addAttribute("menutypeList", menutypeList);
 		model.addAttribute("menutype", menutype);
 		return "/manager/menu/menu";
 	}
@@ -460,29 +467,50 @@ public class ManagerController {
 		model.addAttribute("menu", menu);
 		return "/manager/menu/remake_menu";
 	}
-	
+	// 메뉴 수정 (수정 전)
+	// @PostMapping("/menu/remake_menu")
+	// public String updateMenu(MenuVO menu, MultipartFile mn_img2,  @AuthenticationPrincipal CustomManager manager) {
+	// 	menu.setMn_rt_num(manager.getManager().getRm_rt_num());
+	// 	System.out.println(manager);
+	// 	System.out.println(menu);
+	// 	System.out.println(mn_img2.getOriginalFilename());
+		
+	// 	int rtNum = manager.getManager().getRm_rt_num();
+    // System.out.println("매니저의 매장 번호: " + rtNum);
+    // menu.setMn_rt_num(rtNum);
+
+    // if (rtNum <= 0) {
+    //     // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+    //     return "redirect:/manager/restaurant/make";
+    // }
+
+	// 	if(managerService.updateMenu(menu,mn_img2)){
+	// 		return "redirect:/manager/menu/menulist/"+rtNum;
+	// 	}
+		
+	// 	return "/manager/menu/remake_menu";
+	// }
+
 	@PostMapping("/menu/remake_menu")
-	public String updateMenu(MenuVO menu, MultipartFile mn_img2,  @AuthenticationPrincipal CustomManager manager) {
-		menu.setMn_rt_num(manager.getManager().getRm_rt_num());
-		System.out.println(manager);
-		System.out.println(menu);
-		System.out.println(mn_img2.getOriginalFilename());
-		
+	@ResponseBody
+	public Map<String, Object> updateMenu(MenuVO menu, MultipartFile mn_img2, @AuthenticationPrincipal CustomManager manager) {
+		Map<String, Object> result = new HashMap<>();
+
 		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    menu.setMn_rt_num(rtNum);
+		menu.setMn_rt_num(rtNum);
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/restaurant/make";
-    }
-
-		if(managerService.updateMenu(menu,mn_img2)){
-			return "redirect:/manager/menu/menulist/"+rtNum;
+		if (rtNum <= 0) {
+			result.put("success", false);
+			result.put("redirect", "/manager/restaurant/make");
+			return result;
 		}
-		
-		return "/manager/menu/remake_menu";
+
+		boolean success = managerService.updateMenu(menu, mn_img2);
+		result.put("success", success);
+		result.put("redirect", "/manager/menu/menulist/" + rtNum);
+		return result;
 	}
+
 	
 	//매장 상세 정보 출력
 	@GetMapping("/detail/restaurantdetail/{rt_num}")
@@ -569,8 +597,6 @@ public class ManagerController {
 	@GetMapping("/coupon/couponlist/{rt_num}")
 	public String couponListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
 
-
-		
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/";
 		}
@@ -597,26 +623,17 @@ public class ManagerController {
 	}
 
 	@PostMapping("/coupon/make_coupon")
-	public String insertCoupon(ResCouponVO coupon,  @AuthenticationPrincipal CustomManager manager) {
-		coupon.setRec_rt_num(manager.getManager().getRm_rt_num());
-		System.out.println(manager);
-		System.out.println(coupon);
-		
+	@ResponseBody
+	public boolean insertCoupon(ResCouponVO coupon, @AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    coupon.setRec_rt_num(rtNum);
+		coupon.setRec_rt_num(rtNum);
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-				System.out.println("매니저 정보가 없습니다.");
-        return "redirect:/manager/make";
-    }
-
-		if(managerService.makeCoupon(coupon)){
-			return "redirect:/manager/coupon/couponlist/"+rtNum;
+		if (rtNum <= 0) {
+			System.out.println("매장 정보가 없습니다.");
+			return false;
 		}
 
-		return "/manager/coupon/make_coupon/";
+		return managerService.makeCoupon(coupon);
 	}
 
 	//쿠폰 정보 출력 페이지
@@ -741,25 +758,19 @@ public class ManagerController {
 	}
 	
 	@PostMapping("/news/remake_news")
-	public String updateNews(ResNewsVO news,  @AuthenticationPrincipal CustomManager manager) {
-		news.setRn_rt_num(manager.getManager().getRm_rt_num());
-		System.out.println(manager);
-		System.out.println(news);
-		
+	@ResponseBody
+	public boolean updateNews(ResNewsVO news,  @AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    news.setRn_rt_num(rtNum);
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
-
-		if(managerService.updateNews(news)){
-			return "redirect:/manager/news/newslist/"+rtNum;
+		if (rtNum <= 0) {
+			System.out.println("매장 정보 없음, 매장 등록이 필요합니다.");
+			return false;
 		}
-		
-		return "/manager/news/remake_news";
+
+		news.setRn_rt_num(rtNum);
+		System.out.println("수정 요청 받은 내용: " + news);
+
+		return managerService.updateNews(news); // true/false 반환
 	}
 
 	//소식 삭제
@@ -1307,25 +1318,26 @@ public class ManagerController {
 	}
 
 	@PostMapping("/resfacility/make_resfacility")
-	public String insertResFacility(RestaurantFacilityVO resfacility,  @AuthenticationPrincipal CustomManager manager) {
+	public String insertResFacility(Model model, RestaurantFacilityVO resfacility,  @AuthenticationPrincipal CustomManager manager) {
 		resfacility.setRf_rt_num(manager.getManager().getRm_rt_num());
 		System.out.println(manager.getManager());
 		System.out.println(resfacility);
 		
 		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-  	resfacility.setRf_rt_num(rtNum);
+		System.out.println("매니저의 매장 번호: " + rtNum);
+		resfacility.setRf_rt_num(rtNum);
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
+		if (rtNum <= 0) {
+			// 매장 정보가 없는 매니저 → 매장 등록 페이지로
+			return "redirect:/manager/make";
+		}
 
 		if(managerService.makeResFacility(resfacility)){
 			return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;
 		}
-
-		return "/manager/resfacility/make_resfacility";
+		model.addAttribute("errorMsg", "등록에 실패했습니다. 다시 시도해 주세요.");
+        model.addAttribute("showModal", true);
+		return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;
 	}
 
 	//편의시설 정보 변경

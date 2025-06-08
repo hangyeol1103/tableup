@@ -36,4 +36,7 @@ public class RestaurantVO {
 	List<ReviewVO> reviewList;
 
 	DefaultResTimeVO defaultResTime;
+
+	//썸네일
+	String file_path;
 }

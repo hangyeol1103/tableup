@@ -175,7 +175,7 @@
   </div>
 
   <!-- <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/restime/make_restime'">예약 시간 등록</button> -->
-  <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+  <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" id="goBackToManager" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 
   <script th:inline="javascript">
     const today = new Date();
@@ -200,6 +200,8 @@
     console.log("저장된 예약 가능 시간 : ",restimelist);
 
     function renderCalendar(year, month) {
+      localStorage.setItem('lastViewedYear', year);
+      localStorage.setItem('lastViewedMonth', month);
       $('#calendar').empty();
       const container = $('<div class="calendar-month"></div>');
       const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -284,6 +286,17 @@
     });
 
     $(document).ready(() => {
+      
+      //저장된 달 정보 불러오기
+      const reload = localStorage.getItem('reload');
+      const savedYear = reload?localStorage.getItem('lastViewedYear') : new Date().getFullYear();
+      const savedMonth = reload?localStorage.getItem('lastViewedMonth') : new Date().getMonth();
+      localStorage.removeItem('reload');
+      if (savedYear && savedMonth) {
+        currentYear = parseInt(savedYear);
+        currentMonth = parseInt(savedMonth);
+      }
+
       renderCalendar(currentYear, currentMonth);
 
       // 모달 닫힐 때 정리
@@ -412,6 +425,11 @@
         const date = $(this).data('date');
         showTimeModal(date); // 기존 함수 재사용
       });
+
+      $('#goBackToManager').click(function () {
+        localStorage.removeItem('lastViewedYear');
+        localStorage.removeItem('lastViewedMonth');
+      });
     });
 
     function showTimeModal(dateStr) {
@@ -518,6 +536,7 @@
           list : resultList}),
         success: () => {
           alert("예약 가능 시간이 성공적으로 저장되었습니다.");
+          localStorage.setItem("reload", true);
           location.reload();
         },
         error: (xhr) => {

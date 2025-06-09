@@ -1412,22 +1412,32 @@ public class ManagerController {
 	}
 	
 	//매니저 예약 관리
-	@GetMapping("/manager/manager_reservation")
-	public String reservateionManager(Model model) {
-		
-		return "/manager/reservation/manager_reservation";
-	}
-
 	@GetMapping("/reservation")
-	public String reservateion(Model model) {
-		
+	public String reservateion(Model model, @AuthenticationPrincipal CustomManager manager, Principal principal) {
+		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
+			 manager == null || manager.getManager() == null){
+			return "redirect:/manager/login";
+		}
+		int rt_num = manager.getManager().getRm_rt_num();
+		List<BusinessDateVO> operTimeList = managerService.getOperTimeList(rt_num);
+		List<BusinessHourVO> resTimeList = managerService.getResTimeList(rt_num);
+		List<ReservationVO> reservationList = reservationService.getReservations(rt_num);
+
+		System.out.println("예약 가능 시간대 : " + resTimeList);
+
+
+		model.addAttribute("operTimeList", operTimeList);
+		model.addAttribute("resTimeList", resTimeList);
+		model.addAttribute("reservationList", reservationList);
 		return "/manager/reservation/reservation";
 	}
+
 	@PostMapping("/reservation/date")
 	@ResponseBody
 	public List<ReservationVO> reservationDate(Model model, @AuthenticationPrincipal CustomManager customManager, @RequestParam String date) {
 		return reservationService.getReservationList(customManager, date);
 	}
+
 	@PostMapping("/reservation/state")
 	@ResponseBody
 	public Map<String, Object> reservateionState(@RequestBody ReservationVO reservation, HashMap<String, Object> map) {

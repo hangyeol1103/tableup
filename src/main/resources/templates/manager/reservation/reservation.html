@@ -42,8 +42,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         </div>
       </div>
     </div>
-		<script>
+		<script th:inline="javascript">
       const dateModal = new bootstrap.Modal(document.getElementById('dateModal'));
+      const resTimeList = /*[[${resTimeList}]]*/[];
+      console.log("resTimeList : ", resTimeList);
       /***************************************
       * 문구 변경시 여기를 수정해주세요.
       ****************************************/
@@ -65,18 +67,36 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         let str = '';
         list.forEach(res=>{
           let obj = convertReservationToObject(res);
-          str += 
-          `
-            <div>
-              <div>${obj.time}</div>
-              <div>${obj.user}(${obj.person}명)</div>
-              <div>${obj.state}</div>
+          str += `
+            <div class="card mb-3 shadow-sm border-start border-3 border-${obj.res_state == 0 ? 'secondary' : obj.res_state == 1 ? 'success' : 'danger'} reservation-card" data-target="memo-${obj.res_num}" style="cursor:pointer;">
+              <div class="card-body">
+                <h5 class="card-title mb-2">
+                  <i class="bi bi-clock"></i> ${obj.time}
+                  <span class="badge bg-light text-dark ms-2">남은 좌석: ${obj.remainSeat}</span>
+                </h5>
+                <p class="mb-1"><strong>예약자:</strong> ${obj.user}</p>
+                <p class="mb-1"><strong>인원 수:</strong> ${obj.person}명</p>
+                <p class="mb-2"><strong>상태:</strong> 
+                  <span class="text-${obj.res_state == 0 ? 'secondary' : obj.res_state == 1 ? 'success' : 'danger'}">${obj.state}</span>
+                </p>
+
+                <div class="collapse mt-2" id="memo-${obj.res_num}">
+                  <div class="alert alert-secondary mb-2 py-2 px-3">
+                    <strong>요청사항:</strong> ${obj.request || '없음'}
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  ${obj.res_state == 0 
+                    ? '<button type="button" class="btn btn-sm btn-outline-success btn-reservation" data-target="'+obj.res_num+'" data-state="1" data-date="'+obj.date+'">'+confirmState+'</button>' 
+                    : ''}
+                  ${obj.res_state >= 0 
+                    ? '<button type="button" class="btn btn-sm btn-outline-danger btn-reservation" data-target="'+obj.res_num+'" data-state="-1" data-date="'+obj.date+'">'+cancelState+'</button>' 
+                    : ''}
+                </div>
+              </div>
             </div>
-            <div>
-              ${obj.res_state == 0 ? '<button type="button" class="btn-reservation btn btn-outline-success" data-target="'+obj.res_num+'" data-state="1" data-date="'+obj.date+'">'+confirmState+'</button>' : ''}
-              ${obj.res_state >= 0 ? '<button type="button" class="btn-reservation btn btn-outline-danger" data-target="'+obj.res_num+'" data-state="-1" data-date="'+obj.date+'">'+cancelState+'</button>' : ''}
-            </div>
-          `
+          `;
         })
         str = str.length == 0 ? "예약이 없습니다." : str;
         $("#modalBody").html(str);
@@ -165,8 +185,19 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         let state = res_state == 0 ? readyState : res_state == 1 ? confirmState : cancelState;
         let title = `${time} ${user}(${person}명) ${state}`;
         let color = colorList[res_state+1];
+        let request = res.res_request || '';
         let res_num = res.res_num;
-        return { date,time,title,color,state,user, res_state, person, res_num, date}
+
+        //좌석 정보 처리
+        const fullDateStr = `${date} ${time}:00`; // ex. 2025-06-09 12:00:00
+        const timeInfo = resTimeList.find(rt => rt.bh_start === fullDateStr);
+
+        let remainSeat = "정보 없음";
+        if (timeInfo) {
+          remainSeat = timeInfo.bh_seat_max - timeInfo.bh_seat_current;
+        }
+
+        return { date,time,title,color,state,user, res_state, person, res_num, date, remainSeat, request}
       }
   
       
@@ -253,6 +284,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
           });
         }
       }
+
+      // 예약 현황 정보 카드 클릭시 요구사항 출력되는 토글
+      $(document).on('click', '.reservation-card', function (e) {
+        // 버튼 클릭 시에는 이벤트 무시
+        if ($(e.target).closest('.btn-reservation').length > 0) return;
+
+        const targetId = $(this).data('target');
+        $('#' + targetId).collapse('toggle');
+      });
+
 		</script>
 	</main>
 </body>

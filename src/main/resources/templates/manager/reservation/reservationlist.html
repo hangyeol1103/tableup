@@ -42,7 +42,7 @@
 <body>
 <main layout:fragment="content">
   <div class="container">
-    <h1>예약 관리</h1>
+    <h1>예약 조회</h1>
   </div>
 
   <div class="calendar-navigation">
@@ -159,15 +159,24 @@
         $('#modalBody').append('<p>등록된 예약 가능 시간이 없습니다.</p>');
       } else {
         times.forEach(time => {
-          const timeText = time.bh_start.substring(11, 16) + ' ~ ' + time.bh_end.substring(11, 16);
-          const btn = $(`
-            <button class="btn btn-outline-primary mb-2" data-time="${time.bh_start}">
-              ${timeText}
-            </button>
-          `);
+          const timeOnly = time.bh_start.substring(11, 16);
+          const resCount = reservationlist.filter(r =>
+            r.res_time?.substring(0, 10) === dateStr &&
+            r.res_time?.substring(11, 16) === timeOnly
+          ).length;
+
+          const remainSeat = (time.bh_seat_max || 0) - (time.bh_seat_current || 0);
+
+          const btnText = `${timeOnly} ${resCount}건 예약 / 남은 좌석: ${remainSeat}`;
+
+          const btn = $(`<button class="btn btn-outline-primary mb-2 me-2" data-time="${time.bh_start}">
+            ${btnText}
+          </button>`);
+
           btn.on('click', function () {
             showReservations(dateStr, time.bh_start);
           });
+
           $('#modalBody').append(btn);
         });
       }

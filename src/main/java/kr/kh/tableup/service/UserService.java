@@ -486,7 +486,7 @@ public class UserService {
   
   public List<ReviewVO> getReviewListByRes(int rt_num) {
   
-     return userDAO.selectReviewListByRes(rt_num);
+     return userDAO.selectReviewListbyNum(rt_num);
   }
 
 

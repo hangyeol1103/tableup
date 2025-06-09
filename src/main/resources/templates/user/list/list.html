@@ -64,6 +64,7 @@
 
     .search-box {
       position: relative;
+      margin-top: 10px;
     }
 
     .autocomplete-item.recent {
@@ -160,7 +161,7 @@
     <!-- 검색창 -->
     <div class="search-box mb-3 position-relative">
       <div class="input-group mb-3" >
-        <input type="text" id="searchKeyword" class="form-control" placeholder="식당명, 지역, 음식 키워드로 검색" onkeyup="handleSearchEnter(event)" autocomplete="off">
+        <input type="text" id="searchKeyword" class="form-control" placeholder="식당명, 지역, 음식 키워드로 검색" onkeyup="handleSearchEnter(event)" autocomplete="off" th:value="${keyword != null ? keyword : ''}">
         <button class="btn btn-outline-secondary" type="button" onclick="search()">검색</button>
       </div>
       <div id="autocompleteBox"></div>

@@ -98,10 +98,7 @@ public class ReservationService {
 				System.out.println("예약 내역이 없습니다.");
 				throw new RuntimeException("예약 내역이 없습니다.");
 			}
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String bhStart = dbReservation.getRes_time().format(formatter);
 			
-			System.out.println("조회용 bh_start: " + bhStart);
 			//예약 가능 정보를 가져옴
 			System.out.println("--------------------");
 			BusinessHourVO  businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());

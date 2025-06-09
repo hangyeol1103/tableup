@@ -184,20 +184,23 @@
     <div class="mt-3 p-3 bg-white rounded shadow-sm">
       <div class="container mt-4">
         <h5 class="fw-bold">메뉴</h5>
-        <div class="d-flex justify-content-between align-items-start border-bottom py-3" th:each="menu, iterStat : ${menuList}" th:if="${iterStat.index < 3}">
-          <!-- 왼쪽 메뉴 정보 -->
-          <div class="flex-grow-1 me-3">
-            <div class="text-muted small category-label mb-1" th:text="${menu.mn_div}"></div>
-            <div class="d-flex align-items-center">
-              <h5 class="mb-2" th:text="${menu.mn_name}"></h5>
+        <div class="border-bottom py-3" th:each="menu, iterStat : ${menuList}" th:if="${iterStat.index < 3}">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+            <!-- 왼쪽 메뉴 정보 -->
+            <div class="flex-grow-1 me-md-3">
+              <div class="text-muted small category-label mb-1" th:text="${menu.mn_div}"></div>
+              <div class="d-flex align-items-center">
+                <h5 class="mb-2" th:text="${menu.mn_name}"></h5>
+              </div>
+              <p class="mb-2 text-muted small text-truncate d-inline-block"
+                 style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${menu.mn_content}"></p>
+              <div class="fw-bold mt-2" th:text="${#numbers.formatInteger(menu.mn_price, 0, 'COMMA')} + '원'"></div>
             </div>
-            <p class="mb-2 text-muted small text-truncate" style="max-width: 330px;" th:text="${menu.mn_content}"></p>
-            <div class="fw-bold mt-2" th:text="${#numbers.formatInteger(menu.mn_price, 0, 'COMMA')} + '원'"></div>
-          </div>
-          <!-- 오른쪽 사진 -->
-          <div>
-            <img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="메뉴 사진"
-              style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+            <!-- 오른쪽 사진 -->
+            <div>
+              <img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="메뉴 사진"
+                style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
+            </div>
           </div>
         </div>
         <!-- 메뉴 전체 버튼 -->

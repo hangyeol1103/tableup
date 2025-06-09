@@ -20,4 +20,7 @@ public class BusinessHourVO {
 	private int bh_table_current;
 	private boolean bh_state;
 	private int bh_rt_num;
+
+	private int bh_seat_remain;
+	private int bh_table_remain;
 }

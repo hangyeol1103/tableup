@@ -58,7 +58,7 @@ public class HomeController {
 		model.addAttribute("favoriteFood", favoriteFood);
 		model.addAttribute("favoriteRegion", favoriteRegion);
 		
-		if(customUser != null && customUser.getUser() != null) model.addAttribute("user", customUser.getUser());
+		if(customUser != null && customUser.getUser() != null) model.addAttribute("user", userService.getUserByNum(customUser.getUser().getUs_num()));
 		//System.out.println(regionList);
 		System.out.println("foodList: " + foodList);
 		System.out.println("favoriteFood: "+ Arrays.toString(favoriteFood));	//sysout favorite하면 안되는구나...신기

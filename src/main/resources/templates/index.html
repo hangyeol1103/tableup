@@ -7,6 +7,7 @@ layout:decorate="~{layout/layout.html}"
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
 <head>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 	<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,7 +23,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				max-width: 100%; width: 100%; padding: 1rem;
 				/* height: 700px; */
 				margin: 0 auto;
-				background: #f5f5f5; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 4px 0;
+				/* background: #f5f5f5; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);  */
+				padding: 4px 0;
 			}
 			.btn svg {
 				vertical-align: middle;
@@ -32,58 +34,180 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				padding: 0.25rem 0.5rem;
 				height: auto;
 				min-height: 0;
+
+			}
+
+			.navbar-brand {
+				font-size: 1.6rem;
+				font-weight: 700;
 			}
 			.btn {
 				padding: 0.25rem 0.5rem;
 				font-size: 0.9rem;
 				line-height: 1.2;
 			}
+			.btn-region {
+				background-color: transparent;
+				outline: solid black 1px;
+				/* border: 1px solid #aaa; */
+				border-radius: 8px;
+				color: #333;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 4px 10px;
+				transition: background-color 0.2s ease;
+			}
+
+
+			.btn-region:hover {
+				background-color: rgba(0, 0, 0, 0.03);
+			}
+
+			.btn-region svg {
+				width: 18px;
+				height: 29px;
+				stroke: #333;
+			}
+
+			#demo.carousel {
+				height: 300px;
+				transition: height 0.3s ease;
+				overflow: hidden;
+			}
+
+			.carousel-item {
+				position: relative;
+				height: 100%;
+			}
+
+			.carousel-inner img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				object-position: center center;
+				/* transform: translateY(-50%); */
+			}
+
+			
+			#autocompleteBox {
+				position: absolute;
+				margin-top: 10px;
+				top: 100%;
+				left: 0;
+				z-index: 10;
+				width: 100%;
+				background: white;
+				border: 1px solid #ccc;
+				max-height: 200px;
+				overflow-y: auto;
+				border-radius: 4px;
+			}
+
+			.autocomplete-item {
+				padding: 8px 12px;
+				cursor: pointer;
+			}
+
+			.autocomplete-item:hover {
+				background-color: #f0f0f0;
+				font-weight: bold;
+			}
+
+			.search-box {
+				position: relative;
+				margin-top: 10px;
+			}
+
+			.autocomplete-item.recent {
+				background-color: #f9f9f9;
+				font-style: italic;
+			}
+
+			.autocomplete-item.recent:hover {
+				background-color: #e0e0e0;
+				font-weight: normal;
+			}
+			.dropdown {
+				z-index: 11;
+			}
+
 
 		</style>
 
 		<div class="container mt-4">
 			<div class="main-container">
 				<div class="d-flex justify-content-between align-items-center px-2 first-bar">
-					<!-- 상단 지역 선택 버튼 -->
-					<button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#regionModal">
-						<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#aaa" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:middle;">
-							<circle cx="12" cy="10" r="3"/>
-							<path d="M12 2C8 2 5 5.5 5 9.5c0 5.5 7 12.5 7 12.5s7-7 7-12.5C19 5.5 16 2 12 2z"/>
-						</svg>
-						<strong>전국</strong>
-						<svg width="24" height="24" viewBox="0 0 24 24">
-							<polyline points="6 9 12 15 18 9" style="fill:none;stroke:black;stroke-width:2"/>
-						</svg>
-					</button>
-				  <div>
-						<div class="dropdown" sec:authorize="isAuthenticated()">
-						<button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center gap-2" type="button"
-										id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-							<span th:if="${user != null}">
-								<img th:if="${user.upi_file_path != null and !#strings.isEmpty(user.upi_file_path)}"
-											th:src="@{'/uploads/' + ${user.upi_file_path}}"
-											alt="프로필 이미지"
-											class="rounded-circle"
-											style="width:30px; height:30px; object-fit:cover;">
-								<i th:if="${user.upi_file_path == null or #strings.isEmpty(user.upi_file_path)}"
-									class="bi bi-person-circle fs-4"></i>
-							</span>
-							<span th:if="${user != null}" class="fw-bold">[[${user.us_name}]]님</span>
+					<!--임시로-->
+					<a class="navbar-brand fw-bold fs-4 text-dark text-decoration-none" th:href="@{/}">
+						TABLEUP
+					</a>
 
+					<div class="d-flex align-items-center gap-2">
+						
+						<!-- 상단 지역 선택 버튼 -->
+						<button type="button" class="btn btn-light btn-region" data-bs-toggle="modal" data-bs-target="#regionModal">
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#aaa" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:middle;">
+								<circle cx="12" cy="10" r="3"/>
+								<path d="M12 2C8 2 5 5.5 5 9.5c0 5.5 7 12.5 7 12.5s7-7 7-12.5C19 5.5 16 2 12 2z"/>
+							</svg>
+							<strong>전국</strong>
+							<svg width="24" height="24" viewBox="0 0 24 24">
+								<polyline points="6 9 12 15 18 9" style="fill:none;stroke:black;stroke-width:2"/>
+							</svg>
 						</button>
-							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="max-height: 300px; overflow-y: auto;">
-								<li><a class="dropdown-item" th:href="@{/user/mypage}">프로필</a></li>
-								<li><a class="dropdown-item" th:href="@{/user/mypage}">예약 목록</a></li>
-								<li><a class="dropdown-item" th:href="@{/user/mypage}">결제 내역</a></li>
-								<li><a class="dropdown-item" th:href="@{/user/mypage}">찜한 식당</a></li>
-								<li><hr class="dropdown-divider"></li>
-								<li><a class="dropdown-item" th:href="@{/user/mypage}">도움말</a></li>
-								<li><a class="dropdown-item text-danger" th:href="@{/user/logout}">로그아웃</a></li>
-							</ul>
+
+
+
+						<div>
+							<div class="dropdown" th:if="${user != null}">
+								<button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center gap-2" type="button"
+												id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+									<span th:if="${user != null}">
+										<img th:src="@{/file{path}(path=${user.upi_file_path})}" onerror="this.onerror=null;this.src='/resources/static/img/index/profile.png';"
+											class="rounded-circle" style="width:30px; height:30px; object-fit:cover;">
+									</span>
+									<span th:if="${user != null}" class="fw-bold">[[${user.us_name}]]님</span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="max-height: 300px; overflow-y: auto;">
+									<li><a th:if="${user != null}"  class="dropdown-item" th:href="@{/user/mypage}">프로필</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">예약 목록</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">결제 내역</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">찜한 식당</a></li>
+									<li><hr class="dropdown-divider"></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">도움말</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item text-danger" th:href="@{/user/logout}">로그아웃</a></li>
+								</ul>
+							</div>
+							
+							<div class="dropdown" th:if="${user == null}">
+								<button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center gap-2" type="button"
+												id="toDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+									<span>
+										<img th:src='@{/resources/static/img/index/default.jpg}' class="rounded-circle" style="width:30px; height:30px; object-fit:cover;">
+									</span>
+									<span th:if="${user == null}" class="fw-bold">로그인 메뉴</span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="toDropdown" style="max-height: 300px; overflow-y: auto;">
+									<li><a th:if="${user == null}" th:href="@{/user/login}" class="dropdown-item">로그인</a></li>
+									<li><a th:if="${user == null}" th:href="@{/user/signup}" class="dropdown-item">회원가입</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/}">도움말</a></li>
+									<li><a th:if="${user == null}" th:href="@{/manager/}" class="dropdown-item text-primary">점주분이신가요?</a></li>
+								</ul>
+							</div>
 						</div>
-						<a sec:authorize="!isAuthenticated()" th:href="@{/user/login}" class="btn btn-outline-dark">로그인</a>
 					</div>
+				</div>	
+
+				<!-- 검색창 -->
+				<div class="search-box mb-3 position-relative">
+					<div class="input-group">
+						<input type="text" id="searchKeyword" class="form-control" placeholder="식당명, 지역, 음식 키워드로 검색" onkeyup="handleSearchEnter(event)" autocomplete="off">
+						<button class="btn btn-outline-secondary" type="button" onclick="search()">검색</button>
+					</div>
+					<div id="autocompleteBox"></div>
 				</div>
+
 
 				<!-- 관심지역 모달 -->
 				<div class="modal fade" id="regionModal" tabindex="-1" aria-labelledby="regionModalLabel" aria-hidden="true">
@@ -196,16 +320,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				<!-- The slideshow/carousel -->
 				<div class="carousel-inner">
 					<div class="carousel-item active">
-						<img src="/resources/static/img/index/index1.jpg" alt="Los Angeles" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index1.jpg" alt="Los Angeles" class="d-block" onclick="toggleSize(this)">
 					</div>
 					<div class="carousel-item">
-						<img src="/resources/static/img/index/index2.jpg" alt="Chicago" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index2.jpg" alt="Chicago" class="d-block" onclick="toggleSize(this)">
 					</div>
 					<div class="carousel-item">
-						<img src="/resources/static/img/index/index3.jpg" alt="New York" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index3.jpg" alt="New York" class="d-block" onclick="toggleSize(this)">
 					</div>
 					<div class="carousel-item">
-						<img src="/resources/static/img/index/index4.jpg" alt="4" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index4.jpg" alt="4" class="d-block" onclick="toggleSize(this)">
 					</div>
 				</div>
 				
@@ -239,14 +363,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 						<div class="dfc-item text-center" >
 							<a th:href="@{/user/list}">
 								<img th:src="@{/resources/static/img/index/default.jpg}" 
-											onerror="this.src='/resources/static/img/index/default.jpg'" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+											onerror="this.onerror=null;this.src='/resources/static/img/index/default.jpg'" class="rounded" style="width:110px; height:110px; object-fit:cover;">
 								<div class="mt-2">전체</div>
 							</a>
 						</div>
 						<div th:each="f : ${foodList}" class="dfc-item text-center" th:data-fc="${f.fc_main}" th:data-dfc="${f.dfc_num}">
 							<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
 								<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
-										onerror="this.src='/resources/static/img/index/default.jpg'" 
+										onerror="this.onerror=null;this.src='/resources/static/img/index/default.jpg'" 
 										class="rounded" style="width:110px; height:110px; object-fit:cover;">
 								
 								<div class="mt-2">
@@ -272,7 +396,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 							<div class="text-center" th:each="f : ${foodList}" th:if="${f.dfc_num == favNum}">
 								<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
 									<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
-											onerror="this.src='/resources/static/img/index/default.jpg'" 
+											onerror="this.onerror=null;this.src='/resources/static/img/index/default.jpg'" 
 											class="rounded" style="width:110px; height:110px; object-fit:cover;">
 									<div class="mt-2" th:text="${f.dfc_sub}">카테고리명</div>
 								</a>
@@ -353,9 +477,132 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
 			</script>
 
+			<script>
+				let toggle = false; 
+				function toggleSize(e) {
+					const $carousel = e.closest('.carousel');
+					const $img = e;
+					if($carousel){
+						if (toggle) {
+							$carousel.style.height = "300px"; 
+							// $img.style.transform="translateY(-50%)";
+						}	else {
+							$carousel.style.height = "100vh"; 
+							// $img.style.transform="translateY(+50%)";
+						}
+						toggle = !toggle;
+					}
+				}	
+			</script>
+
+  <script>
+     // 검색 적용
+    function search() {
+			const keyword = $('#searchKeyword').val().trim();
+			if (keyword) {
+				window.location.href = `/user/list?keyword=${encodeURIComponent(keyword)}`;
+			}
+    }
+
+    function handleSearchEnter(event) {
+      if (event.key === 'Enter') {
+        search();
+      }
+    }
+
+    let autocompleteRequest = null; 
+    $('#searchKeyword').on('input', function () {
+      const raw = $(this).val();
+      const lastWord = raw.split(',').pop().trim();
+
+      if (lastWord.length < 2) {
+        $('#autocompleteBox').empty();
+        return;
+      }
+
+      if (autocompleteRequest) {
+        autocompleteRequest.abort();
+      }
+
+      autocompleteRequest = $.ajax({
+        url: '/restaurant/search/recommend',
+        method: 'POST',
+        data: { input: lastWord },
+        dataType: 'json',
+
+        success: function (data) {
+          if (!data || data.length === 0) {
+            $('#autocompleteBox').empty();
+            return;
+          }
+
+          const html = data.map(item => `
+            <div class="autocomplete-item" data-keyword="${item.keyword}">
+              <span>${item.keyword}</span> <small class="text-muted">(${item.source})</small>
+            </div>
+          `).join('');
+          $('#autocompleteBox').html(html);
+        },
+
+        error: function () {
+          $('#autocompleteBox').empty();
+        }
+      });
+    });
+
+    // 추천어 클릭 
+    $(document).on('click', '.autocomplete-item', function () {
+      const selected = $(this).attr('data-keyword');
+      if (!selected || selected === 'null') return;
+      let currentVal = $('#searchKeyword').val();
+      let words = currentVal.split(',');
+
+      words[words.length - 1] = selected;
+      const newVal = words.map(w => w.trim()).filter(w => w.length > 0).join(', ') + ', ';
+      $('#searchKeyword').val(newVal);
+      $('#autocompleteBox').empty();
+      saveRecentKeyword(selected); 
+    });
+
+    // 최근 검색어 클릭
+    $(document).on('click', '.autocomplete-item.recent', function () {
+      const selected = $(this).data('keyword');
+      if (!selected || selected === 'null') return;
+
+      $('#searchKeyword').val(selected);
+      $('#autocompleteBox').empty();
+
+      saveRecentKeyword(selected); 
+    });
+
+    function saveRecentKeyword(keyword) {
+      if (!keyword || keyword.trim().toLowerCase() === 'null') return;
+      let recent = JSON.parse(localStorage.getItem("recentKeywords") || "[]");
+
+      // 중복 제거 및 최신순 정렬
+      recent = [keyword, ...recent.filter(k => k !== keyword)].slice(0, 5);
+      localStorage.setItem("recentKeywords", JSON.stringify(recent));
+    }
+
+    function renderRecentKeywords() {
+      let recent = JSON.parse(localStorage.getItem("recentKeywords") || "[]");
+      if (recent.length === 0) return;
+
+      const html = recent.map(item => `
+        <div class="autocomplete-item recent" data-keyword="${item}">${item}</div>
+      `).join('');
+      $('#autocompleteBox').html(html);
+    }
 
 
+    // 최근 검색어
+    $('#searchKeyword').on('focus', function () {
+      if ($(this).val().trim() === '') {
+        renderRecentKeywords();
+      }
+    });
 
+  </script>
 
 
 			

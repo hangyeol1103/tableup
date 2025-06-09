@@ -38,6 +38,8 @@ import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.vo.BusinessDateVO;
+import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
@@ -458,6 +460,7 @@ public class UserController {
             @RequestParam(required = false) Integer dfc_num,
             @RequestParam(required = false) Integer reg_num,
             @RequestParam(required = false) Integer fc_num,
+            @RequestParam(required = false) String keyword,
             @AuthenticationPrincipal CustomUser customUser) {
           //@RequestParam Map<String, Integer> paramMap 로 한꺼번에 받아와서 paramMap.get("dreg_num") 이런식으로 쓰는게 나을수도
 
@@ -483,6 +486,7 @@ public class UserController {
         if(reg_num != null) model.addAttribute("reg_num", reg_num);
         if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
         if(fc_num != null)model.addAttribute("fc_num", fc_num);  
+        if(keyword != null && keyword.length() > 1)model.addAttribute("keyword", keyword);
         if(customUser != null && customUser.getUser() != null) {
             model.addAttribute("user", customUser.getUser());
         } else {
@@ -510,6 +514,7 @@ public class UserController {
     // System.out.println(cri.getMaxPrice());
     // System.out.println(cri.getOrderBy());
     List<RestaurantVO> list = userService.getRestaurantList(cri);
+    System.out.println("filepath:"+list.get(0).getFile_path());
     //System.out.println(list);
     // 서비스에게 현재 페이지 정보를 주고 PageMaker 객체를 달라고 요청
     PageMaker pm = userService.getPageMaker(cri);
@@ -544,27 +549,35 @@ public class UserController {
     TagVO tag = userService.getTagByRestaurant(rt_num);
     List<FacilityVO> facilityList = userService.getFacilityList();
     List<RestaurantFacilityVO> restaurantFacilityList = userService.getRestaurantFacilityList(rt_num);
+
+
+
     List<FileVO> tapFileList = restaurantService.getTapFileList(rt_num);
     List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
+    List<BusinessHourVO> businessHour = restaurantService.getBusinessHour(rt_num);
+    List<BusinessDateVO> businessDate = restaurantService.getBusinessDate(rt_num);
+    Map<String, Integer> remain = restaurantService.remain(rt_num);
 
     int photoCount = tapFileList.size();
     int reviewCount = reviewList.size();
-
-    model.addAttribute("photoCount", photoCount);
-    model.addAttribute("reviewCount", reviewCount);
-
+    
     //System.out.println(apiKey);
-    System.out.println("restaurant: " + restaurant);
-
+    // System.out.println("restaurant: " + restaurant);
+    // System.out.println("businessHour: "+ businessHour);
+    // System.out.println("remain: "+ remain);
+    
     model.addAttribute("restaurant", restaurant);
     model.addAttribute("foodCategory", foodCategory);
     model.addAttribute("detailFoodCategory", detailFoodCategory);
     model.addAttribute("tag", tag);
     model.addAttribute("facilityList", facilityList);
     model.addAttribute("restaurantFacilityList", restaurantFacilityList);
+    model.addAttribute("businessHour", businessHour);
+    model.addAttribute("businessDate", businessDate);
+    model.addAttribute("remain", remain);
 
-
-
+    model.addAttribute("photoCount", photoCount);
+    model.addAttribute("reviewCount", reviewCount);
     model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가
     return "user/detail/detail";
   }
@@ -578,6 +591,16 @@ public class UserController {
       System.out.println("리뷰 리스트 : " + reviewList);
       return "user/review/view";
   }
+
+  @GetMapping("/review/view/{rt_num}")
+  public String resReviews(Model model, @PathVariable int rt_num) {
+      List<ReviewVO> reviewList = userService.getReviewListByRes(rt_num);
+      model.addAttribute("reviewList", reviewList);
+      model.addAttribute("rt_num", rt_num);
+      System.out.println("리뷰 리스트 : " + reviewList);
+      return "user/review/viewByRes";
+  }
+
 
   @GetMapping("/review/detail/{rev_num}")
   public String myReview(Model model, @PathVariable int rev_num) {

@@ -484,6 +484,12 @@ public class UserService {
     return userDAO.selectReviewList();
 	}
   
+  public List<ReviewVO> getReviewListByRes(int rt_num) {
+  
+     return userDAO.selectReviewListbyNum(rt_num);
+  }
+
+
   public Map<String, List<TagVO>> getTagList() {
    
       List<TagVO> tagList = userDAO.selectTagList();
@@ -628,4 +634,7 @@ public class UserService {
   public UserVO getUserProfileImage(int us_num) {
     return userDAO.selectUserProfileImage(us_num);
   }
+
+
+
 }

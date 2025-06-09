@@ -104,6 +104,8 @@ public interface UserDAO {
 
 	void updateUserProfileImage(UserVO user);
 
+	List<ReviewVO> selectReviewListbyNum(int rt_num);
+
 
 
 }

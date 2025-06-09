@@ -214,7 +214,9 @@
 
               <!-- 시간 선택 -->
               <label for="select-time" class="form-label fw-bold">시간</label>
-              <select id="select-time" class="form-select mb-3"></select>
+              <select id="select-time" class="form-select mb-3">
+                <option disabled>예약 가능한 날을 선택해주세요.</option>
+              </select>
             </div>
             <button
               type="button"
@@ -238,6 +240,8 @@
         const businessHourList = /*[[${businessHour}]]*/ [];
         const MSG = "예약 가능한 날을 선택해주세요.";
         const enableDates = Object.keys(remain).filter(date => remain[date] > 0).sort();
+        const urlParams = new URLSearchParams(window.location.search)
+        const initDate = urlParams.get("date");
       </script>
       
       <script>
@@ -262,16 +266,16 @@
             peopleSelect.appendChild(opt);
           }
         }
-
+        document.addEventListener("DOMContentLoaded", function () {
         flatpickr("#reservation-calendar", {
           inline: true,
           minDate: "today",
-          defaultDate: "today",
+          //defaultDate: initDate || "today",
           dateFormat: "Y-m-d",
           locale: "ko",
 
           enable: Object.keys(remain).filter(date => remain[date] > 0),
-          defaultDate: enableDates[0],
+          defaultDate: initDate || enableDates[0],
 
           onDayCreate: function (dObj, dStr, fp, dayElem) {
             const existing = dayElem.querySelector('.custom-badge');
@@ -322,6 +326,8 @@
           },
 
         });
+        
+      });
 
         // 시간 선택 반복문
         const selectTime = document.getElementById("select-time");

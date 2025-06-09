@@ -116,7 +116,7 @@
 			(rt_name, rt_closed_days, rt_price_lunch, rt_price_dinner,
 			 rt_accept, rt_dfc_num, rt_dreg_num, rt_description)
 		value(#{rt_name},#{rt_closed_days},#{rt_price_lunch},#{rt_price_dinner}
-					,'N',#{rt_dfc_num},#{rt_dreg_num},#{rt_description})
+					,'Y',#{rt_dfc_num},#{rt_dreg_num},#{rt_description})
 	</insert>
 
 	<update id="updateManagerRtNum">

@@ -58,6 +58,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				transition: background-color 0.2s ease;
 			}
 
+
 			.btn-region:hover {
 				background-color: rgba(0, 0, 0, 0.03);
 			}
@@ -95,13 +96,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		<div class="container mt-4">
 			<div class="main-container">
 				<div class="d-flex justify-content-between align-items-center px-2 first-bar">
-
 					<!--임시로-->
 					<a class="navbar-brand fw-bold fs-4 text-dark text-decoration-none" th:href="@{/}">
 						TABLEUP
 					</a>
-					<div class="d-flex align-items-center gap-2">
 
+					<div class="d-flex align-items-center gap-2">
+						
 						<!-- 상단 지역 선택 버튼 -->
 						<button type="button" class="btn btn-light btn-region" data-bs-toggle="modal" data-bs-target="#regionModal">
 							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#aaa" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:middle;">
@@ -117,27 +118,41 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
 
 						<div>
-							<div class="dropdown" sec:authorize="isAuthenticated()">
+							<div class="dropdown" th:if="${user != null}">
 							<button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center gap-2" type="button"
 											id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
 								<span th:if="${user != null}">
 									<img th:src="@{/file{path}(path=${user.upi_file_path})}" onerror="this.onerror=null;this.src='/resources/static/img/index/profile.png';"
 										class="rounded-circle" style="width:30px; height:30px; object-fit:cover;">
-									<i th:if="${user.upi_file_path == null or #strings.isEmpty(user.upi_file_path)}" class="bi bi-person-circle fs-4"></i>
 								</span>
 								<span th:if="${user != null}" class="fw-bold">[[${user.us_name}]]님</span>
 							</button>
 								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="max-height: 300px; overflow-y: auto;">
-									<li><a class="dropdown-item" th:href="@{/user/mypage}">프로필</a></li>
-									<li><a class="dropdown-item" th:href="@{/user/mypage}">예약 목록</a></li>
-									<li><a class="dropdown-item" th:href="@{/user/mypage}">결제 내역</a></li>
-									<li><a class="dropdown-item" th:href="@{/user/mypage}">찜한 식당</a></li>
+									<li><a th:if="${user != null}"  class="dropdown-item" th:href="@{/user/mypage}">프로필</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">예약 목록</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">결제 내역</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">찜한 식당</a></li>
 									<li><hr class="dropdown-divider"></li>
-									<li><a class="dropdown-item" th:href="@{/user/mypage}">도움말</a></li>
-									<li><a class="dropdown-item text-danger" th:href="@{/user/logout}">로그아웃</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">도움말</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item text-danger" th:href="@{/user/logout}">로그아웃</a></li>
 								</ul>
 							</div>
-							<a sec:authorize="!isAuthenticated()" th:href="@{/user/login}" class="btn btn-outline-dark">로그인</a>
+							
+							<div class="dropdown" th:if="${user == null}">
+							<button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center gap-2" type="button"
+											id="toDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+											<span>
+												<img th:src='@{/resources/static/img/index/default.jpg}' class="rounded-circle" style="width:30px; height:30px; object-fit:cover;">
+											</span>
+								<span th:if="${user == null}" class="fw-bold">로그인 메뉴</span>
+							</button>
+								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="toDropdown" style="max-height: 300px; overflow-y: auto;">
+									<li><a th:if="${user == null}" th:href="@{/user/login}" class="dropdown-item">로그인</a></li>
+									<li><a th:if="${user == null}" th:href="@{/user/signup}" class="dropdown-item">회원가입</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/}">도움말</a></li>
+									<li><a th:if="${user == null}" th:href="@{/manager/}" class="dropdown-item text-primary">점주분이신가요?</a></li>
+								</ul>
+							</div>
 						</div>
 					</div>
 				</div>	

@@ -191,6 +191,7 @@
 		and bh_start &gt;= NOW()
 		and bh_start &lt;= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
 		and bh_state = 0
+		ORDER BY bh_start
 	</select>
 
 	<select id="selectBusinessDate" resultType="BusinessDateVO">

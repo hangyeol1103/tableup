@@ -29,7 +29,7 @@ public class BusinessHourVO {
 
 	String bh_date; // "yyyy-MM-dd"
 
-	// // DB 저장용 timestamp (자동 생성)
+	// DB 저장용 timestamp (자동 생성)
 
 	// Timestamp bh_start_ts;
 	

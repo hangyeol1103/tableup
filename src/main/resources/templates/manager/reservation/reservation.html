@@ -192,7 +192,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         let res_num = res.res_num;
 
         //좌석 정보 처리
-        const fullDateStr = `${date} ${time}:00`; // ex. 2025-06-09 12:00:00
+        const fullDateStr = `${date}T${time}:00`; // ex. 2025-06-09 12:00:00
         const timeInfo = resTimeList.find(rt => rt.bh_start === fullDateStr);
 
         let remainSeat = "정보 없음";
@@ -272,6 +272,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
               setTimeout(() => {
                 calendarDateClick(date);
               },400)
+              location.reload();
             }
           }
         })

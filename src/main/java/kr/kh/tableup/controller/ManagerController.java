@@ -1548,7 +1548,7 @@ public class ManagerController {
 	}
 
 	//매니저 예약 허용된 예약 목록
-	@GetMapping("/manager/reservation/reservationlist")
+	@GetMapping("/reservation/reservationlist")
 	public String reservationList(Model model,  @AuthenticationPrincipal CustomManager manager, Principal principal) {
 		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
 			 manager == null || manager.getManager() == null){

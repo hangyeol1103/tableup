@@ -120,7 +120,7 @@ public class ManagerController {
 	public String findManagerId(Model model) {
 		List<RestaurantManagerVO> managerList = managerService.getManagerList();		
 		model.addAttribute("managerList", managerList);
-		return "/manager/findId";
+		return "manager/findId";
 	}
 
 	@PostMapping("/findId")
@@ -160,7 +160,7 @@ public class ManagerController {
 		List<RestaurantManagerVO> managerList = managerService.getManagerList();
 		System.out.println("등록된 매니저 계정 : " + managerList);		
 		model.addAttribute("managerList", managerList);
-		return "/manager/findPw";
+		return "manager/findPw";
 	}
 
 	// 1. 아이디 + 이메일 확인
@@ -189,7 +189,7 @@ public class ManagerController {
 		return "manager/updatePw"; 
 	}
 
-	@PostMapping("path")
+	@PostMapping("/updatePw")
 	public String updateManagerPwInfo(@RequestParam int rm_num, @RequestParam String rm_pw, @RequestParam String confirmPw,
     								  RedirectAttributes redirectAttributes) {
 		System.out.println("변경할 매니저의 기본키 : " + rm_num);

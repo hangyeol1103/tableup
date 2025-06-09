@@ -22,6 +22,6 @@ public interface ScheduleDAO {
 
 	boolean insertResTime(BusinessHourVO res);
 
-	BusinessHourVO checkResTime(int bh_rt_num, String bh_start, String bh_end);
+	BusinessHourVO checkResTime(int bh_rt_num, LocalDateTime bh_start, LocalDateTime bh_end);
 	
 }

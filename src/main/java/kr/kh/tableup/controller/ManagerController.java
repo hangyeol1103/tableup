@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -902,6 +903,89 @@ public class ManagerController {
 	// 					 "등록 실패 " + result1 + "건";
 	// }
 
+	// String으로 받을 때
+	// @PostMapping("/restime/make_restime_list")
+	// @ResponseBody
+	// public String insertResTimeList(@RequestBody Map<String, Object> payload,
+	// 																@AuthenticationPrincipal CustomManager manager) {
+
+	// 		if (manager == null || manager.getManager() == null) {
+	// 				return "로그인 정보가 없습니다.";
+	// 		}
+
+	// 		boolean overwrite = Boolean.parseBoolean(payload.get("overwrite").toString());
+
+	// 		List<LinkedHashMap<String, Object>> rawList = (List<LinkedHashMap<String, Object>>) payload.get("list");
+
+	// 		if (rawList == null || rawList.isEmpty()) {
+	// 				return "등록할 예약 일자가 없습니다.";
+	// 		}
+
+	// 		List<BusinessHourVO> resList = new ArrayList<>();
+	// 		for (Map<String, Object> map : rawList) {
+	// 				BusinessHourVO vo = new BusinessHourVO();
+	// 				vo.setBh_date((String) map.get("bh_date"));
+	// 				vo.setBh_start((String) map.get("bh_start"));
+	// 				vo.setBh_end((String) map.get("bh_end"));
+	// 				vo.setBh_seat_max((int) map.get("bh_seat_max"));
+	// 				vo.setBh_table_max((int) map.get("bh_table_max"));
+	// 				vo.setBh_rt_num((int) map.get("bh_rt_num"));
+	// 				resList.add(vo);
+	// 		}
+
+	// 		System.out.println("resList : "+resList);
+
+	// 		List<BusinessDateVO> opertimeList = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
+
+	// 		Set<String> businessDateSet = opertimeList.stream()
+	// 						.map(bd -> bd.getBd_date().substring(0, 10))
+	// 						.collect(Collectors.toSet());
+
+	// 		boolean hasInvalidDate = resList.stream()
+	// 						.filter(rt -> rt.getBh_start_ts() != null)
+	// 						.map(rt -> rt.getBh_start_ts().toLocalDateTime().toLocalDate().toString())
+	// 						.anyMatch(dateStr -> !businessDateSet.contains(dateStr));
+
+	// 		if (hasInvalidDate) {
+	// 				return "영업일자가 등록되지 않은 날짜가 포함되어 있습니다.";
+	// 		}
+
+	// 		Map<String, BusinessDateVO> operDateMap = opertimeList.stream()
+	// 						.collect(Collectors.toMap(bd -> bd.getBd_date().substring(0, 10), bd -> bd));
+
+	// 		int rtNum = manager.getManager().getRm_rt_num();
+	// 		int success = 0, fail = 0;
+
+	// 		for (BusinessHourVO restime : resList) {
+	// 				restime.setBh_rt_num(rtNum);
+
+	// 				String dateKey = restime.getBh_date();
+	// 				if (dateKey == null || dateKey.isBlank()) {
+	// 						continue; // 또는 오류 처리
+	// 				}
+	// 				System.out.println("------------------");
+	// 				System.out.println("overwrite : "+ overwrite);
+	// 				System.out.println("dateKey : "+ dateKey);
+	// 				System.out.println("------------------");
+
+	// 				if (overwrite && dateKey != null) {
+	// 						System.out.println("덮어쓰기: 기존 데이터 삭제 시도 " + dateKey);
+
+  //   					managerService.deleteRestimesByDate(rtNum, restime.getBh_start(), restime.getBh_end());
+	// 				}
+
+	// 				if (!overwrite) {
+	// 						boolean exists =  managerService.existsRestime(rtNum, restime.getBh_start(), restime.getBh_date());
+	// 						if (exists) continue;
+	// 				}
+
+	// 				if (managerService.makeResTiem(restime, operDateMap)) success++;
+	// 				else fail++;
+	// 		}
+
+	// 		return "등록 성공 " + success + "건 / 실패 " + fail + "건";
+	// }
+
 	@PostMapping("/restime/make_restime_list")
 	@ResponseBody
 	public String insertResTimeList(@RequestBody Map<String, Object> payload,
@@ -912,26 +996,38 @@ public class ManagerController {
 			}
 
 			boolean overwrite = Boolean.parseBoolean(payload.get("overwrite").toString());
-
 			List<LinkedHashMap<String, Object>> rawList = (List<LinkedHashMap<String, Object>>) payload.get("list");
 
 			if (rawList == null || rawList.isEmpty()) {
 					return "등록할 예약 일자가 없습니다.";
 			}
 
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 			List<BusinessHourVO> resList = new ArrayList<>();
 			for (Map<String, Object> map : rawList) {
 					BusinessHourVO vo = new BusinessHourVO();
+
 					vo.setBh_date((String) map.get("bh_date"));
-					vo.setBh_start((String) map.get("bh_start"));
-					vo.setBh_end((String) map.get("bh_end"));
+
+					String bhStartStr = (String) map.get("bh_start");
+					String bhEndStr = (String) map.get("bh_end");
+
+					if (bhStartStr != null && !bhStartStr.isBlank()) {
+							vo.setBh_start(LocalDateTime.parse(bhStartStr, formatter));
+					}
+					if (bhEndStr != null && !bhEndStr.isBlank()) {
+							vo.setBh_end(LocalDateTime.parse(bhEndStr, formatter));
+					}
+
 					vo.setBh_seat_max((int) map.get("bh_seat_max"));
 					vo.setBh_table_max((int) map.get("bh_table_max"));
 					vo.setBh_rt_num((int) map.get("bh_rt_num"));
+
 					resList.add(vo);
 			}
 
-			System.out.println("resList : "+resList);
+			System.out.println("resList : " + resList);
 
 			List<BusinessDateVO> opertimeList = managerService.getOperTimeList(manager.getManager().getRm_rt_num());
 
@@ -940,8 +1036,7 @@ public class ManagerController {
 							.collect(Collectors.toSet());
 
 			boolean hasInvalidDate = resList.stream()
-							.filter(rt -> rt.getBh_start_ts() != null)
-							.map(rt -> rt.getBh_start_ts().toLocalDateTime().toLocalDate().toString())
+							.map(rt -> rt.getBh_start().toLocalDate().toString())
 							.anyMatch(dateStr -> !businessDateSet.contains(dateStr));
 
 			if (hasInvalidDate) {
@@ -959,21 +1054,21 @@ public class ManagerController {
 
 					String dateKey = restime.getBh_date();
 					if (dateKey == null || dateKey.isBlank()) {
-							continue; // 또는 오류 처리
+							continue;
 					}
+
 					System.out.println("------------------");
-					System.out.println("overwrite : "+ overwrite);
-					System.out.println("dateKey : "+ dateKey);
+					System.out.println("overwrite : " + overwrite);
+					System.out.println("dateKey : " + dateKey);
 					System.out.println("------------------");
 
-					if (overwrite && dateKey != null) {
+					if (overwrite) {
 							System.out.println("덮어쓰기: 기존 데이터 삭제 시도 " + dateKey);
-
-    					managerService.deleteRestimesByDate(rtNum, restime.getBh_start(), restime.getBh_end());
+							managerService.deleteRestimesByDate(rtNum, restime.getBh_start(), restime.getBh_end());
 					}
 
 					if (!overwrite) {
-							boolean exists =  managerService.existsRestime(rtNum, restime.getBh_start(), restime.getBh_date());
+							boolean exists = managerService.existsRestime(rtNum, restime.getBh_start(), restime.getBh_date());
 							if (exists) continue;
 					}
 

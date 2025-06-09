@@ -2,6 +2,7 @@ package kr.kh.tableup.dao;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -86,7 +87,7 @@ public interface ManagerDAO {
 
 	List<BusinessHourVO> selectResTimeList(int rt_num);
 
-	BusinessHourVO checkResTime(int bh_rt_num, String bh_start, String bh_end);
+	BusinessHourVO checkResTime(int bh_rt_num, LocalDateTime bh_start, LocalDateTime bh_end);
 
 	boolean insertResTime(BusinessHourVO restime);
 
@@ -94,7 +95,7 @@ public interface ManagerDAO {
 	
 	BusinessDateVO selectOperTimeByDate(int rt_num, String date);
 
-	BusinessHourVO checkUpdateResTime(int bh_rt_num, String bh_start, String bh_end, int bh_num);
+	BusinessHourVO checkUpdateResTime(int bh_rt_num, LocalDateTime bh_start, LocalDateTime bh_end, int bh_num);
 
 	boolean updateResTime(BusinessHourVO restime);
 
@@ -167,13 +168,13 @@ public interface ManagerDAO {
 
 	void updateTemplate(BusinessHourTemplateVO vo);
 
-	void deleteRestimesByDate(int rt_num, String bh_start, String bh_end);
+	void deleteRestimesByDate(int rt_num, LocalDateTime bh_start, LocalDateTime bh_end);
 
-	boolean existsRestime(int rtNum, String bh_start, String bh_date);
+	boolean existsRestime(int rtNum, LocalDateTime bh_start, String bh_date);
 
 	boolean deleteAllRestimes(Integer rt_num, String date);
 
-    RestaurantManagerVO selectFindIdAndEmail(String rm_id, String rm_email);
+  RestaurantManagerVO selectFindIdAndEmail(String rm_id, String rm_email);
 
 
 

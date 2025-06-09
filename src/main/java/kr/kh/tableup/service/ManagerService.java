@@ -384,72 +384,80 @@ public class ManagerService {
 
 	//예약 가능 시간 등록
 	public boolean makeResTiem(BusinessHourVO restime, Map<String, BusinessDateVO> operDateMap) {
-		System.out.println("받은 날짜 : " + restime);
-		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null || restime.getBh_seat_max()<1){
-			return false;
-		}
-		LocalDate bhDate = LocalDateTime.parse(restime.getBh_start(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate();
-		String dateStr = bhDate.toString();
-		System.out.println("dateStr : " + dateStr);
+    System.out.println("받은 시간 : " + restime);
+    if (restime == null || restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() < 1) {
+        return false;
+    }
+
+    // ✅ LocalDate 추출
+    LocalDate bhDate = restime.getBh_start().toLocalDate();
+    String dateStr = bhDate.toString();
+    System.out.println("dateStr : " + dateStr);
+
     BusinessDateVO day = operDateMap.get(dateStr);
     if (day == null) {
         System.out.println("[" + dateStr + "] 영업일자가 없습니다.");
         return false;
     }
-		System.out.println("days: " + day);
-		System.out.println("bd_open: " + day.getBd_open());
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    System.out.println("days: " + day);
+    System.out.println("bd_open: " + day.getBd_open());
 
-		// LocalDate bhDate = LocalDate.parse(restime.getBh_date().substring(0, 10));
-		LocalTime resStart = LocalTime.parse(restime.getBh_start().substring(11));
-		LocalTime resEnd = LocalTime.parse(restime.getBh_end().substring(11));
-		LocalTime open = LocalDateTime.parse(day.getBd_open(), formatter).toLocalTime();
-		LocalTime close = LocalDateTime.parse(day.getBd_close(), formatter).toLocalTime();
-		
-		System.out.println("----------------------");
-		//브레이크 타임 유무 구분
-		if (day.getBd_brstart() != null && day.getBd_brend() != null) {
-					LocalTime brStart = LocalDateTime.parse(day.getBd_brstart(), formatter).toLocalTime();
-					LocalTime brEnd = LocalDateTime.parse(day.getBd_brend(), formatter).toLocalTime();
-					//브레이크 타임 체크
-					if (resStart.isBefore(brEnd) && resEnd.isAfter(brStart)) {
-					    System.out.println("브레이크 타임 겹침");
-					    return false;
-					}
-		}
-		System.out.println("----------------------"); 
-		
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-		//영업시간 체크
+    // ✅ LocalTime 추출
+    LocalTime resStart = restime.getBh_start().toLocalTime();
+    LocalTime resEnd = restime.getBh_end().toLocalTime();
+    LocalTime open = LocalDateTime.parse(day.getBd_open(), formatter).toLocalTime();
+    LocalTime close = LocalDateTime.parse(day.getBd_close(), formatter).toLocalTime();
+
+    System.out.println("----------------------");
+
+    // ✅ 브레이크 타임 체크
+    if (day.getBd_brstart() != null && day.getBd_brend() != null) {
+        LocalTime brStart = LocalDateTime.parse(day.getBd_brstart(), formatter).toLocalTime();
+        LocalTime brEnd = LocalDateTime.parse(day.getBd_brend(), formatter).toLocalTime();
+
+        if (resStart.isBefore(brEnd) && resEnd.isAfter(brStart)) {
+            System.out.println("브레이크 타임 겹침");
+            return false;
+        }
+    }
+
+    System.out.println("----------------------");
+
+    // ✅ 영업시간 범위 체크
     if (resStart.isBefore(open) || resEnd.isAfter(close)) {
         System.out.println("영업시간 범위 초과");
         return false;
     }
 
-		//중복 체크
-		BusinessHourVO check = managerDAO.checkResTime(restime.getBh_rt_num(), restime.getBh_start(), restime.getBh_end());
-		System.out.println("check : " + check);
+    // ✅ 중복 체크
+    BusinessHourVO check = managerDAO.checkResTime(
+        restime.getBh_rt_num(), restime.getBh_start(), restime.getBh_end()
+    );
+    System.out.println("check : " + check);
     if (check != null) {
         System.out.println("중복 예약 시간");
         return false;
     }
 
-		boolean res =managerDAO.insertResTime(restime);
-		if(!res){
-			System.out.println("오류 발생");
-			return false;
-		}
-		return true;
-	}
+    boolean res = managerDAO.insertResTime(restime);
+    if (!res) {
+        System.out.println("오류 발생");
+        return false;
+    }
+
+    return true;
+}
 
 	// 덮어쓰기 하기 위한 기존 파일 삭제
-	public void deleteRestimesByDate(int rtNum, String bh_start, String bh_end) {
+	public void deleteRestimesByDate(int rtNum, LocalDateTime bh_start, LocalDateTime bh_end) {
 		managerDAO.deleteRestimesByDate(rtNum, bh_start, bh_end);
 	}
 
 	//무시하기 위한 기존 파일 가져오기
-	public boolean existsRestime(int rtNum, String bh_start, String bh_date) {
+	public boolean existsRestime(int rtNum, LocalDateTime bh_start, String bh_date) {
 		 return managerDAO.existsRestime(rtNum, bh_start, bh_date);
 	}
 
@@ -460,101 +468,86 @@ public class ManagerService {
 
 	//예약 가능시간 수정하기
 	public boolean remakeResTime(BusinessHourVO restime) {
-		System.out.println(restime);
-		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
-			System.out.println("수정 실패");
-			return false;
-		}
-		System.out.println("수정 할 예약 시간" + restime);
-		System.out.println("날짜 : " + restime.getBh_date());
+			System.out.println(restime);
+			if (restime == null || restime.getBh_date() == null ||
+					restime.getBh_start() == null || restime.getBh_end() == null) {
+					System.out.println("수정 실패 - 필수 정보 누락");
+					return false;
+			}
 
-		int rt_num = restime.getBh_rt_num();
-    String date = restime.getBh_date(); // yyyy-MM-dd 형식
+			String date = restime.getBh_date(); // yyyy-MM-dd
+			int rt_num = restime.getBh_rt_num();
 
-		String startTime = restime.getBh_start(); // HH:mm
-		String endTime = restime.getBh_end();     // HH:mm
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-		String bhStart = date + " " + startTime + ":00";
-		String bhEnd = date + " " + endTime + ":00";
+			// 기존: 시간 문자열 조합 → 현재: LocalDateTime 직접 구성
+			LocalTime startTime = restime.getBh_start().toLocalTime();
+			LocalTime endTime = restime.getBh_end().toLocalTime();
+			LocalDate bhDate = LocalDate.parse(date);
 
-		restime.setBh_start(bhStart);
-		restime.setBh_end(bhEnd);
+			LocalDateTime bhStart = LocalDateTime.of(bhDate, startTime);
+			LocalDateTime bhEnd = LocalDateTime.of(bhDate, endTime);
+			restime.setBh_start(bhStart);
+			restime.setBh_end(bhEnd);
 
-    // 해당 날짜의 영업일자 정보 가져오기
-    BusinessDateVO day = managerDAO.selectOperTimeByDate(rt_num, date);
-    if (day == null) {
-        System.out.println("수정 실패: 해당 날짜의 영업일자 정보 없음");
-        return false;
-    }
-    System.out.println("영업일자 정보: " + day);
+			System.out.println("생성된 LocalDateTime: " + bhStart + " ~ " + bhEnd);
 
-		System.out.println("days: " + day);
-		System.out.println("bd_open: " + day.getBd_open());
+			// 영업일자 조회
+			BusinessDateVO day = managerDAO.selectOperTimeByDate(rt_num, date);
+			if (day == null) {
+					System.out.println("수정 실패: 영업일자 정보 없음");
+					return false;
+			}
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalTime open = LocalDateTime.parse(day.getBd_open(), dateTimeFormatter).toLocalTime();
+			LocalTime close = LocalDateTime.parse(day.getBd_close(), dateTimeFormatter).toLocalTime();
 
-		LocalTime resStart = LocalDateTime.parse(bhStart, formatter).toLocalTime();
-		LocalTime resEnd = LocalDateTime.parse(bhEnd, formatter).toLocalTime();
-    LocalTime open = LocalDateTime.parse(day.getBd_open(), formatter).toLocalTime();
-		LocalTime close = LocalDateTime.parse(day.getBd_close(), formatter).toLocalTime();
+			LocalTime resStart = bhStart.toLocalTime();
+			LocalTime resEnd = bhEnd.toLocalTime();
 
-		System.out.println("resStart : " + resStart);
-		System.out.println("resEnd : " + resEnd);
-		System.out.println("open : " + open);
-		System.out.println("close : " + close);
-		
-		System.out.println("----------------------");
-		//브레이크 타임 유무 구분
-		String brStartStr = day.getBd_brstart();
-		String brEndStr = day.getBd_brend();
-		System.out.println("brStartStr : "+ brStartStr);
-		System.out.println("brEndStr : "+ brEndStr);
+			// 브레이크 타임 검사
+			String brStartStr = day.getBd_brstart();
+			String brEndStr = day.getBd_brend();
+			if (brStartStr != null && !brStartStr.isBlank() &&
+					brEndStr != null && !brEndStr.isBlank()) {
+					try {
+							LocalTime brStart = LocalDateTime.parse(brStartStr, dateTimeFormatter).toLocalTime();
+							LocalTime brEnd = LocalDateTime.parse(brEndStr, dateTimeFormatter).toLocalTime();
 
-		if (brStartStr != null && !brStartStr.isBlank() &&
-				brEndStr != null && !brEndStr.isBlank()) {
+							if (resStart.isBefore(brEnd) && resEnd.isAfter(brStart)) {
+									System.out.println("브레이크 타임 겹침");
+									return false;
+							}
+					} catch (DateTimeParseException e) {
+							System.out.println("브레이크 타임 파싱 실패: " + e.getMessage());
+					}
+			}
 
-				try {
-						LocalTime brStart = LocalDateTime.parse(brStartStr, formatter).toLocalTime();
-						LocalTime brEnd = LocalDateTime.parse(brEndStr, formatter).toLocalTime();
-						System.out.println("brStart : " + brStart);
-						System.out.println("brEnd : " + brEnd);
+			// 영업시간 범위 검사
+			if (resStart.isBefore(open) || resEnd.isAfter(close)) {
+					System.out.println("영업시간 초과");
+					return false;
+			}
 
-						// 브레이크 타임 겹침 검사
-						if (resStart.isBefore(brEnd) || resEnd.isAfter(brStart)) {
-								System.out.println("브레이크 타임 겹침");
-								return false;
-						}
-				} catch (DateTimeParseException e) {
-						System.out.println("브레이크 타임 파싱 오류: " + e.getMessage());
-						// 오류 시 무시하거나 예외 처리
-				}
-		}
-		System.out.println("----------------------");
+			// 중복 검사
+			BusinessHourVO check = managerDAO.checkUpdateResTime(rt_num, bhStart, bhEnd, restime.getBh_num());
+			if (check != null) {
+					System.out.println("중복 예약 시간");
+					return false;
+			}
 
-		//영업시간 체크
-    if (resStart.isBefore(open) || resEnd.isAfter(close)) {
-        System.out.println("영업시간 범위 초과");
-        return false;
-    }
-		System.out.println("시작시간 : " + restime.getBh_start());
-		System.out.println("마감시간 : " + restime.getBh_end());
+			// 최종 업데이트
+			boolean result = managerDAO.updateResTime(restime);
+			if (!result) {
+					System.out.println("수정 실패");
+					return false;
+			}
 
-		//중복 체크
-		BusinessHourVO check = managerDAO.checkUpdateResTime(restime.getBh_rt_num(), restime.getBh_start(), restime.getBh_end(), restime.getBh_num());
-		System.out.println("check : " + check);
-    if (check != null) {
-        System.out.println("중복 예약 시간");
-        return false;
-    }
-
-		boolean res =managerDAO.updateResTime(restime);
-		if(!res){
-				System.out.println("수정 실패");
-			return false;
-		}
-		System.out.println("수정 성공");
-		return true;
+			System.out.println("수정 성공");
+			return true;
 	}
+
 
 	//예약 가능시간 삭제하기
 	public boolean deleteResTime(int bh_num) {

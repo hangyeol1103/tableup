@@ -590,6 +590,15 @@ public class UserController {
       return "user/review/view";
   }
 
+  @GetMapping("/review/view/{rt_num}")
+  public String resReviews(Model model, int rt_num) {
+      List<ReviewVO> reviewList = userService.getReviewListByRes(rt_num);
+      model.addAttribute("reviewList", reviewList);
+      System.out.println("리뷰 리스트 : " + reviewList);
+      return "user/review/viewByRes";
+  }
+
+
   @GetMapping("/review/detail/{rev_num}")
   public String myReview(Model model, @PathVariable int rev_num) {
       

@@ -390,15 +390,16 @@
       cri.rt_dfc_num = Number($('#foodSelect').val()) || 0;
       loadList(true);
     });
-
-    function likeRestaurant(rtNum) {
-      alert(rtNum + '번 매장');
+/*
+    function likeRestaurant(rt_num) {
+      alert(rt_num + '번 매장');
       // 추후 AJAX 찜 처리 연동
     }
-
-    function openReviewModal(rtNum) {
-      alert(rtNum + '번 매장');
+*/
+    function openReviewModal(rt_num) {
+      //alert(rt_num + '번 매장');
       // 추후 리뷰 모달 연동
+      window.location.href = '/user/review/view/' + rt_num;
     }
   </script>
 

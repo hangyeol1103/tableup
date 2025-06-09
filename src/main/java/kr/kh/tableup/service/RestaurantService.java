@@ -74,8 +74,16 @@ public class RestaurantService {
 	}
 
 	public List<BusinessHourVO> getBusinessHour(int rt_num) {
-		
-		return restaurantDAO.selectBusinessHour(rt_num);
+
+		List<BusinessHourVO> businessHourList = restaurantDAO.selectBusinessHour(rt_num);
+		if(businessHourList == null) return null;
+
+		for(BusinessHourVO businessHour : businessHourList){
+			businessHour.setBh_seat_remain(businessHour.getBh_seat_max()-businessHour.getBh_seat_current());
+			businessHour.setBh_table_remain(businessHour.getBh_table_max()-businessHour.getBh_table_current());
+		}
+
+		return businessHourList;
 	}
 
 

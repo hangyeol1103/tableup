@@ -68,6 +68,14 @@ INSERT INTO tag(tag_name,TAG_TT_NUM)
 INSERT INTO facility(fa_name,fa_title,fa_icon)
 	VALUES('무선인터넷','사용가능한 무선인터넷',null);
 
+# 아이콘 마다 위치 정해서 값을 넣어놔야 함.
+INSERT INTO facility(fa_name,fa_title,fa_icon)
+	VALUES('단체석','단체석 이용시 문의','-925px -220px'),
+		  ('네이버페이','네이버페이','-80px -420px'),
+          ('무선인터넷','무선인터넷','-257px -220px'),
+          ('카드','카드','-80px -220px'),
+          ('주차','주차','-988px -413px');
+
 INSERT INTO restaurantfacility(rf_rt_num,rf_fa_num,rf_detail)
 	VALUES(1,1,'와이파이 사용 가능(가게 문의)');
 

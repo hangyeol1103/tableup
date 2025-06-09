@@ -460,6 +460,7 @@ public class UserController {
             @RequestParam(required = false) Integer dfc_num,
             @RequestParam(required = false) Integer reg_num,
             @RequestParam(required = false) Integer fc_num,
+            @RequestParam(required = false) String keyword,
             @AuthenticationPrincipal CustomUser customUser) {
           //@RequestParam Map<String, Integer> paramMap 로 한꺼번에 받아와서 paramMap.get("dreg_num") 이런식으로 쓰는게 나을수도
 
@@ -485,6 +486,7 @@ public class UserController {
         if(reg_num != null) model.addAttribute("reg_num", reg_num);
         if(dfc_num != null)model.addAttribute("dfc_num", dfc_num);  
         if(fc_num != null)model.addAttribute("fc_num", fc_num);  
+        if(keyword != null && keyword.length() > 1)model.addAttribute("keyword", keyword);
         if(customUser != null && customUser.getUser() != null) {
             model.addAttribute("user", customUser.getUser());
         } else {
@@ -589,6 +591,16 @@ public class UserController {
       System.out.println("리뷰 리스트 : " + reviewList);
       return "user/review/view";
   }
+
+  @GetMapping("/review/view/{rt_num}")
+  public String resReviews(Model model, @PathVariable int rt_num) {
+      List<ReviewVO> reviewList = userService.getReviewListByRes(rt_num);
+      model.addAttribute("reviewList", reviewList);
+      model.addAttribute("rt_num", rt_num);
+      System.out.println("리뷰 리스트 : " + reviewList);
+      return "user/review/viewByRes";
+  }
+
 
   @GetMapping("/review/detail/{rev_num}")
   public String myReview(Model model, @PathVariable int rev_num) {

@@ -182,7 +182,7 @@
 
 	<select id="selectTapFileList" resultType="FileVO">
 		select DISTINCT * from file where file_type = 'review' and file_res_num = #{rt_num}
-		ORDER BY FIELD(file_tag, '음식', '내부', '외부', '메뉴판', '기타')
+		ORDER BY FIELD(file_tag,'전체', '음식', '내부', '외부', '메뉴판', '기타')
 	</select>
 
 	<select id="selectBusinessHour" resultType="BusinessHourVO">
@@ -191,6 +191,7 @@
 		and bh_start &gt;= NOW()
 		and bh_start &lt;= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
 		and bh_state = 0
+		ORDER BY bh_start
 	</select>
 
 	<select id="selectBusinessDate" resultType="BusinessDateVO">

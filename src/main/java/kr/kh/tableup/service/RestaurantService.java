@@ -81,15 +81,30 @@ public class RestaurantService {
 
 	public Map<String, Integer> remain(int rt_num) {
     List<BusinessHourVO> list = getBusinessHour(rt_num);
-		
+		System.out.println("list : "+list);
 		Map<String, Integer> result = new TreeMap<>();
     for (BusinessHourVO hourVO : list) {
+			System.out.println("시간 : "+hourVO);
 			String dateKey = hourVO.getBh_start().toLocalDate().toString(); 
 			int remain = hourVO.getBh_seat_max() - hourVO.getBh_seat_current();
 			result.put(dateKey, result.getOrDefault(dateKey, 0) + remain);
     }
     return result;
 }
+	// public Map<String, Integer> remain(int rt_num) {
+	// 		List<BusinessHourVO> list = getBusinessHour(rt_num);
+
+	// 		Map<String, Integer> result = new TreeMap<>();
+	// 		for (BusinessHourVO hourVO : list) {
+	// 				String bhStart = hourVO.getBh_start(); // 예: "2025-06-09 12:00:00"
+	// 				if (bhStart != null && bhStart.length() >= 10) {
+	// 						String dateKey = bhStart.substring(0, 10); // "2025-06-09"
+	// 						int remain = hourVO.getBh_seat_max() - hourVO.getBh_seat_current();
+	// 						result.put(dateKey, result.getOrDefault(dateKey, 0) + remain);
+	// 				}
+	// 		}
+	// 		return result;
+	// }
 
 	public List<BusinessDateVO> getBusinessDate(int rt_num) {
 		return restaurantDAO.selectBusinessDate(rt_num);

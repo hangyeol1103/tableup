@@ -1,6 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,15 +73,18 @@ public class ReservationService {
 	}
 
 		public boolean updateReservationState(ReservationVO reservation) {
+			System.out.println("변경할 예약 값 : " + reservation);
 			if(reservation == null || reservation.getRes_state() == 0){
 				throw new RuntimeException("올바른 접근이 아닙니다.");
 			}
 			//예약 확정
 			if(reservation.getRes_state() == 1){
+				System.out.println("예약 확정");
 				return reservationConfirm(reservation);
 			}
 			//예약 취소
 			else{
+				System.out.println("예약 취소");
 				return reservationCancel(reservation);
 			}
 		}
@@ -88,11 +92,20 @@ public class ReservationService {
 		private boolean reservationConfirm(ReservationVO reservation) {
 			//예약 정보 가져옴
 			ReservationVO dbReservation = reservationDAO.selectReservation(reservation.getRes_num());
+			System.out.println("가져온 예약 정보 : " + dbReservation);
+			
 			if(dbReservation == null){
+				System.out.println("예약 내역이 없습니다.");
 				throw new RuntimeException("예약 내역이 없습니다.");
 			}
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			String bhStart = dbReservation.getRes_time().format(formatter);
+			
+			System.out.println("조회용 bh_start: " + bhStart);
 			//예약 가능 정보를 가져옴
+			System.out.println("--------------------");
 			BusinessHourVO  businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
+			System.out.println("예약 가능 정보 : " + businessHour);
 			if(businessHour == null){
 				//예약 자동 취소
 				reservationDAO.updateReservationState(reservation.getRes_num(), -1);
@@ -115,6 +128,7 @@ public class ReservationService {
 		private boolean reservationCancel(ReservationVO reservation) {
 			//예약 정보 가져옴
 			ReservationVO dbReservation = reservationDAO.selectReservation(reservation.getRes_num());
+			System.out.println("가져온 예약 정보 : " + dbReservation);
 			if(dbReservation == null){
 				throw new RuntimeException("예약 내역이 없습니다.");
 			}

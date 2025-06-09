@@ -14,7 +14,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
 	<title>테이블업 - 매니저페이지</title>
 	<style>
-  
+    .modal-body-scrollable {
+      max-height: 400px; /* 약 2.5개 카드 정도 높이 */
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -33,7 +36,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
           </div>
-          <div class="modal-body" id="modalBody">
+          <div class="modal-body modal-body-scrollable" id="modalBody">
             
           </div>
           <div class="modal-footer">
@@ -68,7 +71,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         list.forEach(res=>{
           let obj = convertReservationToObject(res);
           str += `
-            <div class="card mb-3 shadow-sm border-start border-3 border-${obj.res_state == 0 ? 'secondary' : obj.res_state == 1 ? 'success' : 'danger'} reservation-card" data-target="memo-${obj.res_num}" style="cursor:pointer;">
+             <div class="card mb-3 shadow-sm reservation-card" data-target="memo-${obj.res_num}" style="cursor:pointer; border-left: 4px solid ${obj.res_state == 0 ? 'green' : obj.res_state == 1 ? 'skyblue' : 'red'};">
               <div class="card-body">
                 <h5 class="card-title mb-2">
                   <i class="bi bi-clock"></i> ${obj.time}
@@ -77,7 +80,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                 <p class="mb-1"><strong>예약자:</strong> ${obj.user}</p>
                 <p class="mb-1"><strong>인원 수:</strong> ${obj.person}명</p>
                 <p class="mb-2"><strong>상태:</strong> 
-                  <span class="text-${obj.res_state == 0 ? 'secondary' : obj.res_state == 1 ? 'success' : 'danger'}">${obj.state}</span>
+                  <span style="color: ${obj.res_state == 0 ? 'green' : obj.res_state == 1 ? 'skyblue' : 'red'}">${obj.state}</span>
                 </p>
 
                 <div class="collapse mt-2" id="memo-${obj.res_num}">
@@ -88,7 +91,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
                 <div class="d-flex gap-2">
                   ${obj.res_state == 0 
-                    ? '<button type="button" class="btn btn-sm btn-outline-success btn-reservation" data-target="'+obj.res_num+'" data-state="1" data-date="'+obj.date+'">'+confirmState+'</button>' 
+                    ? '<button type="button" class="btn btn-sm btn-outline-info btn-reservation"  data-target="'+obj.res_num+'" data-state="1" data-date="'+obj.date+'">'+confirmState+'</button>' 
                     : ''}
                   ${obj.res_state >= 0 
                     ? '<button type="button" class="btn btn-sm btn-outline-danger btn-reservation" data-target="'+obj.res_num+'" data-state="-1" data-date="'+obj.date+'">'+cancelState+'</button>' 
@@ -242,9 +245,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
        * 이벤트 : 예약 확정/취소 버튼 클릭
       ****************************************/
       $(document).on('click', '.btn-reservation', function(){
+        console.log("버튼 클릭됨");
         let res_num = $(this).data("target");
         let res_state = $(this).data("state");
         let date = $(this).data("date");
+
+        console.log("보낼 값 : ", res_num, res_state)
         $.ajax({
           url : "/manager/reservation/state",
           method : "post",

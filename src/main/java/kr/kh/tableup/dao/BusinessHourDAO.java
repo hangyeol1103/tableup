@@ -12,4 +12,5 @@ public interface BusinessHourDAO {
 
 	BusinessHourVO selectBusinessHourByBh_start(LocalDateTime time);
 
+
 }

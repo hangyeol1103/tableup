@@ -1441,16 +1441,19 @@ public class ManagerController {
 	@PostMapping("/reservation/state")
 	@ResponseBody
 	public Map<String, Object> reservateionState(@RequestBody ReservationVO reservation, HashMap<String, Object> map) {
+		System.out.println("예약 : " + reservation);
+		System.out.println("맵 : " + map);
 		try{
 			map.put("res", reservationService.updateReservationState(reservation));
 		}catch(Exception e){
 			map.put("error", e.getMessage());
 		}
+		System.out.println("맵 : " + map);
 		return map;
 	}
 
 	//매니저 예약 허용된 예약 목록
-	@GetMapping("/reservation/reservationlist")
+	@GetMapping("/manager/reservation/reservationlist")
 	public String reservationList(Model model,  @AuthenticationPrincipal CustomManager manager, Principal principal) {
 		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
 			 manager == null || manager.getManager() == null){

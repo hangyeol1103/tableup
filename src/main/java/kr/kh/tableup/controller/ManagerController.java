@@ -105,7 +105,9 @@ public class ManagerController {
 	public String opertimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
 		int rt_num =manager.getManager().getRm_rt_num();
 		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
-		
+		List<BusinessDateVO> opertime = managerService.getOperTimeList(rt_num);
+
+		model.addAttribute("opertime", opertime);
 		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("manager", manager);
 		return "manager/opertime/opertimepage";

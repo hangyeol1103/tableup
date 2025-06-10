@@ -39,10 +39,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     </div>
 
     <!-- 카드 푸터 (버튼 영역) -->
-    <div class="card-footer d-grid gap-2">
+    <div class="card-footer d-flex justify-content-end gap-2">
       <!-- <a th:href="@{/manager/news/remake_news/{rn_num}(rn_num=${news.rn_num})}" class="btn btn-outline-warning">소식/공지사항 변경</a> -->
       <!-- 수정 버튼 -->
-      <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editNewsModal">소식/공지사항 변경</button>
+      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editNewsModal">소식/공지사항 변경</button>
       <form th:action="@{/manager/news/delete_news/{rn_num}(rn_num=${news.rn_num})}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
         <button type="submit" class="btn btn-outline-danger">소식/공지사항 삭제</button>
       </form>
@@ -75,7 +75,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
             </div>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-success">저장</button>
+            <button type="submit" class="btn btn-primary">저장</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
           </div>
         </form>

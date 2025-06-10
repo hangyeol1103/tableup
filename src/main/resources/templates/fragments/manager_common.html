@@ -16,12 +16,12 @@
 				</button>
 				<div class="collapse navbar-collapse" id="mynavbar">
 					<ul class="navbar-nav me-auto">
-						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
+						<!-- <li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/managerpage}" th:classappend="${url == '/manager/managerpage' ? 'active' : ''}">매니저페이지</a>
 						</li>
 						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/restaurant/restaurant}" th:classappend="${url == '/manager/restaurant/restaurant' ? 'active' : ''}">매장관리</a>
-						</li>
+						</li> -->
 						<li class="nav-item" sec:authorize="!hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/login}" th:classappend="${url == '/manager/login' ? 'active' : ''}">로그인</a>
 						</li>

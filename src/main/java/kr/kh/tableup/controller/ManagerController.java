@@ -78,14 +78,39 @@ public class ManagerController {
 	PaymentService paymentService;
 
 	
-
+	//매니저 메인 페이지
 	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
 		System.out.println(manager);
 		// model.addAttribute("url","/main");
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("manager", manager);
 		return "manager/main";
 	}
+
+	// 매지저 예약 관리 페이지
+	@GetMapping("/restime/restimepage")
+	public String reservationPage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("manager", manager);
+		return "manager/restime/restimepage";
+	}
+
+	// 매지저 영업일자 관리 페이지
+	@GetMapping("/opertime/opertimepage")
+	public String opertimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("manager", manager);
+		return "manager/opertime/opertimepage";
+	}
+	
 	
 
 	@GetMapping("/login")

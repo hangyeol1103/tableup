@@ -45,6 +45,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         </div>
       </div>
     </div>
+    <a th:href="@{/manager/restime/restimepage}" class="btn btn-outline-secondary col-12 mb-3">예약 관리 페이지로 돌아가기</a>
 		<script th:inline="javascript">
       const dateModal = new bootstrap.Modal(document.getElementById('dateModal'));
       const resTimeList = /*[[${resTimeList}]]*/[];

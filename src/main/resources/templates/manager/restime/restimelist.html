@@ -175,7 +175,8 @@
   </div>
 
   <!-- <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/restime/make_restime'">예약 시간 등록</button> -->
-  <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" id="goBackToManager" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+  <!-- <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" id="goBackToManager" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a> -->
+   <a th:href="@{/manager/restime/restimepage}" class="btn btn-outline-secondary">예약 관리 페이지로 돌아가기</a>
 
   <script th:inline="javascript">
     const today = new Date();
@@ -367,16 +368,21 @@
       // 변경 버튼 이벤트
       $('#editTimeForm').submit(function(e){
         e.preventDefault();
-        const data ={
-          bh_num : $(this).find('input[name="bh_num"]').val(),
-          bh_date : $(this).find('input[name="bh_date"]').val(),
-          bh_start : $(this).find('input[name="bh_start"]').val(),
-          bh_end : $(this).find('input[name="bh_end"]').val(),
-          bh_seat_max : $(this).find('input[name="bh_seat_max"]').val(),
-          bh_table_max : $(this).find('input[name="bh_table_max"]').val(),
-          bh_state : $(this).find('select[name="bh_state"]').val()
+        const bh_date = $(this).find('input[name="bh_date"]').val(); // yyyy-MM-dd
+        const bh_start_time = $(this).find('input[name="bh_start"]').val(); // HH:mm
+        const bh_end_time = $(this).find('input[name="bh_end"]').val(); // HH:mm
+
+        const data = {
+          bh_num: parseInt($(this).find('input[name="bh_num"]').val(), 10),
+          bh_date: bh_date,
+          bh_start: bh_date + 'T' + bh_start_time,
+          bh_end: bh_date + 'T' + bh_end_time,
+          bh_seat_max: parseInt($(this).find('input[name="bh_seat_max"]').val(), 10),
+          bh_table_max: parseInt($(this).find('input[name="bh_table_max"]').val(), 10),
+          bh_state: parseInt($(this).find('select[name="bh_state"]').val(), 10)
         };
         
+        console.log("보낼 데이터 : ", data);
 
         $.ajax({
           async : true,

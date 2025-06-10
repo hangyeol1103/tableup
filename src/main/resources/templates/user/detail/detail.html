@@ -529,7 +529,7 @@
             } else {
               option.textContent = `${timeStr} (${remain}석)`;
               const bhDateTime = new Date(`${date}T${timeStr}`);
-              const reservableTime = new Date(now.getTime() + 30 * 60 * 1000);
+              const reservableTime = new Date(now.getTime());
 
               if (isToday && bhDateTime < reservableTime) {
                 option.disabled = true;
@@ -557,6 +557,7 @@
           if (!hasAvailable) {
             timeSelect.innerHTML = `<option disabled>${MSG}</option>`;
           }
+          return hasAvailable;
         }
 
         function updateReservation(dateStr) {
@@ -566,7 +567,7 @@
           peopleSelect.innerHTML = "";
           const maxPeople = remain[dateStr];
           const reserveBtn = document.querySelector(".btn-warning");
-          let hasAvailable = false
+          // let hasAvailable = false
 
           if (!maxPeople || maxPeople <= 0) {
             peopleSelect.innerHTML = `<option disabled>${MSG}</option>`;
@@ -580,7 +581,7 @@
             peopleSelect.appendChild(opt);
           }
 
-          updateTimeOptions(dateStr);
+          const hasAvailable = updateTimeOptions(dateStr);
           setTimeout(() => {
             const timeValue = document.getElementById("select-time").value;
             updatePeopleOptions(dateStr, timeValue);

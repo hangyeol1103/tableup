@@ -39,12 +39,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
           <div class="mb-2 row">
             <label class="col-md-3 form-label">대표 이미지:</label>
-            <div class="col-md-9 d-flex flex-wrap gap-2">
-              <img th:each="file : ${fileList}"
-                  th:src="@{/file{uploadfilename}(uploadfilename=${file.file_path})}"
-                  alt="대표 이미지"
-                  class="img-thumbnail"
-                  style="width: 150px; height: 150px; object-fit: cover;">
+            <div class="col-md-9">
+              <div class="d-flex overflow-auto gap-2">
+                <img th:each="file : ${fileList}"
+                     th:src="@{/file{uploadfilename}(uploadfilename=${file.file_path})}"
+                     alt="대표 이미지"
+                     class="img-thumbnail"
+                     style="width: 150px; height: 150px; object-fit: cover; flex : 0 0 auto;">
+              </div>              
             </div>
           </div>
 

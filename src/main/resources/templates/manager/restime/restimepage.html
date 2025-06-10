@@ -15,15 +15,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
     .btn-box {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 0px;
       justify-content: center;
       margin: 40px auto;
       max-width: 800px;
     }
 
     .btn-box .reserve-btn {
-      flex: 1 1 45%;
-      height: 120px;
+      flex: 1 1 50%;
+      height: 240px;
       background-color: #4dabf7;
       color: white;
       font-size: 1.3rem;
@@ -31,7 +31,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 10px;
+      border-radius: 0px;
       cursor: pointer;
       transition: background-color 0.3s;
       text-align: center;
@@ -48,25 +48,27 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
     }
 
     .bottom-btn button {
-      padding: 12px 30px;
+      width: 100%;
+      padding: 16px 0px;
       font-size: 1rem;
       font-weight: bold;
-      border-radius: 8px;
-      background-color: #6c757d;
+      border-radius: 0px;
+      background-color: #4dabf7;
       color: white;
       border: none;
       transition: background-color 0.3s;
+      text-align: center;
     }
 
     .bottom-btn button:hover {
-      background-color: #5a6268;
+      filter: brightness(90%);
     }
   </style>
 </head>
 <body>
   <main layout:fragment="content">
     <div class="container">
-      <h2 class="mt-4 text-center fw-bold">예약 관리</h2>
+      <!-- <h2 class="mt-4 text-center fw-bold">예약 관리</h2> -->
       <div class="btn-box">
 
         <!-- 예약 가능 시간 등록 -->

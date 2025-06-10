@@ -45,7 +45,8 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                      th:src="@{/file{uploadfilename}(uploadfilename=${file.file_path})}"
                      alt="대표 이미지"
                      class="img-thumbnail"
-                     style="width: 150px; height: 150px; object-fit: cover; flex : 0 0 auto;">
+                     style="width: 150px; height: 150px; object-fit: cover; flex : 0 0 auto;"
+                     onerror="this.onerror=null; this.src='/resources/static/img/index/sample.jpg'">
               </div>              
             </div>
           </div>

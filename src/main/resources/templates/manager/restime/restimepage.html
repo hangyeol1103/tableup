@@ -12,13 +12,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <title>테이블업 - 예약 관리</title>
   <style>
+    .btn-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
     .btn-box {
       display: flex;
       flex-wrap: wrap;
-      gap: 0px;
-      justify-content: center;
-      margin: 40px auto;
-      max-width: 800px;
+      gap: 0;
     }
 
     .btn-box .reserve-btn {
@@ -31,77 +33,65 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 0px;
+      border-radius: 0;
       cursor: pointer;
       transition: background-color 0.3s;
       text-align: center;
     }
 
-    .btn-box .reserve-btn:hover {
-      filter: brightness(90%);
-    }
-
     .bottom-btn {
-      display: flex;
-      justify-content: center;
-      margin-top: 40px;
+      display: block;
     }
 
     .bottom-btn button {
       width: 100%;
-      padding: 16px 0px;
+      padding: 16px 0;
       font-size: 1rem;
       font-weight: bold;
-      border-radius: 0px;
+      border-radius: 0;
       background-color: #4dabf7;
       color: white;
       border: none;
       transition: background-color 0.3s;
       text-align: center;
     }
-
-    .bottom-btn button:hover {
-      filter: brightness(90%);
-    }
   </style>
 </head>
 <body>
   <main layout:fragment="content">
     <div class="container">
-      <!-- <h2 class="mt-4 text-center fw-bold">예약 관리</h2> -->
+    <!-- 상단/하단 통합 박스 -->
+    <div class="btn-wrapper mx-auto my-4" style="max-width: 1200px;">
+      
+      <!-- 버튼 4개 -->
       <div class="btn-box">
-
-        <!-- 예약 가능 시간 등록 -->
         <div class="reserve-btn btn-action"
-             th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/restime/restimelist/' + ${restaurant?.rt_num}, data-type='예약 가능 시간 등록'">
+            th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/restime/restimelist/' + ${restaurant?.rt_num}, data-type='예약 가능 시간 등록'">
           예약 가능 시간 등록
         </div>
 
-        <!-- 요일별 예약 시간 템플릿 -->
         <div class="reserve-btn btn-action"
-             th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/restime/restimetemplate/' + ${restaurant?.rt_num}, data-type='예약 시간 템플릿'">
+            th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/restime/restimetemplate/' + ${restaurant?.rt_num}, data-type='예약 시간 템플릿'">
           요일별 예약 시간 템플릿
         </div>
 
-        <!-- 예약 현황 -->
         <div class="reserve-btn btn-action"
-             th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/reservation', data-type='예약 현황'">
+            th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/reservation', data-type='예약 현황'">
           예약 현황
         </div>
 
-        <!-- 예약 조회 -->
         <div class="reserve-btn btn-action"
-             th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/reservation/reservationlist', data-type='예약 조회'">
+            th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/reservation/reservationlist', data-type='예약 조회'">
           예약 조회
         </div>
-
       </div>
 
-      <!-- 돌아가기 버튼 -->
+      <!-- 메인 페이지 버튼 -->
       <div class="bottom-btn">
         <button onclick="location.href='/manager'">메인 페이지로 돌아가기</button>
       </div>
     </div>
+  </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {

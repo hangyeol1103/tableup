@@ -27,7 +27,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 		<div class="card-body">
 		<!-- 이미지 -->
 		<div class="text-center mb-4">
-			<img th:src="@{/file/{menuImage}(menuImage=${menu.mn_img})}" class="img-thumbnail" alt="이미지 없음" style="max-width: 100%; height: auto;">
+			<img th:src="@{/file/{menuImage}(menuImage=${menu.mn_img})}" class="img-thumbnail" alt="이미지 없음" style="max-width: 100%; height: auto;" onerror="this.onerror=null; this.src='/resources/static/img/index/sample.jpg';">
 		</div>
 
 		<!-- 메뉴명 -->

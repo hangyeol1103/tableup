@@ -12,18 +12,20 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <title>테이블업 - 예약 관리</title>
   <style>
+    .btn-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
     .btn-box {
       display: flex;
       flex-wrap: wrap;
-      gap: 0px;
-      justify-content: center;
-      margin: 40px auto;
-      max-width: 800px;
+      gap: 0;
     }
 
     .btn-box .reserve-btn {
-      flex: 1 1 45%;
-      height: 120px;
+      flex: 1 1 50%;
+      height: 240px;
       background-color: #4dabf7;
       color: white;
       font-size: 1.3rem;
@@ -31,8 +33,25 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 0px;
+      border-radius: 0;
       cursor: pointer;
+      transition: background-color 0.3s;
+      text-align: center;
+    }
+
+    .bottom-btn {
+      display: block;
+    }
+
+    .bottom-btn button {
+      width: 100%;
+      padding: 32px 0;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 0;
+      background-color: #4dabf7;
+      color: white;
+      border: none;
       transition: background-color 0.3s;
       text-align: center;
     }
@@ -41,51 +60,34 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       filter: brightness(90%);
     }
 
-    .bottom-btn {
-      display: flex;
-      justify-content: center;
-      margin-top: 40px;
-    }
-
-    .bottom-btn button {
-      padding: 12px 30px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 8px;
-      background-color: #6c757d;
-      color: white;
-      border: none;
-      transition: background-color 0.3s;
-    }
-
     .bottom-btn button:hover {
-      background-color: #5a6268;
+      filter: brightness(90%);
     }
+
   </style>
 </head>
 <body>
   <main layout:fragment="content">
     <div class="container">
-      <h2 class="mt-4 text-center fw-bold">영업일자 관리</h2>
-      <div class="btn-box">
+      <!-- <h2 class="mt-4 text-center fw-bold">영업일자 관리</h2> -->
+      <div class="btn-wrapper mx-auto my-4" style="max-width: 1200;">
+        <div class="btn-box">
+            <!-- 영업 일자 조회 밑 등록 -->
+            <div class="reserve-btn btn-action"
+                th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/opertime/opertimelist/' + ${restaurant?.rt_num}, data-type='영업일자 조회 밑 등록'">
+              영업 일자 조회 및 등록 
+            </div>
 
-        <!-- 영업 일자 조회 밑 등록 -->
-        <div class="reserve-btn btn-action"
-             th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/opertime/opertimelist/' + ${restaurant?.rt_num}, data-type='영업일자 조회 밑 등록'">
-          영업 일자 조회 및 등록 
+            <!-- 영업일자 별 상세 정보 -->
+            <div class="reserve-btn btn-action"
+                th:attr="data-has-restaurant=${restaurant != null}, data-action='/schedule/manager_schedulelist', data-type='영업일자 별 상세 일정'">
+              영업 일자 일정
+            </div>
         </div>
-
-        <!-- 영업일자 별 상세 정보 -->
-        <div class="reserve-btn btn-action"
-             th:attr="data-has-restaurant=${restaurant != null}, data-action='/schedule/manager_schedulelist', data-type='영업일자 별 상세 일정'">
-          영업 일자 일정
-        </div>
-
-      </div>
-
-      <!-- 돌아가기 버튼 -->
-      <div class="bottom-btn">
-        <button onclick="location.href='/manager'">메인 페이지로 돌아가기</button>
+        <!-- 메인 페이지 버튼 -->
+          <div class="bottom-btn">
+            <button onclick="location.href='/manager'">메인 페이지</button>
+          </div>
       </div>
     </div>
 

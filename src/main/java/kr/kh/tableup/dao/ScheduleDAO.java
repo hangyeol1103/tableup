@@ -6,6 +6,7 @@ import java.util.List;
 
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 
 public interface ScheduleDAO {
 
@@ -18,5 +19,9 @@ public interface ScheduleDAO {
 	BusinessHourVO selectResTimeDetail(int rt_num, LocalDateTime dateTime);
 
 	boolean updateBdOff(BusinessDateVO date);
+
+	boolean insertResTime(BusinessHourVO res);
+
+	BusinessHourVO checkResTime(int bh_rt_num, LocalDateTime bh_start, LocalDateTime bh_end);
 	
 }

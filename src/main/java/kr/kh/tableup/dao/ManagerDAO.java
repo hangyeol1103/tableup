@@ -1,6 +1,8 @@
 package kr.kh.tableup.dao;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -28,6 +30,12 @@ public interface ManagerDAO {
 	List<RestaurantManagerVO> selectManagerList();
 
 	boolean insertManager(RestaurantManagerVO rm);
+	
+	RestaurantManagerVO selectfindManager(String rm_name, String rm_phone, String rm_business);
+
+	RestaurantManagerVO selectResManager(int rm_num);
+	
+	boolean updateManagerPassWord(RestaurantManagerVO manager);
 
 	RestaurantManagerVO findById(String username);
 
@@ -79,9 +87,15 @@ public interface ManagerDAO {
 
 	List<BusinessHourVO> selectResTimeList(int rt_num);
 
+	BusinessHourVO checkResTime(int bh_rt_num, LocalDateTime bh_start, LocalDateTime bh_end);
+
 	boolean insertResTime(BusinessHourVO restime);
 
 	BusinessHourVO selectBusinessHour(int bh_num);
+	
+	BusinessDateVO selectOperTimeByDate(int rt_num, String date);
+
+	BusinessHourVO checkUpdateResTime(int bh_rt_num, LocalDateTime bh_start, LocalDateTime bh_end, int bh_num);
 
 	boolean updateResTime(BusinessHourVO restime);
 
@@ -143,6 +157,26 @@ public interface ManagerDAO {
 	List<ResCouponVO> getExpiredCoupons(LocalDate now);
 
 	void updateCouponState(ResCouponVO c);
+
+	RestaurantVO selectRestaurantByNum(int rt_num);
+
+	void deleteTemplate(int bhd_rt_num);
+
+	void insertTemplate(BusinessHourTemplateVO vo);
+
+	int existsTemplate(BusinessHourTemplateVO vo);
+
+	void updateTemplate(BusinessHourTemplateVO vo);
+
+	void deleteRestimesByDate(int rt_num, LocalDateTime bh_start, LocalDateTime bh_end);
+
+	boolean existsRestime(int rtNum, LocalDateTime bh_start, String bh_date);
+
+	boolean deleteAllRestimes(Integer rt_num, String date);
+
+  RestaurantManagerVO selectFindIdAndEmail(String rm_id, String rm_email);
+
+
 
 
 	

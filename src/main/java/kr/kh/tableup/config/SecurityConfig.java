@@ -41,7 +41,7 @@ public class SecurityConfig{
       .securityMatcher("/manager/**", "/schedule/**")
       .csrf(csrf ->csrf.disable())
       .authorizeHttpRequests(auth -> auth
-          .requestMatchers("/manager/signup", "/manager/register").permitAll()
+          .requestMatchers("/manager/signup", "/manager/register", "/manager/findId", "/manager/findPw","/manager/updatePw", "/manager/showIdResult").permitAll()
           .anyRequest().authenticated()
       )
       .formLogin(form -> form
@@ -62,7 +62,7 @@ public class SecurityConfig{
       //로그아웃 처리
       .logout(logout -> logout
           .logoutUrl("/manager/logout")
-          .logoutSuccessUrl("/manager/")
+          .logoutSuccessUrl("/manager/login")
           .clearAuthentication(true)
           .invalidateHttpSession(true)
           .permitAll());

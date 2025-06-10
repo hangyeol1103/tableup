@@ -1,6 +1,7 @@
 package kr.kh.tableup.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,22 +34,22 @@ public class ReservationService {
 			return false;
 			
 			// 예약 성공 후 → 겹치는 시간대 조회
-			List<BusinessHourVO> bhList = reservationDAO.selectOverlapHours(
+			List<BusinessHourVO > bhList = reservationDAO.selectOverlapHours(
 				res.getRes_rt_num(), res.getRes_time(), res.getRes_end_time());
 
 		// 좌석 누적 갱신
-		for (BusinessHourVO bh : bhList) {
-			int updated = bh.getBh_seat_current() + res.getRes_person();
-			businessHourDAO.updateCurrentSeat(bh.getBh_num(), updated);
-		}
+		// for (BusinessHourVO  bh : bhList) {
+		// 	int updated = bh.getBh_seat_current() + res.getRes_person();
+		// 	businessHourDAO.updateCurrentSeat(bh.getBh_num(), updated);
+		// }
 
 		return true;
 	}
 
 	public boolean isReservationAvailable(int rt_num, LocalDateTime resStart, LocalDateTime resEnd, int person) {
-		List<BusinessHourVO> bhList = reservationDAO.selectOverlapHours(rt_num, resStart, resEnd);
+		List<BusinessHourVO > bhList = reservationDAO.selectOverlapHours(rt_num, resStart, resEnd);
 
-		for (BusinessHourVO bh : bhList) {
+		for (BusinessHourVO  bh : bhList) {
 			int remaining = bh.getBh_seat_max() - bh.getBh_seat_current();
 			if (remaining < person) {
 				return false;
@@ -72,15 +73,18 @@ public class ReservationService {
 	}
 
 		public boolean updateReservationState(ReservationVO reservation) {
+			System.out.println("변경할 예약 값 : " + reservation);
 			if(reservation == null || reservation.getRes_state() == 0){
 				throw new RuntimeException("올바른 접근이 아닙니다.");
 			}
 			//예약 확정
 			if(reservation.getRes_state() == 1){
+				System.out.println("예약 확정");
 				return reservationConfirm(reservation);
 			}
 			//예약 취소
 			else{
+				System.out.println("예약 취소");
 				return reservationCancel(reservation);
 			}
 		}
@@ -88,12 +92,21 @@ public class ReservationService {
 		private boolean reservationConfirm(ReservationVO reservation) {
 			//예약 정보 가져옴
 			ReservationVO dbReservation = reservationDAO.selectReservation(reservation.getRes_num());
+			System.out.println("가져온 예약 정보 : " + dbReservation);
+			
 			if(dbReservation == null){
+				System.out.println("예약 내역이 없습니다.");
 				throw new RuntimeException("예약 내역이 없습니다.");
 			}
+			
 			//예약 가능 정보를 가져옴
-			BusinessHourVO businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
+			System.out.println("--------------------");
+			BusinessHourVO  businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
+			System.out.println("예약 가능 정보 : " + businessHour);
 			if(businessHour == null){
+				//예약 자동 취소
+				reservationDAO.updateReservationState(reservation.getRes_num(), -1);
+				
 				throw new RuntimeException("예약 가능한 시간대가 아닙니다.");
 			}
 			int count = businessHour.getBh_seat_max() - businessHour.getBh_seat_current();
@@ -112,11 +125,12 @@ public class ReservationService {
 		private boolean reservationCancel(ReservationVO reservation) {
 			//예약 정보 가져옴
 			ReservationVO dbReservation = reservationDAO.selectReservation(reservation.getRes_num());
+			System.out.println("가져온 예약 정보 : " + dbReservation);
 			if(dbReservation == null){
 				throw new RuntimeException("예약 내역이 없습니다.");
 			}
 			//예약 가능 정보를 가져옴
-			BusinessHourVO businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
+			BusinessHourVO  businessHour = businessHourDAO.selectBusinessHourByBh_start(dbReservation.getRes_time());
 			if(businessHour == null){
 				throw new RuntimeException("예약 가능한 시간대가 아닙니다.");
 			}
@@ -143,6 +157,13 @@ public class ReservationService {
 
 		public int[] favoriteRegion() {
 			return reservationDAO.selectFavorateRegion();
+		}
+
+		public List<ReservationVO> getReservations(int rt_num) {
+			if(rt_num==0){
+				return null;
+			}
+			return reservationDAO.selectReservationsList(rt_num);
 		}
 
 }

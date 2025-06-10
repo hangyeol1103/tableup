@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -24,10 +25,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
 
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.service.ManagerService;
@@ -58,7 +61,8 @@ public class ScheduleController {
     }
 
 		int rt_num = manager.getManager().getRm_rt_num();
-
+		System.out.println("나의 정보 : " + manager.getManager());
+		System.out.println("접속한 아이디 : " + principal);
 		if(rt_num <=0){
 			model.addAttribute("restaurant", null);
 		}
@@ -72,23 +76,18 @@ public class ScheduleController {
       model.addAttribute("restaurant", restaurant);
       model.addAttribute("opertimelist", opertimelist);
       model.addAttribute("restimelist", restimelist);
-		}
-		
-		
-		List<LocalDate> dateList= new ArrayList<>();
-		LocalDate today = LocalDate.now();
-		for(int i=0;i<7;i++){
-			dateList.add(today.plusDays(i));
-		}
-		List<LocalTime> timeList = new ArrayList<>();
-		LocalTime startTime = LocalTime.of(0, 0);
-    for (int i = 0; i < 48; i++) {
-        timeList.add(startTime.plusMinutes(30 * i));
-    }
 
+			System.out.println("나의 매장 : " + restaurant);
+			System.out.println("나의 매장 영업 일자 : " + opertimelist);
+		}
 		
-		model.addAttribute("dateList", dateList);
-		model.addAttribute("timeList", timeList);
+		// List<LocalDate> dateList= new ArrayList<>();
+		// LocalDate today = LocalDate.now();
+		// for(int i=0;i<7;i++){
+		// 	dateList.add(today.plusDays(i));
+		// }
+
+		// model.addAttribute("dateList", dateList);
 		model.addAttribute("offset", offset);
 		model.addAttribute("manager", manager);
 		model.addAttribute("url","/manager_schedulelist");
@@ -105,19 +104,32 @@ public class ScheduleController {
 	// 날짜 선택시 날짜와 같은 예약 가능 시간 버튼으로 출력
 	@GetMapping("/getTimes")
 	@ResponseBody
-	public List<String> getFilteredTimes(@RequestParam("selectedDate")String selectedDate, @AuthenticationPrincipal CustomManager manager) {
-		int rt_num=manager.getManager().getRm_rt_num();
+	public List<String> getFilteredTimes(@RequestParam("selectedDate") String selectedDate,
+																			@AuthenticationPrincipal CustomManager manager) {
+			int rt_num = manager.getManager().getRm_rt_num();
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		LocalDate startDate = LocalDate.parse(selectedDate, formatter);
-    LocalDate endDate = startDate.plusDays(6);
+			if (selectedDate == null || selectedDate.isBlank()) {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "선택된 날짜가 비어 있습니다.");
+			}
 
-		List<BusinessHourVO> selectedResStart = scheduleService.getResStart(rt_num, startDate, endDate);
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate startDate = LocalDate.parse(selectedDate, dateFormatter);
+			LocalDate endDate = startDate.plusDays(6);
 
-		return selectedResStart.stream()
-      .filter(bh -> bh.getBh_start().toLocalDate().equals(startDate)) // 선택 날짜만 필터
-      .map(bh -> bh.getBh_start().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
-      .collect(Collectors.toList());
+			System.out.println("selectedDate : " + selectedDate);
+			System.out.println("startDate : " + startDate);
+			System.out.println("endDate : " + endDate);
+
+			List<BusinessHourVO> selectedResStart = scheduleService.getResStart(rt_num, startDate, endDate);
+			System.out.println("리스트 : " + selectedResStart);
+
+			return selectedResStart.stream()
+					.filter(bh -> {
+							LocalDateTime bhStart = bh.getBh_start();
+							return bhStart != null && bhStart.toLocalDate().equals(startDate);
+					})
+					.map(bh -> bh.getBh_start().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
+					.collect(Collectors.toList());
 	}
 
 	//예약 가능 시간 인원수 정보 출력
@@ -149,6 +161,43 @@ public class ScheduleController {
 			
 			boolean result = scheduleService.updateBdOff(date);
 			return ResponseEntity.ok(result);
+		}
+
+		//일정관리 페이지에서 예약 시간 추가
+
+		//@RequestBody Map<String, Object> data , @RequestBody BusinessHourVO data
+		@PostMapping("/insertRestime")
+		public ResponseEntity<?> insertRestime(@RequestBody Map<String, Object> data , @AuthenticationPrincipal CustomManager manager) {
+			try{
+				System.out.println("data : " + data);
+				 String date=(String)data.get("date");
+				 String startTime=(String)data.get("startTime");
+				 String endTime=(String)data.get("endTime");
+				 int seatMax = (int)data.get("seatMax");
+				 int tableMax = (int)data.get("tableMax");
+
+				LocalDateTime start = LocalDateTime.parse(date + "T" + startTime);
+        LocalDateTime end = LocalDateTime.parse(date + "T" + endTime);
+
+				BusinessHourVO res = new BusinessHourVO();
+				res.setBh_start(start);
+				res.setBh_end(end);
+				// res.setBh_start(start.toString());
+				// res.setBh_end(end.toString());
+				res.setBh_seat_max(seatMax);
+				res.setBh_table_max(tableMax);
+				res.setBh_state(false);
+				res.setBh_rt_num(manager.getManager().getRm_rt_num());
+
+				boolean result = scheduleService.insertRestime(res ,date);
+
+				return result ? ResponseEntity.ok().build()
+							: ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+			}catch(Exception e){
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못 입력했습니다.");
+			}
+			
 		}
 		
 	

@@ -1,8 +1,13 @@
 package kr.kh.tableup.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,9 +46,9 @@ public class ManagerService {
 	@Autowired
   PasswordEncoder passwordEncoder;
 	
-	public boolean insertManager(RestaurantManagerVO rm) {
+	public String insertManager(RestaurantManagerVO rm) {
 		if(rm == null){
-			return false;
+			return "잘못된 접근입니다.";
 		}
 		List<RestaurantManagerVO> dbManager = managerDAO.selectManagerList();
 
@@ -51,22 +56,52 @@ public class ManagerService {
 			// 아이디 중복 체크
 			if(db.getRm_id().equals(rm.getRm_id())){
 				System.out.println("중복된 아이디 입니다.");
-				return false;
+				return "중복된 아이디 입니다.";
 			}
 			// 사업자 번호 중복 체크
 			if(db.getRm_business().equals(rm.getRm_business())){
 				System.out.println("중복된 사업자 번호 입니다.");
-				return false;
+				return "중복된 사업자 번호 입니다.";
 			}
 			// 전화 번호 중복 체크
 			if(db.getRm_phone().equals(rm.getRm_phone())){
 				System.out.println("중복된 전화 번호 입니다.");
-				return false;
+				return "중복된 전화 번호 입니다.";
 			}
 		}
 
 		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
-		return managerDAO.insertManager(rm);
+		boolean res=managerDAO.insertManager(rm);
+		return res ? null : "회원가입에 실패했습니다.";
+	}
+
+	// 조회할 아이디 가져오기
+	public RestaurantManagerVO findManager(String rm_name, String rm_phone, String rm_business) {
+		if(rm_name == null || rm_phone ==null || rm_business==null){
+			return null;
+		}
+		return managerDAO.selectfindManager(rm_name, rm_phone, rm_business);
+	}
+
+	// 비밀번호 변경할 계정 가져오기
+	public RestaurantManagerVO getManager(int rm_num) {
+		if(rm_num == 0){
+			return null;
+		}
+		return managerDAO.selectResManager(rm_num);
+	}
+
+	// 변경할 계정 비밀번호 재설정
+	public boolean updateManagerPW(RestaurantManagerVO manager) {
+        if(manager == null){
+			return false;
+		}
+		manager.setRm_pw(passwordEncoder.encode(manager.getRm_pw()));
+        return managerDAO.updateManagerPassWord(manager);
+    }
+
+	public List<RestaurantManagerVO> getManagerList() {
+		return managerDAO.selectManagerList();
 	}
 
 	public RestaurantManagerVO getManagerId(String rm_id) {
@@ -348,16 +383,82 @@ public class ManagerService {
 	}
 
 	//예약 가능 시간 등록
-	public boolean makeResTiem(BusinessHourVO restime) {
-		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
+	public boolean makeResTiem(BusinessHourVO restime, Map<String, BusinessDateVO> operDateMap) {
+    System.out.println("받은 시간 : " + restime);
+    if (restime == null || restime.getBh_start() == null || restime.getBh_end() == null || restime.getBh_seat_max() < 1) {
+        return false;
+    }
 
-			return false;
-		}
-		boolean res =managerDAO.insertResTime(restime);
-		if(!res){
-			return false;
-		}
-		return true;
+    // ✅ LocalDate 추출
+    LocalDate bhDate = restime.getBh_start().toLocalDate();
+    String dateStr = bhDate.toString();
+    System.out.println("dateStr : " + dateStr);
+
+    BusinessDateVO day = operDateMap.get(dateStr);
+    if (day == null) {
+        System.out.println("[" + dateStr + "] 영업일자가 없습니다.");
+        return false;
+    }
+
+    System.out.println("days: " + day);
+    System.out.println("bd_open: " + day.getBd_open());
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    // ✅ LocalTime 추출
+    LocalTime resStart = restime.getBh_start().toLocalTime();
+    LocalTime resEnd = restime.getBh_end().toLocalTime();
+    LocalTime open = LocalDateTime.parse(day.getBd_open(), formatter).toLocalTime();
+    LocalTime close = LocalDateTime.parse(day.getBd_close(), formatter).toLocalTime();
+
+    System.out.println("----------------------");
+
+    // ✅ 브레이크 타임 체크
+    if (day.getBd_brstart() != null && day.getBd_brend() != null) {
+        LocalTime brStart = LocalDateTime.parse(day.getBd_brstart(), formatter).toLocalTime();
+        LocalTime brEnd = LocalDateTime.parse(day.getBd_brend(), formatter).toLocalTime();
+
+        if (resStart.isBefore(brEnd) && resEnd.isAfter(brStart)) {
+            System.out.println("브레이크 타임 겹침");
+            return false;
+        }
+    }
+
+    System.out.println("----------------------");
+
+    // ✅ 영업시간 범위 체크
+    if (resStart.isBefore(open) || resEnd.isAfter(close)) {
+        System.out.println("영업시간 범위 초과");
+        return false;
+    }
+
+    // ✅ 중복 체크
+    BusinessHourVO check = managerDAO.checkResTime(
+        restime.getBh_rt_num(), restime.getBh_start(), restime.getBh_end()
+    );
+    System.out.println("check : " + check);
+    if (check != null) {
+        System.out.println("중복 예약 시간");
+        return false;
+    }
+
+    boolean res = managerDAO.insertResTime(restime);
+    if (!res) {
+        System.out.println("오류 발생");
+        return false;
+    }
+
+    return true;
+}
+
+	// 덮어쓰기 하기 위한 기존 파일 삭제
+	public void deleteRestimesByDate(int rtNum, LocalDateTime bh_start, LocalDateTime bh_end) {
+		managerDAO.deleteRestimesByDate(rtNum, bh_start, bh_end);
+	}
+
+	//무시하기 위한 기존 파일 가져오기
+	public boolean existsRestime(int rtNum, LocalDateTime bh_start, String bh_date) {
+		 return managerDAO.existsRestime(rtNum, bh_start, bh_date);
 	}
 
 	//예약 가능시간 가져오기
@@ -367,23 +468,95 @@ public class ManagerService {
 
 	//예약 가능시간 수정하기
 	public boolean remakeResTime(BusinessHourVO restime) {
-		System.out.println(restime);
-		if(restime==null || restime.getBh_start() == null|| restime.getBh_end()==null){
-			System.out.println("수정 실패");
-			return false;
-		}
-		boolean res =managerDAO.updateResTime(restime);
-		if(!res){
-				System.out.println("수정 실패");
-			return false;
-		}
-		System.out.println("수정 성공");
-		return true;
+			System.out.println(restime);
+			if (restime == null || restime.getBh_date() == null ||
+					restime.getBh_start() == null || restime.getBh_end() == null) {
+					System.out.println("수정 실패 - 필수 정보 누락");
+					return false;
+			}
+
+			String date = restime.getBh_date(); // yyyy-MM-dd
+			int rt_num = restime.getBh_rt_num();
+
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+			// 기존: 시간 문자열 조합 → 현재: LocalDateTime 직접 구성
+			LocalTime startTime = restime.getBh_start().toLocalTime();
+			LocalTime endTime = restime.getBh_end().toLocalTime();
+			LocalDate bhDate = LocalDate.parse(date);
+
+			LocalDateTime bhStart = LocalDateTime.of(bhDate, startTime);
+			LocalDateTime bhEnd = LocalDateTime.of(bhDate, endTime);
+			restime.setBh_start(bhStart);
+			restime.setBh_end(bhEnd);
+
+			System.out.println("생성된 LocalDateTime: " + bhStart + " ~ " + bhEnd);
+
+			// 영업일자 조회
+			BusinessDateVO day = managerDAO.selectOperTimeByDate(rt_num, date);
+			if (day == null) {
+					System.out.println("수정 실패: 영업일자 정보 없음");
+					return false;
+			}
+
+			LocalTime open = LocalDateTime.parse(day.getBd_open(), dateTimeFormatter).toLocalTime();
+			LocalTime close = LocalDateTime.parse(day.getBd_close(), dateTimeFormatter).toLocalTime();
+
+			LocalTime resStart = bhStart.toLocalTime();
+			LocalTime resEnd = bhEnd.toLocalTime();
+
+			// 브레이크 타임 검사
+			String brStartStr = day.getBd_brstart();
+			String brEndStr = day.getBd_brend();
+			if (brStartStr != null && !brStartStr.isBlank() &&
+					brEndStr != null && !brEndStr.isBlank()) {
+					try {
+							LocalTime brStart = LocalDateTime.parse(brStartStr, dateTimeFormatter).toLocalTime();
+							LocalTime brEnd = LocalDateTime.parse(brEndStr, dateTimeFormatter).toLocalTime();
+
+							if (resStart.isBefore(brEnd) && resEnd.isAfter(brStart)) {
+									System.out.println("브레이크 타임 겹침");
+									return false;
+							}
+					} catch (DateTimeParseException e) {
+							System.out.println("브레이크 타임 파싱 실패: " + e.getMessage());
+					}
+			}
+
+			// 영업시간 범위 검사
+			if (resStart.isBefore(open) || resEnd.isAfter(close)) {
+					System.out.println("영업시간 초과");
+					return false;
+			}
+
+			// 중복 검사
+			BusinessHourVO check = managerDAO.checkUpdateResTime(rt_num, bhStart, bhEnd, restime.getBh_num());
+			if (check != null) {
+					System.out.println("중복 예약 시간");
+					return false;
+			}
+
+			// 최종 업데이트
+			boolean result = managerDAO.updateResTime(restime);
+			if (!result) {
+					System.out.println("수정 실패");
+					return false;
+			}
+
+			System.out.println("수정 성공");
+			return true;
 	}
+
 
 	//예약 가능시간 삭제하기
 	public boolean deleteResTime(int bh_num) {
 		return managerDAO.deleteResTime(bh_num);
+	}
+
+	//특정 요일 예약 가능시간 전체 삭제하기
+	public boolean deleteAllRestimes(Integer rt_num, String date) {
+		return managerDAO.deleteAllRestimes(rt_num, date);
 	}
 
 	//영업일자 리스트 출력
@@ -445,9 +618,33 @@ public class ManagerService {
 
 	//영업일자 변경
 	public boolean remakeOperTime(BusinessDateVO opertime) {
-	if(opertime==null){
+		if(opertime==null){
 			return false;
 		}
+		// 날짜
+		String date = opertime.getBd_date();
+
+		// 날짜 + 시간 합치기
+		if (opertime.getBd_open() != null)
+			opertime.setBd_open(date + " " + opertime.getBd_open() + ":00");
+
+		if (opertime.getBd_close() != null)
+			opertime.setBd_close(date + " " + opertime.getBd_close() + ":00");
+
+		if (opertime.getBd_brstart() != null)
+			opertime.setBd_brstart(date + " " + opertime.getBd_brstart() + ":00");
+
+		if (opertime.getBd_brend() != null)
+			opertime.setBd_brend(date + " " + opertime.getBd_brend() + ":00");
+
+		if (opertime.getBd_loam() != null)
+			opertime.setBd_loam(date + " " + opertime.getBd_loam() + ":00");
+
+		if (opertime.getBd_lopm() != null)
+			opertime.setBd_lopm(date + " " + opertime.getBd_lopm() + ":00");
+		
+		System.out.println("수정된 영업일짜 : " + opertime);
+
 		boolean res =managerDAO.updateOperTime(opertime);
 		if(!res){
 			System.out.println("수정 실패");
@@ -495,7 +692,7 @@ public class ManagerService {
 	}
 
 	public RestaurantVO getRestaurantByNum(int rt_num) {
-		return managerDAO.selectRestaurant(rt_num);
+		return managerDAO.selectRestaurantByNum(rt_num);
 	}
 
 	public List<BusinessHourTemplateVO> getTemplateList(int rt_num) {
@@ -577,12 +774,27 @@ public class ManagerService {
 		}
 	}
 
+	public void saveTemplates(List<BusinessHourTemplateVO> list) {
+			for (BusinessHourTemplateVO vo : list) {
+					int count = managerDAO.existsTemplate(vo);
+					if (count > 0) {
+							managerDAO.updateTemplate(vo);
+					} else {
+							managerDAO.insertTemplate(vo);
+					}
+			}
+	}
+
+	// 비밀번호 재설정할 계정 확인하기 위한 
+    public RestaurantManagerVO findIdAndEmail(String rm_id, String rm_email) {
+        if(rm_id == null || rm_email == null){
+			return null;
+		}
+		return managerDAO.selectFindIdAndEmail(rm_id,rm_email);
+    }
 
 
-	
 
-	
 
-	
 
 }

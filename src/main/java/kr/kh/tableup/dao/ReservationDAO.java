@@ -26,9 +26,13 @@ public interface ReservationDAO {
 	
 	ReservationVO selectReservation(int res_num);
 	
+	List<ReservationVO> selectReservations(int rt_num);
+	
 	int[] selectFavorateCategory();
 
 	int[] selectFavorateRegion();
+	
+	List<ReservationVO> selectReservationsList(int rt_num);
 
 
 }

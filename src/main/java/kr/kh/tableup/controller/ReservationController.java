@@ -20,7 +20,8 @@ import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.CustomManager;
-import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.util.CustomUser;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.UserVO;
@@ -100,5 +101,18 @@ public class ReservationController {
 		ra.addFlashAttribute("msg", "예약이 완료되었습니다.");
 		return "redirect:/";
 	}
+
+	// @GetMapping("/resdetail/{res_num}")
+	// public String reservationDetail(Model model, Principal principal, @AuthenticationPrincipal CustomUser user, @PathVariable int res_num) {
+	// 	if(principal == null || user ==null){
+	// 		return "redirect:/user/login";
+	// 	}
+	// 	ReservationVO reservation = reservationService.getUserReservation(res_num);
+	// 	model.addAttribute("reservation", reservation);
+	// 	return "user/reservation/resdetail";
+	// }
+	
+
+
 	
 }

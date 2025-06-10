@@ -21,12 +21,12 @@
 
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text">아이디</span>
-        <input type="text" class="form-control" id="rm_id" name="username">
+        <input type="text" class="form-control" id="rm_id" name="username"  th:value="${param.username}" required>
       </div>
 
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text">비밀번호</span>
-        <input type="password" class="form-control" id="rm_pw" name="password">
+        <input type="password" class="form-control" id="rm_pw" name="password" required>
       </div>
 
       <div class="form-check mb-3">
@@ -45,30 +45,33 @@
         <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/findPw'">비밀번호 찾기</button>
         <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/signup'">회원가입</button>
       </div>
+      <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
       
     </form>
   </div>
   <script>
-    const usIdInput = document.getElementById("rm_id");
-    const saveIdCheck = document.getElementById("saveId");
+      document.addEventListener("DOMContentLoaded", function () {
+        const usIdInput = document.getElementById("rm_id");
+        const saveIdCheck = document.getElementById("saveId");
 
-    // 저장된 ID 불러오기
-    window.addEventListener("load", function () {
-      const savedId = localStorage.getItem("savedId");
-      if (savedId) {
-        usIdInput.value = savedId;
-        saveIdCheck.checked = true;
-      }
-    });
+        // 쿠키에서 savedId 읽기
+        const cookies = document.cookie.split(";").map(cookie => cookie.trim());
+        const savedIdCookie = cookies.find(c => c.startsWith("savedId="));
+        if (savedIdCookie) {
+          const savedId = savedIdCookie.split("=")[1];
+          usIdInput.value = savedId;
+          saveIdCheck.checked = true;
+        }
 
-    // 로그인 시 저장 여부 확인
-    document.getElementById("loginForm").addEventListener("submit", function () {
-      if (saveIdCheck.checked) {
-        localStorage.setItem("savedId", usIdInput.value);
-      } else {
-        localStorage.removeItem("savedId");
-      }
-    });
+        // 로그인 시 쿠키 저장/삭제
+        document.getElementById("loginForm").addEventListener("submit", function () {
+          if (saveIdCheck.checked) {
+            document.cookie = `savedId=${usIdInput.value}; path=/; max-age=2592000`; // 30일
+          } else {
+            document.cookie = `savedId=; path=/; max-age=0`; // 삭제
+          }
+        });
+      });
   </script>
 </body>
 </html>

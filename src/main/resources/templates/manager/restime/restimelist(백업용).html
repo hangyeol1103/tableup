@@ -49,13 +49,11 @@
 <body>
 <main class="container mt-4" layout:fragment="content">
   <h2>예약 시간 달력</h2>
-  <input type="hidden" id="rtNum" th:value="${rt_num}">
   <div class="calendar-navigation">
     <button id="prevMonth" class="btn btn-outline-primary">이전달</button>
     <span id="calendarTitle" class="fw-bold"></span>
     <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
   </div>
-  <button class="btn btn-outline-primary mb-3" id="openTemplateApply">영업일자에 예약시간 추가</button>
   <div id="calendar"></div>
    <!-- 날짜 클릭 시 뜨는 모달 창 -->
   <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
@@ -71,7 +69,6 @@
             
         </div>
         <div class="modal-footer">
-          <button class="btn btn-danger" id="deleteAllTimesForDateBtn">예약시간 전체 삭제</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
         </div>
       </div>
@@ -129,65 +126,14 @@
     </div>
   </div>
 
-  <!-- 모달창: 템플릿 일괄 등록 -->
-  <div class="modal fade" id="templateApplyModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">예약 템플릿 등록</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label>적용할 요일을 선택하세요:</label>
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-outline-primary" data-day="월">월</button>
-              <button type="button" class="btn btn-outline-primary" data-day="화">화</button>
-              <button type="button" class="btn btn-outline-primary" data-day="수">수</button>
-              <button type="button" class="btn btn-outline-primary" data-day="목">목</button>
-              <button type="button" class="btn btn-outline-primary" data-day="금">금</button>
-              <button type="button" class="btn btn-outline-primary" data-day="토">토</button>
-              <button type="button" class="btn btn-outline-primary" data-day="일">일</button>
-            </div>
-          </div>
-          <div class="mb-3">
-            <label>해당 요일의 템플릿:</label>
-            <div id="templatePreviewArea" class="border p-2" style="max-height: 200px; overflow-y: auto;"></div>
-          </div>
-          <div class="mb-3">
-            <label>중복된 날짜 처리:</label><br>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="overwrite" id="overwriteTrue" value="true">
-              <label class="form-check-label" for="overwriteTrue">덮어쓰기</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="overwrite" id="overwriteFalse" value="false" checked>
-              <label class="form-check-label" for="overwriteFalse">무시하기</label>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-          <button type="button" class="btn btn-primary" id="applyTemplateBtn">템플릿 적용</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/restime/make_restime'">예약 시간 등록</button> -->
-  <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" id="goBackToManager" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+  <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/restime/make_restime'">예약 시간 등록</button>
+  <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
 
   <script th:inline="javascript">
     const today = new Date();
     let currentMonth = today.getMonth();
     let currentYear = today.getFullYear();
-    let selectedDay = null;
-    let overwrite = false;
-
-    const dayMap = { '일': 0, '월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6 };
-    const rtNum = document.getElementById('rtNum')?.value;
-
-    console.log("rtNum : ", rtNum);
 
     const opertimelist = /*[[${opertimelist}]]*/ [];
     const restimelist = /*[[${restimelist}]]*/ [];
@@ -200,13 +146,11 @@
     console.log("저장된 예약 가능 시간 : ",restimelist);
 
     function renderCalendar(year, month) {
-      localStorage.setItem('lastViewedYear', year);
-      localStorage.setItem('lastViewedMonth', month);
       $('#calendar').empty();
       const container = $('<div class="calendar-month"></div>');
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const firstDay = new Date(year, month, 1).getDay();
-      
+
       $('#calendarTitle').text(`${year}년 ${month + 1}월`);
       const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
       let row = $('<div class="calendar-row"></div>');
@@ -225,10 +169,6 @@
           .map(res => res.bh_start?.substring(11,16))
           .sort();
 
-        const maxDisplay = 2;
-        const displayedTimes = res.slice(0, maxDisplay);
-        const hiddenCount = res.length - maxDisplay;
-
         const cell = $(`
           <div class="calendar-cell" data-date="${dateStr}">
             <strong>${i}</strong>
@@ -236,16 +176,14 @@
               <div class="opertime-info">
                 ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
                 ${match.bd_off ? '쉬는날' : '여는날'}
-              </div>` : ''
-            }
-            ${displayedTimes.length > 0 ? `
-              <div class="opertime-info text-primary mt-1">
-                <strong>예약:</strong><br>
-                ${displayedTimes.join(', ')}${
-                  hiddenCount > 0 ? `, <span class="more-btn text-decoration-underline text-primary" style="cursor:pointer" data-date="${dateStr}">+외 ${hiddenCount}건</span>` : ''
-                }
-              </div>` : ''
-            }
+              </div>
+            ` : ''}
+            ${res.length > 0 ? `
+            <div class="opertime-info text-primary mt-1">
+              <strong>예약:</strong><br>
+              ${res.join(', ')}
+            </div>
+          ` : ''}
           </div>
         `);
 
@@ -286,83 +224,7 @@
     });
 
     $(document).ready(() => {
-      
-      //저장된 달 정보 불러오기
-      const reload = localStorage.getItem('reload');
-      const savedYear = reload?localStorage.getItem('lastViewedYear') : new Date().getFullYear();
-      const savedMonth = reload?localStorage.getItem('lastViewedMonth') : new Date().getMonth();
-      localStorage.removeItem('reload');
-      if (savedYear && savedMonth) {
-        currentYear = parseInt(savedYear);
-        currentMonth = parseInt(savedMonth);
-      }
-
       renderCalendar(currentYear, currentMonth);
-
-      // 모달 닫힐 때 정리
-      document.addEventListener('hidden.bs.modal', function () {
-        document.body.classList.remove('modal-open');
-        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-      });
-      //템플릿 추가 이벤트
-      $('#openTemplateApply').click(() => new bootstrap.Modal($('#templateApplyModal')).show());
-      $('#templateApplyModal button[data-day]').click(function () {
-        selectedDay = $(this).data('day');
-
-        // 버튼 시각적으로 활성화 표시
-        $('#templateApplyModal button[data-day]').removeClass('active');
-        $(this).addClass('active');
-
-        // 선택한 요일의 템플릿 필터링
-        const templates = templateList.filter(t => t.bhd_date === selectedDay);
-
-        // 출력할 영역
-        const previewArea = $('#templatePreviewArea');
-        previewArea.empty();
-
-        if (templates.length === 0) {
-          previewArea.append(`<p class="text-muted">등록된 템플릿이 없습니다.</p>`);
-        } else {
-          templates.forEach(t => {
-            previewArea.append(`
-              <div class="mb-1">
-                ⏰ ${t.bhd_timeStart} ~ ${t.bhd_timeEnd} | 좌석: ${t.bhd_seat} | 테이블: ${t.bhd_table}
-              </div>
-            `);
-          });
-        }
-      });
-      //요일 예약 시간 전체 삭제버튼 
-      $('#deleteAllTimesForDateBtn').click(() => {
-        const date = $('#selectedDate').text(); // yyyy-MM-dd
-
-        if (!confirm(`${date}의 모든 예약 가능 시간을 삭제하시겠습니까?`)) return;
-
-        $.ajax({
-          url: '/manager/restime/delete_by_date',
-          type: 'POST',
-          contentType: 'application/json',
-          data: JSON.stringify({ rt_num: rtNum, date }),
-          success: () => {
-            alert("해당 날짜의 예약 가능 시간이 삭제되었습니다.");
-            $('#dateModal').modal('hide');
-            // $.get('/manager/restime/restimelist_json/' + rtNum, function(data) {
-            //   restimelist = data;
-            //   renderCalendar(currentYear, currentMonth);
-            // });
-            location.reload();
-          },
-          error: (xhr) => {
-            console.error(xhr.responseText);
-            alert("삭제 중 오류 발생");
-          }
-        });
-      });
-      console.log("overwrite : ", overwrite);
-      $('input[name="overwrite"]').change(function () {
-        overwrite = $(this).val() === 'true';
-      });
-      $('#applyTemplateBtn').click(applyTemplateToBusinessDates);
 
       // 변경 버튼 이벤트
       $('#editTimeForm').submit(function(e){
@@ -376,7 +238,6 @@
           bh_table_max : $(this).find('input[name="bh_table_max"]').val(),
           bh_state : $(this).find('select[name="bh_state"]').val()
         };
-        
 
         $.ajax({
           async : true,
@@ -421,15 +282,6 @@
           }
         });
       })
-      $(document).on('click', '.more-btn', function() {
-        const date = $(this).data('date');
-        showTimeModal(date); // 기존 함수 재사용
-      });
-
-      $('#goBackToManager').click(function () {
-        localStorage.removeItem('lastViewedYear');
-        localStorage.removeItem('lastViewedMonth');
-      });
     });
 
     function showTimeModal(dateStr) {
@@ -479,81 +331,6 @@
       const modal = new bootstrap.Modal(document.getElementById('dateModal'));
       modal.show();
     }
-    function applyTemplateToBusinessDates() {
-      if (!selectedDay) {
-        alert("요일을 선택하세요");
-        return;
-      }
-
-      const resultList = [];
-
-      opertimelist.forEach(bd => {
-        const date = new Date(bd.bd_date);
-
-        if (date.getDay() === dayMap[selectedDay]) {
-          const existTimes = restimelist.filter(rt => rt.bh_start?.startsWith(bd.bd_date));
-          if (!overwrite && existTimes.length > 0) return;
-
-          const templateTimes = templateList.filter(t => t.bhd_date === selectedDay);
-          templateTimes.forEach(t => {
-            const dateOnly = bd.bd_date.substring(0, 10); // "yyyy-MM-dd"
-            
-            // hh:mm:ss 보장
-            const start = t.bhd_timeStart.length === 5 ? `${t.bhd_timeStart}:00` : t.bhd_timeStart;
-            const end = t.bhd_timeEnd.length === 5 ? `${t.bhd_timeEnd}:00` : t.bhd_timeEnd;
-
-            resultList.push({
-              bh_date: bd.bd_date,
-              bh_start: `${dateOnly} ${start}`,
-              bh_end: `${dateOnly} ${end}`,
-              bh_seat_max: t.bhd_seat,
-              bh_table_max: t.bhd_table,
-              bh_rt_num: t.bhd_rt_num,
-
-              bh_start_ts: `${dateOnly}T${start}`,  // 예: 2025-06-23T12:00:00
-              bh_end_ts: `${dateOnly}T${end}`
-            });
-          });
-        }
-      });
-
-      if (resultList.length === 0) {
-        alert("적용할 항목이 없습니다.");
-        return;
-      }
-
-      // 💡 전송 직전 로그 확인용
-      console.log("전송 데이터:", JSON.stringify(resultList, null, 2));
-      // 중복 여부
-      console.log("overwrite : ", overwrite);
-
-      $.ajax({
-        url: '/manager/restime/make_restime_list',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          overwrite: overwrite,
-          list : resultList}),
-        success: () => {
-          alert("예약 가능 시간이 성공적으로 저장되었습니다.");
-          localStorage.setItem("reload", true);
-          location.reload();
-        },
-        error: (xhr) => {
-          console.error("전송 실패:", xhr.responseText);
-          alert("오류가 발생했습니다.");
-        }
-      });
-    }
-
-  </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      document.addEventListener('hidden.bs.modal', function () {
-        document.body.classList.remove('modal-open');
-        document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
-      });
-    });
   </script>
 </main>
 </body>

@@ -193,7 +193,7 @@
             <span th:text="${score.rs_score}"></span>
           </span>
         </div>
-        <div th:if="${rvl.fileList != null and !rvl.fileList.isEmpty()}">
+        <div class="mt-3" th:if="${rvl.fileList != null and !rvl.fileList.isEmpty()}">
           <div class="img-grid" th:data-review-id="${rvl.rev_num}">
 
             <div th:each="file, iterStat : ${rvl.fileList}" 

@@ -93,7 +93,7 @@ public class UserController {
   /** 로그인 */
 
   @GetMapping("/login")
-  public String login(Model model, HttpServletRequest request) {
+  public String login(Model model, HttpServletRequest request, @AuthenticationPrincipal CustomUser customUser) {
     String prevUrl = request.getHeader("Referer");
     System.out.println(prevUrl);
     if (prevUrl != null && !prevUrl.contains("/user/login")) {

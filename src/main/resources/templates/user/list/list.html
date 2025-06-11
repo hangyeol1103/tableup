@@ -724,6 +724,16 @@
       alert("링크가 존재하지 않습니다.");
     }
   }
+
+  // 검색창 외 클릭 -> 닫기
+  document.addEventListener("click", function (event) {
+    const autocompleteBox = document.getElementById("autocompleteBox");
+    const searchInput = document.getElementById("searchKeyword");
+
+    if (!autocompleteBox.contains(event.target) && event.target !== searchInput) {
+      autocompleteBox.innerHTML = "";
+    }
+  });
   </script>
 
 

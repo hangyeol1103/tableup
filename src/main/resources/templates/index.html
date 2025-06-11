@@ -606,6 +606,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       }
     });
 
+		// 검색창 외 클릭 시 닫기
+		document.addEventListener("click", function (event) {
+			const autocompleteBox = document.getElementById("autocompleteBox");
+			const searchInput = document.getElementById("searchKeyword");
+
+			if (!autocompleteBox.contains(event.target) && event.target !== searchInput) {
+				autocompleteBox.innerHTML = "";
+			}
+		});
+
   </script>
 
 

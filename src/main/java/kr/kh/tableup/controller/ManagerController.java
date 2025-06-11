@@ -155,6 +155,21 @@ public class ManagerController {
 		return "redirect:/manager/signup";
 	}
 
+	//회원가입시 아이디 중복 체크
+	@GetMapping("/check/id")
+	@ResponseBody
+	public boolean checkId(@RequestParam("id") String id) {
+		System.out.println("가져온 아이디 : " + id);
+		return managerService.getRestaurantById(id); // true: 중복, false: 사용 가능
+	}
+	//회원가입시 사업자 번호 중복 체크
+	@GetMapping("/check/business")
+	@ResponseBody
+	public boolean checkBusiness(@RequestParam("business") String business) {
+		System.out.println("가져온 사업자 번호 : " + business);
+		return managerService.getRestaurantByBusiness(business); // true: 중복, false: 사용 가능
+	}
+
 	//아이디 찾기(이름, 전화번호, 사업자 번호 확인)
 	@GetMapping("/findId")
 	public String findManagerId(Model model) {

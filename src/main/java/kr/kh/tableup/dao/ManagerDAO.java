@@ -177,6 +177,12 @@ public interface ManagerDAO {
 
   RestaurantManagerVO selectFindIdAndEmail(String rm_id, String rm_email);
 
+	//아이디 중복 체크
+	String selectManagerId(String id);
+
+	//사업자 번호 중복 체크
+	String selectManagerBusiness(String business);
+
 
 
 

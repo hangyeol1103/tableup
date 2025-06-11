@@ -801,6 +801,29 @@ public class ManagerService {
 		return managerDAO.selectFindIdAndEmail(rm_id,rm_email);
     }
 
+		//회원가입시 아이디 중복 체크
+		public boolean getRestaurantById(String id) {
+			if(id==null){
+				return true;
+			}
+			String res= managerDAO.selectManagerId(id);
+			if(res != null){
+				return true;
+			}
+			return false;
+		}
+
+		public boolean getRestaurantByBusiness(String business) {
+			if(business == null){
+				return true;
+			}
+			String res = managerDAO.selectManagerBusiness(business);
+			if(res != null){
+				return true;
+			}
+			return false;
+		}
+
 
 
 

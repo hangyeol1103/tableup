@@ -60,8 +60,18 @@
 
     <div class="mb-3">
       <label>전화번호</label>
-      <input type="text" th:field="*{us_phone}" id="us_phone" name="us_phone" class="form-control" placeholder="010-1234-5678" required>
+      <input type="text" th:field="*{us_phone}" id="us_phone" name="us_phone" class="form-control" placeholder="010-0000-0000" required>
+      <!-- <button type="button" class="btn btn-outline-primary btn-sm mt-2 phone-send-btn">인증 요청</button>
+      <div class="mt-2 phone-check-form d-none">
+        <div class="text-muted">아래 QR을 스캔하여 문자로 인증을 보내주세요.</div>
+        <div class="qr-code mt-2 mb-2 text-center">
+          <img th:src="{qr_addr}" width="200" />
+        </div>
+        <div class="small mt-1 phone-timer text-muted"></div>
+        <div class="mt-1 phone-result"></div>
+      </div> -->
     </div>
+
     <div class="mb-3">
       <label>닉네임 (선택사항입니다)</label>
       <input type="text" th:field="*{us_nickname}" name="us_nickname" class="form-control">

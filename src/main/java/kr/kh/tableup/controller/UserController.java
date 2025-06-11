@@ -2,7 +2,6 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,6 +33,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import kr.kh.tableup.model.DTO.EmailDTO;
 import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
@@ -59,6 +59,7 @@ import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.FileService;
+import kr.kh.tableup.service.MailService;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.ReservationService;
 import kr.kh.tableup.service.RestaurantService;
@@ -86,6 +87,9 @@ public class UserController {
 
   @Autowired
   private FileService fileService;
+
+  @Autowired
+  private MailService mailService;
 
   @Value("${my-api-key}")
   private String apiKey;
@@ -134,8 +138,31 @@ public class UserController {
     return "user/signup";
   }
 
+  @PostMapping("/email/dup")
+  @ResponseBody
+  public String emailIsDuplicated(@RequestParam String us_email) {
+    boolean exists = userService.isDuplicate("email", us_email);
+    return exists ? "duplicate" : null;
+  }
+
+  @PostMapping("/email/send")
+  @ResponseBody
+  public String emailSend(@RequestParam String us_email) {
+    System.out.println(us_email);
+    String ev_key = mailService.sendEmail(us_email.trim());
+    System.out.println(ev_key);
+    if(ev_key == null || ev_key.length() < 5) return null;
+    return ev_key;
+  }
+
+  @PostMapping("/email/check")
+  @ResponseBody
+  public String emailCheck(@RequestParam String ev_key, @RequestParam String code) {
+    return mailService.checkEmail(ev_key, code);
+  }
+
   @PostMapping("/signupPost")
-  public String signup(@Valid @ModelAttribute("userVO") UserVO user, BindingResult result, RedirectAttributes ra) {
+  public String signup(@Valid @ModelAttribute UserVO user, BindingResult result, RedirectAttributes ra) {
 
     System.out.println("유효성 검사 오류 수: " + result.getErrorCount());
 

@@ -543,6 +543,11 @@ public class ManagerController {
 		MenuVO menu = managerService.getMenu(mn_num);
 		MenuTypeVO menutype =managerService.getMenuType(menu.getMn_mt_num());
 		
+		//다른 계정의 매니저가 접근했을 경우
+		if(manager.getManager().getRm_rt_num() != menu.getMn_rt_num()){
+			return "redirect:/manager";
+		}
+
 		int rt_num =manager.getManager().getRm_rt_num();
 		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 		
@@ -712,7 +717,7 @@ public class ManagerController {
 		if (manager == null || manager.getManager() == null) {
         return "redirect:/manager/login";
     }
-		
+
 		int rtNum = manager.getManager().getRm_rt_num();
     System.out.println("매니저의 매장 번호: " + rtNum);
     resdetail.setRd_rt_num(rtNum);
@@ -795,6 +800,12 @@ public class ManagerController {
 		model.addAttribute("restaurant", restaurant);
 
 		ResCouponVO coupon = managerService.getCoupon(rec_num);
+
+		//다른 계정의 매니저가 접근했을 경우
+		if(manager.getManager().getRm_rt_num() != coupon.getRec_rt_num()){
+			return "redirect:/manager";
+		}
+
 		model.addAttribute("coupon", coupon);
 		return "/manager/coupon/coupon";
 	}
@@ -919,6 +930,10 @@ public class ManagerController {
 
 		ResNewsVO news = managerService.getNews(rn_num);
 		System.out.println(news);
+		//다른 계정의 매니저가 접근했을 경우
+		if(manager.getManager().getRm_rt_num() != news.getRn_rt_num()){
+			return "redirect:/manager";
+		}
 		model.addAttribute("news", news);
 		return "/manager/news/news";
 	}

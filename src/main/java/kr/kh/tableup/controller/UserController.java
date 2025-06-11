@@ -33,7 +33,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import kr.kh.tableup.model.DTO.EmailDTO;
 import kr.kh.tableup.model.DTO.ReviewDTO;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;

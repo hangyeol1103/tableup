@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import kr.kh.tableup.model.DTO.EmailDTO;
 
 @Service
 public class MailService {

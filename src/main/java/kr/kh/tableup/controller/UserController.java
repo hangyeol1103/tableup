@@ -35,9 +35,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import kr.kh.tableup.model.DTO.ReviewDTO;
+import kr.kh.tableup.model.util.Criteria;
 import kr.kh.tableup.model.util.CustomUser;
 import kr.kh.tableup.model.util.PageMaker;
 import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.util.RevCriteria;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.DefaultResTimeVO;
@@ -657,10 +659,18 @@ public class UserController {
   } 
 
   @PostMapping("/list/review/{rt_num}")
-  public String postMethodName(@PathVariable("rt_num") int rt_num, Model model) {
-    List<ReviewVO> reviewList = restaurantService.getReviewList(rt_num);
+  public String postMethodName(@PathVariable int rt_num, Model model,@RequestBody RevCriteria cri) {
+    cri.setRt_num(rt_num);
+    cri.setPerPageNum(5);
+    System.out.println(cri);
+    List<ReviewVO> reviewList = restaurantService.getCriReviewList(cri);
+    cri.setPage(cri.getPage()+1); //다음페이지를 가져와서
+    List<ReviewVO> nexList = restaurantService.getCriReviewList(cri); //nexList에 담고
+
+    boolean isNext = nexList.size() != 0; //nextList의 size가 0이 아니면 true
 
     model.addAttribute("reviewList", reviewList);
+    model.addAttribute("isNext", isNext);
     return "user/detail/review";
   }
   

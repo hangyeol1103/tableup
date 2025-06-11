@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import kr.kh.tableup.model.util.RevCriteria;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.FileVO;
@@ -47,6 +48,8 @@ public interface RestaurantDAO {
 		List<BusinessHourVO> selectBusinessHour(int rt_num);
 
 		List<BusinessDateVO> selectBusinessDate(int rt_num);
+
+		List<ReviewVO> selectCriReviewList(RevCriteria cri);
 
 }
 

@@ -671,15 +671,7 @@
           $(".tab-link").removeClass("active");
           $(".tab-link.review").addClass("active");
 
-          $.ajax({
-            url : "/user/list/review/[[${rt_num}]] ",
-            method : "post",
-            success : function(data){
-
-              $(".container-content").html(data)
-            }
-
-          })
+          getRevieList(page);
         }
 
         //화면 로딩 시 홈 내용이 보이게 하는 비동기 통신
@@ -704,10 +696,53 @@
         });
         $(".home").click();
 
-       
+        var page = 1;
+        getRevieList(page);
+        
+        $(document).on("click","#loadMoreBtn", function () {
+          $(this).remove();
+          page++;
+          getRevieList(page)
+          
+        });
+        function getRevieList(page){
+          console.log(page)
+          $.ajax({
+            url: "/user/list/review/[[${rt_num}]]",
+            method: "POST",
+            contentType : 'application/json; charset=utf-8',
+            data: JSON.stringify({
+              page : page
+            }),
+
+            success: function (data){
+              if(page == 1){
+                $(".container-content").html(data);
+              }else{
+                $(".container-content").append(data);
+              }
+
+              // total 개수 비교해서 더보기 버튼 제거
+              const meta = document.getElementById("review-meta");
+              if (meta) {
+                const total = parseInt(meta.dataset.totalCount);
+                const currentPage = parseInt(meta.dataset.currentPage);
+                const perPage = parseInt(meta.dataset.perPage);
+                const shown = currentPage * perPage;
+
+                if (shown >= total) {
+                  $("#loadMoreBtn").remove(); // 더보기 버튼 제거
+                }
+              
+              }
+            }
+
+          });
+        }
+        
       </script>
 
-
+     
  
   <!-- 카카오 지도 -->
   <script>

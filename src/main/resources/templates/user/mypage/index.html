@@ -8,7 +8,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <head>
 	<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>mypage_index</title>
+  <title>마이페이지</title>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 </head>
 <body>
 	<main layout:fragment="content">
@@ -17,44 +19,61 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<a th:href="@{/user/info}" class="btn btn-primary mt-2">내 정보</a>
 		</div>
 
-		<ul class="nav nav-tabs mt-4" id="mypageTabs" role="tablist">
-			<li class="nav-item"><a class="nav-link active" href="#resTab" data-bs-toggle="tab" data-url="/user/mypage/res">내 예약</a></li>
-			<li class="nav-item"><a class="nav-link" href="#revTab" data-bs-toggle="tab" data-url="/user/mypage/rev">내 리뷰</a></li>
-			<li class="nav-item"><a class="nav-link" href="#flwrstTab" data-bs-toggle="tab" data-url="/user/mypage/flwrst">찜한 식당</a></li>
-			<li class="nav-item"><a class="nav-link" href="#flwrvwTab" data-bs-toggle="tab" data-url="/user/mypage/flwrvw">찜한 리뷰</a></li>
+		<ul class="nav nav-tabs mt-4" id="tabs" role="tablist">
+  		<li class="nav-item"><a class="nav-link" href="#resTab" data-tab="res" data-bs-toggle="tab" data-url="/user/mypage/res">내 예약</a></li>
+  		<li class="nav-item"><a class="nav-link" href="#revTab" data-tab="rev" data-bs-toggle="tab" data-url="/user/mypage/rev">내 리뷰</a></li>
+  		<li class="nav-item"><a class="nav-link" href="#flwrstTab" data-tab="flwrst" data-bs-toggle="tab" data-url="/user/mypage/flwrst">찜한 식당</a></li>
+  		<li class="nav-item"><a class="nav-link" href="#flwrvwTab" data-tab="flwrvw" data-bs-toggle="tab" data-url="/user/mypage/flwrvw">찜한 리뷰</a></li>
 		</ul>
 
 		<div class="tab-content p-3 border border-top-0" id="mypageContent">
-			<div id="resTab" class="tab-pane fade show active">로딩 중...</div>
-			<div id="revTab" class="tab-pane fade">로딩 중...</div>
-			<div id="flwrstTab" class="tab-pane fade">로딩 중...</div>
-			<div id="flwrvwTab" class="tab-pane fade">로딩 중...</div>
+			<div id="resTab" class="tab-pane fade"><div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading</span></div></div></div>
+			<div id="revTab" class="tab-pane fade"><div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading</span></div></div></div>
+			<div id="flwrstTab" class="tab-pane fade"><div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading</span></div></div></div>
+			<div id="flwrvwTab" class="tab-pane fade"><div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading</span></div></div></div>
 		</div>
 
-		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-		<script>
-			$('#mypageTabs a').on('shown.bs.tab', function () {
-				const tabId = $(this).attr('href');
-				const url = $(this).data('url');
-				const $target = $(tabId);
 
-				if (!$target.data('loaded')) {
-					$.ajax({
-						url: url,
-						type: 'post',
-						success: function (data) {
-							console.log(data);
-							$target.html(data).data('loaded', true);
-						},
-						error: function () {
-							$target.html('<div class="text-danger">불러오는 데 실패했습니다.</div>');
-						}
-					});
+
+		<script th:inline="javascript">
+			$(function () {
+				const tab = /*[[${tab} ?: 'res']]*/ 'res';
+				let $initialTab = $(`#tabs a[data-tab="${tab}"]`);
+
+				if ($initialTab.length === 0) {
+					$initialTab = $('#tabs a').first(); // fallback
 				}
-			});
 
-			// 첫 번째 탭 자동 로딩
-			$('#mypageTabs a.active').trigger('shown.bs.tab');
+				$initialTab.addClass('active');
+				$($initialTab.attr('href')).addClass('show active');
+
+				// Ajax 로드 함수
+				function loadTabContent($tab) {
+					const tabId = $tab.attr('href');
+					const url = $tab.data('url');
+					const $target = $(tabId);
+
+					if (!$target.data('loaded')) {
+						$.ajax({
+							url: url,
+							type: 'post',
+							success: function (data) {
+								$target.html(data).data('loaded', true);
+							},
+							error: function () {
+								$target.html('<div class="text-danger">불러오는 데 실패했습니다.</div>');
+							}
+						});
+					}
+				}
+
+				// 초기 Ajax 로드
+				$('#tabs a').on('shown.bs.tab', function () {
+					loadTabContent($(this));
+				});
+
+				loadTabContent($initialTab);
+			});
 		</script>
 		
 		

@@ -108,35 +108,36 @@ public class SecurityConfig{
         .securityMatcher("/user/**", "/","/home")
         .csrf(csrf ->csrf.disable())
         .authorizeHttpRequests((requests) -> requests
-        .requestMatchers("/user/review/insert").authenticated()
-        .anyRequest().permitAll()  // 그 외 요청은 인증 필요
-      )
+          .requestMatchers("/user/review/insert").authenticated()
+          .requestMatchers("/user/login", "/user/signup", "/user/login/*").anonymous()
+          .anyRequest().permitAll()  // 그 외 요청은 인증 필요
+        )
      
-      .formLogin(form -> 
-            form
-              .loginPage("/user/login")
-              .loginProcessingUrl("/user/loginPost")
-              .usernameParameter("us_id")
-              .passwordParameter("us_pw")
-              .defaultSuccessUrl("/")
-              .failureHandler(authenticationFailureHandler())
-              //.failureUrl("/user/login?error") // 로그인 실패 시 
-              .permitAll()
-      )
-      .userDetailsService(userDetailService)
-      //자동 로그인 처리
-      .rememberMe(rm-> rm
-        .userDetailsService(userDetailService)//자동 로그인할 때 사용할 userDetailService를 추가
-        .key(rememberMeKey)//키가 변경되면 기존 토큰이 무효처리
-        .rememberMeCookieName("LC")//쿠키 이름
-        .tokenValiditySeconds(60 * 60 * 24 * 100)//유지 기간 : x일
-      )
-      .logout((logout) -> logout
-        .logoutUrl("/user/logout")//post방식
-        .logoutSuccessUrl("/")
-        .clearAuthentication(true)
-        .invalidateHttpSession(true)
-        .permitAll());  // 로그아웃도 모두 접근 가능
+        .formLogin(form -> 
+              form
+                .loginPage("/user/login")
+                .loginProcessingUrl("/user/loginPost")
+                .usernameParameter("us_id")
+                .passwordParameter("us_pw")
+                .defaultSuccessUrl("/")
+                .failureHandler(authenticationFailureHandler())
+                //.failureUrl("/user/login?error") // 로그인 실패 시 
+                .permitAll()
+        )
+        .userDetailsService(userDetailService)
+        //자동 로그인 처리
+        .rememberMe(rm-> rm
+          .userDetailsService(userDetailService)//자동 로그인할 때 사용할 userDetailService를 추가
+          .key(rememberMeKey)//키가 변경되면 기존 토큰이 무효처리
+          .rememberMeCookieName("LC")//쿠키 이름
+          .tokenValiditySeconds(60 * 60 * 24 * 100)//유지 기간 : x일
+        )
+        .logout((logout) -> logout
+          .logoutUrl("/user/logout")//post방식
+          .logoutSuccessUrl("/")
+          .clearAuthentication(true)
+          .invalidateHttpSession(true)
+          .permitAll());  // 로그아웃도 모두 접근 가능
         
       return http
         .userDetailsService(userDetailService)    

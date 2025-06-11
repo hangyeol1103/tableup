@@ -208,15 +208,19 @@
 	<select id="selectFollowedRestaurant" resultType="RestaurantVO">
 		select * from usfollow 
 		join restaurant on uf_foreign = rt_num
+		LEFT JOIN restaurantdetail on rd_rt_num = rt_num
 		where uf_type = 'RESTAURANT' and uf_us_num = #{us_num} 
 	</select>
 
-	<select id="selectFollowedReview" resultType="ReviewVO">
+	<select id="selectFollowedReview" resultMap="ReviewMap">
 		select * from usfollow 
 		join REVIEW on uf_foreign = rev_num
 		join restaurant on rt_num = rev_rt_num
 		join user on us_num = rev_us_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
 		where uf_type = 'REVIEW' and uf_us_num = #{us_num} 
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
 	</select>
 
 	<select id="selectScoreTypeList" resultType="ScoreTypeVO"> SELECT ST_NUM, ST_CATEGORY FROM
@@ -360,7 +364,7 @@
 					FROM review rev
 					JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
 					WHERE rev.rev_rt_num = r.rt_num
-				) ASC
+				) DESC
 			</when>
 
 			<when test="orderBy == 'reservation'">

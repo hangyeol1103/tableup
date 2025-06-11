@@ -123,6 +123,24 @@
         background-color: #5a6268; /* hover 시 어두운 회색 */
       }
 
+      .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.8);
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-out;
+      }
+      .image-modal img {
+        max-width: 95vw;
+        max-height: 95vh;
+        border-radius: 0.5rem;
+      }
     </style>
   </head>
 
@@ -141,12 +159,17 @@
           <div class="row" id="imageContainer">
             <div class="col-md-4 mb-3" th:each="tl : ${tapFileList}" th:data-tag="${tl.file_tag}">
               <img th:src="@{/file{path}(path=${tl.file_path})}" class="img-fluid rounded"
-                  alt="메뉴 사진" style="width: 100%; height: 200px; object-fit: cover;">
+                  alt="메뉴 사진" style="width: 100%; height: 200px; object-fit: cover;"
+                  th:onclick="'openImageModal(\'' + @{/file{path}(path=${tl.file_path})} + '\')'">
             </div>
           </div>
         </div>
       </div>
     </main>
+
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+      <img id="modalImage" src="" alt="확대 이미지">
+    </div>
 
     <script>
       function scrollToGroup(groupId) {
@@ -179,6 +202,26 @@
         btn.classList.add('active');
       });
     });
+    </script>
+
+    <script>
+      function openImageModal(src) {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImage");
+        modal.style.display = "flex";
+        modalImg.src = src;
+      }
+
+      function closeImageModal() {
+        document.getElementById("imageModal").style.display = "none";
+      }
+
+      // ESC 키로 모달 닫기
+      document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+          closeImageModal();
+        }
+      });
     </script>
 
   </body>

@@ -6,10 +6,22 @@
 <head>
   <meta charset="utf-8">
   <title>내 정보</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
   <style>
     .form-label { font-weight: bold; }
     .form-control[readonly] { background-color: #f8f9fa; }
+    .red { color: red; }
+    .green { color: green; }
+    .spinner-box {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -63,18 +75,31 @@
 
         </table>
         <div class="text-end">
-          <button class="btn btn-warning" onclick="toggleEdit()">정보 수정</button>
+          <!-- <button class="btn btn-warning" onclick="toggleEdit()">정보 수정</button> -->
+          <a type="button" class="btn btn-warning" th:href="@{/user/edit}">정보 수정</a>
         </div>
       </div>
     </div>
 
-    <div id="editForm" style="display:none;">
+    <div style="display:none;" class="edit-container">
 			<div th:if="${errorMsg}" class="alert alert-danger" role="alert" th:text="${errorMsg}"></div>
       <!-- 수정 폼 -->
-      <form th:action="@{/user/updateInfo}" method="post">
+      <form id="editForm" th:object="${userVO}" th:action="@{/user/updateInfo}" method="post">
         <div class="mb-3">
           <label for="email" class="form-label">이메일</label>
-          <input type="email" class="form-control" id="email" name="us_email" th:value="${user.us_email}">
+          <input type="email" th:value="${user.us_email}" name="us_email" class="form-control" id="email">
+          <button type="button" class="btn btn-outline-primary btn-sm mt-2 email-send-btn">인증번호 보내기</button>
+
+          <div class="mt-2 email-check-form d-none">
+            <input type="text" class="form-control input-check-email mt-1" placeholder="인증번호 입력" />
+            <button type="button" class="btn btn-outline-success btn-sm mt-2 email-check-btn">인증 확인</button>
+            <div class="small mt-1 timer text-muted"></div>
+            <div class="mt-1 email-result"></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="nickname" class="form-label">닉네임</label>
+          <input type="text" class="form-control" id="nickname" name="us_nickname" th:value="${user.us_nickname}">
         </div>
         <div class="mb-3">
           <label for="phone" class="form-label">전화번호</label>
@@ -90,6 +115,11 @@
         </div>
         <button type="submit" class="btn btn-success">수정 완료</button>
         <button type="button" class="btn btn-secondary" onclick="toggleEdit()">취소</button>
+        <div class="spinner-box d-flex d-none">
+          <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">로딩중...</span>
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -119,12 +149,170 @@
 
 <script>
 function toggleEdit() {
-  const form = document.getElementById('editForm');
+  const form = document.querySelector('.edit-container');
   form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
 </script>
 
 
+    <script th:inline="javascript">
+      $(function () {
+        let ev_key="";
+        let timer;
+        let timeNow = 180;
+        let emailCheck = false;
+
+        function startTimer() {
+          let $timer = $(".timer");
+          clearInterval(timer);
+          timeNow = 180;
+          timer = setInterval(() => {
+            timeNow--;
+            const m = Math.floor(timeNow / 60);
+            const s = timeNow % 60;
+            const time = "남은 시간 : " + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+            $timer.text(time);
+            if (timeNow <= 0) {
+              clearInterval(timer);
+              $timer.text("인증 시간이 만료되었습니다.");
+            }
+          }, 1000);
+        }
+
+        $(".email-send-btn").click(function () {
+          /*<![CDATA[*/
+          const dbEmail = /*[[${user.us_email}]]*/ '[[${user.us_email}]]';
+          /*]]>*/
+          const $email = $("#email");
+          const email = $email.val().trim();
+          
+          $email.val(email);
+          if (!email) return alert("이메일을 입력하세요.");
+          if (dbEmail === email) return;
+          // console.log(email);
+          $(".spinner-box").removeClass("d-none").addClass("d-flex");
+          $(this).prop("disabled", true);
+
+          $.ajax({
+            async : false,
+            url: "/user/email/dup",
+            method: "POST",
+            data: { us_email : email },
+            success: function (data) {
+              if (data.length > 0) {
+                alert("해당 이메일은 이미 사용 중입니다.");
+                $(".spinner-box").removeClass("d-flex").addClass("d-none");
+                $(".email-send-btn").prop("disabled", false);
+                return;
+              }
+              console.log("존재하지 않는 이메일");
+              $.ajax({
+                url: "/user/email/send",
+                method: "POST",
+                data: { us_email : email },
+                success: function (data) {
+                  if (data && data.length > 0) {
+                    alert("인증 번호를 보냈습니다.");
+                    ev_key = data;
+                    // sessionStorage.setItem("ev_key", data);
+                    $("#email").prop("readonly", true);
+                    $(".email-check-form").removeClass("d-none").show();
+                    startTimer();
+                  } else {
+                    alert("인증 번호 전송 실패");
+                  }
+                },
+                error: function () {
+                  alert("오류가 발생했습니다.");
+                },
+                complete: function () {
+                  $(".spinner-box").removeClass("d-flex").addClass("d-none");
+                  $(".email-send-btn").prop("disabled", false);
+                }
+              });
+            },
+            error: function () {
+              alert("오류가 발생했습니다.");
+              $(".spinner-box").removeClass("d-flex").addClass("d-none");
+              $(".email-send-btn").prop("disabled", false);
+            }
+          });
+        });
+
+        $(".email-check-btn").click(function () {
+          const code = $(".input-check-email").val().trim();
+          if (!code) return alert("인증번호를 입력하세요.");
+          if (timeNow <= 0) {
+            clearInterval(timer);
+            $timer.text("인증 시간이 만료되었습니다.");
+            return;
+          }
+          // let newKey = sessionStorage.getItem("ev_key");
+          // if (!newKey) {
+          if (!ev_key) {
+            alert("인증번호가 존재하지 않습니다.");
+            location.reload();
+            return;
+          }
+          $.ajax({
+            url: "/user/email/check",
+            method: "POST",
+            data:{ ev_key : ev_key, code : code },
+            // contentType : "application/json; charset=utf-8",
+            success: function (data) {
+              if (data === "true") {
+                $(".email-result").text("이메일 인증되었습니다.").removeClass("red").addClass("green");
+                clearInterval(timer);
+                emailCheck = true;
+              } else {
+                $(".email-result").text("인증 번호가 일치하지 않습니다.").removeClass("green").addClass("red");
+              }
+            },
+            error: function () {
+              alert("인증 요청 실패");
+            }
+          });
+        });
+
+        $("#editForm").submit(function (e) {
+          /*<![CDATA[*/
+          const dbEmail = /*[[${user.us_email}]]*/ '[[${user.us_email}]]';
+          /*]]>*/
+          const input = $("#email").val();
+          if (!emailCheck && input !== dbEmail) {
+            alert("이메일 인증을 완료해주세요.");
+            e.preventDefault();
+            return;
+          }
+          alert("회원 정보 수정 완료!");
+        });
+      });
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        $("#us_phone").blur(function(){
+          
+          const original = this.value.trim();
+          
+          if (original.includes('-')) return;
+          
+          const digits = original.replace(/\D/g, '');
+          
+          if (digits.length === 10 || digits.length === 11) {
+            let formatted = '';
+            if (digits.startsWith('02')) {
+              formatted = digits.replace(/^(\d{2})(\d{3,4})(\d{4})$/, '$1-$2-$3');
+            } else {
+              formatted = digits.replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3');
+            }
+            this.value = formatted;
+          }
+        });
+      });
+
+
+    </script>
 
 
 </main>

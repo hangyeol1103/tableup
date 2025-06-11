@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>도움말 | 테이블업</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+</head>
+<body>
+<main layout:fragment="content" class="container my-5">
+  <h2 class="mb-4">도움말</h2>
+
+  <ul class="nav nav-tabs" id="helpTabs">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#faq">자주 묻는 질문</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#guide">이용 가이드</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#troubleshoot">오류 해결</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#contact">문의하기</a></li>
+  </ul>
+
+  <div class="tab-content mt-4">
+    <div id="faq" class="tab-pane fade show active" th:insert="~{user/help/fragments/faq :: faq}"></div>
+    <div id="guide" class="tab-pane fade" th:insert="~{user/help/fragments/guide :: guide}"></div>
+    <div id="troubleshoot" class="tab-pane fade" th:insert="~{user/help/fragments/troubleshoot :: troubleshoot}"></div>
+    <div id="contact" class="tab-pane fade" th:insert="~{user/help/fragments/contact :: contact}"></div>
+  </div>
+</main>
+</body>
+</html>

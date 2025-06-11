@@ -344,6 +344,17 @@ public class UserController {
     return "user/mypage/info";
   }
 
+  @PostMapping("/updateInfo")
+  public String updateInfo(@ModelAttribute UserVO user, @AuthenticationPrincipal CustomUser customUser) {
+    if (customUser == null || customUser.getUser() == null)
+      return "redirect:/user/login";
+
+    user.setUs_id(customUser.getUser().getUs_id()); // ID 보안
+    boolean result = userService.updateUserInfo(user);
+
+    return "user/mypage/info";
+  }
+
   @GetMapping("/detail")
   public String detailPage() {
     return "user/detail/detail";

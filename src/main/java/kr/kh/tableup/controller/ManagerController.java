@@ -81,7 +81,7 @@ public class ManagerController {
 	//매니저 메인 페이지
 	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
-		System.out.println(manager);
+		System.out.println("접속한 계정 : "+manager.getManager());
 		// model.addAttribute("url","/main");
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
@@ -410,6 +410,8 @@ public class ManagerController {
 		System.out.println(manager);
 		System.out.println("수정할 매장 정보 :"+restaurant);
 
+		
+
 		if(managerService.updateRestaurant(restaurant, manager.getManager(), fileList)){
 			return "redirect:/manager/restaurant/restaurant";
 		}
@@ -467,6 +469,10 @@ public class ManagerController {
 		System.out.println(manager);
 		System.out.println(menu);
 		System.out.println(mn_img2.getOriginalFilename());
+
+		if (manager == null|| manager.getManager() == null ) {
+        return "redirect:/manager/login";
+    }
 		
 		int rtNum = manager.getManager().getRm_rt_num();
     System.out.println("매니저의 매장 번호: " + rtNum);
@@ -490,7 +496,8 @@ public class ManagerController {
 	@GetMapping("/menu/menu/{mn_num}")
 	public String detailMenu(Model model, @PathVariable int mn_num, Principal principal, @AuthenticationPrincipal CustomManager manager) {
 		String loginId =principal.getName();
-		if (manager == null || loginId !=manager.getManager().getRm_id()) {
+		//매니저 정보가 없는 경우
+		if (manager == null|| manager.getManager() == null || loginId !=manager.getManager().getRm_id()) {
         return "redirect:/manager/login";
     }
 
@@ -540,6 +547,10 @@ public class ManagerController {
 		int rtNum = manager.getManager().getRm_rt_num();
 		menu.setMn_rt_num(rtNum);
 
+		if(manager==null || manager.getManager()==null){
+			
+		}
+
 		if (rtNum <= 0) {
 			result.put("success", false);
 			result.put("redirect", "/manager/restaurant/make");
@@ -557,6 +568,7 @@ public class ManagerController {
 	@GetMapping("/detail/restaurantdetail/{rt_num}")
 	public String restaurantDetailPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
 		
+		//매니저 정보가 없는 경우
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/login";
 		}
@@ -572,7 +584,11 @@ public class ManagerController {
 	}
 
 	@GetMapping("/detail/make_detail")
-	public String makeResDetailPage(Model model) {
+	public String makeResDetailPage(Model model,@AuthenticationPrincipal CustomManager manager) {
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null ) {
+        return "redirect:/manager/login";
+    }
 		model.addAttribute("url", "/make_detail");
 		return "/manager/detail/make_detail";
 	}
@@ -587,6 +603,11 @@ public class ManagerController {
 		
 		System.out.println(manager);
 		System.out.println(resdetail);
+
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null || rtNum == 0) {
+        return "redirect:/manager/login";
+    }
 
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
@@ -625,6 +646,11 @@ public class ManagerController {
 		
 		System.out.println(manager);
 		System.out.println(resdetail);
+
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
 
     if (rtNum <= 0) {
         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
@@ -675,6 +701,7 @@ public class ManagerController {
 	@PostMapping("/coupon/make_coupon")
 	@ResponseBody
 	public boolean insertCoupon(@RequestBody ResCouponVO coupon, @AuthenticationPrincipal CustomManager manager) {
+		//매니저 정보가 없거나, 쿠폰 객체가 없는 경우
 		if (coupon == null || manager == null || manager.getManager() == null){
 			return false;
 		} 
@@ -737,7 +764,7 @@ public class ManagerController {
 	public String newsListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
 
 
-		
+		//매니저 정보가 없는 경우
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/";
 		}
@@ -826,6 +853,11 @@ public class ManagerController {
 	public boolean updateNews(ResNewsVO news,  @AuthenticationPrincipal CustomManager manager) {
 		int rtNum = manager.getManager().getRm_rt_num();
 
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null || rtNum == 0) {
+        return false;
+    }
+
 		if (rtNum <= 0) {
 			System.out.println("매장 정보 없음, 매장 등록이 필요합니다.");
 			return false;
@@ -841,6 +873,10 @@ public class ManagerController {
 	@PostMapping("/news/delete_news/{rn_num}")
 	public String deleteNewsPage(@AuthenticationPrincipal CustomManager manager, @PathVariable int rn_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null || rtNum == 0) {
+        return "redirect:/manager/login";
+    }
 		 if(managerService.deleteNews(rn_num)) {
         return "redirect:/manager/news/newslist/"+rtNum;
     }
@@ -1049,8 +1085,12 @@ public class ManagerController {
 	@PostMapping("/restime/delete_restime/{bh_num}")
 	public String deleteResTime(@AuthenticationPrincipal CustomManager manager, @PathVariable int bh_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
-		 if(managerService.deleteResTime(bh_num)) {
-        return "redirect:/manager/restime/restimelist/"+rtNum;
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
+		if(managerService.deleteResTime(bh_num)) {
+      return "redirect:/manager/restime/restimelist/"+rtNum;
     }
 		return "redirect:/manager/restime/restimelist/"+rtNum;
 	}
@@ -1140,6 +1180,11 @@ public class ManagerController {
 		int rtNum = manager.getManager().getRm_rt_num();
     System.out.println("매니저의 매장 번호: " + rtNum);
     opertime.setBd_rt_num(rtNum);
+
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
 
     if (rtNum <= 0) {
 				
@@ -1256,6 +1301,11 @@ public class ManagerController {
 	@ResponseBody
 	public String deleteOperTime(@AuthenticationPrincipal CustomManager manager, @PathVariable int bd_num) {
 		//int rtNum = manager.getManager().getRm_rt_num();
+		
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
 		System.out.println("삭제할 날짜의 기본키 : " + bd_num);
 		if(managerService.deleteOperTime(bd_num)) {
 			return "success";
@@ -1266,7 +1316,7 @@ public class ManagerController {
 	//매니저페이지
 	@GetMapping("/managerpage")
 	public String managerPage(Model model, @AuthenticationPrincipal CustomManager manager) {
-		
+		//매니저 정보가 없는 경우
 		if (manager == null || manager.getManager() == null) {
         return "redirect:/manager/login";
     }
@@ -1333,6 +1383,11 @@ public class ManagerController {
 	public String makeResFacilityPage(Model model, @AuthenticationPrincipal CustomManager manager) {
 		List<FacilityVO> facility = managerService.getFacilityList();
 
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
+
 		model.addAttribute("facility", facility);
 		model.addAttribute("url", "/make_resfacility");
 		return "/manager/resfacility/make_resfacility";
@@ -1347,6 +1402,11 @@ public class ManagerController {
 		int rtNum = manager.getManager().getRm_rt_num();
 		System.out.println("매니저의 매장 번호: " + rtNum);
 		resfacility.setRf_rt_num(rtNum);
+
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
 
 		if (rtNum <= 0) {
 			// 매장 정보가 없는 매니저 → 매장 등록 페이지로
@@ -1367,6 +1427,11 @@ public class ManagerController {
 		RestaurantFacilityVO resfacility = managerService.getResFacility(rf_num);
 		List<FacilityVO> facility = managerService.getFacilityList();
 		System.out.println(resfacility);
+
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
 		
 		model.addAttribute("facility", facility);
 		model.addAttribute("resfacility", resfacility);
@@ -1384,6 +1449,11 @@ public class ManagerController {
 		System.out.println("매니저: " + manager.getManager());
 		System.out.println("수정 요청된 시설: " + resfacility);
 
+		//매니저 정보가 없는데 실행한 경우
+		if (manager == null || manager.getManager() == null) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("fail");
+    }
+
 		if (rtNum <= 0) {
 			return ResponseEntity.badRequest().body("매장 정보 없음");
 		}
@@ -1399,6 +1469,10 @@ public class ManagerController {
 
 	@PostMapping("/resfacility/delete_resfacility/{rf_num}")
 	public String deleteResFacility(@AuthenticationPrincipal CustomManager manager, @PathVariable int rf_num) {
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
 		int rtNum = manager.getManager().getRm_rt_num();
 		 if(managerService.deleteResFacility(rf_num)) {
         return "redirect:/manager/resfacility/resfacilitylist/"+rtNum;

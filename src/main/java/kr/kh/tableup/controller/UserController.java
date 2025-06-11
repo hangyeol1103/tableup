@@ -168,12 +168,14 @@ public class UserController {
 
   /** 마이페이지 */
   @GetMapping("/mypage")
-  public String mypage(Model model, Principal principal) {
+  public String mypage(Model model, Principal principal, @RequestParam(required = false) String tab) {
     if (principal == null)
       return "user/mypage/indexnot";
 
     UserVO user = userService.getUserById(principal.getName());
     model.addAttribute("user", user);
+    if(tab!=null)model.addAttribute("tab", tab);
+    
     return "user/mypage/index";
   }
 

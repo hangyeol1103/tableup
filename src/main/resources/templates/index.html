@@ -170,10 +170,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 									<span th:if="${user != null}" class="fw-bold">[[${user.us_name}]]님</span>
 								</button>
 								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="max-height: 300px; overflow-y: auto;">
-									<li><a th:if="${user != null}"  class="dropdown-item" th:href="@{/user/mypage}">프로필</a></li>
-									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">예약 목록</a></li>
-									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">결제 내역</a></li>
-									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">찜한 식당</a></li>
+									<li><a th:if="${user != null}"  class="dropdown-item" th:href="@{/user/mypage}">마이페이지</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=res}">예약 목록</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=rev}">리뷰 목록</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=flwrst}">찜한 식당</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=flwrvw}">찜한 리뷰</a></li>
 									<li><hr class="dropdown-divider"></li>
 									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">도움말</a></li>
 									<li><a th:if="${user != null}" class="dropdown-item text-danger" th:href="@{/user/logout}">로그아웃</a></li>

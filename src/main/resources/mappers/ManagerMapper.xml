@@ -482,5 +482,9 @@
 	<select id="selectManagerBusiness" resultType="RestaurantManagerVO">
 		select rm_business from  restaurantmanager where rm_business = #{business}
 	</select>
+
+	<select id="selectManagerOner" resultType="RestaurantManagerVO">
+		select * from  restaurantmanager where rm_rt_num = #{rt_num}
+	</select>
 	
 </mapper>

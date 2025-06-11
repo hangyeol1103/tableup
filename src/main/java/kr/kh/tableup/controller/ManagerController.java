@@ -81,7 +81,7 @@ public class ManagerController {
 	//매니저 메인 페이지
 	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
-		System.out.println("접속한 계정 : "+manager.getManager());
+		// System.out.println("접속한 계정 : "+manager.getManager());
 		// model.addAttribute("url","/main");
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
@@ -111,13 +111,14 @@ public class ManagerController {
 	// 매지저 영업일자 관리 페이지
 	@GetMapping("/opertime/opertimepage")
 	public String opertimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		if (manager == null || manager.getManager() == null) {
+			return "redirect:/manager/login";
+		}
+
 		int rt_num =manager.getManager().getRm_rt_num();
 		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 		List<BusinessDateVO> opertime = managerService.getOperTimeList(rt_num);
-
-		if (manager == null || manager.getManager() == null) {
-      return "redirect:/manager/login";
-    }
+		
 
 		model.addAttribute("opertime", opertime);
 		model.addAttribute("restaurant", restaurant);
@@ -134,6 +135,7 @@ public class ManagerController {
 	}
 
 
+	//매니저 회원가입
 	@GetMapping("/signup")
 	public String manager_signup(Model model) {
 		List<RestaurantManagerVO> managerList = managerService.getManagerList();
@@ -280,14 +282,23 @@ public class ManagerController {
 	
 	//매장 페이지
 	@GetMapping("/restaurant/restaurant/{rm_id}")
-	public String restaurantPage(@PathVariable("rm_id") String rm_id,Model model, Principal principal) {
-		String loginId = principal.getName();
-		
-		if (!loginId.equals(rm_id)) {
-			return "redirect:/manager";
+	public String restaurantPage(@PathVariable("rm_id") String rm_id,Model model, @AuthenticationPrincipal CustomManager pManager /*Principal principal*/) {
+		// String loginId = principal.getName();
+		String loginId = pManager.getManager().getRm_id();
+		RestaurantManagerVO manager = managerService.getManagerId(loginId);
+		System.out.println("접속한 아이디 : " + pManager);
+		System.out.println("가져올 매니저 객체 : " + manager);
+		System.out.println("매니저 아이디 : " + rm_id);
+		if (!loginId.equals(rm_id)|| manager == null) {
+			if(manager != null){
+				System.out.println("다른 계정의 매장 접근 X");
+				return "redirect:/manager";
+			}
+			System.out.println("매니저 회원 가입 필요!");
+			return "redirect:/manager/login";
 		}
 
-		RestaurantManagerVO manager = managerService.getManagerId(loginId);
+
 		//해당 매니저의 매장 외래키를 가져옴
 		int rm_num=manager.getRm_num();
 		RestaurantVO restaurant =managerService.selectRestaurant(rm_num);
@@ -318,9 +329,10 @@ public class ManagerController {
 	}
 
 	@GetMapping("/restaurant/restaurant")
-    public String redirectRestaurant(Principal principal) {
-        String loginId = principal.getName();
-        return "redirect:/manager/restaurant/restaurant/" + loginId;
+    public String redirectRestaurant(@AuthenticationPrincipal CustomManager pManager) {
+      // String loginId = principal.getName();  
+			String loginId = pManager.getManager().getRm_id();
+      return "redirect:/manager/restaurant/restaurant/" + loginId;
     }
 
 	@GetMapping("/restaurant/make")
@@ -453,11 +465,13 @@ public class ManagerController {
 		if(rt_num != manager.getManager().getRm_rt_num()){
 			return "redirect:/manager";
 		}
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 
 		System.out.println("menulist rt_num: " + rt_num);
 		List<MenuVO> menulist = managerService.getMenuList(rt_num);
 		List<MenuTypeVO> menutype = managerService.getMenuTypeList();
 		
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("menulist", menulist);
 		model.addAttribute("menutype", menutype);
 		model.addAttribute("rt_num", rt_num);
@@ -480,7 +494,10 @@ public class ManagerController {
 			return "redirect:/manager/restaurant/make";
     }
 		List<MenuTypeVO> menutype = managerService.getMenuTypeList();
-		
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("url", "/make_menu");
 		model.addAttribute("menutype", menutype);
 		return "/manager/menu/make_menu";
@@ -518,17 +535,21 @@ public class ManagerController {
 	
 	//메뉴 상세 페이지
 	@GetMapping("/menu/menu/{mn_num}")
-	public String detailMenu(Model model, @PathVariable int mn_num, Principal principal, @AuthenticationPrincipal CustomManager manager) {
-		String loginId =principal.getName();
+	public String detailMenu(Model model, @PathVariable int mn_num, @AuthenticationPrincipal CustomManager manager) {
+		
 		//매니저 정보가 없는 경우
-		if (manager == null|| manager.getManager() == null || loginId !=manager.getManager().getRm_id()) {
+		if (manager == null|| manager.getManager() == null) {
         return "redirect:/manager/login";
     }
 
 		MenuVO menu = managerService.getMenu(mn_num);
 		MenuTypeVO menutype =managerService.getMenuType(menu.getMn_mt_num());
 		
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		
 		List<MenuTypeVO> menutypeList = managerService.getMenuTypeList();
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("menu", menu);
 		model.addAttribute("menutypeList", menutypeList);
 		model.addAttribute("menutype", menutype);
@@ -557,11 +578,16 @@ public class ManagerController {
 		MenuVO menu = managerService.getMenu(mn_num);
 		System.out.println(menu);
 
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
+
 		//매니저 정보가 없는 경우
 		if (manager == null || manager.getManager() == null) {
         return "redirect:/manager/login";
     }
 
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("url", "/remake_menu");
 		model.addAttribute("menutype", menutype);
 		model.addAttribute("menu", menu);
@@ -608,7 +634,11 @@ public class ManagerController {
 			return "redirect:/manager";
 		}
 
+		
 		RestaurantVO resdetail = managerService.getResDetail(rt_num);
+		
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		if(resdetail != null) model.addAttribute("resdetail", resdetail);
 		model.addAttribute("manager", manager.getManager());
 		return "/manager/detail/restaurantdetail";
@@ -620,6 +650,9 @@ public class ManagerController {
 		if (manager == null || manager.getManager() == null ) {
         return "redirect:/manager/login";
     }
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("url", "/make_detail");
 		return "/manager/detail/make_detail";
 	}
@@ -663,8 +696,11 @@ public class ManagerController {
 		System.out.println("매니저의 매장 번호: " + rtNum);
 		RestaurantVO resdetail = managerService.getResDetail(rtNum);
 
-		model.addAttribute("res", resdetail);
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 		System.out.println(resdetail);
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("res", resdetail);	
 		model.addAttribute("url", "/remake_detail");
 		return "/manager/detail/remake_detail";
 	}
@@ -712,6 +748,8 @@ public class ManagerController {
 		System.out.println("couponlist rt_num: " + rt_num);
 		List<ResCouponVO> couponlist = managerService.getCouponList(rt_num);
 		
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("couponlist", couponlist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
@@ -725,6 +763,9 @@ public class ManagerController {
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
     }
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("url", "/make_coupon");
 		return "/manager/coupon/make_coupon";
 	}
@@ -743,11 +784,15 @@ public class ManagerController {
 
 	//쿠폰 정보 출력 페이지
 	@GetMapping("/coupon/coupon/{rec_num}")
-	public String detailCoupon(Model model, @PathVariable int rec_num, Principal principal, @AuthenticationPrincipal CustomManager manager) {
+	public String detailCoupon(Model model, @PathVariable int rec_num, @AuthenticationPrincipal CustomManager manager) {
 		// 매니저 정보가 없는 경우
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
     }
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
+
 		ResCouponVO coupon = managerService.getCoupon(rec_num);
 		model.addAttribute("coupon", coupon);
 		return "/manager/coupon/coupon";
@@ -762,6 +807,9 @@ public class ManagerController {
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
     }
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("coupon", coupon);
 		model.addAttribute("url", "/remake_coupon");
 		return "/manager/coupon/remake_coupon";
@@ -807,6 +855,8 @@ public class ManagerController {
 		System.out.println("newslist rt_num: " + rt_num);
 		List<ResNewsVO> newslist = managerService.getNewsList(rt_num);
 
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("newslist", newslist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
@@ -854,12 +904,16 @@ public class ManagerController {
 
 	//소식 정보 출력 페이지
 	@GetMapping("/news/news/{rn_num}")
-	public String detailNews(Model model, @PathVariable int rn_num, @AuthenticationPrincipal CustomManager manager, Principal principal) {
+	public String detailNews(Model model, @PathVariable int rn_num, @AuthenticationPrincipal CustomManager manager) {
 		// 매니저 정보가 없는 경우
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
     }
 		
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
+
 		ResNewsVO news = managerService.getNews(rn_num);
 		System.out.println(news);
 		model.addAttribute("news", news);
@@ -874,6 +928,10 @@ public class ManagerController {
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
     }
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
+
 		model.addAttribute("news", news);
 		model.addAttribute("url", "/news/remake_news");
 		return "/manager/news/remake_news";
@@ -918,7 +976,7 @@ public class ManagerController {
 	//예약 가능 시간 페이지
 	//예약 가능 시간 목록(리스트)
 	@GetMapping("/restime/restimelist/{rt_num}")
-	public String ResTimeListPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager, Principal principal) {
+	public String ResTimeListPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
 		System.out.println("restimelist rt_num: " + rt_num);
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/login";
@@ -933,6 +991,9 @@ public class ManagerController {
 		List<BusinessDateVO> opertimelist= managerService.getOperTimeList(rt_num);
 		List<BusinessHourTemplateVO> templateList =managerService.getTemplateList(rt_num);
 
+
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("restimelist", restimelist);
 		model.addAttribute("templateList", templateList);
@@ -1163,6 +1224,9 @@ public class ManagerController {
 		System.out.println("opertimelist rt_num: " + rt_num);
 		List<BusinessDateVO> opertimelist = managerService.getOperTimeList(rt_num);
 		System.out.println(opertimelist);
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("manager", manager.getManager());
@@ -1184,6 +1248,9 @@ public class ManagerController {
 			e.printStackTrace(); // 에러 로그 확인
 		}
 
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("opertimelist", opertimelist);
 		model.addAttribute("manager", manager.getManager());
 		model.addAttribute("url", "/make_opertime");
@@ -1352,6 +1419,9 @@ public class ManagerController {
         return "redirect:/manager/login";
     }
 		RestaurantManagerVO rm = manager.getManager();
+		int rt_num = manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant =managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("rm", rm);
 
 		return "/manager/managerpage";
@@ -1397,11 +1467,15 @@ public class ManagerController {
 		}
 		
 		
+		
 		System.out.println("resfacilitylist rt_num: " + rt_num);
 		List<FacilityVO> facility = managerService.getFacilityList();
 		List<RestaurantFacilityVO> facilitylist = managerService.getResFacilityList(rt_num);
-
 		System.out.println("등록된 편의 시설 : "+facility);
+		
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("facility", facility);
 		model.addAttribute("facilitylist", facilitylist);
@@ -1513,8 +1587,8 @@ public class ManagerController {
 
 	//결제내역 페이지
 	@GetMapping("/manager_pay/pay")
-	public String paymentPage(Model model, @AuthenticationPrincipal CustomManager manager, Principal principal){
-		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
+	public String paymentPage(Model model, @AuthenticationPrincipal CustomManager manager){
+		if(manager.getManager().getRm_rt_num()==0 || 
 			 manager == null || manager.getManager() == null){
 			return "redirect:/manager/login";
 		}
@@ -1535,10 +1609,10 @@ public class ManagerController {
 		return "/manager/manager_pay/pay";
 	}
 	
-	//매니저 예약 관리
+	//매니저 예약 현황
 	@GetMapping("/reservation")
-	public String reservateion(Model model, @AuthenticationPrincipal CustomManager manager, Principal principal) {
-		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
+	public String reservateion(Model model, @AuthenticationPrincipal CustomManager manager) {
+		if( manager.getManager().getRm_rt_num()==0 || 
 			 manager == null || manager.getManager() == null){
 			return "redirect:/manager/login";
 		}
@@ -1549,7 +1623,10 @@ public class ManagerController {
 
 		System.out.println("예약 가능 시간대 : " + resTimeList);
 
+		
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("operTimeList", operTimeList);
 		model.addAttribute("resTimeList", resTimeList);
 		model.addAttribute("reservationList", reservationList);
@@ -1578,8 +1655,8 @@ public class ManagerController {
 
 	//매니저 예약 허용된 예약 목록
 	@GetMapping("/reservation/reservationlist")
-	public String reservationList(Model model,  @AuthenticationPrincipal CustomManager manager, Principal principal) {
-		if(principal == null || manager.getManager().getRm_rt_num()==0 || 
+	public String reservationList(Model model,  @AuthenticationPrincipal CustomManager manager) {
+		if( manager.getManager().getRm_rt_num()==0 || 
 			 manager == null || manager.getManager() == null){
 			return "redirect:/manager/login";
 		}
@@ -1596,7 +1673,10 @@ public class ManagerController {
 		System.out.println("---------------------");
 		System.out.println("reservationList"+reservationList);
 		System.out.println("---------------------");
-		
+
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("manager", manager);
 		model.addAttribute("operTimeList", operTimeList);
 		model.addAttribute("resTimeList", resTimeList);
@@ -1607,10 +1687,19 @@ public class ManagerController {
 
 	//매니저 예약 시간 템플릿
 	@GetMapping("/restime/restimetemplate/{rt_num}")
-	public String restimeTemplate(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager,Principal principal) {
-		if(principal == null || manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
+	public String restimeTemplate(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
+		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/login";
 		}
+		RestaurantManagerVO getOner = managerService.getManagerOner(rt_num);
+		System.out.println("매장 기본키: "+rt_num);
+		System.out.println("해당 페이지의 매니저 : "+ getOner.getRm_id());
+		System.out.println("접속한 아이디 : " + manager.getManager().getRm_id());
+
+		if(!manager.getManager().getRm_id().equals(getOner.getRm_id())){
+				return "redirect:/manager";
+		}
+
 
 		List<BusinessDateVO> opertimeList = managerService.getOperTimeList(rt_num);
 		List<BusinessHourTemplateVO> templateList =managerService.getTemplateList(rt_num);
@@ -1618,6 +1707,10 @@ public class ManagerController {
 		if (!opertimeList.isEmpty()) {
 				System.out.println("첫 번째 open: " + opertimeList.get(0).getBd_open());
 		}
+
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("rt_num", rt_num);
 		model.addAttribute("opertimeList", opertimeList);
 		model.addAttribute("templateList", templateList != null ? templateList : new ArrayList<>());

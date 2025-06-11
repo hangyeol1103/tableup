@@ -824,6 +824,10 @@ public class ManagerService {
 			return false;
 		}
 
+		public RestaurantManagerVO getManagerOner(int rt_num) {
+			return managerDAO.selectManagerOner(rt_num);
+		}
+
 
 
 

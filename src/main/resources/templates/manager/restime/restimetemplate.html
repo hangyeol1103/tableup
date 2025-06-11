@@ -22,8 +22,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 	<main layout:fragment="content" class="mt-3">
 		<!-- 매장 정보가 등록이 되어 있으면-->
 		<th:block 
-            th:with="openTime=${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_open, 11, 16) : '09:00'},
-                    closeTime=${opertimeList[0] != null ? #strings.substring(opertimeList[0].bd_close, 11, 16) : '18:00'}">
+            th:if="${opertimeList != null and !#lists.isEmpty(opertimeList)}"
+            th:with="openTime=${#strings.substring(opertimeList[0].bd_open, 11, 16)},
+                    closeTime=${#strings.substring(opertimeList[0].bd_close, 11, 16)}">
         </th:block>      
         <div class="container">
             <h3>예약 시간 템플릿</h3>
@@ -60,11 +61,11 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             <button class="btn btn-primary mt-3 mb-3" id="save-template-btn">저장</button>
         </div>
 
-		<!-- 매장 정보가 등록이 되어 있지 않으면-->
+		<!-- 영업일자 정보가 등록이 되어 있지 않으면-->
 		<div th:unless="${opertimeList != null}">
-			<h3>아직 식당정보를 입력하지 않앗습니다.</h3>
+			<h3>아직 영업일자를 입력하지 않앗습니다.</h3>
 		</div>
-        <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+        <a th:href="@{/manager/restime/restimepage}" class="btn btn-outline-secondary col-12 mb-3">예약 관리 페이지로 돌아가기</a>
         
         <script th:inline="javascript">
             const opertimelist = [[${opertimeList}]];

@@ -700,6 +700,14 @@ public class ManagerService {
 	}
 
 	public int updateManagerInfo(RestaurantManagerVO rm) {
+		System.out.println(rm);
+		
+		if(rm==null){
+			return 0;
+		}
+		//비밀번호 암호화
+		rm.setRm_pw(passwordEncoder.encode(rm.getRm_pw()));
+
 		return managerDAO.updateManagerInfo(rm);
 	}
 

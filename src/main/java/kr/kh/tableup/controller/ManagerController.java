@@ -78,14 +78,41 @@ public class ManagerController {
 	PaymentService paymentService;
 
 	
-
+	//매니저 메인 페이지
 	@GetMapping({"", "/"})
 	public String manager(Model model, @AuthenticationPrincipal CustomManager manager) {
 		System.out.println(manager);
 		// model.addAttribute("url","/main");
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("manager", manager);
 		return "manager/main";
 	}
+
+	// 매지저 예약 관리 페이지
+	@GetMapping("/restime/restimepage")
+	public String reservationPage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("manager", manager);
+		return "manager/restime/restimepage";
+	}
+
+	// 매지저 영업일자 관리 페이지
+	@GetMapping("/opertime/opertimepage")
+	public String opertimePage(Model model, @AuthenticationPrincipal CustomManager manager) {
+		int rt_num =manager.getManager().getRm_rt_num();
+		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
+		List<BusinessDateVO> opertime = managerService.getOperTimeList(rt_num);
+
+		model.addAttribute("opertime", opertime);
+		model.addAttribute("restaurant", restaurant);
+		model.addAttribute("manager", manager);
+		return "manager/opertime/opertimepage";
+	}
+	
 	
 
 	@GetMapping("/login")
@@ -1167,16 +1194,21 @@ public class ManagerController {
 	@PostMapping("/managerpage")
 	public String PostmanagerPage(Model model, @AuthenticationPrincipal CustomManager manager, RestaurantManagerVO rm) {
 		RestaurantManagerVO currentManager = manager.getManager();
-
+		System.out.println("기존 매니저 정보 : " + currentManager);
+		System.out.println("입력받은 매니저 객체 : " + rm);
 		if(!currentManager.getRm_id().equals(rm.getRm_id())){
+			System.out.println("매니저 정보 변경 실패!");
 			return "redirect:/manager/managerpage";
 		}
+		System.out.println("매니저 정보 일치!");
 
 		managerService.updateManagerInfo(rm);
 
+		System.out.println("수정 중.....");
 		currentManager.setRm_email(rm.getRm_email());
 		currentManager.setRm_name(rm.getRm_name());
 		currentManager.setRm_phone(rm.getRm_phone());
+		currentManager.setRm_pw(rm.getRm_pw());
 
 		return "manager/main";
 	}

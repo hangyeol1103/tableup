@@ -315,6 +315,7 @@ public class ManagerController {
 		List<DetailRegionVO> dr = managerService.getDetailRegion();
 		List<DetailFoodCategoryVO> dfc = managerService.getDetailFood();
 
+		//매니저 정보가 없는 경우
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
     }
@@ -344,7 +345,11 @@ public class ManagerController {
 		System.out.println(manager);
 		System.out.println(restaurant);
 		
-
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
+		
 		if(managerService.insertRestaurant(restaurant, manager.getManager(), fileList)){
 			return "redirect:/manager/restaurant/restaurant";
 		}
@@ -368,7 +373,7 @@ public class ManagerController {
 	//매장 정보 수정
 	@GetMapping("/restaurant/remake")
 	public String remakePage(Model model,@AuthenticationPrincipal CustomManager manager) {
-		
+		//매니저 정보가 없는 경우
 		if (manager == null || manager.getManager() == null) {
       return "redirect:/manager/login";
     }
@@ -409,8 +414,11 @@ public class ManagerController {
 													 @AuthenticationPrincipal CustomManager manager ) {
 		System.out.println(manager);
 		System.out.println("수정할 매장 정보 :"+restaurant);
-
 		
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
 
 		if(managerService.updateRestaurant(restaurant, manager.getManager(), fileList)){
 			return "redirect:/manager/restaurant/restaurant";
@@ -422,7 +430,7 @@ public class ManagerController {
 	@GetMapping("/menu/menulist/{rt_num}")
 	public String menuListPage(Model model, @PathVariable int rt_num,  @AuthenticationPrincipal CustomManager manager) {
 
-
+		//매니저 정보가 없는 경우
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/login";
 		}
@@ -470,6 +478,7 @@ public class ManagerController {
 		System.out.println(menu);
 		System.out.println(mn_img2.getOriginalFilename());
 
+		//매니저 정보가 없는 경우
 		if (manager == null|| manager.getManager() == null ) {
         return "redirect:/manager/login";
     }
@@ -515,6 +524,10 @@ public class ManagerController {
 	@PostMapping("/menu/delete_menu/{mn_num}")
 	public String deleteMenuPage(@AuthenticationPrincipal CustomManager manager, @PathVariable int mn_num) {
 		int rtNum = manager.getManager().getRm_rt_num();
+		//매니저 정보가 없는 경우
+		if (manager == null || manager.getManager() == null) {
+        return "redirect:/manager/login";
+    }
 		 if(managerService.deleteMenu(mn_num)) {
         return "redirect:/manager/menu/menulist/"+rtNum;
     }
@@ -529,6 +542,7 @@ public class ManagerController {
 		MenuVO menu = managerService.getMenu(mn_num);
 		System.out.println(menu);
 
+		//매니저 정보가 없는 경우
 		if (manager == null || manager.getManager() == null) {
         return "redirect:/manager/login";
     }
@@ -548,7 +562,9 @@ public class ManagerController {
 		menu.setMn_rt_num(rtNum);
 
 		if(manager==null || manager.getManager()==null){
-			
+			result.put("success", false);
+			result.put("redirect", "/manager/login");
+			return result;
 		}
 
 		if (rtNum <= 0) {

@@ -282,7 +282,7 @@
           <option value="default">기본 정렬</option>
           <option value="reservation">예약 많은 순</option>
           <option value="reviewCount">리뷰 많은 순</option>
-          <option value="avg">전체 평점순(일단 테스트용으로 얘만 역순)</option>
+          <option value="avg">전체 평점순</option>
           <option th:each="scoreType : ${scoreTypeList}"
                   th:value="${scoreType.st_num}"
                   th:text="${scoreType.st_category + ' 점수순'}">

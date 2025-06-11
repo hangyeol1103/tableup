@@ -364,7 +364,7 @@
 					FROM review rev
 					JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
 					WHERE rev.rev_rt_num = r.rt_num
-				) ASC
+				) DESC
 			</when>
 
 			<when test="orderBy == 'reservation'">

@@ -95,7 +95,7 @@ public class UserController {
   /** 로그인 */
 
   @GetMapping("/login")
-  public String login(Model model, HttpServletRequest request) {
+  public String login(Model model, HttpServletRequest request, @AuthenticationPrincipal CustomUser customUser) {
     String prevUrl = request.getHeader("Referer");
     System.out.println(prevUrl);
     if (prevUrl != null && !prevUrl.contains("/user/login")) {
@@ -170,12 +170,14 @@ public class UserController {
 
   /** 마이페이지 */
   @GetMapping("/mypage")
-  public String mypage(Model model, Principal principal) {
+  public String mypage(Model model, Principal principal, @RequestParam(required = false) String tab) {
     if (principal == null)
       return "user/mypage/indexnot";
 
     UserVO user = userService.getUserById(principal.getName());
     model.addAttribute("user", user);
+    if(tab!=null)model.addAttribute("tab", tab);
+    
     return "user/mypage/index";
   }
 
@@ -856,5 +858,11 @@ public class UserController {
         userService.updateUserProfileImage(customUser.getUser(), file, redirect);
         return "redirect:/user/info";
     }
+    
+    @GetMapping("/help")
+    public String helpIndex() {
+        return "user/help/index";
+    }
+    
 
 }

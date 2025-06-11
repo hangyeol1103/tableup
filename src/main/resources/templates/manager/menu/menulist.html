@@ -39,8 +39,13 @@
             <tr th:each="menu : ${menulist}">
               <td style="width: 150px">
                 <a th:href="@{/manager/menu/menu/{mn_num}(mn_num=${menu.mn_num})}">
-                  <img th:src="@{/file/{path}(path=${menu.mn_img})}" alt="이미지 없음" class="img-thumbnail" style="width: 130px; height: 130px; object-fit: cover;">
+                  <img th:src="@{/file/{path}(path=${menu.mn_img})}" 
+                      alt="이미지 없음" 
+                      class="img-thumbnail" 
+                      style="width: 130px; height: 130px; object-fit: cover;"
+                      onerror="this.onerror=null; this.src='/resources/static/img/index/sample.jpg';">
                 </a>
+
               </td>
               <td>
                 <a th:href="@{/manager/menu/menu/{mn_num}(mn_num=${menu.mn_num})}" th:text="${menu.mn_name}" class="text-decoration-none fw-bold text-dark"></a>
@@ -103,7 +108,7 @@
                 <!-- 폼 내용 끝 -->
               </div>
               <div class="modal-footer">
-                <button type="submit" class="btn btn-success">등록</button>
+                <button type="submit" class="btn btn-primary">등록</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
               </div>
             </form>
@@ -143,6 +148,7 @@
         });
       });
     </script>
+    
   </main>
 </body>
 </html>

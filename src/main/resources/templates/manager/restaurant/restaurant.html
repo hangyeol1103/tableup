@@ -39,12 +39,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
           <div class="mb-2 row">
             <label class="col-md-3 form-label">대표 이미지:</label>
-            <div class="col-md-9 d-flex flex-wrap gap-2">
-              <img th:each="file : ${fileList}"
-                  th:src="@{/file{uploadfilename}(uploadfilename=${file.file_path})}"
-                  alt="대표 이미지"
-                  class="img-thumbnail"
-                  style="width: 150px; height: 150px; object-fit: cover;">
+            <div class="col-md-9">
+              <div class="d-flex overflow-auto gap-2">
+                <img th:each="file : ${fileList}"
+                     th:src="@{/file{uploadfilename}(uploadfilename=${file.file_path})}"
+                     alt="대표 이미지"
+                     class="img-thumbnail"
+                     style="width: 150px; height: 150px; object-fit: cover; flex : 0 0 auto;"
+                     onerror="this.onerror=null; this.src='/resources/static/img/index/sample.jpg'">
+              </div>              
             </div>
           </div>
 
@@ -90,11 +93,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
           <a class="btn btn-outline-primary" th:href="@{'/manager/menu/menulist/' + ${restaurant.rt_num}}"><i class="bi bi-card-list"></i> 메뉴</a>
           <a class="btn btn-outline-primary" th:href="@{'/manager/detail/restaurantdetail/' + ${restaurant.rt_num}}"><i class="bi bi-info-circle"></i> 상세정보</a>
           <a class="btn btn-outline-primary" th:href="@{'/manager/news/newslist/' + ${restaurant.rt_num}}"><i class="bi bi-megaphone"></i> 공지</a>
-          <a class="btn btn-outline-primary" th:href="@{'/manager/opertime/opertimelist/' + ${restaurant.rt_num}}"><i class="bi bi-clock"></i> 영업시간</a>
-          <a class="btn btn-outline-primary" th:href="@{'/manager/restime/restimelist/' + ${restaurant.rt_num}}"><i class="bi bi-calendar-check"></i> 예약시간</a>
-          <a class="btn btn-outline-primary" th:href="@{'/manager/restime/restimetemplate/' + ${restaurant.rt_num}}"><i class="bi bi-calendar-check"></i> 예약시간 템플릿</a>
+          <!-- <a class="btn btn-outline-primary" th:href="@{'/manager/opertime/opertimelist/' + ${restaurant.rt_num}}"><i class="bi bi-clock"></i> 영업시간</a> -->
+          <!-- <a class="btn btn-outline-primary" th:href="@{'/manager/restime/restimelist/' + ${restaurant.rt_num}}"><i class="bi bi-calendar-check"></i> 예약시간</a> -->
+          <!-- <a class="btn btn-outline-primary" th:href="@{'/manager/restime/restimetemplate/' + ${restaurant.rt_num}}"><i class="bi bi-calendar-check"></i> 예약시간 템플릿</a> -->
           <a class="btn btn-outline-primary" th:href="@{'/manager/resfacility/resfacilitylist/' + ${restaurant.rt_num}}"><i class="bi bi-shop"></i> 편의시설</a>
           <a class="btn btn-outline-primary" th:href="@{'/manager/coupon/couponlist/' + ${restaurant.rt_num}}"><i class="bi bi-ticket-perforated"></i> 쿠폰</a>
+        </div>
+
+        <div class="d-grid gap-2 mt-4">
+          <a th:href="@{/manager}" class="btn btn-outline-secondary">← 매니저 메인 화면으로</a>
         </div>
       </div>
     </div>

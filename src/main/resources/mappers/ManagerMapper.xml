@@ -345,7 +345,8 @@
 		update restaurantmanager set
 			rm_email = #{rm_email},
 			rm_name = #{rm_name},
-			rm_phone = #{rm_phone}
+			rm_phone = #{rm_phone},
+			rm_pw = #{rm_pw}
 		where rm_num = #{rm_num}
 	</update>
 	<select id="selectFacilityList" resultType="FacilityVO">

@@ -45,6 +45,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         </div>
       </div>
     </div>
+    <a th:href="@{/manager/restime/restimepage}" class="btn btn-outline-secondary col-12 mb-3 mt-3">예약 관리 페이지로 돌아가기</a>
 		<script th:inline="javascript">
       const dateModal = new bootstrap.Modal(document.getElementById('dateModal'));
       const resTimeList = /*[[${resTimeList}]]*/[];
@@ -78,6 +79,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
                   <span class="badge bg-light text-dark ms-2">남은 좌석: ${obj.remainSeat}</span>
                 </h5>
                 <p class="mb-1"><strong>예약자:</strong> ${obj.user}</p>
+                <p class="mb-1"><strong>전화번호:</strong> ${obj.phone}</p>
                 <p class="mb-1"><strong>인원 수:</strong> ${obj.person}명</p>
                 <p class="mb-2"><strong>상태:</strong> 
                   <span style="color: ${obj.res_state == 0 ? 'green' : obj.res_state == 1 ? 'skyblue' : 'red'}">${obj.state}</span>
@@ -183,6 +185,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         let minute = res.res_time.slice(4,5);
         let time = fillZero(hour, 2) + ":" + fillZero(minute,2);
         let user = res.user.us_id;
+        let phone = res.user.us_phone;
         let res_state = res.res_state;
         let person = res.res_person;
         let state = res_state == 0 ? readyState : res_state == 1 ? confirmState : cancelState;
@@ -200,7 +203,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
           remainSeat = timeInfo.bh_seat_max - timeInfo.bh_seat_current;
         }
 
-        return { date,time,title,color,state,user, res_state, person, res_num, date, remainSeat, request}
+        return { date,time,title,color,state,user, res_state, person, res_num, date, remainSeat, request, phone}
       }
   
       

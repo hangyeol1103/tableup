@@ -1,0 +1,22 @@
+<div th:fragment="faq">
+  <h4>자주 묻는 질문</h4>
+  <div class="accordion" id="faqAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q1">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#a1">예약은 어떻게 하나요?</button>
+      </h2>
+      <div id="a1" class="accordion-collapse collapse show">
+        <div class="accordion-body">식당 페이지에서 날짜와 시간을 선택한 뒤 인원을 입력해 예약을 완료할 수 있습니다.</div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q2">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a2">리뷰는 언제 작성할 수 있나요?</button>
+      </h2>
+      <div id="a2" class="accordion-collapse collapse">
+        <div class="accordion-body">방문한 예약이 완료된 후 마이페이지 > 리뷰 탭에서 작성할 수 있습니다.</div>
+      </div>
+    </div>
+  </div>
+</div>

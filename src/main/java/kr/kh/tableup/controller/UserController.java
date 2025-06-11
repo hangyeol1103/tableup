@@ -848,5 +848,11 @@ public class UserController {
         userService.updateUserProfileImage(customUser.getUser(), file, redirect);
         return "redirect:/user/info";
     }
+    
+    @GetMapping("/help")
+    public String helpIndex() {
+        return "user/help/index";
+    }
+    
 
 }

@@ -176,7 +176,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=flwrst}">찜한 식당</a></li>
 									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=flwrvw}">찜한 리뷰</a></li>
 									<li><hr class="dropdown-divider"></li>
-									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage}">도움말</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/help}">도움말</a></li>
 									<li><a th:if="${user != null}" class="dropdown-item text-danger" th:href="@{/user/logout}">로그아웃</a></li>
 								</ul>
 							</div>

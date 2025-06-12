@@ -44,7 +44,24 @@ public class OAuth2AutoLoginFilter extends OncePerRequestFilter {
 
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
             String email = oAuth2User.getAttribute("email");
+
+            if (email == null || email.isBlank()) {
+                // sub → 구글, id → 카카오
+                Object rawId = oAuth2User.getAttribute("sub");
+                if (rawId == null) {
+                    rawId = oAuth2User.getAttribute("id");
+                }
+
+                if (rawId == null) {
+                    response.sendRedirect("/");
+                    return;
+                }
+
+                String uniqueId = String.valueOf(rawId); 
+                email = "kakao_" + uniqueId + "@noemail.kakao";
+            }
             String uri = request.getRequestURI();
+            
 
             UserVO userVO = userDetailService.selectUserByEmail(email);
 

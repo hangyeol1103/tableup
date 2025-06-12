@@ -2,7 +2,8 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout.html}">
+      layout:decorate="~{layout/layout.html}"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
   <title>로그인</title>
@@ -25,9 +26,9 @@
         <form th:action="@{/user/loginPost}" method="post" id="loginForm">
           <div class="mb-3">
             <label for="us_id" class="form-label">아이디</label>
-            <input type="text" class="form-control form-control-lg" id="us_id" name="us_id"
-                  placeholder="아이디를 입력하세요" th:value="${loginId}" required>
+            <input type="text" class="form-control form-control-lg" id="us_id" name="us_id" placeholder="아이디를 입력하세요" required>
           </div>
+          <input type="hidden" class="d-none" id="us_id_error" th:value="${loginId}" required>
 
           <div class="mb-3">
             <label for="us_pw" class="form-label">비밀번호</label>
@@ -37,7 +38,7 @@
 
           <div class="form-check mb-2">
             <input type="checkbox" class="form-check-input" id="rememberMe" name="remember-me">
-            <label class="form-check-label" for="rememberMe">자동 로그인 유지</label>
+            <label class="form-check-label" for="rememberMe">자동 로그인</label>
           </div>
 
           <div class="form-check mb-4">
@@ -60,7 +61,7 @@
             <a th:href="@{/oauth2/authorization/google}" class="btn btn-outline-dark w-100 mb-2">
               <i class="bi bi-google me-2"></i> Google 로그인
             </a>
-            <a th:href="@{/user/login/google}" class="btn btn-warning w-100 text-dark">
+            <a th:href="@{/oauth2/authorization/kakao}" class="btn btn-warning w-100 text-dark">
               <i class="bi bi-chat-square-text-fill me-2"></i> Kakao 로그인
             </a>
           </div>
@@ -69,28 +70,40 @@
     </div>
   </main>
 
+  <script>
+    alert("JS 작동 중");
+  </script>
 
   <script>
-    // 아이디 저장 기능
-    const usIdInput = document.getElementById("us_id");
-    const saveIdCheck = document.getElementById("saveId");
+    document.addEventListener("DOMContentLoaded", function () {
+      var usIdInput = document.getElementById("us_id");
+      var saveIdCheck = document.getElementById("saveId");
+      var loginIdInput = document.getElementById("us_id_error");
 
-    window.addEventListener("load", function () {
-      const savedId = localStorage.getItem("savedId");
-      if (savedId) {
-        usIdInput.value = savedId;
-        saveIdCheck.checked = true;
-      }
-    });
+      console.log("loginId input 존재 여부:", loginIdInput !== null);
 
-    document.getElementById("loginForm").addEventListener("submit", function () {
-      if (saveIdCheck.checked) {
-        localStorage.setItem("savedId", usIdInput.value);
+      if (loginIdInput && loginIdInput.value && loginIdInput.value.trim() !== "") {
+        console.log("loginId from server:", loginIdInput.value);
+        usIdInput.value = loginIdInput.value;
       } else {
-        localStorage.removeItem("savedId");
+        var savedId = localStorage.getItem("savedId");
+        console.log("localStorage savedId:", savedId);
+        if (savedId) {
+          usIdInput.value = savedId;
+          saveIdCheck.checked = true;
+        }
       }
+
+      document.getElementById("loginForm").addEventListener("submit", function () {
+        if (saveIdCheck.checked) {
+          localStorage.setItem("savedId", usIdInput.value);
+        } else {
+          localStorage.removeItem("savedId");
+        }
+      });
     });
   </script>
+
 
   <script>
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {

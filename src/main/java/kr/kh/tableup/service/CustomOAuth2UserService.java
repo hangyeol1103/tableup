@@ -32,16 +32,33 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 1. 사용자 정보 추출
         String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google
         Map<String, Object> attributes = oauthUser.getAttributes();
+        
+        String email = null;
+        String name = null;
+        String sub = null;
 
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
-        String sub = (String) attributes.get("sub"); // google 고유 id
+        if ("google".equals(registrationId)) {
+            email = (String) attributes.get("email");
+            name = (String) attributes.get("name");
+            sub = (String) attributes.get("sub");
+        } else if ("kakao".equals(registrationId)) {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+
+            name = (String) profile.get("nickname");
+            email = (String) kakaoAccount.get("email");
+            sub = attributes.get("id").toString(); // Long 타입이라 문자열 변환 필요
+            if (email == null) {
+              email = "kakao_" + sub + "@noemail.kakao";
+            }
+            // 이메일은 비즈니스 해야 가져올수있네요
+        }
 
         // 2. 사용자 존재 여부 확인 후 없으면 자동 가입
         UserVO user = userDAO.selectUserByEmail(email);
         if (user == null) {
             user = new UserVO();
-            user.setUs_id("g_" + sub); // 중복 방지
+            user.setUs_id(registrationId.charAt(0) + "_" + sub); // 중복 방지
             user.setUs_email(email);
             user.setUs_name(name);
             user.setUs_nickname(name);
@@ -49,7 +66,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             user.setUs_sociallogin(true);
             user.setUs_pw(createCode(10));
             userDAO.insertUser(user);
-            userDAO.insertSocial(user.getUs_num(),"sl_google");
+            userDAO.insertSocial(user.getUs_num(), "sl_" + registrationId);
         }
         String userNameAttributeName = userRequest
           .getClientRegistration()

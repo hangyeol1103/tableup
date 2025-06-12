@@ -130,6 +130,33 @@
         margin-top: 2rem;
         margin-bottom: 1rem;
       }
+
+      .tag-button-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .tag-btn {
+        background-color: #f5f5f5;
+        border: none;
+        color: #333;
+        padding: 0.5rem 1.2rem;
+        border-radius: 999px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .tag-btn:hover {
+        background-color: #e0e0e0;
+      }
+
+      .tag-btn.active {
+        background-color: #444;
+        color: white;
+      }
     </style>
   </head>
 
@@ -138,8 +165,8 @@
       <div class="mt-3 p-3 bg-white rounded shadow-sm">
         <div class="container mt-4">
           <!-- 등록한 메뉴 타입만 뿌려준다. -->
-          <div class="mb-3">
-            <button type="button" class="custom-tab-button me-2" th:each="tmtl : ${tapMenuTypeList}"
+          <div class="mb-3 tag-button-group">
+            <button type="button" class="tag-btn me-2" th:each="tmtl : ${tapMenuTypeList}"
             th:attr="onclick=|scrollToGroup('${tmtl.mt_name}')|" th:text="${tmtl.mt_name}"></button>
           </div>
           <div class="container mt-4">

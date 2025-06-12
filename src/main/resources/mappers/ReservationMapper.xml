@@ -27,7 +27,7 @@
 			res_us_num,
 			res_rt_num,
 			res_time,
-			<!-- res_end_time, -->
+			res_end_time,
 			res_person,
 			res_request,
 			res_created,
@@ -36,7 +36,7 @@
 			#{res_us_num},
 			#{res_rt_num},
 			#{res_time},
-			<!-- #{res_end_time}, -->
+			DATE_ADD(#{res_time}, INTERVAL 1 HOUR),
 			#{res_person},
 			#{res_request},
 			NOW(),

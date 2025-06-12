@@ -27,10 +27,11 @@
   </style>
 </head>
 <body>
+  <main layout:fragment="content">
 <div class="container mt-4">
   <h2 class="mb-4">키워드 목록</h2>
   <div id="keywordList">
-    <span th:each="kw : ${keywordList}" th:text="${kw}" class="bubble"></span>
+    <a th:each="kw : ${keywordList}" th:href="@{'/user/list?keyword=' + ${kw}}" th:text="${kw}" class="bubble"></a>
   </div>
   <div id="loading" style="display:none; text-align:center; margin: 20px;">불러오는 중...</div>
 </div>
@@ -62,7 +63,7 @@
         loadedCount += res.length;
         const $list = $('#keywordList');
         res.forEach(kw => {
-          $list.append(`<span class="bubble">${kw}</span>`);
+          $list.append(`<a th:href="@{'/user/list?keyword=' + ${kw}}" th:text="${kw}" class="bubble"></a>`);
         });
         loading = false;
         if (loadedCount >= totalCount) {
@@ -84,6 +85,13 @@
       loadNextPage();
     }
   });
+
+  $(document).ready(function () {
+  if ($(document).height() <= $(window).height()) {
+    loadNextPage();
+  }
+});
 </script>
+</main>
 </body>
 </html>

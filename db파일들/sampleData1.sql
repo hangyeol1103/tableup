@@ -65,16 +65,30 @@ INSERT INTO tag(tag_name,TAG_TT_NUM)
 	VALUES('차분한',1),('신나는',1),('세련된',1);
     
 -- 편의시설
-INSERT INTO facility(fa_name,fa_title,fa_icon)
-	VALUES('무선인터넷','사용가능한 무선인터넷',null);
-
 # 아이콘 마다 위치 정해서 값을 넣어놔야 함.
 INSERT INTO facility(fa_name,fa_title,fa_icon)
-	VALUES('단체석','단체석 이용시 문의','-925px -220px'),
-		  ('네이버페이','네이버페이','-80px -420px'),
-          ('무선인터넷','무선인터넷','-257px -220px'),
-          ('카드','카드','-80px -220px'),
-          ('주차','주차','-988px -413px');
+	VALUES('대관 가능','대관 안내','-230px -240px'),
+		  ('전문 소믈리에',null,'-395px -240px'),
+          ('발렛 가능','발렛 안내','-560px -240px'),
+          ('대기공간',null,'-725px -240px'),
+          ('무선인터넷',null,'-868px -240px'),
+          ('단체 이용가능','룸 안내','-1007px -240px'),
+          ('장애인 편의시설',null,'-868px -240px'),
+          ('자동결제',null,'-230px -420px'),
+          ('콜키지 가능','주류 및 콜키지 안내','-395px -420px'),
+          ('콜키지 프리',null,'-560px -420px'),
+          ('레터링',null,'-738px -420px'),
+          (null,'노키즈존 안내',null),
+          (null,'주차 안내',null),
+          (null,'바 안내',null),
+          (null,'창가 안내',null),
+          ('와인주문',null,'-868px -240px'),
+          ('웰컴키즈존','웰컴키즈존 안내','-868px -240px'),
+          ('유아시설',null,'-550px -560px'),
+          ('아기의자',null,'-710px -560px'),
+          ('위스키 주문',null,'-870px -560px'),
+          ('반려동물 동반',null,'-1025px -560px');
+          
 
 INSERT INTO restaurantfacility(rf_rt_num,rf_fa_num,rf_detail)
 	VALUES(1,1,'와이파이 사용 가능(가게 문의)');

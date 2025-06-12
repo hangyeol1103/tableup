@@ -28,6 +28,8 @@ import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.ReservationService;
 import kr.kh.tableup.service.UserService;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 @RequestMapping("/user/reservation")
@@ -44,9 +46,9 @@ public class ReservationController {
 
 
 
-	@GetMapping("/confirm")
-	public String reservationConfirm(@RequestParam int rt_num, @RequestParam String date, @RequestParam String time,
-																	 @RequestParam int person, Model model) {
+	@PostMapping("/confirm")
+	public String reservationConfirm( int rt_num,  String date,String time,
+																	  int person, Model model) {
 		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 
 		model.addAttribute("restaurant", restaurant);
@@ -56,6 +58,7 @@ public class ReservationController {
 		model.addAttribute("person", person);
 		return "user/reservation/confirm";
 	}
+	
 
 	@PostMapping("/submit")
 	public String reservationSubmit(@RequestParam int rt_num, @RequestParam String date, @RequestParam String time,

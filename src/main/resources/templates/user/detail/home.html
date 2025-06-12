@@ -159,12 +159,15 @@
             <svg width="14" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg"
               color="#E4E4E4" style="vertical-align: middle;"><path d="M1.5625 3.06836C0.728516 3.06836 0.0449219 2.39844 0.0449219 1.55078C0.0449219 0.703125 0.728516 0.0195312 1.5625 0.0195312C2.41016 0.0195312 3.09375 0.703125 3.09375 1.55078C3.09375 2.39844 2.41016 3.06836 1.5625 3.06836Z" fill="currentColor"></path>
             </svg>
-            <span th:text="${#strings.substring(todayResTime.drt_open, 0, 5)}"></span>&nbsp;~
-            <span th:text="${#strings.substring(todayResTime.drt_close, 0, 5)}"></span>
+            <span th:if="${todayResTime.drt_open != null and todayResTime.drt_close != null}">            
+              <span th:text="${#strings.substring(todayResTime.drt_open, 0, 5)}"></span>&nbsp;~
+              <span th:text="${#strings.substring(todayResTime.drt_close, 0, 5)}"></span>
+            </span>
           </span>
             
           <!-- 드롭 아이콘 -->
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="zn9ch5c">
+          <svg th:if="${todayResTime != null and todayResTime.drt_open != null and todayResTime.drt_close != null}" 
+            width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="zn9ch5c">
             <path d="M15 8.33334L10 13.3333L5 8.33334" stroke="#B5B5B5" stroke-width="1.5" stroke-miterlimit="10" stroke-linejoin="round"></path>
           </svg>
         </div>
@@ -175,12 +178,21 @@
             <!-- 공통 박스 -->
             <div th:class="${#strings.trim(drt.drt_date).equals(#strings.trim(today))} ? 'fw-bold' : ''" style="padding: 1px; margin-bottom: 1px;">
               <div>
-                <span th:text="${drt.drt_date}"></span> · 
-                <span th:text="${#strings.substring(drt.drt_open, 0, 5)}"></span>&nbsp;~
-                <span th:text="${#strings.substring(drt.drt_close, 0, 5)}"></span>
+                <div th:if="${drt.drt_open != null and drt.drt_close != null}">
+                  <span th:text="${drt.drt_date}"></span> · 
+                  <span th:text="${#strings.substring(drt.drt_open, 0, 5)}"></span>&nbsp;~
+                  <span th:text="${#strings.substring(drt.drt_close, 0, 5)}"></span>
+                </div>
+              </div>
+              <div th:if="${drt.drt_brstart != null and drt.drt_brend != null}" style="padding-left: 2em;" >
+                <span th:text="'브레이크 타임 · ' + ${#strings.substring(drt.drt_brstart, 0, 5)}"></span>&nbsp;~
+                <span th:text="${#strings.substring(drt.drt_brend, 0, 5)}"></span>
+              </div>
+              <div th:if="${drt.drt_loam != null}" style="padding-left: 2em;" >
+                <span th:text="'(오전) · ' + ${#strings.substring(drt.drt_loam, 0, 5)} + ' 까지 라스트오더'"></span>
               </div>
               <div th:if="${drt.drt_lopm != null}" style="padding-left: 2em;" >
-                <span th:text="${#strings.substring(drt.drt_lopm, 0, 5)} + ' 까지 라스트오더'"></span>
+                <span th:text="'(오후) · ' + ${#strings.substring(drt.drt_lopm, 0, 5)} + ' 까지 라스트오더'"></span>
               </div>
             </div>
           </div>

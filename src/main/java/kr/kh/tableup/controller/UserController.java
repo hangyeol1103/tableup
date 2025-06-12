@@ -935,6 +935,21 @@ public class UserController {
     return "user/sitemap/keyword";
     }
     
+    @GetMapping("/keywords")
+    public String keywordPage(Model model, Criteria cri) {
+        int totalCount = userService.getKeywordCount(); 
+        PageMaker pm = new PageMaker(10, cri, totalCount); 
+        model.addAttribute("pm", pm);
+        model.addAttribute("cri", cri);
+        return "user/sitemap/keyword"; 
+    }
+
+    @GetMapping("/keywords/page")
+    @ResponseBody
+    public List<String> getKeywordList(Criteria cri) {
+        return userService.getKeywords(cri.getPageStart(), cri.getPerPageNum());
+    }
+
     
 
 }

@@ -112,6 +112,12 @@ public interface UserDAO {
 	
 	void updateSocial(Integer us_num, String type, int input);
 
+    int selectKeywordCount();
+
+    List<String> selectKeywords();
+
+    List<String> selectCriKeywords(int start, int end);
+
 
 
 }

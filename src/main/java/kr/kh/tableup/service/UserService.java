@@ -641,5 +641,15 @@ public class UserService {
 	}
 
 
+    public int getKeywordCount() {
+      return userDAO.selectKeywordCount();
+    }
+
+
+    public List<String> getKeywords(int start, int end) {
+      return userDAO.selectCriKeywords(start, end);
+    }
+
+
 
 }

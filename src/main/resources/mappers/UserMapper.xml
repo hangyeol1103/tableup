@@ -629,4 +629,59 @@
 		SELECT fa_name AS keyword FROM facility
 	</select>
 
+<select id="selectKeywordCount" resultType="int">
+  SELECT COUNT(*) FROM (
+    SELECT rt_name AS keyword FROM restaurant
+    UNION
+    SELECT rt_description FROM restaurant
+    UNION
+    SELECT rd_info FROM restaurantdetail
+    UNION
+    SELECT rd_addr FROM restaurantdetail
+    UNION
+    SELECT dreg_sub FROM detailregion
+    UNION
+    SELECT reg_main FROM region
+    UNION
+    SELECT dfc_sub FROM detailfoodcategory
+    UNION
+    SELECT fc_main FROM foodcategory
+    UNION
+    SELECT tag_name FROM tag
+    UNION
+    SELECT TT_NAME FROM tagtype
+    UNION
+    SELECT fa_name FROM facility
+  ) AS all_keywords
+</select>
+
+<select id="selectCriKeywords" resultType="String">
+	SELECT keyword FROM (
+		SELECT rt_name AS keyword FROM restaurant
+		UNION
+		SELECT rt_description FROM restaurant
+		UNION
+		SELECT rd_info FROM restaurantdetail
+		UNION
+		SELECT rd_addr FROM restaurantdetail
+		UNION
+		SELECT dreg_sub FROM detailregion
+		UNION
+		SELECT reg_main FROM region
+		UNION
+		SELECT dfc_sub FROM detailfoodcategory
+		UNION
+		SELECT fc_main FROM foodcategory
+		UNION
+		SELECT tag_name FROM tag
+		UNION
+		SELECT TT_NAME FROM tagtype
+		UNION
+		SELECT fa_name FROM facility
+	) AS all_keywords
+	ORDER BY keyword
+	LIMIT #{start}, #{end}
+</select>
+
+
 </mapper>

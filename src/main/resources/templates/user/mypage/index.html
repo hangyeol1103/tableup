@@ -8,7 +8,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <head>
 	<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>mypage_index</title>
+  <title>마이페이지</title>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 </head>
 <body>
 	<main layout:fragment="content">
@@ -31,7 +33,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			<div id="flwrvwTab" class="tab-pane fade"><div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading</span></div></div></div>
 		</div>
 
-		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 
 		<script th:inline="javascript">
 			$(function () {

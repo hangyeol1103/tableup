@@ -2,7 +2,6 @@ package kr.kh.tableup.controller;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -61,6 +60,7 @@ import kr.kh.tableup.model.vo.TagVO;
 import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.FileService;
+import kr.kh.tableup.service.MailService;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.ReservationService;
 import kr.kh.tableup.service.RestaurantService;
@@ -89,18 +89,24 @@ public class UserController {
   @Autowired
   private FileService fileService;
 
+  @Autowired
+  private MailService mailService;
+
   @Value("${my-api-key}")
   private String apiKey;
-
+  
   /** 로그인 */
 
   @GetMapping("/login")
   public String login(Model model, HttpServletRequest request, @AuthenticationPrincipal CustomUser customUser) {
     String prevUrl = request.getHeader("Referer");
+    
     System.out.println(prevUrl);
     if (prevUrl != null && !prevUrl.contains("/user/login")) {
       request.getSession().setAttribute("prevUrl", prevUrl);
     }
+
+    if(customUser!=null&&customUser.getUser()!=null)  return "redirect:/";
 
     Object loginError = request.getSession().getAttribute("loginError");
     Object loginId = request.getSession().getAttribute("loginId");
@@ -123,7 +129,11 @@ public class UserController {
   /** 회원가입 */
   @GetMapping("/signup")
   public String signupForm(Model model, @RequestParam(required = false, defaultValue = "false") boolean social,
-      @RequestParam(required = false) String us_id) {
+      @RequestParam(required = false) String us_id, @AuthenticationPrincipal CustomUser customUser) {
+
+    if(customUser!=null&&customUser.getUser()!=null)  return "redirect:/";
+
+
     model.addAttribute("social", social);
     model.addAttribute("url", "/signup");
 
@@ -136,8 +146,31 @@ public class UserController {
     return "user/signup";
   }
 
+  @PostMapping("/email/dup")
+  @ResponseBody
+  public String emailIsDuplicated(@RequestParam String us_email) {
+    boolean exists = userService.isDuplicate("email", us_email);
+    return exists ? "duplicate" : null;
+  }
+
+  @PostMapping("/email/send")
+  @ResponseBody
+  public String emailSend(@RequestParam String us_email) {
+    System.out.println(us_email);
+    String ev_key = mailService.sendEmail(us_email.trim());
+    System.out.println(ev_key);
+    if(ev_key == null || ev_key.length() < 5) return null;
+    return ev_key;
+  }
+
+  @PostMapping("/email/check")
+  @ResponseBody
+  public String emailCheck(@RequestParam String ev_key, @RequestParam String code) {
+    return mailService.checkEmail(ev_key, code);
+  }
+
   @PostMapping("/signupPost")
-  public String signup(@Valid @ModelAttribute("userVO") UserVO user, BindingResult result, RedirectAttributes ra) {
+  public String signup(@Valid @ModelAttribute UserVO user, BindingResult result, RedirectAttributes ra) {
 
     System.out.println("유효성 검사 오류 수: " + result.getErrorCount());
 
@@ -170,11 +203,11 @@ public class UserController {
 
   /** 마이페이지 */
   @GetMapping("/mypage")
-  public String mypage(Model model, Principal principal, @RequestParam(required = false) String tab) {
-    if (principal == null)
+  public String mypage(Model model, @AuthenticationPrincipal CustomUser customUser, @RequestParam(required = false) String tab) {
+    if(customUser==null||customUser.getUser()==null)
       return "user/mypage/indexnot";
 
-    UserVO user = userService.getUserById(principal.getName());
+    UserVO user = userService.getUserById(customUser.getUser().getUs_id());
     model.addAttribute("user", user);
     if(tab!=null)model.addAttribute("tab", tab);
     
@@ -182,11 +215,11 @@ public class UserController {
   }
 
   @GetMapping("/edit")
-  public String editForm(Model model, Principal principal) {
-    if (principal == null)
+  public String editForm(Model model, @AuthenticationPrincipal CustomUser customUser) {
+    if (customUser == null || customUser.getUser() == null)
       return "redirect:/user/login";
 
-    UserVO user = userService.getUserById(principal.getName());
+    UserVO user = userService.getUserById(customUser.getUser().getUs_id());
     model.addAttribute("user", user);
     
     String token = UUID.randomUUID().toString().substring(0, 6); // 인증번호 6자리
@@ -203,11 +236,11 @@ public class UserController {
   }
 
   @PostMapping("/edit")
-  public String edit(@ModelAttribute UserVO user, Principal principal, RedirectAttributes ra) {
-    if (principal == null)
+  public String edit(@ModelAttribute UserVO user, @AuthenticationPrincipal CustomUser customUser, RedirectAttributes ra) {
+    if (customUser == null || customUser.getUser() == null)
       return "redirect:/user/login";
 
-    user.setUs_id(principal.getName()); // ID 보안
+    user.setUs_id(customUser.getUser().getUs_id()); // ID 보안
     boolean result = userService.updateUser(user);
 
     ra.addFlashAttribute("msg", result ? "회원정보가 수정되었습니다." : "수정에 실패했습니다.");
@@ -231,13 +264,13 @@ public class UserController {
   }
 
   @PostMapping("/mypage/rev")
-  public String reviewList(Model model, Principal principal) {
-    if (principal == null) {
+  public String reviewList(Model model, @AuthenticationPrincipal CustomUser customUser) {
+    if (customUser == null || customUser.getUser() == null) {
       return "user/mypage/sub/revsub";
     }
 
-    String username = principal.getName();
-    UserVO user = userService.getUserById(username);
+    String us_id = customUser.getUser().getUs_id();
+    UserVO user = userService.getUserById(us_id);
     if (user == null) {
       return "user/mypage/sub/revsub";
     }
@@ -249,13 +282,13 @@ public class UserController {
   }
 
   @PostMapping("/mypage/res")
-  public String reservationList(Model model, Principal principal) {
-    if (principal == null) {
+  public String reservationList(Model model, @AuthenticationPrincipal CustomUser customUser) {
+    if (customUser == null || customUser.getUser() == null) {
       return "user/mypage/sub/ressub";
     }
 
-    String username = principal.getName();
-    UserVO user = userService.getUserById(username);
+    String us_id = customUser.getUser().getUs_id();
+    UserVO user = userService.getUserById(us_id);
     if (user == null) {
       return "user/mypage/sub/ressub";
     }
@@ -267,13 +300,13 @@ public class UserController {
   }
 
   @PostMapping("/mypage/flwrst")
-  public String followRestaurantList(Model model, Principal principal) {
-    if (principal == null) {
+  public String followRestaurantList(Model model, @AuthenticationPrincipal CustomUser customUser) {
+    if (customUser == null || customUser.getUser() == null) {
       return "user/mypage/sub/flwrst";
     }
 
-    String username = principal.getName();
-    UserVO user = userService.getUserById(username);
+    String us_id = customUser.getUser().getUs_id();
+    UserVO user = userService.getUserById(us_id);
     if (user == null) {
       return "user/mypage/sub/flwrst";
     }
@@ -285,13 +318,13 @@ public class UserController {
   }
 
   @PostMapping("/mypage/flwrvw")
-  public String followReviewList(Model model, Principal principal) {
-    if (principal == null) {
+  public String followReviewList(Model model, @AuthenticationPrincipal CustomUser customUser) {
+    if (customUser == null || customUser.getUser() == null) {
       return "user/mypage/sub/flwrvw";
     }
 
-    String username = principal.getName();
-    UserVO user = userService.getUserById(username);
+    String us_id = customUser.getUser().getUs_id();
+    UserVO user = userService.getUserById(us_id);
     if (user == null) {
       return "user/mypage/sub/flwrvw";
     }
@@ -309,6 +342,17 @@ public class UserController {
     model.addAttribute("user", userService.getUserProfileImage(customUser.getUser().getUs_num()));
     System.out.println(userService.getUserProfileImage(customUser.getUser().getUs_num()));
     // model.addAttribute("errorMsg", "에러입니다."); //post에서 이런식으로 에러 넘기면 될듯
+
+    return "user/mypage/info";
+  }
+
+  @PostMapping("/updateInfo")
+  public String updateInfo(@ModelAttribute UserVO user, @AuthenticationPrincipal CustomUser customUser) {
+    if (customUser == null || customUser.getUser() == null)
+      return "redirect:/user/login";
+
+    user.setUs_id(customUser.getUser().getUs_id()); // ID 보안
+    boolean result = userService.updateUserInfo(user);
 
     return "user/mypage/info";
   }

@@ -26,17 +26,15 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             <strong>내용:</strong> <span th:text="${r.rev_content}">리뷰 내용</span><br>
             <strong>작성일:</strong> <small th:text="${#dates.format(r.rev_created, 'yyyy-MM-dd')}">날짜</small>
           </p>
-          <div>나중에 리뷰내용 지우거나 간략화하고 리뷰 상세 페이지 링크 걸어 놓을 것. 리뷰 첨부파일 개수 띄우기(예상) </div>
-          <div>
-            <ul class="list-unstyled">
-              <th:block th:each="score : ${r.scoreList}">
-                  <span th:text="${score.st_category}">항목</span>:
-                  <span th:text="${score.rs_score}">점수</span>
-              </th:block>
-              <div th:if="${r.scoreList.isEmpty()}">
-                <span>점수 없음</span>
-              </div>
-            </ul>
+          <!-- <div th:each="file :${r.fileList}">
+            <img th:src="${'/file' + file.file_path}" alt="">
+          </div> -->
+          <div class="d-flex flex-wrap mt-2">
+            <span th:each="score : ${r.scoreList}" class="me-4">
+              <span th:text="${score.st_category}"></span>
+              <i class="bi bi-star-fill text-warning"></i>
+              <span th:text="${score.rs_score}"></span>
+            </span>
           </div>
         </a>
       </li>

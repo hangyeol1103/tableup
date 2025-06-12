@@ -18,12 +18,14 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       </th:block>
 
       <th:block th:each="r : ${frestaurants}">
-        <li class="list-group-item">
-          <strong th:text="${r.rt_num}">식당 번호</strong><br>
-        </li>
-        <li class="list-group-item">
-          <strong th:text="${r.rt_name}">식당이름</strong><br>
-        </li>
+        <a th:href="@{/user/list/detail/} + ${r.rt_num}" class="text-decoration-none text-dark">
+          <li class="list-group-item">
+            <strong th:text="${r.rt_name}">식당이름</strong><br>
+          </li>
+          <li class="list-group-item">
+            <strong th:text="${r.rd_addr}">식당 주소</strong><br>
+          </li>
+        </a>
       </th:block>
     </ul>
 

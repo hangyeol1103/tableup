@@ -109,7 +109,7 @@ public class SecurityConfig{
         .csrf(csrf ->csrf.disable())
         .authorizeHttpRequests((requests) -> requests
           .requestMatchers("/user/review/insert").authenticated()
-          .requestMatchers("/user/login").anonymous()
+          .requestMatchers("/user/login", "/user/signup", "/user/login/*").anonymous()
           .anyRequest().permitAll()  // 그 외 요청은 인증 필요
         )
      

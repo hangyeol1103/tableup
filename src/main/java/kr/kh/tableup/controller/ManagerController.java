@@ -1450,7 +1450,24 @@ public class ManagerController {
 
 		return "/manager/managerpage";
 	}
-	
+
+	//입력한 현재 비번하고 db에 등록된 현재 비번하고 비교
+	@PostMapping("/checkPassword")
+	@ResponseBody
+	public boolean checkPassword(@RequestBody Map<String, String> param) {
+			String rm_id = param.get("rm_id");
+			String inputPw = param.get("rm_pw2");
+			
+			System.out.println("확인할 아이디 : " + rm_id);
+			System.out.println("입력받은 비번 : " + inputPw);
+
+			boolean res = managerService.selectManagerByIdAndCpw(rm_id,inputPw);
+			if (!res){
+				return false;
+			}
+			return res;
+	}
+
 	@PostMapping("/managerpage")
 	public String PostmanagerPage(Model model, @AuthenticationPrincipal CustomManager manager, RestaurantManagerVO rm) {
 		//매니저 정보가 없는 경우 

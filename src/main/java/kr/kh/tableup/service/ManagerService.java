@@ -828,6 +828,26 @@ public class ManagerService {
 			return managerDAO.selectManagerOner(rt_num);
 		}
 
+		public boolean selectManagerByIdAndCpw(String rm_id, String inputPw) {
+			if (rm_id == null || inputPw == null) {
+					return false;
+			}
+
+			RestaurantManagerVO dbManager = managerDAO.selectManager(rm_id);
+			if (dbManager == null) return false;
+
+			String dbPw = dbManager.getRm_pw(); // 암호화된 비번
+
+			// 평문 비밀번호(inputPw)와 암호화된 비밀번호(dbPw)를 비교
+			boolean result = passwordEncoder.matches(inputPw, dbPw);
+
+			System.out.println("입력 비번: " + inputPw);
+			System.out.println("DB 비번: " + dbPw);
+			System.out.println("비밀번호 일치 여부: " + result);
+
+			return result;
+		}
+
 
 
 

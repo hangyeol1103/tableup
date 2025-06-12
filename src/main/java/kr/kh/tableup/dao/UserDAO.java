@@ -112,6 +112,8 @@ public interface UserDAO {
 	
 	void updateSocial(Integer us_num, String type, int input);
 
+	List<String> selectKeywords();
+
 
 
 }

@@ -492,5 +492,21 @@
 			(drt_rt_num, drt_date, drt_off, drt_open, drt_close, drt_brstart, drt_brend, drt_loam, drt_lopm)
 		values (#{drt_rt_num}, #{drt_date}, #{drt_off}, #{drt_open}, #{drt_close}, #{drt_brstart}, #{drt_brend}, #{drt_loam}, #{drt_lopm})
 	</insert>
+
+	<select id="selectDefaultTimeList" resultType="DefaultResTimeVO">
+		select * from defaultrestime where drt_rt_num=#{rt_num}
+	</select>
+
+	<update id="updateDefaultResTime">
+		update defaultrestime set
+			 drt_off = #{drt_off}, 
+			 drt_open = #{drt_open}, 
+			 drt_close = #{drt_close}, 
+			 drt_brstart = #{drt_brstart}, 
+			 drt_brend = #{drt_brend}, 
+			 drt_loam = #{drt_loam}, 
+			 drt_lopm = #{drt_lopm}
+		where drt_rt_num=#{drt_rt_num} and drt_date=#{drt_date}
+	</update>
 	
 </mapper>

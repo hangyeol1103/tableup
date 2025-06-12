@@ -861,6 +861,22 @@ public class ManagerService {
 			}
 		}
 
+		public List<DefaultResTimeVO> getDefaultTimeList(int rt_num) {
+			return managerDAO.selectDefaultTimeList(rt_num);
+		}
+
+		public void updateDefaultResTimeList(List<DefaultResTimeVO> list, int rtNum) {
+			if(list == null || list.size() ==0){
+					System.out.println("영업시간 리스트가 비어 있습니다.");
+					return;
+				}
+				for (DefaultResTimeVO drt : list) {
+						drt.setDrt_rt_num(rtNum); // 매장번호 설정
+						System.out.println("새로 입력받은 영업시간 정보: " + drt);
+						managerDAO.updateDefaultResTime(drt); // DAO에 insert 메서드 호출
+				}
+		}
+
 
 
 

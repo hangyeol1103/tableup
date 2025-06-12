@@ -188,6 +188,10 @@ public interface ManagerDAO {
 
 	void insertDefaultResTime(DefaultResTimeVO drt);
 
+	List<DefaultResTimeVO> selectDefaultTimeList(int rt_num);
+
+	void updateDefaultResTime(DefaultResTimeVO drt);
+
 
 
 

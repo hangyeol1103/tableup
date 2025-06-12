@@ -144,7 +144,7 @@
 	<select id="selectUserById" resultType="userVO">
 		select * from User where us_id = #{us_id}
 	</select>
-	<insert id="insertUser">
+	<insert id="insertUser" parameterType="UserVO" useGeneratedKeys="true" keyProperty="us_num">
 		INSERT INTO User (
 			us_id,
 			us_pw, 
@@ -164,6 +164,23 @@
 			#{us_sociallogin}
 		)
 	</insert>
+
+	<insert id="insertSocial">
+		INSERT INTO sociallogin 
+		(${type}, sl_us_num) VALUES (1, #{us_num})
+	</insert>
+
+	<select id="selectSocial" resultType="Boolean">
+		SELECT ${type} FROM sociallogin
+		WHERE sl_us_num = #{us_num}
+	</select>
+
+	<update id="updateSocial">
+		UPDATE sociallogin SET
+		${type} = #{input}
+		WHERE sl_us_num = #{us_num}
+	</update>
+
 	<update id="updateUserInfo" parameterType="userVO">
     UPDATE User
     SET us_nickname = #{us_nickname},
@@ -201,7 +218,7 @@
 		LEFT JOIN restaurant ON rt_num = res_rt_num
 		LEFT JOIN revres USING (res_num)
 		LEFT JOIN review USING (rev_num)
-		WHERE res_us_num = #{us_num} and res_state = 1
+		WHERE res_us_num = #{us_num} and (res_state = 1 or res_state = 0)
 		ORDER BY res_num DESC
 	</select>
 

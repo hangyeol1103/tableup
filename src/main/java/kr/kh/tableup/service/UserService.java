@@ -1,5 +1,6 @@
 package kr.kh.tableup.service;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -106,6 +106,12 @@ public interface UserDAO {
 
 	List<ReviewVO> selectReviewListbyNum(int rt_num);
 
+	void insertSocial(Integer us_num, String type);
+
+	void selectSocial(Integer us_num);
+	
+	void updateSocial(Integer us_num, String type, int input);
+
 
 
 }

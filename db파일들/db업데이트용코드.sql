@@ -3,6 +3,8 @@ use tableup;
 ALTER TABLE `tableup`.`usfollow` 
 CHANGE COLUMN `uf_TYPE` `uf_TYPE` ENUM('REVIEW', 'RESTAURANT', 'DETAILREGION', 'DETAILFOODCATEGORY') NOT NULL ;
 
+ALTER TABLE `tableup`.`user` 
+CHANGE COLUMN `us_id` `us_id` VARCHAR(255) NOT NULL ;
 
 
 -- 트리거 제거

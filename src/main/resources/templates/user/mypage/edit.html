@@ -54,9 +54,6 @@
                 전화번호:
                 <input type="text" class="form-control d-inline w-auto" name="us_phone" th:value="${user.us_phone}">
             </li>
-            <li class="list-group-item">
-                가입일: <span th:text="${#dates.format(user.us_created, 'yyyy-MM-dd HH:mm')}"></span>
-            </li>
 
             <img th:src="'data:image/png;base64,' + ${map.qr}" alt="QR코드" style="width: 120px; height: 120px;" />
 

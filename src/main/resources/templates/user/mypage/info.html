@@ -30,7 +30,7 @@
   
   <div class="card mt-4">
   <div class="card-header bg-primary text-white">
-    <h4><i class="bi bi-person-badge"></i> 내 정보</h4>
+    <h4><i class="bi bi-person-badge"></i><span th:text="${user.us_nickname + '님 정보'}">님 정보</span></h4>
   </div>
   <div class="card-body">
     <div class="row mb-3">
@@ -63,19 +63,21 @@
           <tr>
             <th>계정 유형</th>
             <td>
-              <span th:text="${user.us_sociallogin == 1 ? '소셜 로그인' : '일반 로그인'}"
+              <span th:text="${user.us_sociallogin == 1 ? '인증된 사용자' : '미인증된 사용자'}"
                     th:classappend="${user.us_sociallogin == 1 ? 'badge bg-success' : 'badge bg-secondary'}">
               </span>
             </td>
           </tr>
           <tr>
 						<th>가입일자</th>
-						<td th:text="${user.us_created != null ? #dates.format(user.us_created, 'yyyy-MM-dd HH:mm') : '날짜 없음'}"></td>
+						<td th:text="${user.us_created != null ? #dates.format(user.us_created, 'yyyy-MM-dd') : '날짜 없음'}"></td>
 					</tr>
 
         </table>
         <div class="text-end">
           <!-- <button class="btn btn-warning" onclick="toggleEdit()">정보 수정</button> -->
+          <a type="button" class="btn btn-primary" th:href="@{/user/mypage}">내 이력 보기</a>
+          <a type="button" class="btn btn-success" th:href="@{/}">처음 화면</a>
           <a type="button" class="btn btn-warning" th:href="@{/user/edit}">정보 수정</a>
         </div>
       </div>

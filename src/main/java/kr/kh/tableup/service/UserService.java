@@ -636,5 +636,10 @@ public class UserService {
   }
 
 
+	public List<String> getKeywords() {
+		return userDAO.selectKeywords();
+	}
+
+
 
 }

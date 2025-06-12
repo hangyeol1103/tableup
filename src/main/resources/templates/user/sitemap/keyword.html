@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+  <title>키워드 목록</title>
+  <style>
+    .bubble {
+      display: inline-block;
+      margin: 8px;
+      padding: 10px 16px;
+      border-radius: 30px;
+      background-color: #f0f8ff;
+      border: 1px solid #a3c2f2;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .bubble:hover {
+      background-color: #cfe2ff;
+      transform: scale(1.05);
+    }
+    .section-title {
+      font-weight: bold;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-4">
+  <h2 class="mb-4">키워드 목록</h2>
+
+  <div id="keywordContainer"></div>
+</div>
+
+<script>
+  // 예시 JSON 데이터 (뷰에서 가져올 데이터를 서버에서 JSON으로 보내주는 구조 가정)
+  const keywords = [
+    { keyword: "김밥천국", source: "식당명" },
+    { keyword: "가정식 전문", source: "소개글" },
+    { keyword: "무료 와이파이 제공", source: "식당정보" },
+    { keyword: "서울시 마포구", source: "주소" },
+    { keyword: "홍대입구", source: "상세지역" },
+    { keyword: "서울", source: "지역대분류" },
+    { keyword: "돈가스", source: "음식소분류" },
+    { keyword: "한식", source: "음식대분류" },
+    { keyword: "혼밥", source: "태그" },
+    { keyword: "분위기", source: "태그유형" },
+    { keyword: "주차 가능", source: "편의시설" }
+  ];
+
+  const grouped = keywords.reduce((acc, cur) => {
+    if (!acc[cur.source]) acc[cur.source] = [];
+    acc[cur.source].push(cur.keyword);
+    return acc;
+  }, {});
+
+  const container = document.getElementById('keywordContainer');
+  for (const [source, keys] of Object.entries(grouped)) {
+    const section = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'section-title';
+    title.textContent = source;
+    section.appendChild(title);
+
+    keys.forEach(kw => {
+      const a = document.createElement('a');
+      a.href = `/user/list?keyword=${encodeURIComponent(kw)}`;
+      a.className = 'bubble';
+      a.textContent = kw;
+      section.appendChild(a);
+    });
+    container.appendChild(section);
+  }
+</script>
+
+</body>
+</html>

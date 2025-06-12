@@ -604,4 +604,29 @@
 					upi_upload_date = NOW()
 		WHERE upi_num = #{upi_num}
 	</update>
+
+	<select id="selectKeywords" resultType="String">
+		SELECT rt_name AS keyword FROM restaurant
+		UNION
+		SELECT rt_description AS keyword FROM restaurant
+		UNION
+		SELECT rd_info AS keyword FROM restaurantdetail
+		UNION
+		SELECT rd_addr AS keyword FROM restaurantdetail
+		UNION
+		SELECT dreg_sub AS keyword FROM detailregion
+		UNION
+		SELECT reg_main AS keyword FROM region
+		UNION
+		SELECT dfc_sub AS keyword FROM detailfoodcategory
+		UNION
+		SELECT fc_main AS keyword FROM foodcategory
+		UNION
+		SELECT tag_name AS keyword FROM tag
+		UNION
+		SELECT TT_NAME AS keyword FROM tagtype
+		UNION
+		SELECT fa_name AS keyword FROM facility
+	</select>
+
 </mapper>

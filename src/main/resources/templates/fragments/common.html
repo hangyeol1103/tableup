@@ -100,14 +100,55 @@
 
 		</back>
 
-		<footer th:fragment="footer" class="mt-5 py-4 bg-white border-top text-center">
-			<div class="container">
+		<footer th:fragment="footer" class="">
+			<div class="container py-4 bg-white border-top text-center">
 				<div class="row">
 					<div class="col-12 col-md">
-						<small class="d-block mb-3 text-body-secondary">Copyright ⓒ tablemate Corp.</small>
+
+						
+
+						<br>
+
+						<!-- 사이트맵 링크 영역 -->
+						<div class="mt-2 mb-5">
+							<a href="/manager" class="footer-link">매장 관리자 페이지</a> |
+							<a href="/admin" class="footer-link">사이트 관리자 페이지</a> |
+							<a href="/user/about" class="footer-link">테이블업에 관하여</a> |
+							<a href="/user/review/view" class="footer-link">리뷰 모음</a> |
+							<a href="/user/terms" class="footer-link">이용규약</a> |
+							<a href="/user/keywords" class="footer-link">키워드일람</a> |
+							<a href="/user/developer" class="footer-link">개발자 소개</a>
+						</div>
+
+						<div class="">
+							<a class="fw-bold fs-4 text-dark text-decoration-none" href="/" style="text: size 10px;">
+								TABLEUP
+							</a>
+							<!-- 저작권 표시 -->
+							<small class="d-block text-body-secondary mt-2 mb-5">Copyright ⓒ tablemate Corp.</small>
+						</div>
 					</div>
 				</div>
 			</div>
+
+			<!-- 스타일 추가 -->
+			<style>
+				.footer-link {
+					font-size: 0.85rem;
+					color: #007bff;
+					text-decoration: none;
+					padding: 0 4px;
+				}
+
+				.footer-link:hover {
+					text-decoration: underline;
+					color: #0056b3;
+				}
+
+				.container{
+					margin-top: 200px;
+				}
+			</style>
 
 			
 			

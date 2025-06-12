@@ -907,6 +907,34 @@ public class UserController {
     public String helpIndex() {
         return "user/help/index";
     }
+
+    @GetMapping("/about")
+    public String about(Model model) {
+
+      model.addAttribute("apiKey", apiKey); // API 키를 모델에 추가  
+      return "user/sitemap/about";
+    }
+
+    @GetMapping("/terms")
+    public String terms(Model model) {
+
+      return "user/sitemap/terms";
+    }
+
+    @GetMapping("/privacy")
+    public String privacy(Model model) {
+
+      return "user/sitemap/privacy";
+    }
+    
+    @GetMapping("/keywords")
+    public String keywords(Model model) {
+    List<String> keywordList = userService.getKeywords();
+
+    model.addAttribute("groupedKeywords", keywordList);
+    return "user/sitemap/keyword";
+    }
+    
     
 
 }

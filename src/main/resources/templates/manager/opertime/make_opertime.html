@@ -10,17 +10,37 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <style>
     .calendar-cell {
-      width: 120px;
-      height: 100px;
-      border: 1px solid #ccc;
-      margin: 5px;
-      padding: 5px;
+      width: 170px;
+      height: 150px;
+      border: 1px solid #dee2e6;
+      border-radius: 0px;
+      margin: 0px;
+      padding: 8px;
       display: inline-block;
       vertical-align: top;
       position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      background-color: #fff;
+      box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .calendar-cell:hover {
+      background-color: #f1f3f5;
+      transform: scale(1.02);
+    }
+    .calendar-header-cell {
+      height: 50px;
+      background-color: #f8f9fa;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-align: center;
+      line-height: 50px;
+      border-bottom: 2px solid #dee2e6;
+      padding: 0px;
     }
     .calendar-row {
       display: flex;
+      flex-wrap: nowrap;
     }
     .calendar-month {
       margin-bottom: 2rem;
@@ -30,6 +50,11 @@
       min-height: 40px;
       font-size: 0.85em;
       margin-top: 5px;
+    }
+    .drop-content {
+      margin-top: 30px;
+      background: #f8f9fa;
+      min-height: 40px;
     }
     .sample-card {
       border: 1px solid #aaa;
@@ -49,6 +74,19 @@
       align-items: center;
       margin-bottom: 1rem;
     }
+    .calendar-cell.disabled {
+      background-color: #e9ecef;
+      pointer-events: auto;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    .day-number {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -58,14 +96,14 @@
   <div id="sampleCardContainer" class="mb-4"></div>
 
   <h3>영업일자 달력</h3>
-  <div class="calendar-navigation">
+  <div class="calendar-navigation mb-3">
     <button id="prevMonth" class="btn btn-outline-primary">이전달</button>
     <span id="calendarTitle" class="fw-bold"></span>
     <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
   </div>
-  <div id="calendar"></div>
+  <div id="calendar" class="d-flex justify-content-center flex-wrap"></div>
 
-  <button id="submitCalendar" class="btn btn-success w-100 mt-3">등록하기</button>
+  <button id="submitCalendar" class="btn btn-primary w-100 mt-3">등록하기</button>
   <a th:href="@{/manager/opertime/opertimelist/{rm_rt_num}(rm_rt_num=${manager.rm_rt_num})}" 
   class="btn btn-secondary col-12 mb-3 mt-3">영업일자 목록으로 돌아가기</a>
 
@@ -87,7 +125,12 @@
       $('#calendarTitle').text(`${year}년 ${month + 1}월`);
       const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
       let row = $('<div class="calendar-row"></div>');
-      weekdays.forEach(day => row.append(`<div class="calendar-cell"><strong>${day}</strong></div>`));
+      weekdays.forEach(day => {
+        // const headerCell = $(`<div class="calendar-cell"><strong>${day}</strong></div>`);
+        const headerCell = $(`<div class="calendar-cell calendar-header-cell"><strong>${day}</strong></div>`);
+        headerCell.css('pointer-events', 'none'); // 요일 클릭 비활성화
+        row.append(headerCell);
+      });
       container.append(row);
 
       row = $('<div class="calendar-row"></div>');
@@ -101,10 +144,10 @@
 
          if (match) {
             cellHtml = `
-              <div class="calendar-cell bg-light text-muted" data-date="${dateStr}" 
+              <div class="calendar-cell disabled bg-light text-muted" data-date="${dateStr}" 
                   style="cursor: pointer;" 
                   onclick="location.href='/manager/opertime/remake_opertime/${match.bd_num}'">
-                <strong>${i}</strong>
+                <strong class="day-number">${i}</strong>
                 <div class="drop-content">
                   ${match.bd_open ? match.bd_open.substring(11, 16) : '-'} ~ ${match.bd_close ? match.bd_close.substring(11, 16) : '-'}<br>
                   ${match.bd_off ? '쉬는날' : '영업중'}
@@ -113,7 +156,7 @@
           } else {
             cellHtml = `
               <div class="calendar-cell" data-date="${dateStr}" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <strong>${i}</strong>
+                <strong class="day-number">${i}</strong>
                 <div class="drop-content"></div>
               </div>`;
           }
@@ -158,13 +201,42 @@
       ev.preventDefault();
     }
 
+    // function drop(ev) {
+    //   ev.preventDefault();
+
+    //   const data = ev.dataTransfer.getData("text/plain");
+    //   const sample = JSON.parse(data);
+    //   const date = $(ev.target).closest('[data-date]').data('date');
+    //   $(ev.target).closest('.calendar-cell').find('.drop-content').html(
+    //     `<div><strong>${sample.bd_open || '-'}~${sample.bd_close || '-'}</strong><br>📅 ${date}
+    //      <span class="delete-btn" style="float:right; color:red; cursor:pointer;">&times;</span>
+    //     </div>`
+    //   ).data('sample', sample);
+    // }
+
     function drop(ev) {
       ev.preventDefault();
+
       const data = ev.dataTransfer.getData("text/plain");
       const sample = JSON.parse(data);
-      const date = $(ev.target).closest('[data-date]').data('date');
-      $(ev.target).closest('.calendar-cell').find('.drop-content').html(
-        `<div><strong>${sample.bd_open || '-'}~${sample.bd_close || '-'}</strong><br>📅 ${date}</div>`
+      const $cell = $(ev.target).closest('.calendar-cell');
+      const date = $cell.data('date');
+
+      // 등록된 날짜 목록
+     const operDateSet = new Set(
+        opertimelist.map(op => op.bd_date?.substring(0, 10))  // 날짜 부분만 추출
+      );
+
+      // 이미 등록된 날짜이면 드롭 금지
+      if (operDateSet.has(date)) {
+        alert('이미 등록된 날짜입니다.');
+        return;
+      }
+
+      $cell.find('.drop-content').html(
+        `<div><strong>${sample.bd_open || '-'}~${sample.bd_close || '-'}</strong><br>📅 ${date}
+        <span class="delete-btn" style="float:right; color:red; cursor:pointer;">&times;</span>
+        </div>`
       ).data('sample', sample);
     }
 
@@ -229,6 +301,11 @@
     $(document).ready(() => {
       renderCalendar(currentYear, currentMonth);
       loadSamples();
+    });
+
+    $(document).on('click', '.calendar-cell .delete-btn', function () {
+      const dropArea = $(this).closest('.drop-content');
+      dropArea.removeData('sample').empty();
     });
 
   </script>

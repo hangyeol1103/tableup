@@ -11,11 +11,11 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     .calendar-cell {
-      width: 140px;
-      height: 110px;
+      width: 170px;
+      height: 160px;
       border: 1px solid #dee2e6;
-      border-radius: 10px;
-      margin: 6px;
+      border-radius: 0px;
+      margin: 0px;
       padding: 8px;
       display: inline-block;
       vertical-align: top;
@@ -29,6 +29,23 @@
       background-color: #f1f3f5;
       transform: scale(1.02);
     }
+    .calendar-header-cell {
+      height: 50px;
+      background-color: #f8f9fa;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-align: center;
+      line-height: 50px;
+      border-bottom: 2px solid #dee2e6;
+      padding: 0px;
+    }
+    .calendar-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
     .calendar-row {
       display: flex;
       flex-wrap: nowrap;
@@ -36,12 +53,20 @@
     .opertime-info {
       font-size: 0.75em;
       color: #495057;
+      margin-top: 30px;
     }
     .opertime-info .badge.open {
       background-color: #198754;
     }
     .opertime-info .badge.closed {
       background-color: #dc3545;
+    }
+    .day-number {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-weight: bold;
+      font-size: 1rem;
     }
   </style>
 </head>
@@ -50,11 +75,11 @@
   <h2>영업일자 달력</h2>
   <div class="calendar-navigation mb-3">
     <button id="prevMonth" class="btn btn-outline-primary">이전달</button>
-    <span id="calendarTitle" class="fw-bold mx-3"></span>
+    <span id="calendarTitle" class="fw-bold"></span>
     <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
   </div>
 
-  <div id="calendar"></div>
+  <div id="calendar" class="d-flex justify-content-center flex-wrap"></div>
 
   <!-- 상세 보기 모달 -->
   <div class="modal fade" id="daySummaryModal" tabindex="-1">
@@ -157,7 +182,7 @@
 
       const container = $('<div class="calendar-month"></div>');
       let row = $('<div class="calendar-row"></div>');
-      ['일','월','화','수','목','금','토'].forEach(d => row.append(`<div class="calendar-cell"><strong>${d}</strong></div>`));
+      ['일','월','화','수','목','금','토'].forEach(d => row.append(`<div class="calendar-cell calendar-header-cell"><strong>${d}</strong></div>`));
       container.append(row);
 
       row = $('<div class="calendar-row"></div>');
@@ -167,7 +192,7 @@
         const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const match = opertimelist.find(op => op.bd_date?.substring(0, 10) === dateStr);
 
-        const cell = $(`<div class="calendar-cell"><strong>${i}</strong></div>`);
+        const cell = $(`<div class="calendar-cell"><strong class="day-number">${i}</strong></div>`);
         if (match) {
           cell.append(`
             <div class="opertime-info">

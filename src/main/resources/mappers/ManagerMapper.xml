@@ -475,6 +475,16 @@
 		select * from restaurantmanager where rm_id = #{rm_id} and rm_email = #{rm_email}
 	</select>
 	
+	<select id="selectManagerId" resultType="RestaurantManagerVO">
+		select rm_id from  restaurantmanager where rm_id = #{id}
+	</select>
 
+	<select id="selectManagerBusiness" resultType="RestaurantManagerVO">
+		select rm_business from  restaurantmanager where rm_business = #{business}
+	</select>
+
+	<select id="selectManagerOner" resultType="RestaurantManagerVO">
+		select * from  restaurantmanager where rm_rt_num = #{rt_num}
+	</select>
 	
 </mapper>

@@ -13,16 +13,35 @@
     .calendar-cell {
       width: 170px;
       height: 150px;
-      border: 1px solid #ccc;
-      margin: 5px;
-      padding: 5px;
+      border: 1px solid #dee2e6;
+      border-radius: 0px;
+      margin: 0px;
+      padding: 8px;
       display: inline-block;
       vertical-align: top;
       position: relative;
       cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      background-color: #fff;
+      box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .calendar-cell:hover {
+      background-color: #f1f3f5;
+      transform: scale(1.02);
+    }
+    .calendar-header-cell {
+      height: 50px;
+      background-color: #f8f9fa;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-align: center;
+      line-height: 50px;
+      border-bottom: 2px solid #dee2e6;
+      padding: 0px;
     }
     .calendar-row {
       display: flex;
+      flex-wrap: nowrap;
     }
     .calendar-navigation {
       display: flex;
@@ -31,27 +50,35 @@
       margin-bottom: 1rem;
     }
     .opertime-info {
-      font-size: 0.8em;
-      margin-top: 5px;
+      font-size: 0.75em;
+      color: #495057;
+      margin-top: 30px;
     }
     .modal-footer button {
       min-width: 120px;
     }
+    .day-number {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
   </style>
 </head>
 <body>
-<main layout:fragment="content">
+<main class="container mt-4" layout:fragment="content">
   <div class="container">
     <h1>예약 조회</h1>
   </div>
-
-  <div class="calendar-navigation">
+  <div class="calendar-navigation mb-3">
     <button id="prevMonth" class="btn btn-outline-primary">이전달</button>
     <span id="calendarTitle" class="fw-bold"></span>
     <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
   </div>
 
-  <div id="calendar"></div>
+  <div id="calendar" class="d-flex justify-content-center flex-wrap"></div>
 
   <!-- 모달 -->
   <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
@@ -98,7 +125,11 @@
       $('#calendarTitle').text(`${year}년 ${month + 1}월`);
       const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
       let row = $('<div class="calendar-row"></div>');
-      weekdays.forEach(day => row.append(`<div class="calendar-cell"><strong>${day}</strong></div>`));
+      weekdays.forEach(day => {
+        const headerCell = $(`<div class="calendar-cell calendar-header-cell"><strong>${day}</strong></div>`);
+        headerCell.css('pointer-events', 'none'); // 요일 클릭 비활성화
+        row.append(headerCell);
+      });
       container.append(row);
 
       row = $('<div class="calendar-row"></div>');
@@ -121,7 +152,7 @@
 
         const cell = $(`
           <div class="calendar-cell" data-date="${dateStr}">
-            <strong>${i}</strong>
+            <strong class="day-number">${i}</strong>
             ${operInfo}
             ${reservationInfo}
           </div>

@@ -36,7 +36,7 @@
   <div id="loading" style="display:none; text-align:center; margin: 20px;">불러오는 중...</div>
 </div>
 
-<script>
+<script th:inline="javascript">
   let page = 1;
   const perPageNum = [[${cri.perPageNum}]];
   const totalCount = [[${pm.totalCount}]];

@@ -963,6 +963,18 @@ public class UserController {
       
       return "user/sitemap/developer"; 
     }
+
+    @GetMapping("/test")
+    public String test2(Model model) {
+
+      return "/test2";
+    }
+    
+    @GetMapping("/QnA")
+    public String QnA(Model model) {
+
+      return "/QnA";
+    }
     
 
 }

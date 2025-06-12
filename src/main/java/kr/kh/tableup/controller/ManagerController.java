@@ -857,6 +857,12 @@ public class ManagerController {
 							drt.setDrt_rt_num(rtNum); // 매장 번호 설정
 					}
 			}
+			
+			List<DefaultResTimeVO> defaultTimeList = managerService.getDefaultTimeList(rtNum);
+			//상세정보 등록할때 영업시간을 등록 안한 경우
+			if(defaultTimeList==null||defaultTimeList.size()==0){
+				managerService.insertDefaultResTimeList(list, rtNum);
+			}
 			// 영업시간 변경 
 			if (list != null && !list.isEmpty()) {
 					managerService.updateDefaultResTimeList(list, rtNum);

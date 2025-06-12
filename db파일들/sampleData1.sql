@@ -94,7 +94,7 @@ INSERT INTO `restaurant` (rt_name,rt_closed_days,rt_price_lunch,rt_price_dinner,
 														                                                        
 -- 태그                                                       
 INSERT INTO tagtype(TT_NAME) 
-	VALUES ('분위기'),('테이블타입'),('편의시설'),('가격');
+	VALUES ('분위기'),('테이블타입');--,('편의시설'),('가격');
 
 
 INSERT INTO tag(tag_name,TAG_TT_NUM) 

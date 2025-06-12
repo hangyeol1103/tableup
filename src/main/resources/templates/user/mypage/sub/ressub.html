@@ -5,52 +5,75 @@ xmlns:th="http://www.thymeleaf.org"
 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 <head>
-	<meta charset="utf-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>mypage_index</title>
 </head>
 <body>
-	<main layout:fragment="content">
+  <main layout:fragment="content">
+  
+  <ul class="list-group">
+    <th:block th:if="${#lists.isEmpty(reservations)}">
+    <li class="list-group-item">예약 이력이 없습니다.</li>
+    </th:block>
+
+    <th:block th:each="r : ${reservations}">
+    <li class="list-group-item mt-1">
+      <a th:href="@{/user/list/detail/} + ${r.res_rt_num}"><strong>식당 번호:</strong> <span th:text="${r.res_rt_num}"></span><br></a>
+      <strong>식당 이름:</strong> <span th:text="${r.rt_name}"></span><br>
+      <strong>유저 이름:</strong> <span th:text="${r.us_name}"></span><br>
+
+      <!-- 예약 상태 표시 -->
+      <span th:if="${r.res_state == 0}" class="badge badge-gray">예약 미확정</span>
+      <span th:if="${r.res_state == 1}" class="badge badge-blue">예약 확정</span>
+
+      <div class="mt-2">
+      <!-- 리뷰가 있는 경우 -->
+      <a th:if="${r.rev_num != 0}"
+        th:href="@{/user/review/detail/{rev_num}(rev_num=${r.rev_num})}"
+        class="btn btn-outline-primary btn-sm">
+        내 리뷰 보기
+      </a>
+
+      <!-- 리뷰가 없는 경우 -->
+      <a th:if="${r.rev_num == 0}"
+        th:href="@{/user/review/insert/{res_num}(res_num=${r.res_num})}"
+        class="btn btn-primary btn-sm btn-rev-input">
+        리뷰 작성
+      </a>
+      <a th:if="${r.res_time > T(java.time.LocalDateTime).now()}" type="button" class="btn btn-info btn-sm btn-rev-input" th:href="@{/}">예약 수정/취소</a>
+      </div>
+      <div style="float: center; text-align: left; cursor: pointer; position: relative;" class="reservation-info">
+        <div class="modal-detail" style="display:none; position:absolute; top:100%; right:0; background:#fff; border:1px solid #ccc; padding:10px; z-index:100; min-width:500px;">
+          <div><strong>예약 날짜:</strong> <span th:text="${r.res_time}"></span></div>
+          <div><strong>예약 인수:</strong> <span th:text="${r.res_person}"></span></div>
+          <div><strong>요청 사항:</strong> <span th:text="${r.res_request}"></span></div>
+        </div>
+      </div>
+      <script>
+        document.querySelectorAll('.list-group-item').forEach(function(item) {
+          item.addEventListener('mouseenter', function() {
+            const modal = item.querySelector('.modal-detail');
+            if (modal) modal.style.display = 'block';
+          });
+          item.addEventListener('mouseleave', function() {
+            const modal = item.querySelector('.modal-detail');
+            if (modal) modal.style.display = 'none';
+          });
+        });
+      </script>
+
+    </li>
+    </th:block>
+  </ul>
+
+  <script>
+    $('.btn-rev-input').click(() => {
     
-    <ul class="list-group">
-      <th:block th:if="${#lists.isEmpty(reservations)}">
-        <li class="list-group-item">예약 이력이 없습니다.</li>
-      </th:block>
+    });
 
-      <th:block th:each="r : ${reservations}">
-        <li class="list-group-item">
-          <strong>식당 번호:</strong> <span th:text="${r.res_rt_num}"></span><br>
-          <strong>식당 이름:</strong> <span th:text="${r.rt_name}"></span><br>
-          <strong>유저 이름:</strong> <span th:text="${r.us_name}"></span><br>
-
-          <div class="mt-2">
-            <!-- 리뷰가 있는 경우 -->
-            <a th:if="${r.rev_num != 0}"
-              th:href="@{/user/review/detail/{rev_num}(rev_num=${r.rev_num})}"
-              class="btn btn-outline-primary btn-sm">
-              내 리뷰 보기
-            </a>
-
-            <!-- 리뷰가 없는 경우 -->
-            <a th:if="${r.rev_num == 0}"
-              th:href="@{/user/review/insert/{res_num}(res_num=${r.res_num})}"
-              class="btn btn-primary btn-sm btn-rev-input">
-              리뷰 작성
-            </a>
-          </div>
-          
-        </li>
-      </th:block>
-    </ul>
-
-    <script>
-      $('.btn-rev-input').click(() => {
-        
-      });
-
-    </script>
+  </script>
 
 
-	</main>
+  </main>
 </body>
 </html>

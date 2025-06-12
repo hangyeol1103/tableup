@@ -478,10 +478,10 @@
 
   // 찜 토글 함수
   function likeRestaurant(rt_num) {
-    if (!us_num) {
-      window.location.href = '/user/login';
-      return;
-    }
+    // if (!us_num || Number(us_num) < 1) {
+    //   window.location.href = '/user/login';
+    //   return;
+    // }
     $.ajax({
       url: '/user/follow',
       type: 'POST',

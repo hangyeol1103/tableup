@@ -43,7 +43,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             user = new UserVO();
             user.setUs_id("g_" + sub); // 중복 방지
             user.setUs_email(email);
-            user.setUs_name("미입력");
+            user.setUs_name(name);
             user.setUs_nickname(name);
             user.setUs_phone("000-0000-0000");
             user.setUs_sociallogin(true);

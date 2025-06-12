@@ -39,10 +39,8 @@ public class OAuth2AutoLoginFilter extends OncePerRequestFilter {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null &&
-            authentication.isAuthenticated() &&
-            authentication.getPrincipal() instanceof OAuth2User &&
-            !(authentication.getPrincipal() instanceof CustomUser)) {
+        if (authentication != null && authentication.isAuthenticated() && 
+            authentication.getPrincipal() instanceof OAuth2User && !(authentication.getPrincipal() instanceof CustomUser)) {
 
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
             String email = oAuth2User.getAttribute("email");

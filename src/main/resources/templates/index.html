@@ -218,33 +218,29 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<div class="modal-dialog modal-dialog-centered modal-lg">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title">관심지역 설정</h5>
+								<h5 class="modal-title">지역 선택</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 							</div>
 							<div class="modal-body" th:if="${regionList != null and #lists.size(regionList) > 0}">
-							<!-- 인기 지역 (동그란 이미지/버튼) -->
-							<div class="mb-3" th:if="${favoriteRegion != null}">
-								<strong>인기 지역</strong>
-								<div class="d-flex flex-wrap mt-2">
-									<!-- 전국 버튼은 항상 고정 -->
-									<button class="btn btn-outline-primary rounded-circle m-1 region-btn"
-													style="width:60px; height:60px;" data-dreg="0" data-reg="0">전국</button>
-
-									<!-- 동적으로 인기 지역 버튼 출력 -->
-									<div th:each="favRegion : ${favoriteRegion}">
-										<div th:each="r : ${regionList}" th:if="${r.dreg_num == favRegion}" class="d-inline-block">
-											<button class="btn btn-outline-primary rounded-circle m-1 region-btn"
-															style="width:60px; height:60px;"
-															th:attr="data-dreg=${r.dreg_num}, data-reg=${r.reg_num}"
-															 th:text="${#strings.length(r.dreg_sub) > 2 ? #strings.substring(r.dreg_sub, 0, 2) : r.dreg_sub}">지역명</button>
+								<!-- 인기 지역 (동그란 이미지/버튼) -->
+								<div class="mb-3" th:if="${favoriteRegion != null}">
+									<strong>인기 지역</strong>
+									<div class="d-flex flex-wrap mt-2">
+										<!-- 전국 버튼은 항상 고정 -->
+										<button class="btn btn-outline-primary rounded-circle m-1 region-btn"
+											style="width:60px; height:60px;" data-dreg="0" data-reg="0">전국</button>
+										<!-- 동적으로 인기 지역 버튼 출력 -->
+										<div th:each="favRegion : ${favoriteRegion}">
+											<div th:each="r : ${regionList}" th:if="${r.dreg_num == favRegion}" class="d-inline-block">
+												<button class="btn btn-outline-primary rounded-circle m-1 region-btn"
+													style="width:60px; height:60px;"
+													th:attr="data-dreg=${r.dreg_num}, data-reg=${r.reg_num}"
+													th:text="${#strings.length(r.dreg_sub) > 2 ? #strings.substring(r.dreg_sub, 0, 2) : r.dreg_sub}">지역명</button>
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-								
 								<div class="row">
-
-
 									<!-- 대분류 -->
 									<div class="col-4">
 										<ul class="list-group">
@@ -261,7 +257,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 											</li>
 										</ul>
 									</div>
-
 									<!-- 소분류 -->
 									<div class="col-8">
 										<div class="tab-content p-3">
@@ -269,12 +264,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 												th:if="${parent.dreg_sub == '전체'}"
 												class="tab-pane fade"
 												th:id="${'tab-' + #strings.replace(parent.reg_main, ' ', '')}">
-
 												<!-- 전체 버튼 -->
 												<button type="button"
 													class="btn btn-outline-dark m-1 btn-sm region-btn"
 													th:attr="data-dreg=0, data-reg=${parent.reg_num}">전체</button>
-
 												<!-- 소분류 -->
 												<button th:each="child : ${regionList}"
 													th:if="${child.reg_main == parent.reg_main and child.dreg_sub != '전체' and child.dreg_num != 0}"
@@ -282,12 +275,60 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 													class="btn btn-outline-secondary m-1 btn-sm region-btn"
 													th:attr="data-dreg=${child.dreg_num}, data-reg=${child.reg_num}"
 													th:text="${child.dreg_sub}"></button>
-													
 											</div>
 										</div>
 									</div>
-
-
+								</div>
+								<!-- 관심지역 등록된 항목 출력 -->
+								<div class="mt-3">
+									<strong>내 관심지역</strong>
+									<div id="myFavoriteRegions" class="d-flex flex-wrap gap-2 mt-2">
+										<!-- 관심지역 버튼이 동적으로 여기에 표시됩니다 -->
+									</div>
+								</div>
+								<script th:inline="javascript">
+									document.addEventListener("DOMContentLoaded", function () {
+										function renderMyFavoriteRegions() {
+											const container = document.getElementById("myFavoriteRegions");
+											if (!container) return;
+											container.innerHTML = "";
+											const cookie = document.cookie.split('; ').find(row => row.startsWith('favoriteRegion='));
+											let favs = [];
+											if (cookie) {
+												favs = decodeURIComponent(cookie.split('=')[1]).split(',').filter(Boolean);
+											}
+											if (favs.length === 0) {
+												container.innerHTML = '<span class="text-muted">등록된 관심지역이 없습니다.</span>';
+												return;
+											}
+											// regionList는 Thymeleaf에서 렌더링된 데이터 사용
+											/*<![CDATA[*/
+												const regionList = [[${regionList}]];
+											/*]]>*/
+											favs.forEach(key => {
+												const [dreg, reg] = key.split('-');
+												const region = regionList.find(r => r.dreg_num == dreg && r.reg_num == reg);
+												const name = region ? region.reg_main + " : " + region.dreg_sub : '알수없음';
+												const btn = document.createElement("button");
+												btn.type = "button";
+												btn.className = "btn btn-outline-primary btn-sm";
+												btn.textContent = name;
+												btn.onclick = function() {
+													window.location.href = `/user/list?dreg_num=${dreg}&reg_num=${reg}`;
+												};
+												container.appendChild(btn);
+											});
+										}
+										renderMyFavoriteRegions();
+										// 관심지역 변경 시에도 갱신
+										document.getElementById("saveFavoriteRegionBtn")?.addEventListener("click", function () {
+											setTimeout(renderMyFavoriteRegions, 500);
+										});
+									});
+								</script>
+								<!-- 관심지역 설정 버튼 -->
+								<div class="mt-3 text-end">
+									<button type="button" class="btn btn-outline-primary" id="openFavoriteRegionModal">관심지역 설정</button>
 								</div>
 							</div>
 							<div th:if="${regionList == null or #lists.size(regionList) == 0}" class="modal-body">
@@ -295,15 +336,133 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 									지역 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.
 								</div>
 							</div>
-
 							<div class="modal-footer">
-								<button type="button" class="btn btn-outline-secondary">초기화</button>
-								<button type="button" class="btn btn-primary" disabled>관심지역 설정 완료</button>
+								<button type="button" class="btn btn-outline-secondary" id="resetRegionBtn">초기화</button>
 								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
 							</div>
 						</div>
 					</div>
 				</div>
+
+				<!-- 관심지역 선택 모달 -->
+				<div class="modal fade" id="favoriteRegionModal" tabindex="-1" aria-labelledby="favoriteRegionModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-md">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">관심지역 선택</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<div th:if="${regionList != null and #lists.size(regionList) > 0}">
+									<div class="mb-2">최대 3개까지 선택할 수 있습니다.</div>
+									<div class="d-flex flex-wrap gap-2">
+										<button th:each="region : ${regionList}"
+											th:if="${region.dreg_sub != '전체' and region.dreg_num != 0}"
+											type="button"
+											class="btn btn-outline-secondary favorite-region-btn"
+											th:attr="data-dreg=${region.dreg_num}, data-reg=${region.reg_num}"
+											th:text="${region.dreg_sub}"></button>
+									</div>
+								</div>
+								<div th:if="${regionList == null or #lists.size(regionList) == 0}">
+									<div class="alert alert-warning" role="alert">
+										지역 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-outline-secondary" id="resetFavoriteRegionBtn">초기화</button>
+								<button type="button" class="btn btn-primary" id="saveFavoriteRegionBtn" disabled>관심지역 설정</button>
+								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<script>
+					// 관심지역 모달에서 관심지역 설정 버튼 클릭 시 관심지역 선택 모달로 전환
+					document.addEventListener("DOMContentLoaded", function () {
+						const openFavBtn = document.getElementById("openFavoriteRegionModal");
+						if (openFavBtn) {
+							openFavBtn.addEventListener("click", function () {
+								const regionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('regionModal'));
+								regionModal.hide();
+								setTimeout(() => {
+									const favModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('favoriteRegionModal'));
+									favModal.show();
+								}, 300);
+							});
+						}
+
+						// 관심지역 선택 버튼 로직
+						let selectedFavoriteRegions = [];
+
+						// 버튼 클릭 시 선택/해제
+						$(document).on('click', '.favorite-region-btn', function () {
+							const dreg = $(this).attr('data-dreg');
+							const reg = $(this).attr('data-reg');
+							const key = dreg + '-' + reg;
+							const idx = selectedFavoriteRegions.findIndex(r => r === key);
+
+							if (idx > -1) {
+								selectedFavoriteRegions.splice(idx, 1);
+								$(this).removeClass('btn-primary').addClass('btn-outline-secondary');
+							} else {
+								if (selectedFavoriteRegions.length >= 3) return;
+								selectedFavoriteRegions.push(key);
+								$(this).removeClass('btn-outline-secondary').addClass('btn-primary');
+							}
+							$('#saveFavoriteRegionBtn').prop('disabled', selectedFavoriteRegions.length === 0);
+						});
+
+						// 초기화 버튼
+						$('#resetFavoriteRegionBtn').on('click', function () {
+							selectedFavoriteRegions = [];
+							$('.favorite-region-btn').removeClass('btn-primary').addClass('btn-outline-secondary');
+							$('#saveFavoriteRegionBtn').prop('disabled', true);
+						});
+
+						// 관심지역 설정(쿠키 등록)
+						$('#saveFavoriteRegionBtn').on('click', function () {
+							if (selectedFavoriteRegions.length === 0) return;
+							document.cookie = "favoriteRegion=" + encodeURIComponent(selectedFavoriteRegions.join(',')) + ";path=/;max-age=2592000";
+							// 모달 닫고 지역선택 모달로 복귀
+							const favModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('favoriteRegionModal'));
+							favModal.hide();
+							setTimeout(() => {
+								const regionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('regionModal'));
+								regionModal.show();
+							}, 300);
+						});
+
+						// 관심지역 모달 열릴 때 기존 선택 복원
+						$('#favoriteRegionModal').on('show.bs.modal', function () {
+							// 쿠키에서 기존 값 읽기
+							const cookie = document.cookie.split('; ').find(row => row.startsWith('favoriteRegion='));
+							selectedFavoriteRegions = [];
+							if (cookie) {
+								selectedFavoriteRegions = decodeURIComponent(cookie.split('=')[1]).split(',').filter(Boolean);
+							}
+							$('.favorite-region-btn').each(function () {
+								const dreg = $(this).attr('data-dreg');
+								const reg = $(this).attr('data-reg');
+								const key = dreg + '-' + reg;
+								if (selectedFavoriteRegions.includes(key)) {
+									$(this).removeClass('btn-outline-secondary').addClass('btn-primary');
+								} else {
+									$(this).removeClass('btn-primary').addClass('btn-outline-secondary');
+								}
+							});
+							$('#saveFavoriteRegionBtn').prop('disabled', selectedFavoriteRegions.length === 0);
+						});
+
+						// 지역선택 모달 초기화 버튼
+						$('#resetRegionBtn').on('click', function () {
+							// 선택된 지역 초기화 (필요시 구현)
+							// location.reload(); // 또는 원하는 초기화 동작
+						});
+					});
+				</script>
 
 						<!-- 여기에 나머지 홈 콘텐츠 삽입 가능 -->
 
@@ -345,7 +504,23 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<span class="carousel-control-next-icon"></span>
 				</button>
 				</div>
+				
+				<div class="container mt-4">
+					<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
+					<div class="d-flex gap-4">
+						<div th:each="favNum : ${favoriteFood}">
+							<div class="text-center" th:each="f : ${foodList}" th:if="${f.dfc_num == favNum}">
+								<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
+									<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
+											onerror="this.onerror=null;this.src='/resources/static/img/index/default.jpg'" 
+											class="rounded" style="width:110px; height:110px; object-fit:cover;">
+									<div class="mt-2" th:text="${f.dfc_sub}">카테고리명</div>
+								</a>
+							</div>
+						</div>
 
+					</div>
+				</div>
 
 				<div class="container mt-4"  th:if="${foodList != null}">
 					<h4 class="fw-bold mb-3">음식 카테고리 선택</h4>
@@ -393,22 +568,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</div>
 				</div>
 
-				<div class="container mt-4">
-					<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
-					<div class="d-flex gap-4">
-						<div th:each="favNum : ${favoriteFood}">
-							<div class="text-center" th:each="f : ${foodList}" th:if="${f.dfc_num == favNum}">
-								<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
-									<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
-											onerror="this.onerror=null;this.src='/resources/static/img/index/default.jpg'" 
-											class="rounded" style="width:110px; height:110px; object-fit:cover;">
-									<div class="mt-2" th:text="${f.dfc_sub}">카테고리명</div>
-								</a>
-							</div>
-						</div>
-
-					</div>
-				</div>
 		
 			</div>
 

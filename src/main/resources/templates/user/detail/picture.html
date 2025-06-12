@@ -141,6 +141,33 @@
         max-height: 95vh;
         border-radius: 0.5rem;
       }
+
+      .tag-button-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .tag-btn {
+        background-color: #f5f5f5;
+        border: none;
+        color: #333;
+        padding: 0.5rem 1.2rem;
+        border-radius: 999px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .tag-btn:hover {
+        background-color: #e0e0e0;
+      }
+
+      .tag-btn.active {
+        background-color: #444;
+        color: white;
+      }
     </style>
   </head>
 
@@ -148,13 +175,13 @@
     <main layout:fragment="content" class="container">
       <div class="mt-3 p-3 bg-white rounded shadow-sm">
         <div class="container mt-4">
-          <div class="mt-5 mb-3">
-            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="전체">전체</button>
-            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="음식">음식</button>
-            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="내부">내부</button>
-            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="외부">외부</button>
-            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="메뉴판">메뉴판</button>
-            <button class="filter-btn btn btn-outline-secondary me-2" data-tag="기타">기타</button>
+          <div class="tag-button-group mt-5 mb-3">
+            <button class="tag-btn me-2 active" data-tag="전체">전체</button>
+            <button class="tag-btn me-2" data-tag="음식">음식</button>
+            <button class="tag-btn me-2" data-tag="내부">내부</button>
+            <button class="tag-btn me-2" data-tag="외부">외부</button>
+            <button class="tag-btn me-2" data-tag="메뉴판">메뉴판</button>
+            <button class="tag-btn me-2" data-tag="기타">기타</button>
           </div>
           <div class="row" id="imageContainer">
             <div class="col-md-4 mb-3" th:each="tl : ${tapFileList}" th:data-tag="${tl.file_tag}">
@@ -183,7 +210,7 @@
     </script>
 
     <script>
-      document.querySelectorAll('.filter-btn').forEach(btn => {
+      document.querySelectorAll('.tag-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const selectedTag = btn.dataset.tag;
 
@@ -198,7 +225,7 @@
         });
 
         // 버튼 active 효과 처리
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       });
     });

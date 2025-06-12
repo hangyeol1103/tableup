@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import kr.kh.tableup.dao.BusinessHourDAO;
 import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
+import kr.kh.tableup.model.util.RevCriteria;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
 import kr.kh.tableup.model.vo.FileVO;
@@ -116,6 +117,10 @@ public class RestaurantService {
 
 	public List<BusinessDateVO> getBusinessDate(int rt_num) {
 		return restaurantDAO.selectBusinessDate(rt_num);
+	}
+
+	public List<ReviewVO> getCriReviewList(RevCriteria cri) {
+		return restaurantDAO.selectCriReviewList(cri);
 	}
 
 	

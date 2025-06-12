@@ -104,6 +104,26 @@
 		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
 	</select>
 
+	<select id="selectCriReviewList" resultMap="ReviewMap">
+		SELECT
+			rev.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category,
+			f.*
+		FROM (select * from review 
+			WHERE review.rev_rt_num = #{rt_num}
+			ORDER BY review.rev_num ASC
+			LIMIT #{pageStart}, #{perPageNum}) rev
+		LEFT JOIN user ON rev.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON rev.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON rev.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+    LEFT JOIN (select * from file where file_type = "REVIEW") f ON rev_num = file_foreign 
+		
+	</select>
+
   <select id="selectRestaurantByNum" parameterType="int" resultType="kr.kh.tableup.model.vo.RestaurantVO">
     SELECT * FROM restaurant WHERE rt_num = #{rt_num}
   </select>

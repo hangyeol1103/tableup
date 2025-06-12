@@ -20,6 +20,7 @@ import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
@@ -826,6 +827,54 @@ public class ManagerService {
 
 		public RestaurantManagerVO getManagerOner(int rt_num) {
 			return managerDAO.selectManagerOner(rt_num);
+		}
+
+		public boolean selectManagerByIdAndCpw(String rm_id, String inputPw) {
+			if (rm_id == null || inputPw == null) {
+					return false;
+			}
+
+			RestaurantManagerVO dbManager = managerDAO.selectManager(rm_id);
+			if (dbManager == null) return false;
+
+			String dbPw = dbManager.getRm_pw(); // 암호화된 비번
+
+			// 평문 비밀번호(inputPw)와 암호화된 비밀번호(dbPw)를 비교
+			boolean result = passwordEncoder.matches(inputPw, dbPw);
+
+			System.out.println("입력 비번: " + inputPw);
+			System.out.println("DB 비번: " + dbPw);
+			System.out.println("비밀번호 일치 여부: " + result);
+
+			return result;
+		}
+
+		public void insertDefaultResTimeList(List<DefaultResTimeVO> drtList, int rtNum) {
+			if(drtList == null || drtList.size() ==0){
+				System.out.println("영업시간 리스트가 비어 있습니다.");
+				return;
+			}
+			for (DefaultResTimeVO drt : drtList) {
+					drt.setDrt_rt_num(rtNum); // 매장번호 설정
+					System.out.println("저장할 영업시간 정보: " + drt);
+					managerDAO.insertDefaultResTime(drt); // DAO에 insert 메서드 호출
+			}
+		}
+
+		public List<DefaultResTimeVO> getDefaultTimeList(int rt_num) {
+			return managerDAO.selectDefaultTimeList(rt_num);
+		}
+
+		public void updateDefaultResTimeList(List<DefaultResTimeVO> list, int rtNum) {
+			if(list == null || list.size() ==0){
+					System.out.println("영업시간 리스트가 비어 있습니다.");
+					return;
+				}
+				for (DefaultResTimeVO drt : list) {
+						drt.setDrt_rt_num(rtNum); // 매장번호 설정
+						System.out.println("새로 입력받은 영업시간 정보: " + drt);
+						managerDAO.updateDefaultResTime(drt); // DAO에 insert 메서드 호출
+				}
 		}
 
 

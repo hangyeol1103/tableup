@@ -178,8 +178,8 @@
   </head>
 
   <body>
-    <main layout:fragment="content" class="container">
-      <div th:each="rvl : ${reviewList}" class="mb-4">
+    <!-- <main layout:fragment="content" class="container"> -->
+      <div th:each="rvl : ${reviewList}" class="mb-4" th:attr="data-review=${rvl.rev_num}">
         <!-- 사용자명 -->
         <div class="d-flex justify-content-between align-items-center">
           <div class="fw-bold" th:text="${rvl.us_name}"></div>
@@ -217,11 +217,24 @@
         </div>
         <p th:utext="${#strings.replace(rvl.rev_content, '\n', '<br/>')}" class="mt-3"></p>
       </div>
+
+      <!-- 정보 -->
+      <div id="review-meta" 
+           th:data-total-count="${totalReviewCount}" 
+           th:data-current-page="${currentPage}" 
+           th:data-per-page="5">
+      </div>
+
+      <!-- 더보기 버튼 -->
+      <div class="text-center mt-4" th:if="${isNext}">
+        <button id="loadMoreBtn" class="btn btn-outline-dark">더보기</button>
+      </div>
+
       <!-- 이미지 클릭 시 뜨는 모달 -->
       <div id="imageModal" class="image-modal" onclick="closeImageModal()">
         <img id="modalImage" src="" alt="확대 이미지">
       </div>
-    </main>
+    <!-- </main> -->
   </body>
   <script>
   function showMoreImages(button) {
@@ -259,4 +272,7 @@
     document.getElementById("imageModal").style.display = "none";
   }
   </script>
+
+  
+  
 </html>

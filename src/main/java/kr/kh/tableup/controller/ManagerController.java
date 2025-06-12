@@ -26,6 +26,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,10 +36,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.kh.tableup.model.DTO.DefaultResTimeListDTO;
 import kr.kh.tableup.model.util.CustomManager;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
@@ -377,7 +383,7 @@ public class ManagerController {
 		System.out.println(restaurant);
 
 		if(managerService.insertRestaurant(restaurant, manager.getManager(), fileList)){
-			return "redirect:/manager/restaurant/restaurant";
+			return "redirect:/manager/detail/restaurantdetail";		//이거를 디테일화면으로 넘어가게
 		}
 		return "redirect:/manager/restaurant/make";
 	}
@@ -627,24 +633,29 @@ public class ManagerController {
 
 	
 	//매장 상세 정보 출력
-	@GetMapping("/detail/restaurantdetail/{rt_num}")
-	public String restaurantDetailPage(Model model, @PathVariable int rt_num, @AuthenticationPrincipal CustomManager manager) {
+	@GetMapping("/detail/restaurantdetail")
+	public String restaurantDetailPage(Model model, @AuthenticationPrincipal CustomManager manager) {
 		
 		//매니저 정보가 없는 경우
 		if(manager == null || manager.getManager() == null || manager.getManager().getRm_rt_num() <= 0) {
 			return "redirect:/manager/login";
 		}
+		int rt_num = manager.getManager().getRm_rt_num();
 
-		if(rt_num != manager.getManager().getRm_rt_num()){
+		if(rt_num != manager.getManager().getRm_rt_num() || rt_num == 0){
 			return "redirect:/manager";
 		}
 
 		
 		RestaurantVO resdetail = managerService.getResDetail(rt_num);
-		
+		List<DefaultResTimeVO> defaultTimeList = managerService.getDefaultTimeList(rt_num);
+
 		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 		model.addAttribute("restaurant", restaurant);
-		if(resdetail != null) model.addAttribute("resdetail", resdetail);
+		if(resdetail != null){
+			model.addAttribute("resdetail", resdetail);
+			model.addAttribute("defaultTimeList", defaultTimeList);
+		}
 		model.addAttribute("manager", manager.getManager());
 		return "/manager/detail/restaurantdetail";
 	}
@@ -661,32 +672,114 @@ public class ManagerController {
 		model.addAttribute("url", "/make_detail");
 		return "/manager/detail/make_detail";
 	}
+
 	
+	// @PostMapping("/detail/make_detail")
+	// public String insertResDetailPage(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager,@ModelAttribute("drtList") List<DefaultResTimeVO> drtList ) {
+	// 	int rtNum = manager.getManager().getRm_rt_num();
+  //   //매니저 정보가 없는 경우
+	// 	if (manager == null || manager.getManager() == null || rtNum == 0) {
+  //       return "redirect:/manager/login";
+  //   }
+	// 	System.out.println("매니저의 정보: " + manager);
+	// 	System.out.println("매니저의 매장 번호: " + rtNum);
+  //   resdetail.setRt_num(rtNum);
+	// 	resdetail.setRd_rt_num(rtNum);
+		
+	// 	System.out.println(manager);
+	// 	System.out.println(resdetail);
+	// 	for(DefaultResTimeVO drt : drtList){
+	// 		drt.setDrt_rt_num(rtNum);
+	// 		System.out.println("영업시간 정보 : " + drt);
+	// 	}
+	// 	System.out.println("등록된 영업일자 목록들 : " + drtList);
+	// 	System.out.println("등록된 영업일자 목록의 길이 : "+ drtList.size());
+
+	// 	if(drtList.size()!=0){
+	// 		managerService.insertDefaultResTimeList(drtList, rtNum);
+	// 	}
+
+  //   if (rtNum <= 0) {
+  //       // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+  //       return "redirect:/manager/make";
+  //   }
+	// 	if(managerService.insertResDetail(resdetail)){
+			
+	// 		// return "redirect:/manager/detail/restaurantdetail/"+ rtNum;
+	// 		return "redirect:/manager/detail/restaurantdetail";
+	// 	}
+	// 	return "redirect:/manager/detail/make_detail";
+	// }
+
+	// @PostMapping("/detail/make_detail2")
+	// public String insertResDetailPage2(
+	// 		RestaurantVO resdetail,
+	// 		@AuthenticationPrincipal CustomManager manager,
+	// 		@RequestParam(value = "drtJson", required = false) String drtJson) {
+
+	// 		int rtNum = manager.getManager().getRm_rt_num();
+	// 		if (manager == null || rtNum == 0) return "redirect:/manager/login";
+
+	// 		resdetail.setRt_num(rtNum);
+	// 		resdetail.setRd_rt_num(rtNum);
+	// 		System.out.println("--------------");
+	// 		System.out.println("drtJson : " + drtJson);
+
+	// 		if (drtJson != null && !drtJson.trim().isEmpty()) {
+	// 				try {
+	// 						ObjectMapper mapper = new ObjectMapper();
+	// 						List<DefaultResTimeVO> drtList = mapper.readValue(drtJson, new TypeReference<List<DefaultResTimeVO>>() {});
+	// 						for (DefaultResTimeVO drt : drtList) {
+	// 								drt.setDrt_rt_num(rtNum);
+	// 						}
+	// 						System.out.println("입력받은 영업일자 리스트 : " + drtList);
+	// 						managerService.insertDefaultResTimeList(drtList, rtNum);
+	// 				} catch (Exception e) {
+	// 						e.printStackTrace();
+	// 						// 에러 발생 시 실패 처리
+	// 						return "redirect:/manager/detail/make_detail";
+	// 				}
+	// 		}
+
+	// 		System.out.println("--------------");
+	// 		System.out.println("저장할 상세정보 : " + resdetail);
+	// 		if (managerService.insertResDetail(resdetail)) {
+	// 				return "redirect:/manager/detail/restaurantdetail";
+	// 		}
+
+	// 		return "redirect:/manager/detail/make_detail";
+	// }
+
 	@PostMapping("/detail/make_detail")
-	public String insertResDetailPage(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager ) {
-		int rtNum = manager.getManager().getRm_rt_num();
-    //매니저 정보가 없는 경우
-		if (manager == null || manager.getManager() == null || rtNum == 0) {
-        return "redirect:/manager/login";
-    }
-		System.out.println("매니저의 정보: " + manager);
-		System.out.println("매니저의 매장 번호: " + rtNum);
-    resdetail.setRt_num(rtNum);
-		resdetail.setRd_rt_num(rtNum);
-		
-		System.out.println(manager);
-		System.out.println(resdetail);
+	public String insertResDetailPage(
+			RestaurantVO resdetail,
+			@AuthenticationPrincipal CustomManager manager,
+			DefaultResTimeListDTO drtDTO) {
+			int rtNum = manager.getManager().getRm_rt_num();
+			if (manager == null || rtNum == 0) return "redirect:/manager/login";
 
-		
+			resdetail.setRt_num(rtNum);
+			resdetail.setRd_rt_num(rtNum);
+			
+			System.out.println("받은 영업일자 : " + drtDTO);
+			System.out.println("저장할 상세정보 : " + resdetail);
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
-		if(managerService.insertResDetail(resdetail)){
-			return "redirect:/manager/detail/restaurantdetail/"+ rtNum;
-		}
-		return "redirect:/manager/detail/make_detail";
+			List<DefaultResTimeVO> list = drtDTO.getList();
+			if (list != null) {
+					for (DefaultResTimeVO drt : list) {
+							drt.setDrt_rt_num(rtNum); // 매장 번호 설정
+					}
+			}
+			// 영업시간 리스트 저장
+			if (list != null && !list.isEmpty()) {
+					managerService.insertDefaultResTimeList(list, rtNum);
+			}
+
+			if (managerService.insertResDetail(resdetail)) {
+					return "redirect:/manager/detail/restaurantdetail";
+			}
+
+			return "redirect:/manager/detail/make_detail";
 	}
 
 	//상세정보 변경 페이지
@@ -701,41 +794,87 @@ public class ManagerController {
 		int rtNum = manager.getManager().getRm_rt_num();
 		System.out.println("매니저의 매장 번호: " + rtNum);
 		RestaurantVO resdetail = managerService.getResDetail(rtNum);
+		List<DefaultResTimeVO> defaultTimeList = managerService.getDefaultTimeList(rtNum);
 
+		System.out.println("defaultTimeList : "+defaultTimeList);
 		int rt_num =manager.getManager().getRm_rt_num();
 		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 		System.out.println(resdetail);
 		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("res", resdetail);	
+		model.addAttribute("defaultTimeList", defaultTimeList);
 		model.addAttribute("url", "/remake_detail");
 		return "/manager/detail/remake_detail";
 	}
 	
-	@PostMapping("/detail/remake_detail")
-	public String updateDetail(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager) {
-		//매니저 정보가 없는 경우
-		if (manager == null || manager.getManager() == null) {
-        return "redirect:/manager/login";
-    }
+	// @PostMapping("/detail/remake_detail")
+	// public String updateDetail(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager) {
+	// 	//매니저 정보가 없는 경우
+	// 	if (manager == null || manager.getManager() == null) {
+  //       return "redirect:/manager/login";
+  //   }
 
-		int rtNum = manager.getManager().getRm_rt_num();
-    System.out.println("매니저의 매장 번호: " + rtNum);
-    resdetail.setRd_rt_num(rtNum);
+	// 	int rtNum = manager.getManager().getRm_rt_num();
+  //   System.out.println("매니저의 매장 번호: " + rtNum);
+  //   resdetail.setRd_rt_num(rtNum);
 		
-		System.out.println(manager);
-		System.out.println(resdetail);
+	// 	System.out.println(manager);
+	// 	System.out.println(resdetail);
 
-    if (rtNum <= 0) {
-        // 매장 정보가 없는 매니저 → 매장 등록 페이지로
-        return "redirect:/manager/make";
-    }
+  //   if (rtNum <= 0) {
+  //       // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+  //       return "redirect:/manager/make";
+  //   }
 
-		if(managerService.updateDetail(resdetail)){
-			return "redirect:/manager/detail/restaurantdetail/"+ rtNum;
+	// 	if(managerService.updateDetail(resdetail)){
+	// 		// return "redirect:/manager/detail/restaurantdetail/"+ rtNum;
+	// 		return "redirect:/manager/detail/restaurantdetail";
+	// 	}
+	// 	System.out.println("수정 실패");
+	// 	return "/manager/detail/remake_detail";
+	// }
+
+	@PostMapping("/detail/remake_detail")
+	public String updateDetail(RestaurantVO resdetail, @AuthenticationPrincipal CustomManager manager, DefaultResTimeListDTO drtDTO) {
+			int rtNum = manager.getManager().getRm_rt_num();
+			if (manager == null || rtNum == 0){
+				return "redirect:/manager/login";
+			}
+			if (rtNum <= 0) {
+         // 매장 정보가 없는 매니저 → 매장 등록 페이지로
+         return "redirect:/manager/make";
+     	} 
+
+			resdetail.setRt_num(rtNum);
+			resdetail.setRd_rt_num(rtNum);
+			
+			System.out.println("수정할 영업일자 : " + drtDTO);
+			System.out.println("수정할 상세정보 : " + resdetail);
+
+			List<DefaultResTimeVO> list = drtDTO.getList();
+			if (list != null) {
+					for (DefaultResTimeVO drt : list) {
+							drt.setDrt_rt_num(rtNum); // 매장 번호 설정
+					}
+			}
+			
+			List<DefaultResTimeVO> defaultTimeList = managerService.getDefaultTimeList(rtNum);
+			//상세정보 등록할때 영업시간을 등록 안한 경우
+			if(defaultTimeList==null||defaultTimeList.size()==0){
+				managerService.insertDefaultResTimeList(list, rtNum);
+			}
+			// 영업시간 변경 
+			if (list != null && !list.isEmpty()) {
+					managerService.updateDefaultResTimeList(list, rtNum);
+			}
+
+			if(managerService.updateDetail(resdetail)){
+				return "redirect:/manager/detail/restaurantdetail";
+			}
+			System.out.println("수정 실패");
+			return "/manager/detail/remake_detail";
+		
 		}
-		System.out.println("수정 실패");
-		return "/manager/detail/remake_detail";
-	}
 
 	//매니저 쿠폰 페이지
 	//쿠폰 리스트
@@ -1450,7 +1589,24 @@ public class ManagerController {
 
 		return "/manager/managerpage";
 	}
-	
+
+	//입력한 현재 비번하고 db에 등록된 현재 비번하고 비교
+	@PostMapping("/checkPassword")
+	@ResponseBody
+	public boolean checkPassword(@RequestBody Map<String, String> param) {
+			String rm_id = param.get("rm_id");
+			String inputPw = param.get("rm_pw2");
+			
+			System.out.println("확인할 아이디 : " + rm_id);
+			System.out.println("입력받은 비번 : " + inputPw);
+
+			boolean res = managerService.selectManagerByIdAndCpw(rm_id,inputPw);
+			if (!res){
+				return false;
+			}
+			return res;
+	}
+
 	@PostMapping("/managerpage")
 	public String PostmanagerPage(Model model, @AuthenticationPrincipal CustomManager manager, RestaurantManagerVO rm) {
 		//매니저 정보가 없는 경우 

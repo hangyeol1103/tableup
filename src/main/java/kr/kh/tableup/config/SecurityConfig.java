@@ -60,7 +60,7 @@ public class SecurityConfig{
       .csrf(csrf ->csrf.disable())
       .authorizeHttpRequests(auth -> auth
           .requestMatchers("/manager/signup", "/manager/register", "/manager/findId", "/manager/findPw","/manager/updatePw", "/manager/showIdResult").anonymous()
-          .anyRequest().authenticated()
+          .requestMatchers("/manager/**").authenticated()
       )
       .formLogin(form -> form
           .loginPage("/manager/login")

@@ -23,6 +23,9 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
       <div class="card-header bg-primary text-white py-2 px-3">
         <div class="d-flex justify-content-between align-items-center">
           <h4 class="mb-0"><i class="bi bi-info-circle"></i> 매장 상세 정보</h4>
+          <button class="btn btn-outline-light btn-sm ms-2" id="toggleTimeBtn" onclick="toggleTimeSection()">
+            <i class="bi bi-clock"></i> 영업시간 보기
+          </button>
           <button class="btn btn-light btn-sm" onclick="location.href='/manager/detail/remake_detail'">
             <i class="bi bi-pencil-square"></i> 정보 수정
           </button>
@@ -53,6 +56,21 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
         </div>
       </div>
 
+      <div id="timeSection" class="mt-4" style="display: none;">
+        <hr>
+        <h5><i class="bi bi-clock-history"></i> 요일별 영업시간</h5>
+        <div th:each="time : ${defaultTimeList}" class="mb-2 border rounded p-2">
+          <strong th:text="${time.drt_date}">월</strong>
+          <div th:if="${time.drt_off}" class="text-danger ms-2">휴무일</div>
+          <div th:unless="${time.drt_off}" class="ms-2">
+            <span th:text="'개점: ' + ${time.drt_open} + ' ~ 마감: ' + ${time.drt_close}"></span><br>
+            <span th:if="${time.drt_brstart != null}" th:text="'브레이크: ' + ${time.drt_brstart} + ' ~ ' + ${time.drt_brend}"></span><br>
+            <span th:if="${time.drt_loam != null}" th:text="'라스트오더(점심): ' + ${time.drt_loam}"></span><br>
+            <span th:if="${time.drt_lopm != null}" th:text="'라스트오더(저녁): ' + ${time.drt_lopm}"></span>
+          </div>
+        </div>
+      </div>
+
       <!-- 돌아가기 버튼 -->
       <div class="card-footer">
         <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary w-100">
@@ -66,6 +84,18 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
       <h4 class="mb-3 text-muted">아직 상세 정보를 입력하지 않았습니다.</h4>
       <button class="btn btn-success btn-lg" onclick="location.href='/manager/detail/make_detail'">상세 정보 입력</button>
     </div>
+
+    <script>
+      function toggleTimeSection() {
+        const section = document.getElementById("timeSection");
+        const btn = document.getElementById("toggleTimeBtn");
+        const visible = section.style.display !== "none";
+        section.style.display = visible ? "none" : "block";
+        btn.innerHTML = visible 
+          ? '<i class="bi bi-clock"></i> 영업시간 보기' 
+          : '<i class="bi bi-eye-slash"></i> 영업시간 숨기기';
+      }
+    </script>
 
   </main>
 </body>

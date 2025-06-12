@@ -377,7 +377,7 @@ public class ManagerController {
 		System.out.println(restaurant);
 
 		if(managerService.insertRestaurant(restaurant, manager.getManager(), fileList)){
-			return "redirect:/manager/restaurant/restaurant";
+			return "redirect:/manager/restaurant/restaurant";		//이거를 디테일화면으로 넘어가게
 		}
 		return "redirect:/manager/restaurant/make";
 	}

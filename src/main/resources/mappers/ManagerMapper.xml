@@ -486,5 +486,11 @@
 	<select id="selectManagerOner" resultType="RestaurantManagerVO">
 		select * from  restaurantmanager where rm_rt_num = #{rt_num}
 	</select>
+
+	<insert id="insertDefaultResTime" useGeneratedKeys="true" keyProperty="drt_num">
+		insert into defaultrestime 
+			(drt_rt_num, drt_date, drt_off, drt_open, drt_close, drt_brstart, drt_brend, drt_loam, drt_lopm)
+		values (#{drt_rt_num}, #{drt_date}, #{drt_off}, #{drt_open}, #{drt_close}, #{drt_brstart}, #{drt_brend}, #{drt_loam}, #{drt_lopm})
+	</insert>
 	
 </mapper>

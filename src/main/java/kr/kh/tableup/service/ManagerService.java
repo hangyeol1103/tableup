@@ -20,6 +20,7 @@ import kr.kh.tableup.model.util.UploadFileUtils;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
@@ -846,6 +847,18 @@ public class ManagerService {
 			System.out.println("비밀번호 일치 여부: " + result);
 
 			return result;
+		}
+
+		public void insertDefaultResTimeList(List<DefaultResTimeVO> drtList, int rtNum) {
+			if(drtList == null || drtList.size() ==0){
+				System.out.println("영업시간 리스트가 비어 있습니다.");
+				return;
+			}
+			for (DefaultResTimeVO drt : drtList) {
+					drt.setDrt_rt_num(rtNum); // 매장번호 설정
+					System.out.println("저장할 영업시간 정보: " + drt);
+					managerDAO.insertDefaultResTime(drt); // DAO에 insert 메서드 호출
+			}
 		}
 
 

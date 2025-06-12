@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import kr.kh.tableup.model.vo.BusinessDateVO;
 import kr.kh.tableup.model.vo.BusinessHourTemplateVO;
 import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
@@ -184,6 +185,8 @@ public interface ManagerDAO {
 	String selectManagerBusiness(String business);
 
 	RestaurantManagerVO selectManagerOner(int rt_num);
+
+	void insertDefaultResTime(DefaultResTimeVO drt);
 
 
 

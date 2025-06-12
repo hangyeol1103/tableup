@@ -20,6 +20,9 @@
   <main class="container mt-4" layout:fragment="content">
     <h2>상세정보 변경</h2>
     <form th:action="@{/manager/detail/remake_detail}" method="post" id="signup-form">
+      <div class="mb-3">
+        <button type="button" class="btn btn-outline-primary" id="addResTimeBtn">+ 영업일자 추가</button>
+      </div>
       <div class="mb-3 form-group box">
         <label for="rd_phone" class="form-label">전화번호</label>
         <input type="text" class="form-control" name="rd_phone" id="rd_phone" th:value="${res.rd_phone}">
@@ -40,18 +43,134 @@
         <label for="rd_addr" class="form-label">주소</label>
         <input type="text" class="form-control" name="rd_addr" id="rd_addr" th:value="${res.rd_addr}">
       </div>
+
+      <div id="resTimeSection" class="mt-4" style="display: none;">
+        <h5>요일별 영업시간</h5>
+        <div id="weekday-container"></div>
+      </div>
       <button type="submit" class="btn btn-primary w-100">상세 정보 변경 하기</button>
     </form>
 
     <script>
-      $(document).ready(function(){
-        $('#rd_info').summernote({
-          placeholder: '상세 정보를 입력하세요.',
-          tabsize: 2,
-          height: 400
+    $(document).ready(function () {
+      $('#addResTimeBtn').click(function () {
+        const container = $('#weekday-container');
+        if ($('#resTimeSection').is(':visible')) {
+          $('#resTimeSection').slideUp();
+          container.empty(); // 기존 항목 제거
+        } else {
+          addWeekdayInputs(); // 한 번만 생성
+          $('#resTimeSection').slideDown();
+        }
+      });
+
+      $('#rd_info').summernote({
+        placeholder: '상세 정보를 입력하세요.',
+        tabsize: 2,
+        height: 400
+      });
+    });
+
+    function addWeekdayInputs() {
+      const days = ['월', '화', '수', '목', '금', '토', '일'];
+      const dayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+      const container = document.getElementById('weekday-container');
+
+      for (let i = 0; i < days.length; i++) {
+        const day = days[i];
+        const key = dayKeys[i];
+
+        const html = `
+        <div class="border p-3 mb-3 rounded shadow-sm bg-light weekday-block" data-day="${key}">
+          <h5>${day}요일</h5>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input day-off" type="checkbox" name="${key}_off" id="${key}_off">
+            <label class="form-check-label" for="${key}_off">휴무일</label>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-2">개점</div>
+            <div class="col-md-4"><input type="time" class="form-control ${key}_control" name="${key}_open"></div>
+            <div class="col-md-2">마감</div>
+            <div class="col-md-4"><input type="time" class="form-control ${key}_control" name="${key}_close"></div>
+          </div>
+
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input break-toggle" type="checkbox" id="${key}_break_toggle">
+            <label class="form-check-label" for="${key}_break_toggle">브레이크 타임 있음</label>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-2">브레이크 시작</div>
+            <div class="col-md-4"><input type="time" class="form-control ${key}_br_control" name="${key}_brstart" disabled></div>
+            <div class="col-md-2">브레이크 종료</div>
+            <div class="col-md-4"><input type="time" class="form-control ${key}_br_control" name="${key}_brend" disabled></div>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-2">라스트오더(점심)</div>
+            <div class="col-md-4"><input type="time" class="form-control ${key}_br_control" name="${key}_loam" disabled></div>
+            <div class="col-md-2">라스트오더(저녁)</div>
+            <div class="col-md-4"><input type="time" class="form-control ${key}_control" name="${key}_lopm"></div>
+          </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', html);
+      }
+
+      bindInputToggleEvents();
+    }
+
+    function bindInputToggleEvents() {
+      // 휴무일 체크 시 전체 비활성화
+      $('.day-off').change(function () {
+        const key = $(this).attr('id').split('_')[0];
+        const isChecked = $(this).is(':checked');
+
+        $(`.${key}_control`).prop('disabled', isChecked);
+        $(`#${key}_break_toggle`).prop('disabled', isChecked);
+        $(`.${key}_br_control`).prop('disabled', true); // 브레이크는 항상 초기화
+      });
+
+      // 브레이크 체크 시 관련 항목 활성화/비활성화
+      $('.break-toggle').change(function () {
+        const key = $(this).attr('id').split('_')[0];
+        const isChecked = $(this).is(':checked');
+
+        if ($(`#${key}_off`).is(':checked')) return; // 휴무일이면 작동X
+
+        $(`.${key}_br_control`).prop('disabled', !isChecked);
+      });
+
+      $(document).ready(function () {
+        $('#signup-form').submit(function (e) {
+          // 영업일자 입력 영역이 열려 있는지 검사
+          if ($('#resTimeSection').is(':visible')) {
+            // 필수 항목 검사 예시 (옵션)
+            let valid = true;
+            $('#weekday-container').find('input:enabled[required]').each(function () {
+              if (!$(this).val()) {
+                alert('모든 항목을 입력해주세요.');
+                valid = false;
+                return false; // break each
+              }
+            });
+
+            if (!valid) {
+              e.preventDefault(); // 제출 막기
+              return;
+            }
+
+            // 열려있으면 정상 제출 진행
+          } else {
+            // 닫혀 있으면 영업일자 항목 제거 (또는 제출 자체를 막기)
+            $('#weekday-container').empty(); // 1. 그냥 지움
+            // e.preventDefault(); // 2. 혹은 전체 제출을 막기
+          }
         });
       });
-    </script>
+
+    }
+  </script>
 
   </main>
 </body>

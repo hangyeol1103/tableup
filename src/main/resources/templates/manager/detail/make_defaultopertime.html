@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      >
+
+<head>
+  <meta charset="UTF-8">
+  <title>샘플 영업일자 저장</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+<main layout:fragment="content" class="container mt-4">
+  <h2>샘플 영업일자 작성</h2>
+  <form id="sampleForm">
+    <input type="hidden" id="managerId" th:value="${managerId}" />
+    <div class="row mb-3">
+      <div class="col">
+        <label for="bd_open">개점 시간</label>
+        <input type="time" id="bd_open" class="form-control">
+      </div>
+      <div class="col">
+        <label for="bd_close">마감 시간</label>
+        <input type="time" id="bd_close" class="form-control">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label for="has_break">브레이크타임 유무</label>
+        <select id="has_break" class="form-select">
+          <option value="false">없음</option>
+          <option value="true">있음</option>
+        </select>
+      </div>
+      <div class="col">
+        <label for="bd_brstart">브레이크 시작</label>
+        <input type="time" id="bd_brstart" class="form-control">
+      </div>
+      <div class="col">
+        <label for="bd_brend">브레이크 종료</label>
+        <input type="time" id="bd_brend" class="form-control">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label for="bd_loam">라스트오더(점심)</label>
+        <input type="time" id="bd_loam" class="form-control">
+      </div>
+      <div class="col">
+        <label for="bd_lopm">라스트오더(저녁)</label>
+        <input type="time" id="bd_lopm" class="form-control">
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary w-100" id="saveSampleBtn">샘플 저장</button>
+  </form>
+</main>
+
+<script>
+  $(document).ready(() => {
+    const managerId = $('#managerId').val();
+
+    $('#has_break').on('change', function () {
+      const hasBreak = $(this).val() === 'true';
+      $('#bd_brstart, #bd_brend, #bd_loam').prop('disabled', !hasBreak);
+    }).trigger('change');
+
+    $('#saveSampleBtn').click(() => {
+      const timestamp = new Date().getTime();
+      const key = `${managerId}_sample_${timestamp}`;
+      const sample = {
+        bd_open: $('#bd_open').val(),
+        bd_close: $('#bd_close').val(),
+        bd_brstart: $('#bd_brstart').val(),
+        bd_brend: $('#bd_brend').val(),
+        bd_loam: $('#bd_loam').val(),
+        bd_lopm: $('#bd_lopm').val()
+      };
+      const cookieValue = encodeURIComponent(JSON.stringify(sample));
+      document.cookie = `${key}=${cookieValue}; path=/; max-age=86400;`;
+      alert('샘플 데이터가 쿠키에 저장되었습니다.');
+      window.close();
+      
+    });
+  });
+</script>
+
+</body>
+</html>

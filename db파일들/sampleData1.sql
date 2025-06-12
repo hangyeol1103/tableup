@@ -94,7 +94,10 @@ INSERT INTO tagtype(TT_NAME)
 
 
 INSERT INTO tag(tag_name,TAG_TT_NUM) 
-	VALUES('차분한',1),('신나는',1),('세련된',1);
+	VALUES('차분한',1),('신나는',1),('세련된',1),('전통적인',1),('트렌디한',1)
+			,('조용한',1),('모던한',1),('비즈니스미팅',1)
+			--  
+            ,('세련된',1);
     
 -- 편의시설
 INSERT INTO facility(fa_name,fa_title,fa_icon)

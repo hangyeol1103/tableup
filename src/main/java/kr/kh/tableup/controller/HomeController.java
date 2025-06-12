@@ -53,10 +53,12 @@ public class HomeController {
 		List<DetailFoodCategoryVO> foodList = userService.getFoodCategoryListWithWhole();
 		int[] favoriteFood = reservationService.favoriteCategory();
 		int[] favoriteRegion = reservationService.favoriteRegion();
+		int count = userService.getKeywordCount();
 		model.addAttribute("regionList", regionList);
 		model.addAttribute("foodList", foodList);
 		model.addAttribute("favoriteFood", favoriteFood);
 		model.addAttribute("favoriteRegion", favoriteRegion);
+		model.addAttribute("kCount", count);
 		
 		if(customUser != null && customUser.getUser() != null) model.addAttribute("user", userService.getUserByNum(customUser.getUser().getUs_num()));
 		//System.out.println(regionList);

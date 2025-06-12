@@ -927,14 +927,42 @@ public class UserController {
       return "user/sitemap/privacy";
     }
     
-    @GetMapping("/keywords")
-    public String keywords(Model model) {
-    List<String> keywordList = userService.getKeywords();
+    // @GetMapping("/keywords")
+    // public String keywords(Model model) {
+    // List<String> keywordList = userService.getKeywords();
 
-    model.addAttribute("groupedKeywords", keywordList);
-    return "user/sitemap/keyword";
-    }
+    // model.addAttribute("groupedKeywords", keywordList);
+    // return "user/sitemap/keyword";
+    // }
     
+    @GetMapping("/keywords")
+    public String keywordPage(Model model, @ModelAttribute("cri") Criteria cri) {
+      if (cri == null || cri.getPage() <= 0) cri = new Criteria(1, 10);
+  
+      // Criteria cri = new Criteria(1, 10); // Initialize cri
+      int totalCount = userService.getKeywordCount(); 
+      PageMaker pm = new PageMaker(10, cri, totalCount); 
+      List<String> keywordList = userService.getKeywords(cri.getPageStart(), cri.getPerPageNum());
+
+      model.addAttribute("pm", pm);
+      model.addAttribute("cri", cri);
+      model.addAttribute("keywordList", keywordList);
+      
+      return "user/sitemap/keyword"; 
+    }
+
+    @PostMapping("/keywords/page")
+    @ResponseBody
+    public List<String> getKeywordList(Model model, @RequestBody Criteria cri) {
+
+      return userService.getKeywords(cri.getPageStart(), cri.getPerPageNum());
+    }
+
+    @GetMapping("/developer")
+    public String developer() {
+      
+      return "user/sitemap/developer"; 
+    }
     
 
 }

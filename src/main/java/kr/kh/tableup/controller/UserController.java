@@ -958,6 +958,11 @@ public class UserController {
       return userService.getKeywords(cri.getPageStart(), cri.getPerPageNum());
     }
 
+    @GetMapping("/developer")
+    public String developer() {
+      
+      return "user/sitemap/developer"; 
+    }
     
 
 }

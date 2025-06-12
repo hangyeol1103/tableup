@@ -16,6 +16,11 @@
       max-width: 700px;
       margin: auto;
     }
+    .error {
+			color: red;
+			font-size: 0.9em;
+			margin-top: 4px;
+		}
   </style>
 </head>
 
@@ -92,16 +97,16 @@
           </div>
 
           <div class="mb-3 row">
-            <label class="col-md-3 col-form-label fw-bold">새 비밀번호</label>
+            <label class="col-md-3 col-form-label fw-bold">현재 비밀번호</label>
             <div class="col-md-9">
-              <input type="password" class="form-control" name="rm_pw">
+              <input type="password" class="form-control" name="rm_pw2">
             </div>
           </div>
 
           <div class="mb-3 row">
-            <label class="col-md-3 col-form-label fw-bold">현재 비밀번호</label>
+            <label class="col-md-3 col-form-label fw-bold">새 비밀번호</label>
             <div class="col-md-9">
-              <input type="password" class="form-control" name="rm_pw2">
+              <input type="password" class="form-control" name="rm_pw">
             </div>
           </div>
 
@@ -120,12 +125,68 @@
     </div>
   </div>
 
-  <script>
+  <script th:inline="javascript">
+
     function toggleEdit() {
       const form = document.getElementById('editForm');
       form.style.display = form.style.display === 'none' ? 'block' : 'none';
     }
+
+    // 유효성 검사 설정
+        $("#signup-form").validate({
+          rules: {
+            
+            rm_pw: {
+              required: true,
+              regex: /^[a-zA-Z0-9!@#$]{3,12}$/
+            },
+            rm_pw2: {
+              equalTo: "#rm_pw"
+            },
+            rm_email: {
+              required: true,
+              email: true
+            },
+            rm_phone: {
+              required: true,
+              phone: true
+            },
+            rm_business: {
+              required: true,
+              business: true,
+							businessDuplicate: true
+            }
+          },
+          messages: {
+            rm_pw: {
+              required: "·비밀번호는 필수 항목입니다.",
+              regex: "·비밀번호는 영어, 숫자, 특수문자(!@#$) 포함 3~12자입니다."
+            },
+            rm_pw2: {
+              equalTo: "·비밀번호와 일치하지 않습니다."
+            },
+            rm_email: {
+              required: "·이메일은 필수 항목입니다.",
+              email: "·이메일 형식이 올바르지 않습니다."
+            },
+            rm_phone: {
+              required: "·전화번호는 필수 항목입니다.",
+              phone: "·010-xxxx-xxxx 형식으로 입력하세요."
+            }
+          },
+          errorPlacement: function (error, element) {
+            error.insertAfter(element); // 에러 메시지를 입력창 바로 아래에 표시
+          },
+          submitHandler: function () {
+            return true;
+          }
+        });
   </script>
+  <script th:if="${signupError != null}" th:inline="javascript">
+			/*<![CDATA[*/
+			alert([[${signupError}]]);
+			/*]]>*/
+		</script>
 </main>
 </body>
 </html>

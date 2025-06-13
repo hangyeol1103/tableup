@@ -51,10 +51,11 @@
 								</button>
 
 								<button class="btn btn-outline-primary btn-sm"
-												th:onclick="'openReviewModal(' + ${restaurant.rt_num} + ')'">
+												th:onclick="'openReviewModal(' + ${restaurant.rt_num} + ')'"
+                        style="max-height: 38px;">
 									<i class="bi bi-chat-dots"></i> 리뷰보기
 								</button>
-              	<p class="restaurant-info" th:text="${restaurant.rt_description}">설명</p>
+              	<p class="restaurant-info" th:text="${restaurant.rt_description}" style="max-width: 300px;">설명</p>
             </div>
           </div>
         </div>

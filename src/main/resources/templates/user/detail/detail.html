@@ -446,7 +446,7 @@
 
           onReady: function (selectedDates, dateStr, instance) {
             document.getElementById("selected-date").textContent = dateStr;
-            document.getElementById("selected-date-input").value = dateStr;
+            // document.getElementById("selected-date-input").value = dateStr;
             // ✅ 달력 헤더: 년 → 월 순서로 재배치
             const monthElement = instance.calendarContainer.querySelector(
               ".flatpickr-current-month"

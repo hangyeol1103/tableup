@@ -256,7 +256,7 @@
             </div>
             <!-- 오른쪽 사진 -->
             <div>
-              <img th:src="@{/file//{path}(path=${menu.mn_img})}" 
+              <img th:src="@{/file/{path}(path=${menu.mn_img})}" 
                    onerror="this.onerror=null; this.src='/img/default.jpg';"
                 style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;">
             </div>

@@ -552,7 +552,7 @@ public class UserController {
   @PostMapping("/list/sub")
   public String listPost(Model model, @RequestBody ResCriteria cri,
       @AuthenticationPrincipal CustomUser customUser) {
-    cri.setPerPageNum(2);   //차후 삭제
+    //cri.setPerPageNum(2);   //차후 삭제
     // num를 서비스에게 주면서 게시판 번호에 맞는 게시글 목록 중 2개를 가져오라고 요청.
     System.out.println(cri);
     // System.out.println("태그: " + cri.getTagList());

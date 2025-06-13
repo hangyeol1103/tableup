@@ -257,11 +257,12 @@
 
             <!-- 편의시설 -->
             <div class="fw-bold mt-3 mb-2">편의시설</div>
-            <div class="form-check mb-1" th:each="fac : ${facilityList}">
+            <div class="form-check mb-1" th:each="fac : ${facilityList}"
+               th:classappend="${fac.fa_name == null} ? 'd-none' : ''">
               <input class="form-check-input facility-check" type="checkbox"
-                    th:id="'fac-' + ${fac.fa_num}" th:value="${fac.fa_num}">
+                th:id="'fac-' + ${fac.fa_num}" th:value="${fac.fa_num}">
               <label class="form-check-label" th:for="'fac-' + ${fac.fa_num}"
-                    th:text="${fac.fa_name}"></label>
+                th:text="${fac.fa_name}"></label>
             </div>
 
           </div>

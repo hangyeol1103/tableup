@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kh.tableup.dao.ReviewDAO">
+
+
+<!-- ReviewScoreVO + ReviewVO -->
+	<resultMap id="ReviewMap" type="ReviewVO">
+		<!-- ReviewVO -->
+		<id property="rev_num" column="rev_num" />
+		<result property="rev_us_num" column="rev_us_num" />
+		<result property="rev_rt_num" column="rev_rt_num" />
+		<result property="rev_content" column="rev_content" />
+		<result property="rev_created" column="rev_created" />
+		<result property="rev_updated" column="rev_updated" />
+		<result property="rev_state" column="rev_state" />
+		<result property="rev_visit" column="rev_visit" />
+		<result property="rev_visitor" column="rev_visitor" />
+		
+		<!-- 유저와 식당 이름 -->
+		<result property="us_name" column="us_name" />
+		<result property="rt_name" column="rt_name" />
+		<result property="res_num" column="res_num" />
+
+		<!-- ReviewScoreVO 리스트 -->
+		<collection property="scoreList" ofType="ReviewScoreVO">
+			<id property="rs_num" column="rs_num" />
+			<result property="rs_rev_num" column="rs_rev_num" />
+			<result property="rs_st_num" column="rs_st_num" />
+			<result property="rs_score" column="rs_score" />
+			<result property="st_num" column="st_num" />
+			<result property="st_category" column="st_category" />
+		</collection>
+		<!-- fileList -->
+		<collection property="fileList" ofType="FileVO">
+			<id property="file_num" column="file_num"/>
+			<result property="file_path" column="file_path"/>
+			<result property="file_name" column="file_name"/>
+			<result property="file_type" column="file_type"/>
+			<result property="file_foreign" column="file_foreign"/>
+			<result property="file_tag" column="file_tag"/>
+			<result property="file_res_num" column="file_res_num"/>
+		</collection>
+	</resultMap>
+
+
+	<insert id="insertReview" parameterType="ReviewVO" useGeneratedKeys="true" keyProperty="rev_num"> 
+		INSERT INTO review ( rev_us_num, rev_rt_num, rev_content, rev_created, rev_updated, rev_state, rev_visit, rev_visitor ) 
+			VALUES ( #{rev_us_num}, #{rev_rt_num}, #{rev_content}, now(), now(), 0, #{rev_visit}, #{rev_visitor} ) 
+	</insert>
+
+	<insert id="insertReviewScore" parameterType="ReviewScoreVO" useGeneratedKeys="true" > 
+		INSERT INTO reviewscore ( rs_rev_num, rs_st_num, rs_score ) 
+			VALUES ( #{rs_rev_num}, #{rs_st_num}, #{rs_score} ) 
+	</insert>
+
+	<update id="deleteReview">
+		UPDATE `review` SET rev_state = -1 
+			WHERE rev_num = #{rev_num}
+	</update>
+
+	<delete id="deleteReviewScore">
+		DELETE FROM `reviewscore`
+		WHERE rs_num = #{rs_num}
+	</delete>
+
+
+	<select id="selectReviewByReservation" resultMap="ReviewMap">
+		SELECT 
+			r.rev_num, r.rev_us_num, r.rev_rt_num, r.rev_content, r.rev_created,
+			r.rev_updated, r.rev_state, r.rev_visit, r.rev_visitor,
+			u.us_name, rt.rt_name,
+
+			rs.rs_num, rs.rs_rev_num, rs.rs_st_num, rs.rs_score,
+			st.st_num, st.st_category,
+
+			f.file_num, f.file_path, f.file_name, f.file_type, f.file_foreign, f.file_tag, f.file_res_num,
+
+			revres.res_num
+
+		FROM review r
+		LEFT JOIN revres ON r.rev_num = revres.rev_num
+		LEFT JOIN reservation res ON revres.res_num = res.res_num
+		LEFT JOIN user u ON r.rev_us_num = u.us_num
+		LEFT JOIN restaurant rt ON r.rev_rt_num = rt.rt_num
+		LEFT JOIN reviewscore rs ON r.rev_num = rs.rs_rev_num
+		LEFT JOIN scoretype st ON rs.rs_st_num = st.st_num
+		LEFT JOIN file f ON r.rev_num = f.file_foreign AND f.file_type = 'REVIEW'
+
+		WHERE revres.res_num = #{res_num}
+	</select>
+
+	<select id="selectReview" resultMap="ReviewMap" parameterType="int">
+		SELECT 
+			r.rev_num, r.rev_us_num, r.rev_rt_num, r.rev_content, r.rev_created,
+			r.rev_updated, r.rev_state, r.rev_visit, r.rev_visitor,
+			u.us_name, rt.rt_name,
+
+			rs.rs_num, rs.rs_rev_num, rs.rs_st_num, rs.rs_score,
+			st.st_num, st.st_category,
+
+			f.file_num, f.file_path, f.file_name, f.file_type, f.file_foreign, f.file_tag, f.file_res_num
+
+		FROM review r
+		LEFT JOIN user u ON r.rev_us_num = u.us_num
+		LEFT JOIN restaurant rt ON r.rev_rt_num = rt.rt_num
+		LEFT JOIN reviewscore rs ON r.rev_num = rs.rs_rev_num
+		LEFT JOIN scoretype st ON rs.rs_st_num = st.st_num
+		LEFT JOIN file f ON r.rev_num = f.file_foreign AND f.file_type = 'REVIEW'
+
+		WHERE r.rev_num = #{rev_num}
+	</select>
+	<!-- <insert id="insertFile" useGeneratedKeys="true" keyProperty="file_num">
+
+	</insert> -->
+
+	<insert id="insertRevres">
+		INSERT INTO revres (rt_num, us_num, rev_num, res_num)
+		VALUES (#{rt_num}, #{us_num}, #{rev_num}, #{res_num})
+	</insert>
+
+	<update id="updateReview" parameterType="ReviewVO">
+		UPDATE review
+		SET rev_content = #{rev_content},
+				rev_updated = NOW(),
+				rev_visit = #{rev_visit},
+				rev_visitor = #{rev_visitor}
+		WHERE rev_num = #{rev_num}
+	</update>
+</mapper>

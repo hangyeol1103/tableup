@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.UserDAO">
 	
-	
 	<!-- ReviewScoreVO + ReviewVO -->
 	<resultMap id="ReviewMap" type="ReviewVO">
 		<!-- ReviewVO -->
@@ -64,6 +63,18 @@
 		<collection property="reviewList" resultMap="ReviewMap"/>
 	</resultMap>
 
+	<resultMap id="RestaurantFacilityMap" type="RestaurantFacilityVO">
+		<id property="rf_num" column="rf_num"/>
+		<result property="rf_detail" column="rf_detail"/>
+		<result property="rf_rt_num" column="rf_rt_num"/>
+		<result property="rf_fa_num" column="rf_fa_num"/>
+		<association property="facility" javaType="FacilityVO">
+			<id property="fa_num" column="fa_num"/>
+			<result property="fa_name" column="fa_name"/>
+			<result property="fa_title" column="fa_title"/>
+			<result property="fa_icon" column="fa_icon"/>
+		</association>
+	</resultMap>
 	<!-- 매장 태그 리스트 -->
 	<select id="selectRestaurantTagList" resultMap="TagMap">
 		SELECT tag.*, tagtype.tt_name
@@ -125,21 +136,15 @@
 		WHERE restaurant.rt_num = #{rt_num}
 	</select>
 
-
-
-
-
-	
-	
-	
-	
 	<select id="selectUser" resultType="userVO">
-		select * from User where us_num = #{us_num}
+		select * from User 
+		LEFT JOIN userprofileimage ON upi_us_num = us_num
+		where us_num = #{us_num}
 	</select>
 	<select id="selectUserById" resultType="userVO">
 		select * from User where us_id = #{us_id}
 	</select>
-	<insert id="insertUser">
+	<insert id="insertUser" parameterType="UserVO" useGeneratedKeys="true" keyProperty="us_num">
 		INSERT INTO User (
 			us_id,
 			us_pw, 
@@ -159,6 +164,23 @@
 			#{us_sociallogin}
 		)
 	</insert>
+
+	<insert id="insertSocial">
+		INSERT INTO sociallogin 
+		(${type}, sl_us_num) VALUES (1, #{us_num})
+	</insert>
+
+	<select id="selectSocial" resultType="Boolean">
+		SELECT ${type} FROM sociallogin
+		WHERE sl_us_num = #{us_num}
+	</select>
+
+	<update id="updateSocial">
+		UPDATE sociallogin SET
+		${type} = #{input}
+		WHERE sl_us_num = #{us_num}
+	</update>
+
 	<update id="updateUserInfo" parameterType="userVO">
     UPDATE User
     SET us_nickname = #{us_nickname},
@@ -191,24 +213,31 @@
 	</select>
 
 	<select id="selectReservationByUser" resultType="ReservationVO">
-		SELECT * FROM Reservation 
+		SELECT Reservation.*, user.*,restaurant.rt_name,review.rev_num FROM Reservation 
 		LEFT JOIN user ON us_num = res_us_num
 		LEFT JOIN restaurant ON rt_num = res_rt_num
-		WHERE res_us_num = #{us_num}
+		LEFT JOIN revres USING (res_num)
+		LEFT JOIN review USING (rev_num)
+		WHERE res_us_num = #{us_num} and (res_state = 1 or res_state = 0)
+		ORDER BY res_num DESC
 	</select>
 
 	<select id="selectFollowedRestaurant" resultType="RestaurantVO">
 		select * from usfollow 
 		join restaurant on uf_foreign = rt_num
+		LEFT JOIN restaurantdetail on rd_rt_num = rt_num
 		where uf_type = 'RESTAURANT' and uf_us_num = #{us_num} 
 	</select>
 
-	<select id="selectFollowedReview" resultType="ReviewVO">
+	<select id="selectFollowedReview" resultMap="ReviewMap">
 		select * from usfollow 
 		join REVIEW on uf_foreign = rev_num
 		join restaurant on rt_num = rev_rt_num
 		join user on us_num = rev_us_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
 		where uf_type = 'REVIEW' and uf_us_num = #{us_num} 
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
 	</select>
 
 	<select id="selectScoreTypeList" resultType="ScoreTypeVO"> SELECT ST_NUM, ST_CATEGORY FROM
@@ -239,7 +268,15 @@
 
 	<select id="selectRestaurantList" resultType="RestaurantVO">
 		SELECT * FROM Restaurant r
-		<!-- LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num -->
+		LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num
+		LEFT JOIN file f ON f.file_type = 'RESTAURANTDETAIL'
+			AND f.file_res_num = r.rt_num
+			AND f.file_num = (
+				SELECT MIN(file_num)
+				FROM file
+				WHERE file_type = 'RESTAURANTDETAIL' AND file_res_num = r.rt_num
+				LIMIT 1
+			)
 		<!-- JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num   -->
 		WHERE r.rt_accept = 'Y'
 
@@ -298,6 +335,45 @@
 			</choose>
 		</if>
 
+		<if test="keywordList != null and keywordList.size() > 0">
+			AND (
+				<foreach collection="keywordList" item="kw" separator=" OR ">
+					r.rt_name LIKE CONCAT('%', #{kw}, '%')
+					OR r.rt_description LIKE CONCAT('%', #{kw}, '%')
+					
+					OR rd.rd_info LIKE CONCAT('%', #{kw}, '%')
+					OR rd.rd_addr LIKE CONCAT('%', #{kw}, '%')
+					<!-- OR EXISTS (
+						SELECT 1 FROM restaurantdetail rd
+						WHERE rd.rd_rt_num = r.rt_num AND (
+							rd.rd_info LIKE CONCAT('%', #{kw}, '%')
+							OR rd.rd_addr LIKE CONCAT('%', #{kw}, '%')
+						)
+					) -->
+					OR EXISTS (
+						SELECT 1 FROM detailregion dr
+						JOIN region reg ON dr.dreg_reg_num = reg.reg_num
+						WHERE dr.dreg_num = r.rt_dreg_num AND (dr.dreg_sub LIKE CONCAT('%', #{kw}, '%') OR reg.reg_main LIKE CONCAT('%', #{kw}, '%'))
+					)
+					OR EXISTS (
+						SELECT 1 FROM detailfoodcategory dfc
+						JOIN foodcategory fc ON dfc.dfc_fc_num = fc.fc_num
+						WHERE dfc.dfc_num = r.rt_dfc_num AND (dfc.dfc_sub LIKE CONCAT('%', #{kw}, '%') OR fc.fc_main LIKE CONCAT('%', #{kw}, '%'))
+					)
+					OR EXISTS (
+						SELECT 1 FROM restauranttag
+						JOIN tag t ON restauranttag.tag_num = t.tag_num
+						WHERE restauranttag.rt_num = r.rt_num AND t.tag_name LIKE CONCAT('%', #{kw}, '%')
+					)
+					OR EXISTS (
+						SELECT 1 FROM restaurantfacility
+						JOIN facility f ON restaurantfacility.rf_fa_num = f.fa_num
+						WHERE restaurantfacility.rf_rt_num = r.rt_num AND f.fa_name LIKE CONCAT('%', #{kw}, '%')
+					)
+				</foreach>
+			)
+		</if>
+
 		<choose>
 			<when test="orderBy == 'avg'">
 				ORDER BY (
@@ -305,7 +381,7 @@
 					FROM review rev
 					JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
 					WHERE rev.rev_rt_num = r.rt_num
-				) ASC
+				) DESC
 			</when>
 
 			<when test="orderBy == 'reservation'">
@@ -344,7 +420,7 @@
 
 	<select id="selectCountRestaurantList" resultType="int">
 		SELECT COUNT(*) FROM Restaurant r
-		<!-- LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num -->
+		LEFT JOIN RestaurantDetail rd ON r.rt_num = rd.rd_rt_num
 		<!-- JOIN DetailRegion dr ON r.rt_dreg_num = dr.dreg_num   -->
 		WHERE r.rt_accept = 'Y'
 
@@ -395,6 +471,47 @@
 			</choose>
 		</if>
 
+		
+		<if test="keywordList != null and keywordList.size() > 0">
+			AND (
+				<foreach collection="keywordList" item="kw" separator=" OR ">
+					r.rt_name LIKE CONCAT('%', #{kw}, '%')
+					OR r.rt_description LIKE CONCAT('%', #{kw}, '%')
+					
+					OR rd.rd_info LIKE CONCAT('%', #{kw}, '%')
+					OR rd.rd_addr LIKE CONCAT('%', #{kw}, '%')
+					<!-- OR EXISTS (
+						SELECT 1 FROM restaurantdetail rd
+						WHERE rd.rd_rt_num = r.rt_num AND (
+							rd.rd_info LIKE CONCAT('%', #{kw}, '%')
+							OR rd.rd_addr LIKE CONCAT('%', #{kw}, '%')
+						)
+					) -->
+					OR EXISTS (
+						SELECT 1 FROM detailregion dr
+						JOIN region reg ON dr.dreg_reg_num = reg.reg_num
+						WHERE dr.dreg_num = r.rt_dreg_num AND (dr.dreg_sub LIKE CONCAT('%', #{kw}, '%') OR reg.reg_main LIKE CONCAT('%', #{kw}, '%'))
+					)
+					OR EXISTS (
+						SELECT 1 FROM detailfoodcategory dfc
+						JOIN foodcategory fc ON dfc.dfc_fc_num = fc.fc_num
+						WHERE dfc.dfc_num = r.rt_dfc_num AND (dfc.dfc_sub LIKE CONCAT('%', #{kw}, '%') OR fc.fc_main LIKE CONCAT('%', #{kw}, '%'))
+					)
+					OR EXISTS (
+						SELECT 1 FROM restauranttag
+						JOIN tag t ON restauranttag.tag_num = t.tag_num
+						WHERE restauranttag.rt_num = r.rt_num AND t.tag_name LIKE CONCAT('%', #{kw}, '%')
+					)
+					OR EXISTS (
+						SELECT 1 FROM restaurantfacility
+						JOIN facility f ON restaurantfacility.rf_fa_num = f.fa_num
+						WHERE restaurantfacility.rf_rt_num = r.rt_num AND f.fa_name LIKE CONCAT('%', #{kw}, '%')
+					)
+				</foreach>
+			)
+		</if>
+
+
 	</select>
 
 
@@ -422,12 +539,113 @@
 		#{rt_num} </select>
 	<select id="selectTagByRestaurant" resultType="TagVO"> SELECT * FROM tag WHERE tag_tt_num =
 		#{rt_num} LIMIT 1 </select>
-	
+
 	<select id="selectByFacilityList" resultType="FacilityVO">
 		select * from restaurantfacility join facility on fa_num = rf_fa_num where rf_rt_num = #{rt_num}
 	</select>
-	<select id="selectRestaurantFacilityList" resultType="RestaurantFacilityVO">
-		select * from restaurantfacility where rf_rt_num = #{rt_num}
+	<select id="selectRestaurantFacilityList" resultMap="RestaurantFacilityMap">
+		select * from restaurantfacility join facility on fa_num = rf_fa_num where rf_rt_num = #{rt_num}
 	</select>
+	<select id="selectResNewsList" resultType="ResNewsVO">
+		select * from resnews where rn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectFollowByUser" resultType="UsFollowVO">
+		SELECT * FROM usfollow WHERE uf_us_num = #{us_num}
+	</select>
+
+	<select id="selectUsFollow" resultType="UsFollowVO" >
+		SELECT * FROM usfollow
+		WHERE uf_us_num = #{uf_us_num}
+			AND uf_type = #{uf_type}
+			AND uf_foreign = #{uf_foreign}
+	</select>
+
+	<insert id="insertUsFollow" useGeneratedKeys="true" > 
+		INSERT INTO usfollow(uf_us_num, uf_type, uf_foreign)
+		VALUES(#{uf_us_num}, #{uf_type}, #{uf_foreign})
+	</insert>
+
+	<delete id="deleteUsFollow" > 
+		DELETE FROM usfollow
+		WHERE uf_us_num = #{uf_us_num}
+			AND uf_type = #{uf_type}
+			AND uf_foreign = #{uf_foreign}
+	</delete>
+
+
+	<select id="selectFileList" resultType="FileVO">
+		select * from file where file_type = 'RestaurantDetail' and file_res_num = #{rt_num}
+	</select>
+
+	<select id="selectMenuList" resultType="MenuVO">
+		select * from menu where mn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectDefaultResTimeList" resultType="DefaultResTimeVO">
+		select * from defaultrestime where drt_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectUserProfileImage" resultType="UserVO">
+		select * from user
+		LEFT JOIN userprofileimage ON us_num = upi_us_num
+		where us_num = #{us_num}
+	</select>
+
+	<insert id="insertUserProfileImage" >
+		INSERT INTO userprofileimage (upi_us_num, upi_file_name, upi_file_path, upi_upload_date)
+		VALUES (#{upi_us_num},#{upi_file_name},#{upi_file_path}, NOW())
+	</insert>
+
+	<update id="updateUserProfileImage" >
+		UPDATE userprofileimage
+			SET upi_file_name = #{upi_file_name},
+					upi_file_path = #{upi_file_path},
+					upi_upload_date = NOW()
+		WHERE upi_num = #{upi_num}
+	</update>
+
+	<sql id="commonKeywordUnion">
+		SELECT rt_name AS keyword FROM restaurant
+		UNION
+		SELECT rt_description AS keyword FROM restaurant
+		UNION
+		SELECT rd_info AS keyword FROM restaurantdetail
+		UNION
+		SELECT rd_addr AS keyword FROM restaurantdetail
+		UNION
+		SELECT dreg_sub AS keyword FROM detailregion
+		UNION
+		SELECT reg_main AS keyword FROM region
+		UNION
+		SELECT dfc_sub AS keyword FROM detailfoodcategory
+		UNION
+		SELECT fc_main AS keyword FROM foodcategory
+		UNION
+		SELECT tag_name AS keyword FROM tag
+		UNION
+		SELECT TT_NAME AS keyword FROM tagtype
+		UNION
+		SELECT fa_name AS keyword FROM facility
+	</sql>
+	<select id="selectKeywords" resultType="String">
+		<include refid="commonKeywordUnion"/>
+	</select>
+
+	<select id="selectKeywordCount" resultType="int">
+		SELECT COUNT(*) FROM (
+			<include refid="commonKeywordUnion"/>
+		) AS all_keywords
+	</select>
+
+	<select id="selectCriKeywords" resultType="String">
+		SELECT keyword FROM (
+			<include refid="commonKeywordUnion"/>
+		) AS all_keywords
+		ORDER BY keyword
+		LIMIT #{start}, #{end}
+	</select>
+
+
 
 </mapper>

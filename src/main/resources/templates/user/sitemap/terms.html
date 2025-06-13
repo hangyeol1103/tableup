@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+  <title>이용약관</title>
+  <style>
+    h2.section-title {
+      margin-top: 2rem;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: .5rem;
+      font-weight: 700;
+    }
+    .terms-container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      line-height: 1.8;
+    }
+    .terms-container ul, .terms-container ol {
+      margin-left: 1.5rem;
+    }
+    .terms-container strong {
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+<main class="terms-container" layout:fragment="content">
+  <h1 class="mb-4 fw-bold">이용약관</h1>
+
+  <p>본 약관은 주식회사 테이블업(이하 "회사")이 제공하는 서비스인 "테이블업"의 이용과 관련하여, 회원 및 이용자 여러분이 준수해야 할 사항과 권리/의무 관계를 규정합니다. 서비스를 이용하시기 전에 반드시 본 약관을 확인하여 주시기 바랍니다.</p>
+
+  <h2 class="section-title">1. 목적</h2>
+  <p>테이블업는 고객이 등록한 음식점 관련 후기, 사진 등의 정보를 공개하여, 다른 고객이 음식점을 선택할 때 참고할 수 있도록 제공하는 커뮤니티 기반의 정보 공유 플랫폼입니다.</p>
+
+  <h2 class="section-title">2. 회원가입</h2>
+  <p>회원은 회사가 정한 절차에 따라 테이블업의 회원으로 등록할 수 있으며, 본 약관에 동의한 것으로 간주됩니다.</p>
+
+  <h2 class="section-title">3. 개인정보 보호</h2>
+  <ul>
+    <li>회사는 개인정보 보호법을 준수하며, 이용자의 개인정보를 적법하게 수집, 이용, 보관합니다.</li>
+    <li>개인정보의 수집 및 활용 목적, 보유 기간 등은 별도의 <a href="/user/privacy">개인정보 처리방침</a>에 따릅니다.</li>
+  </ul>
+
+  <h2 class="section-title">4. 위치 기반 서비스</h2>
+  <p>이용자가 선택적으로 위치 정보를 제공하는 경우, 음식점 검색 및 추천 등의 편의 서비스를 위해 사용됩니다.</p>
+
+  <h2 class="section-title">5. 사용자 콘텐츠</h2>
+  <ul>
+    <li>회원이 등록한 리뷰, 이미지 등 콘텐츠의 저작권은 원칙적으로 회원에게 있으나, 회사는 서비스 운영 및 홍보 목적 범위 내에서 이를 무상으로 사용할 수 있습니다.</li>
+    <li>타인의 권리를 침해하거나 명예를 훼손하는 등 부적절한 콘텐츠는 사전 통보 없이 삭제될 수 있습니다.</li>
+  </ul>
+
+  <h2 class="section-title">6. 금지행위</h2>
+  <ul>
+    <li>허위 정보의 등록</li>
+    <li>영리 목적의 무단 활용 및 콘텐츠 복제/배포</li>
+    <li>타인의 개인정보 또는 계정 도용</li>
+    <li>공서양속에 반하는 행위</li>
+  </ul>
+
+  <h2 class="section-title">7. 면책사항</h2>
+  <ul>
+    <li>회사 및 제휴사가 제공하는 지도 정보의 정확성은 보장하지 않습니다.</li>
+    <li>사용자 간 분쟁, 제3자의 게시물로 인한 피해에 대해서는 책임을 지지 않습니다.</li>
+  </ul>
+
+  <h2 class="section-title">8. 지도 API 사용</h2>
+  <p>서비스에는 카카오 지도 API가 포함되어 있으며, 해당 정보는 카카오 플랫폼의 정책에 따릅니다. 지도 및 위치 정보는 실제와 다를 수 있으며, 정확한 정보는 매장에 직접 문의해 주시기 바랍니다.</p>
+
+  <h2 class="section-title">9. AI 기능</h2>
+  <p>테이블업는 AI 기반 챗봇 기능을 제공합니다. 본 기능은 정보 제공용이며, 정확성과 법적 효력은 보장하지 않습니다. 언제든 기능이 중단될 수 있습니다.</p>
+
+  <h2 class="section-title">10. 약관의 변경</h2>
+  <p>본 약관은 회사의 정책 또는 관련 법령의 변경에 따라 사전 고지 후 수정될 수 있으며, 변경된 약관은 고지된 효력 발생일부터 적용됩니다.</p>
+
+  <h2 class="section-title">11. 문의</h2>
+  <p>서비스 이용 중 궁금한 사항은 <a href="/user/help">문의하기</a> 페이지를 통해 접수해 주세요.</p>
+</main>
+</body>
+</html>

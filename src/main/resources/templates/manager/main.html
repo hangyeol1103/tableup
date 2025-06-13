@@ -50,10 +50,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
     }
 
 		.sub-box {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-}
+      display: flex;
+      justify-content: center;
+      gap: 0;
+    }
 
 .sub-box > div {
   width: 100%;
@@ -79,27 +79,67 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 	<main layout:fragment="content">
 		<div class="container my-4">
 			<div class="main-box">
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/manager_reservation'|">예약 관리</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">예약 관리</div>
-        
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/reservation'|">예약 관리</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">예약 관리</div>
 
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/restaurant/restaurant'|">매장 관리</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">매장 관리</div>
+        <!-- 예약 -->
+        <div class="new-reserve btn-action" sec:authorize="isAuthenticated()" th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/restime/restimepage'">예약</div>
+        <div class="new-reserve btn-action" sec:authorize="!isAuthenticated()" data-action="/manager/login">예약</div>
 
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/manager/restaurant'|">매출 관리</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">매출 관리</div>
-			</div>
-			<div class="sub-box">
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/schedule/manager_schedulelist'|">일정 관리</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">일정 관리</div>
+        <!-- 매장 -->
+        <div class="new-reserve" sec:authorize="isAuthenticated()" 
+            th:onclick="|location.href='/manager/restaurant/restaurant'|">매장</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" 
+            th:onclick="|location.href='/manager/login'|">매장</div>
 
-        <div class="new-reserve" sec:authorize="isAuthenticated()" th:onclick="|location.href='/schedule/daily'|">오늘 일정 요약</div>
-        <div class="new-reserve" sec:authorize="!isAuthenticated()" th:onclick="|location.href='/manager/login'|">오늘 일정 요약</div>
+        <!-- 매니저 -->
+        <div class="new-reserve" sec:authorize="isAuthenticated()" 
+            th:onclick="|location.href='/manager/managerpage'|">매니저</div>
+        <div class="new-reserve" sec:authorize="!isAuthenticated()" 
+            th:onclick="|location.href='/manager/login'|">매니저</div>
 
-			</div>
+      </div>
+
+      <div class="sub-box">
+
+        <!-- 일정 -->
+        <div class="new-reserve btn-action" sec:authorize="isAuthenticated()" th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/opertime/opertimepage', data-type='일정'">일정</div>
+        <div class="new-reserve btn-action" sec:authorize="!isAuthenticated()" data-action="/manager/login" data-type="일정">일정</div>
+
+        <!-- 매출 -->
+        <div class="new-reserve btn-action" sec:authorize="isAuthenticated()" th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/manager_pay/pay', data-type='매출'">매출</div>
+        <div class="new-reserve btn-action" sec:authorize="!isAuthenticated()" data-action="/manager/login" data-type="매출">매출</div>
+      </div>
 		</div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll('.btn-action').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const hasRestaurant = btn.dataset.hasRestaurant === 'true';
+          const targetUrl = btn.dataset.action;
+
+          if (!hasRestaurant && targetUrl.includes('/restime/')) {
+            alert('아직 매장 정보가 입력되지 않았습니다.\n예약 페이지를 사용하려면 먼저 매장을 등록하세요.');
+            return;
+          }
+
+          if (!hasRestaurant && targetUrl.includes('/opertime/')) {
+            alert('아직 매장 정보가 입력되지 않았습니다.\n일정 페이지를 사용하려면 먼저 매장을 등록하세요.');
+            return;
+          }
+
+          // 공통적으로 막고 싶은 경우
+          if (!hasRestaurant && targetUrl.includes('/manager_pay/')) {
+            alert('아직 매장 정보가 입력되지 않았습니다.\n매출 페이지를 사용하려면 먼저 매장을 등록하세요.');
+            return;
+          }
+
+          // 정상 이동
+          window.location.href = targetUrl;
+        });
+      });
+    });
+  </script>
+
 	</main>
 </body>
 </html>

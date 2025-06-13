@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+<head>
+  <meta charset="utf-8">
+  <title>리뷰 작성</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .form-label { font-weight: bold; }
+    .score-input { width: 80px; text-align: center; }
+  </style>
+</head>
+<body>
+<main layout:fragment="content" class="container mt-5">
+  <h2 class="mb-4">리뷰 작성</h2>
+
+  <div th:if="${errorMsg != null}" class="alert alert-danger" role="alert" th:text="${errorMsg}"></div>
+
+  <form id="form-review" onsubmit="return false;">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label">식당 번호</label>
+        <input type="number" class="form-control" name="rev_rt_num" th:value="${rev_rt_num}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">방문 일자</label>
+        <input type="date" class="form-control" name="rev_visit" th:value="${reviewDTO?.review?.rev_visit}" required>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">방문 인원</label>
+      <input type="number" class="form-control" name="rev_visitor" th:value="${reviewDTO?.review?.rev_visitor}" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">리뷰 내용</label>
+      <textarea name="rev_content" class="form-control" rows="8"
+                th:text="${reviewDTO?.review?.rev_content}" placeholder="리뷰 내용을 입력하세요."></textarea>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label">평점</label>
+      <div class="d-flex flex-wrap gap-3">
+        <div th:each="scoreType : ${scoreTypeList}" class="d-flex align-items-center me-3">
+          <label th:for="'st_' + ${scoreType.st_num}" th:text="${scoreType.st_category}" class="me-2"></label>
+          <input type="number" class="form-control score-input"
+                 th:id="'st_' + ${scoreType.st_num}"
+                 th:name="rs_scores"
+                 th:attr="data-st-num=${scoreType.st_num}" value="5" min="1" max="5" required>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">사진 첨부</label>
+      <div id="file-upload-area"></div>
+      <button type="button" class="btn btn-outline-secondary mt-2" id="add-file-btn">파일 추가</button>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-success btn-submit">리뷰 제출</button>
+      <a th:href="@{/user/review/view}" class="btn btn-outline-dark ms-auto">리뷰 목록</a>
+    </div>
+  </form>
+
+  <script>
+    $(function () {
+      $('#add-file-btn').click(() => {
+        const group = $(`
+          <div class="file-upload-group mb-2">
+            <input type="file" class="form-control mb-1" accept="image/*" required>
+            <select class="form-select mb-1" name="fileTags" required>
+              <option value="">태그 선택</option>
+              <option value="내부">내부</option>
+              <option value="외부">외부</option>
+              <option value="음식">음식</option>
+              <option value="메뉴판">메뉴판</option>
+              <option value="기타">기타</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-danger">삭제</button>
+          </div>
+        `);
+        $('#file-upload-area').append(group);
+        group.find('button').click(() => group.remove());
+      });
+
+      function getReviewData() {
+        return {
+          rev_rt_num: $('input[name="rev_rt_num"]').val(),
+          rev_visit: $('input[name="rev_visit"]').val(),
+          rev_visitor: $('input[name="rev_visitor"]').val(),
+          rev_content: $('textarea[name="rev_content"]').val()
+        };
+      }
+
+      function getScoreList() {
+        return $('input[name="rs_scores"]').map(function () {
+          return {
+            st_num: $(this).data('st-num'),
+            value: $(this).val()
+          };
+        }).get();
+      }
+
+      function uploadFiles(revNum) {
+        const groups = $('#file-upload-area .file-upload-group');
+        let uploaded = 0;
+        if (groups.length === 0) return location.href = "/user/review/view";
+
+        groups.each(function () {
+          const formData = new FormData();
+          const file = $(this).find('input[type="file"]')[0].files[0];
+          const tag = $(this).find('select[name="fileTags"]').val();
+
+          formData.append("rev_num", revNum);
+          formData.append("file_tag", tag);
+          formData.append("file", file);
+
+          $.ajax({
+            url: '/user/review/uploadFile',
+            method: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: () => {
+              uploaded++;
+              if (uploaded === groups.length) {
+                alert("모든 파일 업로드 완료!");
+                location.href = "/user/review/view";
+              }
+            },
+            error: () => alert("파일 업로드 실패")
+          });
+        });
+      }
+
+      $('.btn-submit').click(() => {
+        const dto = {
+          review: getReviewData(),
+          scoreList: getScoreList()
+        };
+
+        $.ajax({
+          url: '/user/review/insertReviewAndScore',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(dto),
+          success: revNum => {
+            if (revNum > 0) {
+              uploadFiles(revNum);
+            } else {
+              alert("리뷰 등록 실패 (revNum 오류)");
+            }
+          },
+          error: () => alert("리뷰 등록 실패")
+        });
+      });
+    });
+  </script>
+</main>
+</body>
+</html>

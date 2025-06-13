@@ -7,13 +7,7 @@
   <meta charset="utf-8">
   <title>리뷰 작성</title>
   <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <!-- summer note -->
-  <script src="/summernote/summernote-bs5.js"></script>
-  <link rel="stylesheet" href="/summernote/summernote-bs5.css">
-  <script src="/summernote/lang/summernote-ko-KR.js"></script>
-  <!-- summer note -->
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     .form-label { font-weight: bold; }
     .score-input { width: 80px; text-align: center; }
@@ -22,63 +16,71 @@
 <body>
 <main layout:fragment="content" class="container mt-5">
   <h2 class="mb-4">리뷰 작성</h2>
-  <div class="mt-4 text-end">
-    <button type="button" class="btn btn-info" onclick="resInfo()">식당 조회</button>
-  </div>
-  <form th:action="@{/user/review/insertPost}" method="post" enctype="multipart/form-data" id="reviewForm">
 
+  <div th:if="${errorMsg != null}" class="alert alert-danger" role="alert" th:text="${errorMsg}"></div>
+  <input type="hidden" name="us_name" th:value="${user.us_name}" />
+
+  <div class="mt-4 text-end">
+    <button type="button" class="btn btn-info" id="btn-resinfo">식당 조회</button>
+  </div>
+
+  <form id="form-review" onsubmit="return false;">
+    <!-- 리뷰 기본 정보 -->
+    <div class="col-md-6">
+      <label class="form-label">식당 번호</label>
+      <input type="number" class="form-control d-none" name="review.res_num" th:value="${reservation.res_num}" readonly>
+      <input type="number" class="form-control" name="review.rev_rt_num" th:value="${reservation.res_rt_num}" readonly>
+    </div>
     <div class="row mb-3">
       <div class="col-md-6">
-        <label class="form-label">식당 번호</label>
-        <input type="text" class="form-control" name="rev_rt_num" th:value="${rev_rt_num}" required>
-      </div>
-      <div class="col-md-6">
         <label class="form-label">방문 일자</label>
-        <input type="date" class="form-control" name="rev_visit" th:value="${review != null} ? ${review.rev_visit}: ''" required>
+        <input type="text" class="form-control" name="review.rev_visit" th:value="${#strings.substring(reservation.res_time, 0, 10)}" readonly>
       </div>
     </div>
 
     <div class="mb-3">
       <label class="form-label">방문 인원</label>
-      <input type="number" class="form-control" name="rev_visitor" min="1" max="99" value="2" th:value="${review != null} ? ${review.rev_visitor}: ''" required>
+      <input type="number" class="form-control" name="review.rev_visitor" min="0" max="99" th:value="${reservation.res_person}" required>
     </div>
 
     <div class="mb-3">
       <label for="rev_content" class="form-label">리뷰 내용</label>
-      <textarea class="form-control" name="rev_content" id="rev_content" th:value="${review != null} ? ${review.rev_content}: ''"></textarea>
+      <textarea class="form-control" name="review.rev_content" id="rev_content" th:text="${reviewDTO?.review?.rev_content}"></textarea>
     </div>
 
+    <!-- 평점 입력 -->
     <div class="mb-4">
-      <label class="form-label">평점 입력</label>
+      <label class="form-label">평점</label>
       <div class="d-flex flex-wrap gap-3">
         <div th:each="scoreType : ${scoreTypeList}" class="d-flex align-items-center me-3">
-          <label th:for="${'score_' + scoreType.st_num}" th:text="${scoreType.st_category}" class="me-2"></label>
-          <input type="number"
-                class="form-control score-input"
-                th:id="${'score_' + scoreType.st_num}"
-                th:name="${'score[' + scoreType.st_num + ']'}"
-                min="1" max="5" value="5" required>
+          <label th:for="'st_' + ${scoreType.st_num}" th:text="${scoreType.st_category}" class="me-2"></label>
+          <input type="number" class="form-control score-input"
+                 th:id="'st_' + ${scoreType.st_num}"
+                 th:name="rs_scores"
+                 th:attr="data-st-num=${scoreType.st_num}" value="5" min="1" max="5" required>
         </div>
       </div>
     </div>
 
-    <!-- 사진 첨부 영역 -->
+    <!-- 파일 첨부 -->
     <div class="mb-3">
       <label class="form-label">사진 첨부</label>
       <div id="file-upload-area"></div>
-      <button type="button" class="btn btn-outline-secondary mt-2" onclick="createFileInput()" id="add-file-btn">파일 추가</button>
+      <button type="button" class="btn btn-outline-secondary mt-2" id="add-file-btn">파일 추가</button>
       <div class="form-text">사진을 첨부하면 이름과 태그 입력창이 나타납니다.</div>
     </div>
-    <!-- 사진 첨부 영역 -->
 
+    <!-- 제출 버튼 -->
     <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary">리뷰 작성</button>
+      <button type="button" class="btn btn-primary btn-sample">미리보기</button>
+      <button type="button" class="btn btn-success btn-submit">리뷰 제출</button>
       <button type="reset" class="btn btn-outline-secondary">초기화</button>
       <a th:href="@{/user/mypage}" class="btn btn-outline-dark ms-auto">마이페이지로</a>
-      <a th:href="@{/user/review/list}" class="btn btn-outline-dark">리뷰 목록</a>
+      <a th:href="@{/user/review/view}" class="btn btn-outline-dark">리뷰 목록</a>
     </div>
   </form>
 
+  <!-- 식당 조회 모달 -->
   <div class="modal fade" id="resModal" tabindex="-1" aria-labelledby="resModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
@@ -91,98 +93,158 @@
     </div>
   </div>
 
-  <script>
-    function resInfo() {
-      const rtNum = document.getElementById("rev_rt_num").value;
-      if (!rtNum) {
-        alert("식당 번호가 존재하지 않습니다.");
-        return;
-      }
-      fetch('/user/review/insertsub?rt_num=' + rtNum)
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById("resModalBody").innerHTML = html;
-          const modal = new bootstrap.Modal(document.getElementById('resModal'));
-          modal.show();
-        })
-        .catch(error => {
-          console.error("식당 정보를 불러오는 데 실패했습니다:", error);
-          alert("식당 정보를 불러오지 못했습니다.");
-        });
-    }
+  <!-- 미리보기 모달 -->
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">리뷰 미리보기</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body" id="previewBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-success btn-submit">리뷰 제출</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    $(document).ready(function(){
-      $('#rev_content').summernote({
-        placeholder: '내용을 입력하세요.',
-        tabsize: 2,
-        height: 400,
-        lang : 'ko-KR'
+  <script>
+  $(function () {
+      const $rev_rt_num = $('input[name="review.rev_rt_num"]');
+      const $rev_visit = $('input[name="review.rev_visit"]');
+      const $rev_visitor = $('input[name="review.rev_visitor"]');
+      const $rev_content = $('#rev_content');
+      const $file_upload_area = $('#file-upload-area');
+      const $res_num = $('input[name="review.res_num"]');
+
+
+      $('#btn-resinfo').click(() => {
+        const rtNum = $rev_rt_num.val();
+        if (!rtNum) return alert("식당 번호를 입력하세요.");
+        window.open(`/user/list/detail/${rtNum}`, '_blank');
       });
-    });
-  </script>
-  <script>
-    function createFileInput() {
-      const area = document.getElementById("file-upload-area");
 
-      // 파일이 선택되지 않은 그룹이 있는지 확인
-      const incomplete = Array.from(area.querySelectorAll('input[type="file"]'))
-        .some(input => !input.files || input.files.length === 0);
+      $('#add-file-btn').click(() => {
+        const incomplete = [...$file_upload_area.find('input[type="file"]')]
+          .some(input => !input.files.length);
+        if (incomplete) return alert("기존 파일 입력을 먼저 완료하세요.");
 
-      if (incomplete) {
-        alert("기존에 파일이 선택되지 않은 칸이 있습니다.");
-        return;
+        const $group = $(`
+          <div class="file-upload-group mb-2">
+            <input type="file" class="form-control mb-1" name="files" accept="image/*">
+          </div>
+        `);
+        $file_upload_area.append($group);
+
+        $group.find('input[type="file"]').change(function () {
+          if ($group.find('input[name="fileNames"]').length) return;
+
+          const file = this.files[0];
+          if (!file) return;
+
+          let name2 = file.name;
+          const index = name2.lastIndexOf('.');
+          if (index > 0) name2 = name2.substring(0, index);
+
+
+          $group.append(`
+            <input type="text" class="form-control mb-1" name="fileNames" value="${name2}" placeholder="파일 이름" required>
+            <select class="form-select mb-1" name="fileTags" required>
+              <option value="">태그 선택</option>
+              <option value="내부">내부</option>
+              <option value="외부">외부</option>
+              <option value="메뉴판">메뉴판</option>
+              <option value="음식">음식</option>
+              <option value="기타">기타</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-danger">삭제</button>
+          `);
+          $group.find('button').click(() => $group.remove());
+        });
+      });
+
+      function getReviewData() {
+        return {
+          rev_rt_num: $rev_rt_num.val(),
+          rev_visit: $rev_visit.val(),
+          rev_visitor: $rev_visitor.val(),
+          rev_content: $rev_content.val(),
+          res_num: $res_num.val()
+        };
+      }
+      function getScoreList() {
+        return $('.score-input').map(function () {
+          const $input = $(this);
+          const st_num = parseInt($input.data('st-num'));
+          const st_category = $input.closest('div.d-flex').find('label').first().text().trim(); // 해당 라벨의 텍스트
+          const rs_score = parseInt($input.val());
+
+          return { st_num, st_category, rs_score };
+        }).get();
+      }
+      function getFileList(files) {
+        const fileList = [];
+
+        $('#file-upload-area .file-upload-group').each(function () {
+          const fileInput = this.querySelector('input[type="file"]');
+          const file = fileInput.files[0];
+
+          const fileNameInput = this.querySelector('input[name="fileNames"]');
+          const tagSelect = this.querySelector('select[name="fileTags"]');
+
+          if (file && fileNameInput && tagSelect && fileNameInput.value && tagSelect.value) {
+            files.push(file); // MultipartFile 목록에 추가
+
+            fileList.push({
+              file_name: fileNameInput.value,
+              file_tag: tagSelect.value
+            });
+          }
+        });
+
+        return fileList;
       }
 
-      const newGroup = document.createElement("div");
-      newGroup.classList.add("file-upload-group", "mb-2");
 
-      newGroup.innerHTML = `
-        <input type="file" class="form-control mb-1" name="files" accept="image/*" onchange="handleFileSelect(this)">
-      `;
+      function submitReview(preview, url) {
+        const files = [];
+        const dto = {
+          review: getReviewData(),
+          scoreList: getScoreList(),
+          fileList: getFileList(files)
+        };
+        const formData = new FormData();
+        formData.append("preview", preview ? "true" : "false");
+        formData.append("reviewDTO", new Blob([JSON.stringify(dto)], { type: "application/json" }));
+        files.forEach(f => formData.append("files", f));
 
-      area.appendChild(newGroup);
-    }
+        $.ajax({
+          url,
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: res => {
+            if (preview) {
+              $('#previewBody').html(res);
+              new bootstrap.Modal('#previewModal').show();
+            } else {
+              alert("리뷰 등록 완료!");
+              location.href = "/user/review/view";
+            }
+          },
+          error: xhr => {
+            alert(preview ? "미리보기 실패" : "등록 실패");
+            console.error(xhr.responseText);
+          }
+        });
+      }
 
-    function handleFileSelect(input) {
-      const parent = input.closest(".file-upload-group");
-
-      // 이미 추가된 경우 방지
-      if (parent.querySelector('input[name="fileNames"]')) return;
-
-      const file = input.files[0];
-      if (!file) return;
-
-      const fileNameInput = document.createElement("input");
-      fileNameInput.type = "text";
-      fileNameInput.className = "form-control mb-1";
-      fileNameInput.name = "fileNames";
-      fileNameInput.placeholder = "파일 이름을 입력하세요";
-      fileNameInput.required = true;
-      fileNameInput.value = file.name;
-
-      const tagSelect = document.createElement("select");
-      tagSelect.className = "form-select mb-1";
-      tagSelect.name = "fileTags";
-      tagSelect.required = true;
-      tagSelect.innerHTML = `
-        <option value="">태그 선택</option>
-        <option value="내부">내부</option>
-        <option value="외부">외부</option>
-        <option value="메뉴판">메뉴판</option>
-        <option value="음식">음식</option>
-        <option value="기타">기타</option>
-      `;
-
-      const delBtn = document.createElement("button");
-      delBtn.type = "button";
-      delBtn.className = "btn btn-sm btn-danger";
-      delBtn.textContent = "삭제";
-      delBtn.onclick = () => parent.remove();
-
-      parent.appendChild(fileNameInput);
-      parent.appendChild(tagSelect);
-      parent.appendChild(delBtn);
-    }
+      $('.btn-sample').click(() => submitReview(true, '/user/review/insertSamplePost'));
+      $('.btn-submit').click(() => submitReview(false, '/user/review/insertFinalPost'));
+  });
   </script>
 </main>
 </body>

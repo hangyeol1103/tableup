@@ -101,13 +101,22 @@
         z-index: 2; /* 활성/호버된 탭을 앞에 보이게 */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
+
+      .news-box {
+        border: 1px solid #e3e3e3;
+        border-radius: 12px;
+        padding: 16px;
+        background-color: #fff;
+        margin-top: 10px;
+      }
     </style>
   </head>
 
   <body>
     <main layout:fragment="content" class="container">
-      123
-
+      <div class="news-box" th:each="trn : ${tapResNewsList}">소식
+        <p th:utext="${#strings.replace(trn.rn_content, '\n', '<br/>')}"></p>
+      </div>
     </main>
   </body>
 </html>

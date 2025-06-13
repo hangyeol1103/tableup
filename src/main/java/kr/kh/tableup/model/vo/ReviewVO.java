@@ -23,4 +23,8 @@ public class ReviewVO {
 	private String rt_name;
 
 	private List<ReviewScoreVO> scoreList;
+	private List<FileVO> fileList;
+
+	//revres 통해 연결해 가져온 res 필드 
+	private int res_num;
 }

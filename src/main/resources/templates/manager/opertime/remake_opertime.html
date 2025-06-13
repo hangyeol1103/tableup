@@ -40,8 +40,8 @@
       <div class="mb-3 form-group box">
         <label for="has_break" class="form-label">브레이크 타임 유무</label>
         <select class="form-select time-input" id="has_break">
-          <option value="true" th:selected="${breakTimeExists == true}">있음</option>
-          <option value="false" th:selected="${breakTimeExists == false}">없음</option>
+          <option value="true" th:selected="${opertime.bd_off == true}">있음</option>
+          <option value="false" th:selected="${opertime.bd_off == false}">없음</option>
         </select>
       </div>
       <div class="mb-3 form-group box">
@@ -73,7 +73,7 @@
           // 공통 시간 입력 필드 (개점, 마감, 라스트오더)
           const timeFields = ['#bd_open', '#bd_close', '#bd_loam', '#bd_lopm'];
           // 브레이크 타임 필드
-          const breakFields = ['#bd_brstart', '#bd_brend'];
+          const breakFields = ['#bd_brstart', '#bd_brend', '#bd_loam'];
 
           // 모든 필드 초기화 및 비활성화/활성화 처리
           timeFields.forEach(id => {

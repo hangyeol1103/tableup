@@ -27,7 +27,7 @@
 			res_us_num,
 			res_rt_num,
 			res_time,
-			<!-- res_end_time, -->
+			res_end_time,
 			res_person,
 			res_request,
 			res_created,
@@ -36,7 +36,7 @@
 			#{res_us_num},
 			#{res_rt_num},
 			#{res_time},
-			<!-- #{res_end_time}, -->
+			DATE_ADD(#{res_time}, INTERVAL 1 HOUR),
 			#{res_person},
 			#{res_request},
 			NOW(),
@@ -66,7 +66,7 @@
 	<!-- 매장 예약 모두 출력 -->
 <!-- 
 	<select id="selectReservationList" resultType="ReservationVO">
-		select * from reservation where res_rt_num = #{rt_num}
+		select * from reservation where res_rt_num = #{rt_num} and res_state=1
 	</select>
 -->
 	<!-- 지정된 날짜에 맞는 예약 정보 및 회원 정보 가져오는 쿼리 -->
@@ -76,5 +76,40 @@
 		where res_rt_num = #{rt_num} and res_time like concat(#{date}, '%')
 		order by res_time
 	</select>
+	<!-- 예약 번호에 맞는 예약 정보를 가져오는 쿼리 -->
+	<select id="selectReservation">
+		select * from reservation where res_num = #{res_num}
+	</select>
+
+
+
+	<select id="selectFavorateCategory" resultType="int">
+		SELECT r.rt_dfc_num
+			FROM reservation rs
+				JOIN restaurant r ON rs.res_rt_num = r.rt_num
+					WHERE rs.res_time >= NOW() - INTERVAL 1 MONTH
+						AND rs.res_state != -1
+				GROUP BY r.rt_dfc_num
+			ORDER BY COUNT(*) DESC
+		LIMIT 10
+	</select>
+
+		<select id="selectFavorateRegion" resultType="int">
+		SELECT r.rt_dreg_num
+			FROM reservation rs
+				JOIN restaurant r ON rs.res_rt_num = r.rt_num
+					WHERE rs.res_time >= NOW() - INTERVAL 1 MONTH
+						AND rs.res_state != -1
+				GROUP BY r.rt_dreg_num
+			ORDER BY COUNT(*) DESC
+		LIMIT 10
+	</select>
 	
+	<!-- 매장의 기본키를 가진 예약 정보를 가져오는 쿼리 -->
+	<select id="selectReservationsList" resultMap="ReservationMap">
+		select * from reservation
+		join user on us_num = res_us_num
+		where res_rt_num=#{rt_num} and res_state = 1
+	</select> 
+
 </mapper>

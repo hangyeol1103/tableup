@@ -1,57 +1,192 @@
 <!DOCTYPE html>
-<html 
-lang="en" 
-xmlns:th="http://www.thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
-layout:decorate="~{layout/manager_layout.html}"
-xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+<html lang="ko" 
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/manager_layout.html}"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-	<meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>테이블업 - 편의시설 목록</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-	<title>매장 메뉴 리스트</title>
-	
-  </style>
 </head>
 <body>
-	<main layout:fragment="content" class="container">
-			<h1>매장 편의시설 목록</h1>
-			<table class="table table-bordered table-hover">
-			<thead>
-				<tr>
-					<th>편의시설 이름</th>
-					<th>편의시설 설명</th>
-					<th>편의시설 관리</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="rf : ${facilitylist}">
-					<td>
-						<span th:each="fa:${facility}"
-									th:if="${fa.fa_num == rf.rf_fa_num}"
-									th:text="${fa.fa_name}">
-							편의시설
-						</span>
-					</td>
-					<td th:text="${rf.rf_detail} ">상세설명</td>
-					<td class="">
-						<form th:action="@{/manager/resfacility/remake_resfacility/{rf_num}(rf_num=${rf.rf_num})}" method="get" style="display:inline;">
-							<button type="submit" class="btn btn-outline-primary">매장 상세정보 변경</button>
-						</form>
-						<form th:action="@{/manager/resfacility/delete_resfacility/{rf_num}(rf_num=${rf.rf_num})}" method="post" style="display:inline;">
-							<button type="submit" class="btn btn-outline-danger">매장 상세정보 삭제</button>
-						</form>
-					</td>
-				</tr>
-				<!-- 매장 정보가 등록이 되어 있지 않으면-->
-					<tr th:if="${facilitylist.size() == 0}">
-						<td colspan="3" class="text-center">등록한 편의시설이 없습니다.</td>
-					</tr>
-			</tbody>
-		</table>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/resfacility/make_resfacility'">편의시설 등록</button>
-		<a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
-	</main>
+  <main layout:fragment="content" class="container mt-4">
+    <div class="card shadow-sm p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">편의시설 목록</h2>
+        <!-- <button type="button" class="btn btn-primary" onclick="location.href='/manager/resfacility/make_resfacility'">
+          <i class="bi bi-plus-circle"></i> 편의시설 등록
+        </button> -->
+        <!-- 기존 버튼 수정 -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facilityModal">
+          <i class="bi bi-plus-circle"></i> 편의시설 등록
+        </button>
+
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th scope="col" style="width: 25%">이름</th>
+              <th scope="col">설명</th>
+              <th scope="col" style="width: 25%">관리</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="rf : ${facilitylist}">
+              <td>
+                <span th:each="fa : ${facility}" 
+                      th:if="${fa.fa_num == rf.rf_fa_num}" 
+                      th:text="${fa.fa_name}">편의시설</span>
+              </td>
+              <td th:text="${rf.rf_detail}">설명</td>
+              <td>
+                <div class="d-flex gap-2 justify-content-center">
+                  <!-- <a th:href="@{/manager/resfacility/remake_resfacility/{rf_num}(rf_num=${rf.rf_num})}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square"></i> 수정
+                  </a> -->
+                  <button type="button" class="btn btn-outline-primary btn-sm edit-btn"
+                        data-bs-toggle="modal" data-bs-target="#editFacilityModal"
+                        th:data-id="${rf.rf_num}" th:data-fa="${rf.rf_fa_num}" th:data-detail="${rf.rf_detail}">
+                    <i class="bi bi-pencil-square"></i> 수정
+                  </button>
+                  <form th:action="@{/manager/resfacility/delete_resfacility/{rf_num}(rf_num=${rf.rf_num})}" method="post"
+                        onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                      <i class="bi bi-trash"></i> 삭제
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <tr th:if="${facilitylist.size() == 0}">
+              <td colspan="3" class="text-center text-muted">등록된 편의시설이 없습니다.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 편의시설 등록 모달 -->
+      <div class="modal fade" id="facilityModal" tabindex="-1" aria-labelledby="facilityModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form th:action="@{/manager/resfacility/make_resfacility}" method="post" id="facilityForm">
+              <div class="modal-header">
+                <h5 class="modal-title" id="facilityModalLabel">매장 편의시설 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="rf_fa_num" class="form-label">편의시설</label>
+                  <select class="form-select" id="rf_fa_num" name="rf_fa_num" required>
+                    <option value="">편의시설 선택</option>
+                    <th:block th:each="fa : ${facility}">
+                      <option th:value="${fa.fa_num}" th:text="${fa.fa_name}"></option>
+                    </th:block>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="rf_detail" class="form-label">편의시설 설명</label>
+                  <input type="text" class="form-control" name="rf_detail" id="rf_detail" required>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">등록</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!--편의시설 수정 모달 -->
+      <div class="modal fade" id="editFacilityModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="editFacilityForm">
+              <div class="modal-header">
+                <h5 class="modal-title">편의시설 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" name="rf_num" id="edit_rf_num" />
+                
+                <div class="mb-3">
+                  <label for="edit_rf_fa_num" class="form-label">편의시설</label>
+                  <select class="form-select" id="edit_rf_fa_num" name="rf_fa_num" required>
+                    <option value="">편의시설 선택</option>
+                    <th:block th:each="fa : ${facility}">
+                      <option th:value="${fa.fa_num}" th:text="${fa.fa_name}"></option>
+                    </th:block>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="edit_rf_detail" class="form-label">설명</label>
+                  <input type="text" class="form-control" id="edit_rf_detail" name="rf_detail" required>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">저장</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${errorMsg}" class="alert alert-danger" role="alert" th:text="${errorMsg}"></div>
+
+      <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary mt-3 w-100">
+        <i class="bi bi-arrow-left"></i> 매장 관리 화면으로 돌아가기
+      </a>
+    </div>
+    <script th:if="${showModal}" th:inline="javascript">
+      const modal = new bootstrap.Modal(document.getElementById('facilityModal'));
+      modal.show();
+    </script>
+    <script>
+      // 수정 버튼 누르면 모달에 데이터 채우기
+      $(document).on('click', '.edit-btn', function () {
+        const rf_num = $(this).data('id');
+        const rf_fa_num = $(this).data('fa');
+        const rf_detail = $(this).data('detail');
+
+        $('#edit_rf_num').val(rf_num);
+        $('#edit_rf_fa_num').val(rf_fa_num);
+        $('#edit_rf_detail').val(rf_detail);
+      });
+
+      // 수정 AJAX 요청
+      $('#editFacilityForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const data = {
+          rf_num: $('#edit_rf_num').val(),
+          rf_fa_num: $('#edit_rf_fa_num').val(),
+          rf_detail: $('#edit_rf_detail').val()
+        };
+
+        $.ajax({
+          type: 'POST',
+          url: '/manager/resfacility/remake_resfacility',
+          data: JSON.stringify(data),
+          contentType: 'application/json',
+          success: function () {
+            alert('수정 성공');
+            location.reload();
+          },
+          error: function () {
+            alert('수정 실패');
+          }
+        });
+      });
+    </script>
+  </main>
 </body>
 </html>

@@ -1,7 +1,19 @@
 package kr.kh.tableup.service;
 
-import java.util.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,10 +22,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import kr.kh.tableup.dao.UserDAO;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 
-import kr.kh.tableup.model.util.*;
-import kr.kh.tableup.model.vo.*;
+import kr.kh.tableup.dao.UserDAO;
+import kr.kh.tableup.model.util.PageMaker;
+import kr.kh.tableup.model.util.ResCriteria;
+import kr.kh.tableup.model.util.UploadFileUtils;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
+import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
+import kr.kh.tableup.model.vo.DetailRegionVO;
+import kr.kh.tableup.model.vo.FacilityVO;
+import kr.kh.tableup.model.vo.FileVO;
+import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
+import kr.kh.tableup.model.vo.ReservationVO;
+import kr.kh.tableup.model.vo.RestaurantFacilityVO;
+import kr.kh.tableup.model.vo.RestaurantVO;
+import kr.kh.tableup.model.vo.ReviewScoreVO;
+import kr.kh.tableup.model.vo.ReviewVO;
+import kr.kh.tableup.model.vo.ScoreTypeVO;
+import kr.kh.tableup.model.vo.TagVO;
+import kr.kh.tableup.model.vo.UsFollowVO;
+import kr.kh.tableup.model.vo.UserVO;
 
 @Service
 public class UserService {
@@ -182,35 +216,51 @@ public class UserService {
 
   public boolean insertReview(ReviewVO review) {
 
+    System.out.println(review);
     if (review.getRev_rt_num() <= 0 || review.getRev_visit() == null || review.getRev_visitor() <= 0
-        || review.getRev_content() == null || review.getUs_name() == null) {
+        || review.getRev_content() == null || review.getRev_us_num() < 1 ) {
       return false;
     }
+    System.out.println("널체크 통과");
 
     return userDAO.insertReview(review);
   }
 
   public boolean insertReviewScore(ReviewVO review, int rs_st_num, int rs_score) {
+    System.out.println("insertReviewScore called with review: " + review + ", rs_st_num: " + rs_st_num + ", rs_score: " + rs_score);
     if (review == null || review.getRev_num() < 1 || rs_st_num < 1 || rs_score < 1 || rs_score > 5) return false;
 
     ReviewScoreVO reviewScore = new ReviewScoreVO();
     reviewScore.setRs_rev_num(review.getRev_num());
     reviewScore.setRs_st_num(rs_st_num);
     reviewScore.setRs_score(rs_score);
+    System.out.println("ReviewScoreVO created: " + reviewScore);
     return userDAO.insertReviewScore(reviewScore);
   }
 
   public boolean insertFile(ReviewVO review, List<MultipartFile> files, List<String> fileNames, List<String> fileTags) {
     if (review == null || files == null) return false;
-    if (files.size() != fileNames.size() || files.size() != fileTags.size()) return false;
+    System.out.println("File Names: " + fileNames);
+    //if (files.size() != fileNames.size() || files.size() != fileTags.size()) return false;
+    System.out.println(files.size() + " files to upload.");
+    System.out.println("File Tags: " + fileTags);
     if (review.getRev_num() < 1) return false;
+    System.out.println("Review Number: " + review.getRev_num());
 
-    for (int i = 0; i < files.size(); i++) {
+    for (int i = 0; i < Math.min(files.size(), Math.min(fileNames.size(), fileTags.size())); i++) {
       MultipartFile file = files.get(i);
       String inputFileName = fileNames.get(i);
       String fileTag = fileTags.get(i);
 
-      if (file == null || file.isEmpty()) return false;
+      if (file == null || file.isEmpty()) continue;
+      if (fileTag == null || fileTag.isEmpty()) fileTag = "default";
+      System.out.println("Processing file: " + inputFileName + " with tag: " + fileTag);
+      // 파일이 비어있거나 이름이 비어있으면 건너뛰기
+      if (file.getSize() <= 0 || inputFileName == null || inputFileName.isEmpty()) {
+        System.out.println("Skipping empty file: " + inputFileName);
+        continue;
+      }
+      
 
       try {
         // 파일 확장자 추출
@@ -227,7 +277,7 @@ public class UserService {
         String uploadFileName = UploadFileUtils.uploadFile(uploadPath, newFileName, file.getBytes(), "review");
 
         // DB에 넣을 FileVO 생성
-        FileVO fileVO = new FileVO(uploadFileName, inputFileName, "REVIEW", String.valueOf(review.getRev_num()), fileTag, review.getRev_rt_num());
+        FileVO fileVO = new FileVO(0,uploadFileName, inputFileName, "REVIEW", /*String.valueOf(review.getRev_num())*/review.getRev_num(), fileTag, review.getRev_rt_num());
         // fileVO.setFile_name(inputFileName); // 사용자가 입력한 이름
         // fileVO.setFile_path(uploadFileName); // 서버 저장 경로
         // fileVO.setFile_type("REVIEW");
@@ -236,10 +286,12 @@ public class UserService {
         // fileVO.setFile_res_num(review.getRev_rt_num());
 
         userDAO.insertFile(fileVO);
+        System.out.println(i + "파일 업로드 성공: " + uploadFileName);
 
       } catch (Exception e) {
         e.printStackTrace();
-        return false;
+        System.out.println(i + "파일 업로드 실패: " + e.getMessage());
+        continue;
       }
     }
 
@@ -341,9 +393,16 @@ public class UserService {
   }
 
 
-  public List<RestaurantVO> getRestaurantList(Criteria cri) {
+  public List<RestaurantVO> getRestaurantList(ResCriteria cri) {
     if (cri == null) {
       return null;
+    }
+    if (cri.getKeyword() != null && !cri.getKeyword().isBlank()) {
+      List<String> keywordList = Arrays.stream(cri.getKeyword().split(","))
+              .map(String::trim)
+              .filter(k -> !k.isEmpty())
+              .collect(Collectors.toList());
+      cri.setKeywordList(keywordList);
     }
 
     
@@ -386,10 +445,18 @@ public class UserService {
   }
 */
 
-  	public PageMaker getPageMaker(Criteria cri) {
+  	public PageMaker getPageMaker(ResCriteria cri) {
     if(cri == null) {
 			return null;
 		}
+    
+    if (cri.getKeyword() != null && !cri.getKeyword().isBlank()) {
+      List<String> keywordList = Arrays.stream(cri.getKeyword().split(","))
+              .map(String::trim)
+              .filter(k -> !k.isEmpty())
+              .collect(Collectors.toList());
+      cri.setKeywordList(keywordList);
+    }
 		
 		int count = userDAO.selectCountRestaurantList(cri);
 		return new PageMaker(1, cri, count);
@@ -417,6 +484,12 @@ public class UserService {
     return userDAO.selectReviewList();
 	}
   
+  public List<ReviewVO> getReviewListByRes(int rt_num) {
+  
+     return userDAO.selectReviewListbyNum(rt_num);
+  }
+
+
   public Map<String, List<TagVO>> getTagList() {
    
       List<TagVO> tagList = userDAO.selectTagList();
@@ -439,10 +512,7 @@ public class UserService {
     return userDAO.selectScoreTypeList();
   }
 
-  public List<FacilityVO> getFacilityList(int rt_num) {
-    return userDAO.selectByFacilityList(rt_num);
-  }
-
+  
 
   public List<RestaurantFacilityVO> getRestaurantFacilityList(int rt_num) {
     return userDAO.selectRestaurantFacilityList(rt_num);
@@ -452,6 +522,133 @@ public class UserService {
   public UserVO selectUserById(String loginId) {
     return userDAO.selectUserById(loginId);
   }
+
+
+	public List<UsFollowVO> getFollowByUser(int us_num) {
+		if(us_num <= 0) {
+      return Collections.emptyList();
+    }
+    
+    List<UsFollowVO> followList = userDAO.selectFollowByUser(us_num);
+    if (followList == null) {
+      return Collections.emptyList();
+    }
+    System.out.println("Follow List: " + followList);
+    return followList;
+	}
+
+
+  public int toggleFollow(UsFollowVO follow) {
+    UsFollowVO dbFollow = userDAO.selectUsFollow(follow);
+    if (dbFollow != null) {
+      int result = userDAO.deleteUsFollow(follow);
+      return result * (-1);
+    } else {
+      int result = userDAO.insertUsFollow(follow);
+      return result;
+    }
+  }
+
+
+	public boolean isFollow(int uf_us_num, String uf_type, int uf_foreign) {
+		
+    return userDAO.selectFollowByUser(uf_us_num).stream()
+        .anyMatch(follow -> follow.getUf_type().equals(uf_type) && follow.getUf_foreign() == uf_foreign);
+    
+	}
+	public List<ResNewsVO> getResNewsList(int rt_num) {
+		return userDAO.selectResNewsList(rt_num);
+	}
+
+
+	public List<FileVO> getFileList(int rt_num) {
+		return userDAO.selectFileList(rt_num);
+	}
+
+
+  public List<MenuVO> getMenuList(int rt_num) {
+    return userDAO.selectMenuList(rt_num);
+  }
+
+
+  public List<DefaultResTimeVO> getDefaultResTimeList(int rt_num) {
+    return userDAO.selectDefaultResTimeList(rt_num);
+  }
+
+
+  public String generateQrBase64(String content) {
+      try {
+          BitMatrix matrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, 200, 200);
+          BufferedImage image = MatrixToImageWriter.toBufferedImage(matrix);
+
+          ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          ImageIO.write(image, "png", baos);
+          return Base64.getEncoder().encodeToString(baos.toByteArray());
+      } catch (Exception e) {
+          throw new RuntimeException("QR 생성 실패", e);
+      }
+  }
+
+
+  public void updateUserProfileImage(UserVO user, MultipartFile file, RedirectAttributes redirect) {
+    try {
+        if (file == null || file.isEmpty()) {
+            redirect.addFlashAttribute("errorMsg", "업로드할 파일이 없습니다.");
+            return;
+        }
+
+        UserVO dbImg = getUserProfileImage(user.getUs_num());
+        if (dbImg != null && dbImg.hasUPI()) {
+            UploadFileUtils.delteFile(uploadPath, dbImg.getUpi_file_path());
+        }
+
+
+        String fileName = file.getOriginalFilename();
+        String filePath = UploadFileUtils.uploadFile(uploadPath, fileName, file.getBytes());
+
+        UserVO userImg = new UserVO();
+        userImg.setUs_num(user.getUs_num());
+        System.out.println("유저 번호 출력 : "+user.getUs_num());
+        userImg.setUpi_us_num(user.getUs_num());
+        userImg.setUpi_file_name(fileName);
+        userImg.setUpi_file_path(filePath);
+
+        if (dbImg == null || !dbImg.hasUPI()) {
+            System.out.println("기존에 사진이 존재하지 않아 새 이미지 등록");
+            userDAO.insertUserProfileImage(userImg);
+        } else {
+            System.out.println("기존에 존재하는 이미지를 변경");
+            userImg.setUpi_num(dbImg.getUpi_num());
+            userDAO.updateUserProfileImage(userImg);
+        }
+
+        redirect.addFlashAttribute("msg", "프로필 이미지가 변경되었습니다.");
+    } catch (Exception e) {
+        redirect.addFlashAttribute("errorMsg", "파일 업로드 중 오류가 발생했습니다.");
+    }
+  }
+
+
+
+
+  public UserVO getUserProfileImage(int us_num) {
+    return userDAO.selectUserProfileImage(us_num);
+  }
+
+
+	public List<String> getKeywords() {
+		return userDAO.selectKeywords();
+	}
+
+
+    public int getKeywordCount() {
+      return userDAO.selectKeywordCount();
+    }
+
+
+    public List<String> getKeywords(int start, int end) {
+      return userDAO.selectCriKeywords(start, end);
+    }
 
 
 

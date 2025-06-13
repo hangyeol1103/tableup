@@ -5,11 +5,14 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import kr.kh.tableup.model.util.Criteria;
+import kr.kh.tableup.model.vo.DefaultResTimeVO;
 import kr.kh.tableup.model.vo.DetailFoodCategoryVO;
 import kr.kh.tableup.model.vo.DetailRegionVO;
 import kr.kh.tableup.model.vo.FacilityVO;
 import kr.kh.tableup.model.vo.FileVO;
 import kr.kh.tableup.model.vo.FoodCategoryVO;
+import kr.kh.tableup.model.vo.MenuVO;
+import kr.kh.tableup.model.vo.ResNewsVO;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantFacilityVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
@@ -17,6 +20,7 @@ import kr.kh.tableup.model.vo.ReviewScoreVO;
 import kr.kh.tableup.model.vo.ReviewVO;
 import kr.kh.tableup.model.vo.ScoreTypeVO;
 import kr.kh.tableup.model.vo.TagVO;
+import kr.kh.tableup.model.vo.UsFollowVO;
 import kr.kh.tableup.model.vo.UserVO;
 
 public interface UserDAO {
@@ -54,6 +58,7 @@ public interface UserDAO {
 	List<DetailFoodCategoryVO> selectFoodCategoryList();
 
 	List<RestaurantVO> selectRestaurantList(Criteria cri);
+	
 	int selectCountRestaurantList(Criteria cri);
 	// List<RestaurantVO> selectRestaurantList(Map<String, Object> map);
 	// int selectCountRestaurantList(Map<String, Object> map);
@@ -65,6 +70,7 @@ public interface UserDAO {
 	List<FacilityVO> selectFacilityList();
 
 	List<TagVO> selectTagList();
+
 	RestaurantVO selectRestaurantDetail(@Param("rt_num") int rt_num);
 
 	FoodCategoryVO selectFoodCategoryByRestaurant(int rt_num);
@@ -73,9 +79,45 @@ public interface UserDAO {
 
 	TagVO selectTagByRestaurant(@Param("rt_num") int rt_num);
 
-	List<FacilityVO> selectByFacilityList(@Param("rt_num") int rt_num);
 
 	List<RestaurantFacilityVO> selectRestaurantFacilityList(@Param("rt_num") int rt_num);
+
+	List<UsFollowVO> selectFollowByUser(int us_num);
+
+	UsFollowVO selectUsFollow(UsFollowVO follow);
+
+	int deleteUsFollow(UsFollowVO follow);
+
+	int insertUsFollow(UsFollowVO follow);
+
+	List<ResNewsVO> selectResNewsList(@Param("rt_num") int rt_num);
+
+	List<FileVO> selectFileList(@Param("rt_num") int rt_num);
+
+	List<MenuVO> selectMenuList(@Param("rt_num") int rt_num);
+
+	List<DefaultResTimeVO> selectDefaultResTimeList(@Param("rt_num") int rt_num);
+
+	UserVO selectUserProfileImage(int us_num);
+
+	void insertUserProfileImage(UserVO user);
+
+	void updateUserProfileImage(UserVO user);
+
+	List<ReviewVO> selectReviewListbyNum(int rt_num);
+
+	void insertSocial(Integer us_num, String type);
+
+	void selectSocial(Integer us_num);
+	
+	void updateSocial(Integer us_num, String type, int input);
+
+	int selectKeywordCount();
+
+	List<String> selectKeywords();
+
+	List<String> selectCriKeywords(int start, int end);
+
 
 
 }

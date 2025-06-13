@@ -53,7 +53,7 @@ CREATE TABLE `BusinessDate` (
 	`BD_OFF`	BOOLEAN NOT NULL,
 	`bd_open`	DATETIME	NULL,
 	`bd_close`	DATETIME	NULL,
-	`bd_brstart`	TIME	NULL,
+	`bd_brstart` DATETIME	NULL,
 	`bd_brend`	DATETIME	NULL,
 	`bd_loam`	DATETIME	NULL,
 	`bd_lopm`	DATETIME	NULL
@@ -203,7 +203,7 @@ DROP TABLE IF EXISTS `DefaultResTime`;
 
 CREATE TABLE `DefaultResTime` (
 	`DRT_NUM`	INT PRIMARY KEY AUTO_INCREMENT	NOT NULL,
-	`drt_rt_num`	INT	NOT NULL UNIQUE,
+	`drt_rt_num`	INT NULL,
 	`drt_date`		ENUM('월', '화', '수', '목', '금', '토', '일') NOT NULL,
 	`drt_off`		BOOLEAN NOT NULL,
 	`drt_open`	TIME	NULL,

@@ -1,128 +1,443 @@
 <!DOCTYPE html>
-<html 
-lang="en" 
-xmlns:th="http://www.thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
-layout:decorate="~{layout/manager_layout.html}"
-xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
-<head>
-	<meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  
- 
-  <title>테이블업 - 매니저페이지 - 매장 일정 관리</title>
+    <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/manager_layout.html}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<style>
-    .date-button.active {
-      background-color: #0d6efd;
-      color: white;
-    }
-    .time-button.active {
-      background-color: #198754;
-      color: white;
-    }
-    .table-box {
-      width: 80px;
-      height: 80px;
-      border: 2px solid #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 5px;
-      cursor: pointer;
-    }
-    .reserved {
-      background-color: lightgray;
-    }
-</style>
-</head>
-<body>
-	<main layout:fragment="content">
-		<!-- 매장 정보가 등록이 되어 있으면-->
-		<h2>매장 일정 관리</h2>
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <title>영업 일자 상세 정보</title>
+
+    <style>
+        .container {
+        max-width: 900px;
+        }
+
+        .date-button.active {
+        background-color: #0d6efd;
+        color: white;
+        }
+
+        .btn-group {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 24px;
+        }
+
+        .card-section {
+        border: 1px solid #dee2e6;
+        border-radius: 0px;
+        padding: 16px;
+        background-color: #f8f9fa;
+        margin-bottom: 20px;
+        }
+
+        .time-button {
+        margin-bottom: 6px;
+        }
+
+        #quick-time-restime input {
+        max-width: 240px;
+        }
+
+        #selected-time-infomation {
+        font-size: 1.1rem;
+        font-weight: 500;
+        }
+    </style>
+    </head>
+
+    <body>
+    <main layout:fragment="content" class="mt-3">
+        <div class="container">
+        <h2 class="mb-4">영업 일자 상세 정보</h2>
+
         <div th:if="${restaurant != null}">
-            <div class="btn-group mb-3" role="group" aria-label="날짜 선택">
-            <button type="button" class="btn btn-outline-primary date-button"
-                    th:each="date : ${dateList}"
-                    th:text="${#temporals.format(date, 'MM/dd (E)')}"
-                    th:data-date="${date}"
-                    onclick="selectDate(this)">
-            </button>
-            
+            <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary" onclick="changeWeek(-1)">←</button>
+            <div id="date-buttons-container" class="d-inline-flex flex-wrap"></div>
+            <button type="button" class="btn btn-outline-primary" onclick="changeWeek(1)">→</button>
             </div>
+
             <div class="row">
-                <div class="col-md-3">
-                    <h5>예약 가능 시간</h5>
-                    <div class="list-group" id="time-list">
-                        
-                    </div>
-                </div>
-
-                <div class="col-md-9">
-                    <h5>테이블 정보</h5>
-                    <div class="list-group" id="table-info">
-                    
-                    </div>
-                </div>
+            <div class="col-md-4 card-section">
+                <h5>예약 가능 시간</h5>
+                <div class="list-group" id="time-list"></div>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-3" id="toggle-restime-form" style="display: none;">+ 추가 등록</button>
+                <div id="quick-time-restime" class="mt-3" style="display: none;"></div>
+                <div id="holiday-toggle-area" class="mt-3"></div>
             </div>
-		</div>
-		<!-- 매장 정보가 등록이 되어 있지 않으면-->
-		<div th:unless="${restaurant != null}">
-			<h3>아직 식당정보를 입력하지 않앗습니다.</h3>
-		</div>
-		<button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/schedule/make_schetime'">일정등록</button>
-        <script>
-            const timeList = /*[[${timeList}]]*/ [];
-            const restimeList = /*[[${restimelist}]]*/ [];
-            const tableCount = /*[[${restaurant.rt_max_table}]]*/ 0;
-            const tableCapacity = /*[[${restaurant.rt_max_person}]]*/ 0;
 
-            function selectDate(button) {
+            <div class="col-md-8 card-section">
+                <h5>좌석 정보</h5>
+                <div id="selected-time-infomation" class="text-primary"></div>
+            </div>
+            </div>
+        </div>
+
+        <div th:unless="${restaurant != null}">
+            <div class="alert alert-warning">아직 식당정보를 입력하지 않았습니다.</div>
+        </div>
+
+        <button type="button" class="btn btn-outline-secondary col-12 mt-4" onclick="location.href='/manager/opertime/opertimepage'">매장 화면으로 돌아가기</button>
+        </div>
+        <!-- 오늘로 부터 1주일 데이터 출력 -->
+        <script>
+            let baseDate = new Date(); // 오늘 기준
+            const container = document.getElementById('date-buttons-container');
+
+            function renderDateButtons(startDate) {
+                container.innerHTML = '';
+
+                for (let i = 0; i < 7; i++) {
+                    const current = new Date(startDate);
+                    current.setDate(startDate.getDate() + i);
+
+                    const yyyyMMdd = current.toISOString().split('T')[0];
+                    const month = (current.getMonth() + 1).toString().padStart(2, '0');
+                    const day = current.getDate().toString().padStart(2, '0');
+                    const weekday = ['일', '월', '화', '수', '목', '금', '토'][current.getDay()];
+                    const label = `${month}/${day} (${weekday})`;
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'btn btn-outline-primary date-button';
+                    btn.setAttribute('data-date', yyyyMMdd);
+                    btn.textContent = label;
+                    btn.onclick = () => selectDate(btn);
+
+                    container.appendChild(btn);
+                }
+            }
+
+            function changeWeek(offset) {
+                baseDate.setDate(baseDate.getDate() + offset * 7);
+                renderDateButtons(new Date(baseDate));
+            }
+
+            window.addEventListener('DOMContentLoaded', () => {
+                renderDateButtons(baseDate);
+            });
+        </script>
+        
+        <script th:inline="javascript">
+
+        const formatDate = (dateStr) => {
+            if (!dateStr) return '';
+            try {
+                return new Date(dateStr).toISOString().split('T')[0];
+            } catch(e) {
+                console.error("Invalid date:", dateStr);
+                return '';
+            }
+        };
+        
+        // opertimeList = List<businessHourVO>
+        const restimeList = [[${restimelist}]];
+        // opertimeList = List<businessDateVO>
+        const opertimeList=[[${opertimelist}]];
+
+        console.log("opertimeList : ",opertimeList);
+        const reservationList = /*[[${reservationList}]]*/ [];
+        function selectDate(button) {
+
+            
             // 날짜 버튼 활성화
             document.querySelectorAll('.date-button').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
-            // 선택된 날짜에 해당하는 시간대 필터링
             const selectedDate = button.getAttribute('data-date');
-            const filteredTimes = restimeList
-                .filter(item => item.date === selectedDate)
-                .map(item => item.time);
+            const timeListDiv = document.getElementById('time-list');
+            const infoDiv = document.getElementById('selected-time-infomation'); 
+            const hoildayButton = document.getElementById('holiday-toggle-area');
+            
+            //예약 가능 시간 추가 버튼
+            const quickRestimeDiv = document.getElementById('quick-time-restime');
+            const toggleResButton = document.getElementById('toggle-restime-form');
+            
+            // 이전 정보 초기화
+            timeListDiv.innerHTML = '';
+            infoDiv.innerHTML = '';
+            hoildayButton.innerHTML = '';
+            
+            //예약 가능 시간 추가 버튼 초기화
+            quickRestimeDiv.style.display='none';
+            quickRestimeDiv.innerHTML = '';
+            toggleResButton.style.display = 'none';
+            toggleResButton.textContent = '+ 추가 등록';
 
-            // 시간대 목록 업데이트
+            const openDay = opertimeList.find(item => item.bd_date?.substring(0, 10) === selectedDate);
+
+            // 등록된 날짜가 없는 경우
+            if (!openDay) {
+                timeListDiv.innerHTML = '<div class="text-danger">미등록 된 날짜입니다</div>';
+                toggleResButton.style.display = 'none';
+                return;
+            }
+            //간단 등록 버튼 
+            // 쉬는 날 버튼 생성
+            const toggleButton = document.createElement('button');
+            toggleButton.className = 'btn btn-outline-warning';
+            toggleButton.textContent = openDay.bd_off ? '쉬는 날 해제' : '쉬는 날로 변경';
+            toggleButton.onclick = () => HolidayStatus(selectedDate, !openDay.bd_off);
+            hoildayButton.appendChild(toggleButton);
+
+            //예약 가능 시간 등록
+
+            //예약 시간(시작)
+            const starttimeLabel = document.createElement('label');
+            starttimeLabel.textContent = '예약 시작 시간';
+            starttimeLabel.className = 'form-label';
+
+            const starttimeInput = document.createElement('input');
+            starttimeInput.type = 'time';
+            starttimeInput.className = 'form-control mb-2';
+            starttimeInput.id = 'start-time-input';
+            starttimeInput.style.maxWidth = '200px';
+
+            //예약 시간(종료)
+            const endtimeLabel = document.createElement('label');
+            endtimeLabel.textContent = '예약 종료 시간';
+            endtimeLabel.className = 'form-label';
+
+            const endtimeInput = document.createElement('input');
+            endtimeInput.type = 'time';
+            endtimeInput.className = 'form-control mb-2';
+            endtimeInput.id = 'end-time-input';
+            endtimeInput.style.maxWidth = '200px';
+
+            // 좌석 수
+            const seatLabel = document.createElement('label');
+            seatLabel.textContent = '최대 좌석 수';
+            seatLabel.className = 'form-label mt-2';
+
+            const seatInput = document.createElement('input');
+            seatInput.type = 'number';
+            seatInput.className = 'form-control mb-2';
+            seatInput.id = 'seat-max-input';
+            seatInput.placeholder = '예: 10';
+            seatInput.style.maxWidth = '200px';
+
+            // 테이블 수
+            const tableLabel = document.createElement('label');
+            tableLabel.textContent = '최대 테이블 수';
+            tableLabel.className = 'form-label mt-2';
+
+            const tableInput = document.createElement('input');
+            tableInput.type = 'number';
+            tableInput.className = 'form-control mb-2';
+            tableInput.id = 'table-max-input';
+            tableInput.placeholder = '예: 5';
+            tableInput.style.maxWidth = '200px';
+
+            const addButton = document.createElement('button');
+            addButton.textContent='등록';
+            addButton.className='btn btn-sm btn-outline-primary';
+            addButton.onclick = function(){
+                const newTime = starttimeInput.value;
+                const endTime = endtimeInput.value;
+                const seatMax = seatInput.value;
+                const tableMax = tableInput.value;
+                const selectedDate = document.querySelector('.date-button.active')?.getAttribute('data-date');
+
+                if(!selectedDate || !newTime ||!seatMax){
+                    alert('날짜와 시간, 좌석을 모두 입력해주세요.');
+                    return;
+                }
+                $.ajax({
+                    async : true, 
+                    url : '/schedule/insertRestime', 
+                    type : 'post', 
+                    contentType: 'application/json',
+                    data : JSON.stringify({
+                        date : selectedDate,
+                        startTime : newTime,
+                        endTime : endTime,
+                        seatMax : parseInt(seatMax),
+                        tableMax : parseInt(tableMax),
+                    }), 
+                    success : function (){
+                        alert('등록했습니다.');
+                        const btn=document.querySelector(`.date-button[data-date="${selectedDate}"]`);
+                        if (btn) selectDate(btn);
+                    }, 
+                    error : function(){
+                        alert('등록에 실패했습니다.');
+                    }
+                });
+                
+            }
+            //
+            if(openDay.bd_off === true) {
+                document.getElementById('quick-time-restime').style.display = 'none';
+                return;
+            } else {
+                document.getElementById('quick-time-restime').style.display = 'block';
+            }
+            
+
+            quickRestimeDiv.appendChild(starttimeLabel);
+            quickRestimeDiv.appendChild(starttimeInput);
+            
+            quickRestimeDiv.appendChild(endtimeLabel);
+            quickRestimeDiv.appendChild(endtimeInput);
+
+            quickRestimeDiv.appendChild(seatLabel);
+            quickRestimeDiv.appendChild(seatInput);
+
+            quickRestimeDiv.appendChild(tableLabel);
+            quickRestimeDiv.appendChild(tableInput);
+
+            quickRestimeDiv.appendChild(addButton);
+
+            // 쉬는 날인 경우
+            if (openDay.bd_off === true) {
+                timeListDiv.innerHTML = '<div class="text-warning">쉬는 날입니다</div>';
+                toggleResButton.style.display = 'none';
+                quickRestimeDiv.style.display = 'none';
+                return;
+            }
+
+            toggleResButton.style.display='inline-block';
+            quickRestimeDiv.style.display='none';
+
+            console.log("selectedDate", selectedDate);
+            document.getElementById('selected-time-infomation').innerHTML = '';
+           $.ajax({
+                async : true, 
+                url : '/schedule/getTimes', 
+                type : 'get', 
+                data : {selectedDate: selectedDate}, 
+                success : function(filteredTimes){
+                    
+                    const timeListDiv =document.getElementById('time-list');
+                    timeListDiv.innerHTML='';
+                    console.log("선택된 날짜:", selectedDate);
+                    console.log("bh_start들:", restimeList.map(r => r.bh_start));
+                    console.log("filteredTimes : ",filteredTimes);
+                    if(!filteredTimes || filteredTimes.length === 0){
+                        timeListDiv.innerHTML = '<div class="text-secondary">등록된 예약 시간이 없습니다.</div>';
+                        return;
+                    }
+
+                    filteredTimes.forEach(timeStr => {
+                        const bh = restimeList.find(item => {
+                            const itemDate = new Date(item.bh_start);
+                            const itemDateStr = itemDate.toISOString().split('T')[0];
+                            const itemTimeStr = itemDate.toTimeString().substring(0,5);
+                            return itemDateStr === selectedDate && itemTimeStr === timeStr;
+                            });
+                        const isFull = bh && status && status.tableCount >= bh.bh_table_max;
+                        
+                        const timeButton = document.createElement('button');
+                        timeButton.className = 'list-group-item list-group-item-action time-button';
+                        timeButton.setAttribute('data-time', timeStr);
+                        timeButton.setAttribute('data-date', selectedDate);
+
+                        if (isFull) {
+                            timeButton.innerHTML = `<span>${timeStr}</span> <small class="text-danger">(마감)</small>`;
+                            timeButton.classList.add('disabled');
+                        } else {
+                            timeButton.textContent = timeStr;
+                            timeButton.onclick = () => selectTime(timeButton);
+                        }
+
+                        timeListDiv.appendChild(timeButton);
+                    });
+                    
+                }, 
+                error : function(){
+                    console.error("불러오기 실패")
+                }
+            });
+            
+
+        }
+        //쉬는날 변경 여부 버튼
+        function HolidayStatus(date, newStatus){
+            console.log("보내는 데이터:", { date: date, bd_off: newStatus });
+            $.ajax({
+                async : true, 
+                url : '/schedule/update-holiday', 
+                type : 'post', 
+                data : JSON.stringify({bd_date: date, bd_off: newStatus}), 
+                contentType: 'application/json', 
+                success : function (){
+                    alert('상태가 변경되었습니다.');
+                    const updated = opertimeList.find(item => item.bd_date?.substring(0, 10) === date);
+                    if (updated) {
+                        updated.bd_off = newStatus;
+                    }
+                    
+                    const btn = document.querySelector(`.date-button[data-date="${date}"]`);
+                    if (btn) selectDate(btn);
+                }, 
+                error : function(){
+                    alert('오류가 발생하였습니다.');
+                }
+            });
+        }
+
+        //예약 가능 시간대 버튼 출력
+        function renderTimeButtons(selectedDate, startHour, endHour) {
+            console.log('selectedDate:', selectedDate);
+
+            console.log('startHour:', startHour, 'endHour:', endHour);
+            
+            console.log("filteredTimes:", filteredTimes);
             const timeListDiv = document.getElementById('time-list');
             timeListDiv.innerHTML = '';
-            filteredTimes.forEach(time => {
-                const timeButton = document.createElement('button');
-                timeButton.className = 'list-group-item list-group-item-action time-button';
-                timeButton.textContent = time;
-                timeButton.setAttribute('data-time', time);
-                timeButton.onclick = () => selectTime(timeButton);
-                timeListDiv.appendChild(timeButton);
+        }
+
+        function selectTime(button){
+            const selectedDate = button.getAttribute('data-date');
+            const selectedTime = button.getAttribute('data-time');
+            
+            $.ajax({
+                async : true,
+                url : '/schedule/time-infomation', 
+                type : 'get', 
+                data : {
+                    date : selectedDate,
+                    time : selectedTime
+                },
+                dataType : 'json', 
+                success : function (response){
+                    const infoDiv = document.getElementById('selected-time-infomation');
+                    console.log(infoDiv)
+                    if (response && response.seatCount != null && response.seatMax != null) {
+                        let message = `<strong>${selectedTime}</strong> - 예약 인원 : ${response.seatCount} / ${response.seatMax}`;
+                        if (response.seatCount >= response.seatMax) {
+                            message += ` <span class="text-danger">(예약 마감)</span>`;
+                        }
+                        infoDiv.innerHTML = message;
+                    } else {
+                        infoDiv.innerHTML = "예약 정보를 불러올 수 없습니다.";
+                    }
+                }, 
+                error: function () {
+                    document.getElementById('selected-time-infomation').innerHTML = "오류가 생겼습니다.";
+                }
             });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleResButton = document.getElementById('toggle-restime-form');
+            const formDiv = document.getElementById('quick-time-restime');
 
-            // 테이블 정보 초기화
-            document.getElementById('table-info').innerHTML = '';
+            if (toggleResButton && formDiv) {
+                toggleResButton.addEventListener('click', function () {
+                    const isHidden = formDiv.style.display === 'none';
+                    formDiv.style.display = isHidden ? 'block' : 'none';
+                    toggleResButton.textContent = isHidden ? '▲ 닫기' : '+ 추가 등록';
+                });
             }
-
-            function selectTime(button) {
-            // 시간대 버튼 활성화
-            document.querySelectorAll('.time-button').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-
-            // 테이블 정보 표시
-            const tableInfoDiv = document.getElementById('table-info');
-            tableInfoDiv.innerHTML = '';
-            for (let i = 1; i <= tableCount; i++) {
-                const tableBox = document.createElement('div');
-                tableBox.className = 'table-box';
-                tableBox.textContent = `T${i} (${tableCapacity}명)`;
-                tableInfoDiv.appendChild(tableBox);
-            }
-            }
+        });
+                
         </script>
-
+        
         
     </main>
 </body>

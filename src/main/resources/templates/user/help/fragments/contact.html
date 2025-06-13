@@ -1,0 +1,31 @@
+<div th:fragment="contact">
+  <h4>문의하기</h4>
+  <form th:action="@{/help/contact}" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="name">이름</label>
+      <input type="text" class="form-control" name="name" required>
+    </div>
+    <div class="mb-3">
+      <label for="email">이메일</label>
+      <input type="email" class="form-control" name="email" required>
+    </div>
+    <div class="mb-3">
+      <label for="type">문의 유형</label>
+      <select class="form-select" name="type">
+        <option value="예약">예약</option>
+        <option value="오류">오류</option>
+        <option value="기능요청">기능 요청</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="message">내용</label>
+      <textarea class="form-control" name="message" rows="5" required></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="file">파일 첨부</label>
+      <input type="file" class="form-control" name="file">
+    </div>
+    <button type="submit" class="btn btn-primary">문의하기</button>
+  </form>
+</div>

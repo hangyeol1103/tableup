@@ -1,43 +1,114 @@
 <!DOCTYPE html>
 <html 
-lang="en" 
+lang="ko"
 xmlns:th="http://www.thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 layout:decorate="~{layout/manager_layout.html}"
-xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
-	<meta charset="utf-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>소식/공지사항 상세</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-	<title>테이블업 - 매장 관리 및 매장 정보</title>
-	
-  </style>
 </head>
+
 <body>
-	<main layout:fragment="content" class="container">
-		<div>			
-			<h2 class="mb-4 fw-bold text-primary">소식/공지사항 정보</h2>
-			<div>
-				<div class="input-group form-group">
-					<div class="form-control col-3">소식/공지사항 내용</div>
-					<div class="form-control" th:text="${news.rn_content}"></div>
-				</div>
-				<div class="input-group form-group">
-					<div class="form-control col-3">소식/공지사항 상태</div>
-					<div class="form-control" th:text="${news.rn_state != null ?(news.rn_state ? '공개' : '비공개'):'-'}"></div>
-				</div>
-			</div>
-			<div>
-				<!-- <button type="button" class="btn btn-outline-warning col-12 mb-3" onclick="location.href='/manager/remake_menu'">메뉴 정보 변경</button> -->
-				<a th:href="@{/manager/news/remake_news/{rn_num}(rn_num=${news.rn_num})}"class="btn btn-outline-warning col-12 mb-3">소식/공지사항 변경</a>
-				<form th:action="@{/manager/news/delete_news/{rn_num}(rn_num=${news.rn_num})}"  method="post">
-					<button type="submit" class="btn btn-outline-danger col-12 mb-3" onclick="return confirm('정말 삭제하시겠습니까?');">소식/공지사항 삭제</button>
-				</form>
-				
-			</div>
-			 <a th:href="@{/manager/news/menulist/{rt_num}(rt_num=${news.rn_rt_num})}" class="btn btn-outline-secondary col-12 mb-3">소식/공지사항 목록으로</a>
-		</div>
-	</main>
+<main layout:fragment="content" class="container mt-5 mb-5">
+  <div class="card shadow-sm p-3" style="max-width: 700px; margin: auto;">
+    
+    <!-- 카드 헤더 -->
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h4 class="mb-0"><i class="bi bi-megaphone"></i> 소식/공지사항 상세</h4>
+      <a th:href="@{/manager/news/newslist/{rt_num}(rt_num=${news.rn_rt_num})}" class="btn btn-light btn-sm">← 목록으로</a>
+    </div>
+
+    <!-- 카드 본문 -->
+    <div class="card-body">
+      <div class="mb-3 row">
+        <label class="col-md-3 fw-bold">내용:</label>
+        <div class="col-md-9" th:text="${news.rn_content}"></div>
+      </div>
+
+      <div class="mb-3 row">
+        <label class="col-md-3 fw-bold">상태:</label>
+        <div class="col-md-9" th:text="${news.rn_state != null ? (news.rn_state ? '공개' : '비공개') : '-'}"></div>
+      </div>
+    </div>
+
+    <!-- 카드 푸터 (버튼 영역) -->
+    <div class="card-footer d-flex justify-content-end gap-2">
+      <!-- <a th:href="@{/manager/news/remake_news/{rn_num}(rn_num=${news.rn_num})}" class="btn btn-outline-warning">소식/공지사항 변경</a> -->
+      <!-- 수정 버튼 -->
+      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editNewsModal">소식/공지사항 변경</button>
+      <form th:action="@{/manager/news/delete_news/{rn_num}(rn_num=${news.rn_num})}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+        <button type="submit" class="btn btn-outline-danger">소식/공지사항 삭제</button>
+      </form>
+    </div>
+
+  </div>
+  <!-- 수정 모달 추가 (카드 하단에 배치) -->
+  <div class="modal fade" id="editNewsModal" tabindex="-1" aria-labelledby="editNewsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editNewsForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editNewsModalLabel">소식/공지사항 변경</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="rn_num" th:value="${news.rn_num}" />
+
+            <div class="mb-3">
+              <label for="rn_content" class="form-label">내용</label>
+              <input type="text" class="form-control" name="rn_content" id="rn_content" th:value="${news.rn_content}" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="rn_state" class="form-label">상태</label>
+              <select class="form-select" name="rn_state" id="rn_state" required>
+                <option value="true" th:selected="${news.rn_state} == true">공개</option>
+                <option value="false" th:selected="${news.rn_state} == false">비공개</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">저장</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function () {
+      $('#editNewsForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = {
+          rn_num: $('input[name="rn_num"]').val(),
+          rn_content: $('#rn_content').val(),
+          rn_state: $('#rn_state').val()
+        };
+
+        $.ajax({
+          type: 'POST',
+          url: '/manager/news/remake_news',
+          data: formData,
+          success: function (res) {
+            alert("수정 성공");
+            location.reload(); // 페이지 새로고침
+          },
+          error: function () {
+            alert("수정 실패");
+          }
+        });
+      });
+    });
+  </script>
+
+</main>
 </body>
 </html>

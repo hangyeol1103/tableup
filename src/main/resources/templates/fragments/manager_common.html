@@ -15,12 +15,14 @@
 					<span class="navbar-toggler-icon"></span>
 				</button>
 				<div class="collapse navbar-collapse" id="mynavbar">
-					<ul class="navbar-nav me-auto">
-						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
-							<a class="nav-link" th:href="@{/manager/managerpage}" th:classappend="${url == '/manager/managerpage' ? 'active' : ''}">매니저페이지</a>
+					<ul class="navbar-nav ms-auto">
+						<!-- 예약 현황 -->
+						<li class="nav-item" th:if="${restaurant != null}"   sec:authorize="hasRole('ROLE_MANAGER')">
+							<a class="nav-link" th:href="@{/manager/reservation}" th:classappend="${url == '/manager/reservation' ? 'active' : ''}">예약 현황</a>
 						</li>
-						<li class="nav-item" sec:authorize="hasRole('ROLE_MANAGER')">
-							<a class="nav-link" th:href="@{/manager/restaurant/restaurant}" th:classappend="${url == '/manager/restaurant/restaurant' ? 'active' : ''}">매장관리</a>
+						<!-- 예약 조회 -->
+						<li class="nav-item" th:if="${restaurant != null}"  sec:authorize="hasRole('ROLE_MANAGER')">
+							<a class="nav-link" th:href="@{/manager/reservation/reservationlist}" th:classappend="${url == '/manager/reservation/reservationlist' ? 'active' : ''}">예약 조회</a>
 						</li>
 						<li class="nav-item" sec:authorize="!hasRole('ROLE_MANAGER')">
 							<a class="nav-link" th:href="@{/manager/login}" th:classappend="${url == '/manager/login' ? 'active' : ''}">로그인</a>
@@ -29,9 +31,6 @@
 							<form th:action="@{/manager/logout}" method="post">
 								<button class="btn nav-link">로그아웃</button>
 							</form>
-						</li>
-						<li class="nav-item" sec:authorize="!hasRole('ROLE_MANAGER')">
-							<a class="nav-link" th:href="@{/manager/signup}" th:classappend="${url == '/manager/signup' ? 'active' : ''}">회원가입</a>
 						</li>
 						
 					</ul>
@@ -53,5 +52,18 @@
 				</div>
 			</div>
 		</footer>
+		<!-- <script th:inline="javascript">
+			document.addEventListener('DOMContentLoaded', function () {
+				document.querySelectorAll('.reservation-link').forEach(function (link) {
+					const hasRestaurant = link.dataset.hasRestaurant === 'true';
+					if (!hasRestaurant) {
+						link.addEventListener('click', function (e) {
+							e.preventDefault();
+							alert('매장 정보가 등록되지 않았습니다.\n먼저 매장 정보를 등록해주세요.');
+						});
+					}
+				});
+			});
+		</script> -->
 </body>
 </html>

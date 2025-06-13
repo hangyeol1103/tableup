@@ -20,13 +20,16 @@ import kr.kh.tableup.dao.ReservationDAO;
 import kr.kh.tableup.dao.RestaurantDAO;
 import kr.kh.tableup.dao.UserDAO;
 import kr.kh.tableup.model.util.CustomManager;
-import kr.kh.tableup.model.vo.BusinessHourVO;
+import kr.kh.tableup.model.util.CustomUser;
+import kr.kh.tableup.model.vo.BusinessHourVO22;
 import kr.kh.tableup.model.vo.ReservationVO;
 import kr.kh.tableup.model.vo.RestaurantVO;
 import kr.kh.tableup.model.vo.UserVO;
 import kr.kh.tableup.service.ManagerService;
 import kr.kh.tableup.service.ReservationService;
 import kr.kh.tableup.service.UserService;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 @RequestMapping("/user/reservation")
@@ -43,9 +46,9 @@ public class ReservationController {
 
 
 
-	@GetMapping("/confirm")
-	public String reservationConfirm(@RequestParam int rt_num, @RequestParam String date, @RequestParam String time,
-																	 @RequestParam int person, Model model) {
+	@PostMapping("/confirm")
+	public String reservationConfirm( int rt_num,  String date,String time,
+																	  int person, Model model) {
 		RestaurantVO restaurant = managerService.getRestaurantByNum(rt_num);
 
 		model.addAttribute("restaurant", restaurant);
@@ -55,6 +58,7 @@ public class ReservationController {
 		model.addAttribute("person", person);
 		return "user/reservation/confirm";
 	}
+	
 
 	@PostMapping("/submit")
 	public String reservationSubmit(@RequestParam int rt_num, @RequestParam String date, @RequestParam String time,
@@ -100,5 +104,18 @@ public class ReservationController {
 		ra.addFlashAttribute("msg", "예약이 완료되었습니다.");
 		return "redirect:/";
 	}
+
+	// @GetMapping("/resdetail/{res_num}")
+	// public String reservationDetail(Model model, Principal principal, @AuthenticationPrincipal CustomUser user, @PathVariable int res_num) {
+	// 	if(principal == null || user ==null){
+	// 		return "redirect:/user/login";
+	// 	}
+	// 	ReservationVO reservation = reservationService.getUserReservation(res_num);
+	// 	model.addAttribute("reservation", reservation);
+	// 	return "user/reservation/resdetail";
+	// }
+	
+
+
 	
 }

@@ -8,23 +8,36 @@
   <title>영업일자 달력 보기</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     .calendar-cell {
-      width: 120px;
-      height: 100px;
-      border: 1px solid #ccc;
-      margin: 5px;
-      padding: 5px;
+      width: 170px;
+      height: 160px;
+      border: 1px solid #dee2e6;
+      border-radius: 0px;
+      margin: 0px;
+      padding: 8px;
       display: inline-block;
       vertical-align: top;
       position: relative;
       cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      background-color: #fff;
+      box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
     }
-    .calendar-row {
-      display: flex;
+    .calendar-cell:hover {
+      background-color: #f1f3f5;
+      transform: scale(1.02);
     }
-    .calendar-month {
-      margin-bottom: 2rem;
+    .calendar-header-cell {
+      height: 50px;
+      background-color: #f8f9fa;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-align: center;
+      line-height: 50px;
+      border-bottom: 2px solid #dee2e6;
+      padding: 0px;
     }
     .calendar-navigation {
       display: flex;
@@ -32,69 +45,178 @@
       align-items: center;
       margin-bottom: 1rem;
     }
+    
+    .calendar-row {
+      display: flex;
+      flex-wrap: nowrap;
+    }
     .opertime-info {
-      font-size: 0.8em;
-      margin-top: 5px;
+      font-size: 0.75em;
+      color: #495057;
+      margin-top: 30px;
+    }
+    .opertime-info .badge.open {
+      background-color: #198754;
+    }
+    .opertime-info .badge.closed {
+      background-color: #dc3545;
+    }
+    .day-number {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-weight: bold;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
 <main class="container mt-4" layout:fragment="content">
   <h2>영업일자 달력</h2>
-  <div class="calendar-navigation">
+  <div class="calendar-navigation mb-3">
     <button id="prevMonth" class="btn btn-outline-primary">이전달</button>
     <span id="calendarTitle" class="fw-bold"></span>
     <button id="nextMonth" class="btn btn-outline-primary">다음달</button>
   </div>
-  <div id="calendar"></div>
 
-  <button type="button" class="btn btn-outline-success col-12 mb-3" onclick="location.href='/manager/make_opertime'">영업시간 등록</button>
-  <a th:href="@{/manager/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mb-3">매장 관리 화면으로 돌아가기</a>
+  <div id="calendar" class="d-flex justify-content-center flex-wrap"></div>
+
+  <!-- 상세 보기 모달 -->
+  <div class="modal fade" id="daySummaryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">영업일자 상세</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="modal-body-content"></div>
+        <div class="modal-footer">
+          <a href="#" id="edit-link" class="btn btn-primary">수정하기</a>
+          <button type="button" class="btn btn-danger" id="delete-btn">삭제</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 수정 모달 -->
+  <div class="modal fade" id="editOpentimeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form id="editOpentimeForm">
+          <div class="modal-header">
+            <h5 class="modal-title">영업일자 수정</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="bd_num" id="edit_bd_num">
+            <div class="mb-3">
+              <label class="form-label">영업 날짜</label>
+              <input type="date" class="form-control" id="edit_bd_date" name="bd_date" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">휴무일 여부</label>
+              <select class="form-select" id="edit_bd_off" name="bd_off">
+                <option value="false">영업일</option>
+                <option value="true">쉬는날</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">개점 시간</label>
+              <input type="time" class="form-control" id="edit_bd_open" name="bd_open">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">마감 시간</label>
+              <input type="time" class="form-control" id="edit_bd_close" name="bd_close">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">브레이크 타임 유무</label>
+              <select class="form-select" id="edit_has_break">
+                <option value="false">없음</option>
+                <option value="true">있음</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">브레이크 시작</label>
+              <input type="time" class="form-control" id="edit_bd_brstart" name="bd_brstart">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">브레이크 종료</label>
+              <input type="time" class="form-control" id="edit_bd_brend" name="bd_brend">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">라스트오더(점심)</label>
+              <input type="time" class="form-control" id="edit_bd_loam" name="bd_loam">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">라스트오더(저녁)</label>
+              <input type="time" class="form-control" id="edit_bd_lopm" name="bd_lopm">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">저장</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <a th:href="@{/manager/opertime/make_opertime}" class="btn btn-primary col-12 mt-4">영업일자 등록</a>
+  <!-- <a th:href="@{/manager/restaurant/restaurant/{rm_id}(rm_id=${manager.rm_id})}" class="btn btn-outline-secondary col-12 mt-4">매장 관리 화면으로 돌아가기</a> -->
+  <a th:href="@{/manager/opertime/opertimepage}" class="btn btn-outline-secondary col-12 mt-4">영업일자 관리 페이지로</a>
 
   <script th:inline="javascript">
+    const opertimelist = /*[[${opertimelist}]]*/ [];
     const today = new Date();
     let currentMonth = today.getMonth();
     let currentYear = today.getFullYear();
-
-    const opertimelist = /*[[${opertimelist}]]*/ [];
+    let selectedBdNum = null;
+    let selectedMatch = null;
 
     function renderCalendar(year, month) {
       $('#calendar').empty();
-      const container = $('<div class="calendar-month"></div>');
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const firstDay = new Date(year, month, 1).getDay();
-
       $('#calendarTitle').text(`${year}년 ${month + 1}월`);
-      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+
+      const container = $('<div class="calendar-month"></div>');
       let row = $('<div class="calendar-row"></div>');
-      weekdays.forEach(day => row.append(`<div class="calendar-cell"><strong>${day}</strong></div>`));
+      ['일','월','화','수','목','금','토'].forEach(d => row.append(`<div class="calendar-cell calendar-header-cell"><strong>${d}</strong></div>`));
       container.append(row);
 
       row = $('<div class="calendar-row"></div>');
       for (let i = 0; i < firstDay; i++) row.append('<div class="calendar-cell"></div>');
 
       for (let i = 1; i <= daysInMonth; i++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        const match = opertimelist.find(op => op.bd_date === dateStr);
+        const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const match = opertimelist.find(op => op.bd_date?.substring(0, 10) === dateStr);
 
-        const cell = $(`
-          <div class="calendar-cell" data-date="${dateStr}">
-            <strong>${i}</strong>
-            ${match ? `
-              <div class="opertime-info">
-                ${match.bd_open || '-'} ~ ${match.bd_close || '-'}<br>
-                ${match.bd_off ? '쉬는날' : '여는날'}
-              </div>
-            ` : ''}
-          </div>
-        `);
-
+        const cell = $(`<div class="calendar-cell"><strong class="day-number">${i}</strong></div>`);
         if (match) {
+          cell.append(`
+            <div class="opertime-info">
+              <span class="badge ${match.bd_off ? 'closed' : 'open'}">${match.bd_off ? '쉬는날' : '영업중'}</span><br>
+              ${match.bd_open && match.bd_close ? `
+              <small>${match.bd_open.substring(11, 16)} ~ ${match.bd_close.substring(11, 16)}</small>` : ''}
+            </div>
+          `);
           cell.click(() => {
-            location.href = `/manager/opertime/remake_opertime/${match.bd_num}`;
+            selectedBdNum = match.bd_num;
+            selectedMatch = match;
+            const infoHtml = `
+              <p><strong>날짜:</strong> ${dateStr}</p>
+              <p><strong>상태:</strong> ${match.bd_off ? '쉬는날' : '영업일'}</p>
+              <p><strong>시간:</strong> ${match.bd_open?.substring(11, 16)} ~ ${match.bd_close?.substring(11, 16)}</p>
+              ${match.bd_brstart ? `<p><strong>브레이크:</strong> ${match.bd_brstart.substring(11, 16)} ~ ${match.bd_brend.substring(11, 16)}</p>` : ''}
+              ${match.bd_loam ? `<p><strong>라스트오더(점심):</strong> ${match.bd_loam.substring(11, 16)}</p>` : ''}
+              ${match.bd_lopm ? `<p><strong>라스트오더(저녁):</strong> ${match.bd_lopm.substring(11, 16)}</p>` : ''}
+            `;
+            $('#modal-body-content').html(infoHtml);
+            const modal = new bootstrap.Modal(document.getElementById('daySummaryModal'));
+            modal.show();
           });
         }
-
         row.append(cell);
         if ((firstDay + i) % 7 === 0) {
           container.append(row);
@@ -106,25 +228,108 @@
     }
 
     $('#prevMonth').click(() => {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-      }
+      currentMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+      if (currentMonth === 11) currentYear--;
       renderCalendar(currentYear, currentMonth);
     });
 
     $('#nextMonth').click(() => {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
+      currentMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+      if (currentMonth === 0) currentYear++;
       renderCalendar(currentYear, currentMonth);
     });
 
     $(document).ready(() => {
       renderCalendar(currentYear, currentMonth);
+      $('#edit-link').click(function (e) {
+        e.preventDefault();
+        if (selectedMatch) {
+          const summaryModal = bootstrap.Modal.getInstance(document.getElementById('daySummaryModal'));
+          summaryModal.hide();
+          openEditModal(selectedMatch);
+        }
+      });
+    });
+
+    function openEditModal(match) {
+      $('#edit_bd_num').val(match.bd_num);
+      $('#edit_bd_date').val(match.bd_date?.substring(0, 10));
+      $('#edit_bd_off').val(match.bd_off);
+      $('#edit_bd_open').val(match.bd_open?.substring(11, 16));
+      $('#edit_bd_close').val(match.bd_close?.substring(11, 16));
+      $('#edit_has_break').val(match.bd_brstart ? 'true' : 'false');
+      $('#edit_bd_brstart').val(match.bd_brstart?.substring(11, 16));
+      $('#edit_bd_brend').val(match.bd_brend?.substring(11, 16));
+      $('#edit_bd_loam').val(match.bd_loam?.substring(11, 16));
+      $('#edit_bd_lopm').val(match.bd_lopm?.substring(11, 16));
+      updateEditTimeInputs();
+      new bootstrap.Modal(document.getElementById('editOpentimeModal')).show();
+    }
+
+    function updateEditTimeInputs() {
+      const isClosed = $('#edit_bd_off').val() === 'true';
+      const hasBreak = $('#edit_has_break').val() === 'true';
+      const timeFields = ['#edit_bd_open', '#edit_bd_close', '#edit_bd_loam', '#edit_bd_lopm'];
+      const breakFields = ['#edit_bd_brstart', '#edit_bd_brend'];
+
+      timeFields.forEach(id => {
+        $(id).prop('disabled', isClosed);
+        $(id).prop('required', !isClosed);
+      });
+
+      breakFields.forEach(id => {
+        const disabled = isClosed || !hasBreak;
+        $(id).prop('disabled', disabled);
+        $(id).prop('required', !disabled);
+        if (disabled) $(id).val('');
+      });
+
+      $('#edit_has_break').prop('disabled', isClosed);
+    }
+
+    $('#edit_bd_off').change(updateEditTimeInputs);
+    $('#edit_has_break').change(updateEditTimeInputs);
+
+    $('#editOpentimeForm').submit(function (e) {
+      e.preventDefault();
+      const data = {
+        bd_num: $('#edit_bd_num').val(),
+        bd_date: $('#edit_bd_date').val(),
+        bd_off: $('#edit_bd_off').val(),
+        bd_open: $('#edit_bd_open').val(),
+        bd_close: $('#edit_bd_close').val(),
+        bd_brstart: $('#edit_bd_brstart').val(),
+        bd_brend: $('#edit_bd_brend').val(),
+        bd_loam: $('#edit_bd_loam').val(),
+        bd_lopm: $('#edit_bd_lopm').val()
+      };
+      $.ajax({
+        url: '/manager/opertime/remake_opertime',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: () => {
+          alert("수정 완료");
+          location.reload();
+        },
+        error: () => alert("수정 실패")
+      });
+    });
+
+    $('#delete-btn').click(function () {
+      if (selectedBdNum && confirm("정말 삭제하시겠습니까?")) {
+        $.ajax({
+          url: `/manager/opertime/delete_opertime/${selectedBdNum}`,
+          type: 'POST',
+          success: res => {
+            if (res === 'success') {
+              alert("삭제 완료");
+              location.reload();
+            } else alert("삭제 실패");
+          },
+          error: () => alert("서버 오류 발생")
+        });
+      }
     });
   </script>
 </main>

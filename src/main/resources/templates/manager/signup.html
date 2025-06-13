@@ -4,23 +4,43 @@
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
   layout:decorate="~{layout/manager_layout.html}">
   <head>
-    <title>Bootstrap Example</title>
+    <title>회원가입</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>	
 
     <style>
-      .box input:focus{outline: 0; box-shadow: none; z-index: 10;}
-      .box input+input{margin-top: -1px;}
-      .box input:first-of-type{ border-radius: 5px 5px 0 0 !important;}
-      .box input:last-of-type{ border-radius: 0 0 5px 5px !important;}
-      .error{color: red;}
-    </style>
+			.box input:focus {
+				outline: 0;
+				box-shadow: none;
+				z-index: 10;
+			}
+
+			.box input+input {
+				margin-top: -1px;
+			}
+
+			.box input:first-of-type {
+				border-radius: 5px 5px 0 0 !important;
+			}
+
+			.box input:last-of-type {
+				border-radius: 0 0 5px 5px !important;
+			}
+
+			.error {
+				color: red;
+				font-size: 0.9em;
+				margin-top: 4px;
+			}
+		</style>
   </head>
 <body>
   <main div class="container mt-4"layout:fragment="content" >
-    <h2>회원가입</h2>
+    <h2>매니저 회원가입</h2>
     <form th:action="@{/manager/signup}" method="post" id="signup-form">
       <div class="mb-3 form-group box">
         <label for="rm_id" class="form-label">아이디</label>
@@ -64,97 +84,134 @@
         <label for="rm_business" id="rm_business-error" class="error d-block"></label>
 			</div>
 
-      <button type="submit" class="btn btn-success w-100">가입 하기</button>
+      <button type="submit" class="btn btn-success w-100 mb-3">가입 하기</button>
     </form>
-    <script>
-      $("#signup-form").validate({
-				rules : {
-					rm_id : {
-						required : true,
-						regex : /^[a-zA-Z0-9]{3,12}$/,
-						duplicate : true
-					},
-					rm_pw : {
-						required : true,
-						regex : /^[a-zA-Z0-9!@#$]{3,12}$/
-					},
-					rm_pw2 : {
-						equalTo : rm_pw
-					},
-					rm_email : {
-						required : true,
-						email : true
-					},
-					rm_phone : {
-						required : true,
-						phone : true
-					},
-          rm_business : {
-            required : true,
-						business : true
-          }
+    <script th:inline="javascript">
 
-				},
-				messages : {
-					rm_id : {
-						required : "·아이디는 필수 항목입니다.",
-						regex : "·아이디는 영어, 숫자로 이루어져 있으며, 3~20자입니다.",
-						duplicate : "이미 사용중인 아이디입니다."
-					},
-					rm_pw : {
-						required : "·비번은 필수 항목입니다.",
-						regex : "·비번은 영어, 숫자, 특수문자(!@#$)로 이루어져 있으며, 3~20자입니다."
-					},
-					rm_pw2 : {
-						equalTo : "·비번과 비번 확인이 같지 않습니다."
-					},
-					rm_email : {
-						required : "·이메일은 필수 항목입니다.",
-						email : "·이메일 형식에 맞지 않습니다."
-					},
-					rm_phone : {
-						required : "·전화번호는 필수 항목입니다.",
-						phone : "·전화번호 형식에 맞지 않습니다.(예:010-xxx(x)-xxxx)"
-					},
-          rm_business : {
-						required : "·사용자번호는 필수 항목입니다.",
-						phone : "·사용자번호 형식에 맞지 않습니다.(예:xxx-xx-xxxxx)"
-					}
-				},
-				submitHandler : function(){
-					return true;
+			$(document).ready(function () {
+        const managerList = /*[[${managerList}]]*/ [];
+
+        // 사용자 정의 메서드 등록
+        $.validator.addMethod("regex", function (value, element, regex) {
+          const re = new RegExp(regex);
+          return this.optional(element) || re.test(value);
+        });
+
+        $.validator.addMethod("phone", function (value, element) {
+          return this.optional(element) || /^0\d{1,2}-\d{3,4}-\d{4}$/.test(value);
+        });
+
+        $.validator.addMethod("business", function (value, element) {
+          return this.optional(element) || /^\d{3}-\d{2}-\d{5}$/.test(value);
+        });
+
+        $.validator.addMethod("duplicate", function (value, element) {
+          return this.optional(element) || checkId(value);
+        });
+
+				$.validator.addMethod("businessDuplicate", function(value, element) {
+					return this.optional(element) || checkBusiness(value);
+				}, "이미 사용중인 사업자 번호입니다.");
+
+        // 아이디 중복 체크
+        function checkId(id) {
+          let res = false;
+          $.ajax({
+            async: false,
+            url: "/manager/check/id",
+            method: "get",
+            data: { id },
+            success: function (data) {
+              res = data;
+            }
+          });
+          return res;
+        }
+				//사업자 번호 중복 체크
+				function checkBusiness(business) {
+					let res = false;
+					$.ajax({
+						async: false,
+						url: "/manager/check/business",
+						method: "get",
+						data: { business },
+						success: function(data) {
+							res = data;
+						}
+					});
+					return res;
 				}
-			});
-      $.validator.addMethod("regex", function(value, element, regex){
-				var re = new RegExp(regex);
-				return this.optional(element) || re.test(value);
-			}, "정규 표현식을 확인하세요.");
-			$.validator.addMethod("phone", function(value, element){
-				return this.optional(element) || /^0\d{1,2}-\d{3,4}-\d{4}$/.test(value);
-			}, "전화번호 형식에 맞지 않습니다.(예:010-xxx(x)-xxxx)");
-      $.validator.addMethod("business", function(value, element){
-				return this.optional(element) || /^0\d{3}-\d{2}-\d{5}$/.test(value);
-			}, "사업자번호 형식에 맞지 않습니다.(예:xxx-xx-xxxxx)");
-			$.validator.addMethod("duplicate", function(value, element){
-				return this.optional(element) || checkId(value);
-			}, "이미 사용중인 아이디입니다.");
-      
-      function checkId(id){
-        var res =false;
-        $.ajax({
-          async : false,
-					url : "/check/id",
-					method : "get",
-					data : { id },
-          success : function(data){
-						res = data;
-					},
-					error : function(){
-					}
-        })
-        return res;
-      }
+
+        // 유효성 검사 설정
+        $("#signup-form").validate({
+          rules: {
+            rm_id: {
+              required: true,
+              regex: /^[a-zA-Z0-9]{3,12}$/,
+              duplicate: true
+            },
+            rm_pw: {
+              required: true,
+              regex: /^[a-zA-Z0-9!@#$]{3,12}$/
+            },
+            rm_pw2: {
+              equalTo: "#rm_pw"
+            },
+            rm_email: {
+              required: true,
+              email: true
+            },
+            rm_phone: {
+              required: true,
+              phone: true
+            },
+            rm_business: {
+              required: true,
+              business: true,
+							businessDuplicate: true
+            }
+          },
+          messages: {
+            rm_id: {
+              required: "·아이디는 필수 항목입니다.",
+              regex: "·아이디는 영어, 숫자로 이루어져 있으며, 3~12자입니다.",
+              duplicate: "·이미 사용중인 아이디입니다."
+            },
+            rm_pw: {
+              required: "·비밀번호는 필수 항목입니다.",
+              regex: "·비밀번호는 영어, 숫자, 특수문자(!@#$) 포함 3~12자입니다."
+            },
+            rm_pw2: {
+              equalTo: "·비밀번호와 일치하지 않습니다."
+            },
+            rm_email: {
+              required: "·이메일은 필수 항목입니다.",
+              email: "·이메일 형식이 올바르지 않습니다."
+            },
+            rm_phone: {
+              required: "·전화번호는 필수 항목입니다.",
+              phone: "·010-xxxx-xxxx 형식으로 입력하세요."
+            },
+            rm_business: {
+              required: "·사업자 번호는 필수 항목입니다.",
+              business: "·사업자번호 형식이 올바르지 않습니다. (예: 123-45-67890)",
+							businessDuplicate: "·이미 사용중인 사업자 번호입니다."
+						}
+          },
+          errorPlacement: function (error, element) {
+            error.insertAfter(element); // 에러 메시지를 입력창 바로 아래에 표시
+          },
+          submitHandler: function () {
+            return true;
+          }
+        });
+      });
     </script>
+		<script th:if="${signupError != null}" th:inline="javascript">
+			/*<![CDATA[*/
+			alert([[${signupError}]]);
+			/*]]>*/
+		</script>
   </main>
 </body>
 </html>

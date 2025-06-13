@@ -21,11 +21,11 @@ public class ReservationScheduler {
 
     @Autowired
     BusinessHourDAO businessHourDAO;
-
-		@PostConstruct
-		public void runOnceOnStartup() {
-			updateExpiredReservations(); // 서버 시작 시 한 번 실행
-		}
+    
+    @PostConstruct
+    public void runOnceOnStartup() {
+        //updateExpiredReservations(); // 서버 시작 시 한 번 실행
+    }
 
 
     /** 매 5분마다 예약 만료 처리 */

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      >
+
+<head>
+  <meta charset="UTF-8">
+  <title>샘플 예약 시간 저장</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+<main layout:fragment="content" class="container mt-4">
+  <h2>샘플 예약 시간 작성</h2>
+  <form id="sampleForm">
+    <input type="hidden" id="managerId" th:value="${managerId}" />
+    <form id="sampleForm">
+      <div class="mb-3 form-group box">
+        <label for="bh_start" class="form-label">예약시간(시작)</label>
+        <input type="time" class="form-control" name="bh_start" id="bh_start" required>
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bh_end" class="form-label">예약시간(끝)</label>
+        <input type="time" class="form-control" name="bh_end" id="bh_end" required>
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bh_seat_max" class="form-label">최대 좌석 수</label>
+        <input type="text" class="form-control" name="bh_seat_max" id="bh_seat_max" required>
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bh_table_max" class="form-label">최대 테이블 수</label>
+        <input type="text" class="form-control" name="bh_table_max" id="bh_table_max" required>
+      </div>
+      <div class="mb-3 form-group box">
+        <label for="bh_state" class="form-label">마감 여부</label>
+         <select class="form-select" name="bh_state" id="bh_state" required>
+          <option value="false">열림</option>
+          <option value="true">닫힘</option>
+         </select>
+      </div>
+    <button type="button" class="btn btn-primary w-100" id="saveSampleBtn">샘플 저장</button>
+  </form>
+</main>
+
+<script>
+  $(document).ready(() => {
+    const managerId = $('#managerId').val();
+    console.log("managerId",managerId);
+
+    $('#saveSampleBtn').click(() => {
+      const timestamp = new Date().getTime();
+      const key = `res_${managerId}_sample_${timestamp}`;
+      const sample = {
+        bh_start: $('#bh_start').val(),
+        bh_end: $('#bh_end').val(),
+        bh_seat_max: $('#bh_seat_max').val(),
+        bh_table_max: $('#bh_table_max').val(),
+        bh_state: $('#bh_state').is(':checked')
+      };
+      const cookieValue = encodeURIComponent(JSON.stringify(sample));
+      document.cookie = `${key}=${cookieValue}; path=/; max-age=86400;`;
+      alert('샘플 데이터가 쿠키에 저장되었습니다.');
+      window.close();
+    });
+  });
+</script>
+
+</body>
+</html>

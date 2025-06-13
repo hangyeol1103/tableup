@@ -3,8 +3,220 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.kh.tableup.dao.RestaurantDAO">
 
+	<resultMap id="reviewMap" type="ReviewVO">
+		<id property="rev_num" column="rev_num"/>
+		<result property="rev_us_num" column="rev_us_num"/>
+		<result property="rev_rt_num" column="rev_rt_num"/>
+		<result property="rev_content" column="rev_content"/>
+		<result property="rev_created" column="rev_created"/>
+		<result property="rev_updated" column="rev_updated"/>
+		<result property="rev_state" column="rev_state"/>
+		<result property="rev_visit" column="rev_visit"/>
+		<result property="rev_visitor" column="rev_visitor"/>
+		
+		<result property="us_name" column="us_name"/>
+		<result property="rt_name" column="rt_name"/>
+		<!-- 리뷰와 리뷰 스코어 -->
+		<association property="score" javaType="ReviewScoreVO">
+			<id property="rs_num" column="rs_num"/>
+			<result property="rs_rev_num" column="rs_rev_num"/>
+			<result property="rs_st_num" column="rs_st_num"/>
+			<result property="rs_score" column="rs_score"/>
+
+			<result property="st_num" column="st_num"/>
+			<result property="st_category" column="st_category"/>
+			<result property="rt_num" column="rt_num_for_score"/>
+		</association>
+	</resultMap>
+
+	<!-- 메뉴와 메뉴타입 -->
+	<resultMap id="MenuMap" type="MenuVO">
+		<id property="mn_num" column="mn_num"/>
+		<result property="mn_name" column="mn_name"/>
+		<result property="mn_img" column="mn_img"/>
+		<result property="mn_price" column="mn_price"/>
+		<result property="mn_content" column="mn_content"/>
+		<result property="mn_mt_num" column="mn_mt_num"/>
+		<result property="mn_rt_num" column="mn_rt_num"/>
+		<result property="mn_div" column="mn_div"/>
+
+		<association property="menuType" javaType="MenuTypeVO">
+			<id property="mt_num" column="mt_num"/>
+			<result property="mt_name" column="mt_name"/>
+		</association>
+	</resultMap>
+
+  <!-- ReviewScoreVO + ReviewVO -->
+	<resultMap id="ReviewMap" type="ReviewVO">
+		<!-- ReviewVO -->
+		<id property="rev_num" column="rev_num" />
+		<result property="rev_us_num" column="rev_us_num" />
+		<result property="rev_rt_num" column="rev_rt_num" />
+		<result property="rev_content" column="rev_content" />
+		<result property="rev_created" column="rev_created" />
+		<result property="rev_updated" column="rev_updated" />
+		<result property="rev_state" column="rev_state" />
+		<result property="rev_visit" column="rev_visit" />
+		<result property="rev_visitor" column="rev_visitor" />
+		
+		<!-- 유저와 식당 이름 -->
+		<result property="us_name" column="us_name" />
+		<result property="rt_name" column="rt_name" />
+
+		<!-- ReviewScoreVO 리스트 -->
+		<collection property="scoreList" ofType="ReviewScoreVO">
+			<id property="rs_num" column="rs_num" />
+			<result property="rs_rev_num" column="rs_rev_num" />
+			<result property="rs_st_num" column="rs_st_num" />
+			<result property="rs_score" column="rs_score" />
+			<result property="st_num" column="st_num" />
+			<result property="st_category" column="st_category" />
+      <result property="rt_num" column="rt_num"/>
+		</collection>
+
+    <collection property="fileList" ofType="FileVO">
+      <id property="file_num" column="file_num"/>
+      <result property="file_path" column="file_path"/>
+      <result property="file_name" column="file_name"/>
+      <result property="file_type" column="file_type"/>
+      <result property="file_foreign" column="file_foreign"/>
+      <result property="file_tag" column="file_tag"/>
+      <result property="file_res_num" column="file_res_num"/>
+    </collection>
+	</resultMap>
+
+  <!-- 특정 식당 리뷰 + 점수 -->
+	<select id="selectReviewListbyNum" resultMap="ReviewMap">
+		SELECT
+			review.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category,
+			f.*
+		FROM review
+		LEFT JOIN user ON review.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON review.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON review.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+    LEFT JOIN (select * from file where file_type = "REVIEW") f ON rev_num = file_foreign 
+		WHERE review.rev_rt_num = #{rt_num}
+		ORDER BY review.rev_num ASC, reviewscore.rs_num ASC
+	</select>
+
+	<select id="selectCriReviewList" resultMap="ReviewMap">
+		SELECT
+			rev.*,
+			user.us_name,
+			restaurant.rt_name,
+			reviewscore.*,
+			scoretype.st_num, scoretype.st_category,
+			f.*
+		FROM (select * from review 
+			WHERE review.rev_rt_num = #{rt_num}
+			ORDER BY review.rev_num ASC
+			LIMIT #{pageStart}, #{perPageNum}) rev
+		LEFT JOIN user ON rev.rev_us_num = user.us_num
+		LEFT JOIN restaurant ON rev.rev_rt_num = restaurant.rt_num
+		LEFT JOIN reviewscore ON rev.rev_num = reviewscore.rs_rev_num
+		LEFT JOIN scoretype ON reviewscore.rs_st_num = scoretype.st_num
+    LEFT JOIN (select * from file where file_type = "REVIEW") f ON rev_num = file_foreign 
+		
+	</select>
+
   <select id="selectRestaurantByNum" parameterType="int" resultType="kr.kh.tableup.model.vo.RestaurantVO">
     SELECT * FROM restaurant WHERE rt_num = #{rt_num}
   </select>
+
+  <select id="selecrSearchRecommend" resultType="map">
+    SELECT keyword, source FROM (
+      SELECT rt_name AS keyword, '식당명' AS source FROM Restaurant
+      UNION
+      SELECT rt_description, '소개글' FROM Restaurant
+      UNION
+      SELECT rd_info, '식당정보' FROM RestaurantDetail
+      UNION
+      SELECT rd_addr, '주소' FROM RestaurantDetail
+      UNION
+      SELECT dreg_sub, '상세지역' FROM DetailRegion
+      UNION
+      SELECT reg_main, '지역대분류' FROM Region
+      UNION
+      SELECT dfc_sub, '음식소분류' FROM DetailFoodCategory
+      UNION
+      SELECT fc_main, '음식대분류' FROM FoodCategory
+      UNION
+      SELECT tag_name, '태그' FROM Tag
+      UNION
+      SELECT tt_name, '태그유형' FROM TagType
+      UNION
+      SELECT fa_name, '편의시설' FROM Facility
+    ) AS combined
+    WHERE keyword LIKE CONCAT('%', #{keyword}, '%')
+    LIMIT 10;  
+
+  </select>  
+  <select id="selectRestaurantDetailList" resultType="RestaurantDetailVO">
+    select * from restaurantdetail where rd_rt_num = #{rt_num}
+  </select>
+
+  <select id="countScoreByRtNum" resultType="Double">
+    SELECT ROUND(IFNULL(AVG(rs.rs_score), 0), 2)
+      FROM review rev
+      JOIN reviewscore rs ON rev.rev_num = rs.rs_rev_num
+      WHERE rev.rev_rt_num = #{rt_num};
+  </select>
+
+  <select id="countReviewByRtNum" resultType="Integer">
+    SELECT COUNT(*)
+      FROM review rev
+      WHERE rev.rev_rt_num = #{rt_num};
+  </select>
+  
+
+  <!-- <select id="countReviewByUsNum">
+    SELECT COUNT(*)
+      FROM review rev
+      WHERE rev.rev_rt_num = #{rt_num} AND rev.rev_us_num = #{us_num};
+  </select> -->
+
+	<select id="selectTapResNewsList" resultType="ResNewsVO">
+		select * from resnews where rn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectMenuTypeList" resultType="MenuTypeVO">
+		select DISTINCT menuType.* from menu
+		join menutype on mt_num = mn_mt_num
+		where mn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectMenuDivList" resultType="MenuVO">
+		select mn_num, 
+			mn_name, 
+			mn_content, 
+			mn_price, 
+			mn_img, 
+			mn_div
+		from menu where mn_rt_num = #{rt_num}
+	</select>
+
+	<select id="selectTapFileList" resultType="FileVO">
+		select DISTINCT * from file where file_type = 'review' and file_res_num = #{rt_num}
+		ORDER BY FIELD(file_tag,'전체', '음식', '내부', '외부', '메뉴판', '기타')
+	</select>
+
+	<select id="selectBusinessHour" resultType="BusinessHourVO">
+		select * from BusinessHour 
+		where bh_rt_num = #{rt_num}
+		and bh_start &gt;= NOW()
+		and bh_start &lt;= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+		and bh_state = 0
+		ORDER BY bh_start
+	</select>
+
+	<select id="selectBusinessDate" resultType="BusinessDateVO">
+		select * from businessdate 
+		where bd_rt_num = #{rt_num}
+	</select>
 
 </mapper>

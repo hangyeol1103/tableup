@@ -58,10 +58,32 @@
 		select * from restaurantmanager where rm_id=#{rm_id}
 	</select>
 
+	<select id="selectfindManager" resultType="RestaurantManagerVO">
+		select * from restaurantmanager
+		where 
+			rm_name = #{rm_name} and
+			rm_phone = #{rm_phone} and
+			rm_business = #{rm_business} 
+	</select>
+
+	<select id="selectResManager" resultType="RestaurantManagerVO">
+		select * from restaurantmanager where rm_num=#{rm_num}
+	</select>
+
+	<update id="updateManagerPassWord">
+		update restaurantmanager set
+			rm_pw = #{rm_pw}
+		where rm_num=#{rm_num}
+	</update> 
+
 	<select id="selectRestaurant" resultType="RestaurantVO">
 		select * from restaurant 
 		join restaurantmanager on rm_rt_num = rt_num
 		where rm_num=#{rm_num}
+	</select>
+
+	<select id="selectRestaurantByNum" resultType="RestaurantVO">
+		select * from restaurant where rt_num=#{rt_num}
 	</select>
 
 	<select id="selectFoodCategoryList" resultType="FoodCategoryVO">
@@ -94,7 +116,7 @@
 			(rt_name, rt_closed_days, rt_price_lunch, rt_price_dinner,
 			 rt_accept, rt_dfc_num, rt_dreg_num, rt_description)
 		value(#{rt_name},#{rt_closed_days},#{rt_price_lunch},#{rt_price_dinner}
-					,'N',#{rt_dfc_num},#{rt_dreg_num},#{rt_description})
+					,'Y',#{rt_dfc_num},#{rt_dreg_num},#{rt_description})
 	</insert>
 
 	<update id="updateManagerRtNum">
@@ -203,6 +225,14 @@
 		select * from businesshour where bh_rt_num=#{rt_num}
 	</select>
 
+	<select id="checkResTime" resultType="BusinessHourVO">
+		select * from businesshour 
+		where bh_rt_num = #{bh_rt_num} and
+				  bh_start = #{bh_start} and 
+					bh_end = #{bh_end}
+		limit 1
+	</select>
+
 	<insert id="insertResTime" useGeneratedKeys="true" keyProperty="bh_num">
 		insert into businesshour
 			(bh_start, bh_end, bh_seat_max, bh_seat_current, bh_table_max, bh_table_current, bh_state, bh_rt_num)
@@ -211,6 +241,19 @@
 
 	<select id="selectBusinessHour" resultType="BusinessHourVO">
 		select * from businesshour where bh_num=#{bh_num}
+	</select>
+
+	<select id="selectOperTimeByDate" resultType="BusinessDateVO">
+		select * from businessdate 
+		where bd_rt_num = #{rt_num} and date(bd_date) = #{date}
+	</select>
+
+	<select id="checkUpdateResTime" resultType="BusinessHourVO">
+		select * from businesshour 
+		where bh_rt_num = #{bh_rt_num} and 
+					bh_start = #{bh_start} and 
+					bh_end = #{bh_end} and 
+					bh_num != #{bh_num}
 	</select>
 
 	<update id="updateResTime">
@@ -302,7 +345,8 @@
 		update restaurantmanager set
 			rm_email = #{rm_email},
 			rm_name = #{rm_name},
-			rm_phone = #{rm_phone}
+			rm_phone = #{rm_phone},
+			rm_pw = #{rm_pw}
 		where rm_num = #{rm_num}
 	</update>
 	<select id="selectFacilityList" resultType="FacilityVO">
@@ -343,12 +387,12 @@
 
 	<!-- 등록한 매장 대표 이미지 모두 출력 -->
 	<select id="selectFileList" resultType = "FileVO">
-		select * from file where file_res_num = #{rm_rt_num}
+		select * from file where file_res_num = #{rm_rt_num} AND File_type = 'RESTAURANTDETAIL'
 	</select>
 
 	<!-- 매장에 등록된 대표이미지 삭제-->
-	<delete id="deletefile">
-		delete from file where file_res_num = #{rt_num}
+	<delete id="deletefileByForeign">
+		delete from file where file_res_num = #{foreign} and file_type = #{type}
 	</delete>
 
 	<update id="updateRestaurant">
@@ -375,5 +419,94 @@
 		where rec_period =#{rec_period} 
 	</update>
 
+	<delete id="deleteTemplate">
+		delete from businesshourtemplate where bhd_rt_num=#{bhd_rt_num}
+	</delete>
+
+	<insert id="insertTemplate" useGeneratedKeys="true" keyProperty="bhd_num">
+		INSERT INTO businesshourtemplate (
+      bhd_date, bhd_timeStart, bhd_timeEnd, bhd_seat, bhd_table, bhd_rt_num
+    )
+    VALUES (
+      #{bhd_date}, #{bhd_timeStart}, #{bhd_timeEnd}, #{bhd_seat}, #{bhd_table}, #{bhd_rt_num}
+    )
+	</insert>
+	
+	<select id="existsTemplate" parameterType="BusinessHourTemplateVO" resultType="int">
+		SELECT COUNT(*)
+		FROM businesshourtemplate
+		WHERE bhd_rt_num = #{bhd_rt_num}
+			AND bhd_date = #{bhd_date}
+			AND bhd_timeStart = #{bhd_timeStart}
+	</select>
+
+	<update id="updateTemplate">
+		update businesshourtemplate set
+			bhd_seat = #{bhd_seat}, 
+			bhd_table = #{bhd_table}
+		where 
+			bhd_rt_num = #{bhd_rt_num} and 
+			bhd_date = #{bhd_date} and 
+			bhd_timeStart = #{bhd_timeStart}
+	</update>
+
+	<delete id="deleteRestimesByDate">
+		DELETE FROM businesshour
+		WHERE bh_rt_num = #{rt_num}
+			AND bh_start = #{bh_start}
+	</delete>
+
+	<select id="existsRestime" resultType="boolean">
+		SELECT EXISTS (
+			SELECT 1
+			FROM businesshour
+			WHERE bh_rt_num = #{rtNum}
+				AND bh_start = #{bh_start}
+		)
+	</select>
+
+	<delete id="deleteAllRestimes">
+		delete from businesshour
+		where bh_rt_num = #{rt_num}
+			and DATE(bh_start) = #{date}
+	</delete>
+
+	<select id="selectFindIdAndEmail" resultType="RestaurantManagerVO">
+		select * from restaurantmanager where rm_id = #{rm_id} and rm_email = #{rm_email}
+	</select>
+	
+	<select id="selectManagerId" resultType="RestaurantManagerVO">
+		select rm_id from  restaurantmanager where rm_id = #{id}
+	</select>
+
+	<select id="selectManagerBusiness" resultType="RestaurantManagerVO">
+		select rm_business from  restaurantmanager where rm_business = #{business}
+	</select>
+
+	<select id="selectManagerOner" resultType="RestaurantManagerVO">
+		select * from  restaurantmanager where rm_rt_num = #{rt_num}
+	</select>
+
+	<insert id="insertDefaultResTime" useGeneratedKeys="true" keyProperty="drt_num">
+		insert into defaultrestime 
+			(drt_rt_num, drt_date, drt_off, drt_open, drt_close, drt_brstart, drt_brend, drt_loam, drt_lopm)
+		values (#{drt_rt_num}, #{drt_date}, #{drt_off}, #{drt_open}, #{drt_close}, #{drt_brstart}, #{drt_brend}, #{drt_loam}, #{drt_lopm})
+	</insert>
+
+	<select id="selectDefaultTimeList" resultType="DefaultResTimeVO">
+		select * from defaultrestime where drt_rt_num=#{rt_num}
+	</select>
+
+	<update id="updateDefaultResTime">
+		update defaultrestime set
+			 drt_off = #{drt_off}, 
+			 drt_open = #{drt_open}, 
+			 drt_close = #{drt_close}, 
+			 drt_brstart = #{drt_brstart}, 
+			 drt_brend = #{drt_brend}, 
+			 drt_loam = #{drt_loam}, 
+			 drt_lopm = #{drt_lopm}
+		where drt_rt_num=#{drt_rt_num} and drt_date=#{drt_date}
+	</update>
 	
 </mapper>

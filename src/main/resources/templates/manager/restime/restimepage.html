@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html 
+lang="ko" 
+xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{layout/manager_layout.html}"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <title>테이블업 - 예약 관리</title>
+  <style>
+    /* .btn-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    } */
+
+    .btn-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+    }
+
+    .btn-box .reserve-btn {
+      flex: 1 1 50%;
+      height: 250px;
+      background-color: #4dabf7;
+      color: white;
+      font-size: 1.8rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      text-align: center;
+    }
+
+    .bottom-btn {
+      display: block;
+    }
+
+    .bottom-btn button {
+      width: 100%;
+      height: 120px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 0;
+      background-color: #4dabf7;
+      color: white;
+      border: none;
+      transition: background-color 0.3s;
+      text-align: center;
+    }
+    
+    .btn-box .reserve-btn:hover {
+      filter: brightness(90%);
+    }
+
+    .bottom-btn button:hover {
+      filter: brightness(90%);
+    }
+
+  </style>
+</head>
+<body>
+  <main layout:fragment="content">
+    <div class="container">
+      <!-- 상단/하단 통합 박스 -->
+      <div class="btn-wrapper mx-auto my-4" >
+        
+        <!-- 버튼 4개 -->
+        <div class="btn-box">
+          <div class="reserve-btn btn-action"
+              th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/restime/restimelist/' + ${restaurant?.rt_num}, data-type='예약 가능 시간 등록'">
+            예약 시간 등록
+          </div>
+
+          <div class="reserve-btn btn-action"
+              th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/restime/restimetemplate/' + ${restaurant?.rt_num}, data-type='예약 시간 템플릿'">
+            예약 시간 템플릿
+          </div>
+
+          <div class="reserve-btn btn-action"
+              th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/reservation', data-type='예약 현황'">
+            예약 현황
+          </div>
+
+          <div class="reserve-btn btn-action"
+              th:attr="data-has-restaurant=${restaurant != null}, data-action='/manager/reservation/reservationlist', data-type='예약 조회'">
+            예약 조회
+          </div>
+        </div>
+
+        <!-- 메인 페이지 버튼 -->
+        <div class="bottom-btn">
+          <button onclick="location.href='/manager'">메인 페이지</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.btn-action').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const hasRestaurant = btn.dataset.hasRestaurant === 'true';
+            const targetUrl = btn.dataset.action;
+            const menuType = btn.dataset.type;
+
+            if (!hasRestaurant) {
+              alert(`아직 매장 정보가 입력되지 않았습니다.\n[${menuType}] 기능을 사용하려면 먼저 매장을 등록하세요.`);
+              return;
+            }
+
+            window.location.href = targetUrl;
+          });
+        });
+      });
+    </script>
+  </main>
+</body>
+</html>

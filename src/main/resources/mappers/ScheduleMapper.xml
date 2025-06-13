@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kh.tableup.dao.ScheduleDAO">
+
+	<select id="selectScheduleOperTimeList" resultType="BusinessDateVO">
+		select * from businessdate where bd_rt_num=#{rt_num} 
+	</select>
+
+	<select id="selectOperTimeByDay" resultType="BusinessDateVO">
+		SELECT * 
+		FROM businessdate 
+		WHERE bd_date BETWEEN CONCAT(#{date}, ' 00:00:00') 
+										AND CONCAT(#{date}, ' 23:59:59')
+	</select>
+
+	<select id="selectResTime" resultType="BusinessHourVO">
+		select * from businesshour 
+		where bh_rt_num=#{rt_num} and bh_start between #{startDate} and #{endDate}
+	</select>
+
+	<select id="selectResTimeDetail" resultType="BusinessHourVO">
+		select * from businesshour
+		where bh_rt_num=#{rt_num} and bh_start=#{dateTime}
+	</select>
+
+	<!--  -->
+	<update id="updateBdOff">
+		update businessdate set
+			bd_off = #{bd_off}
+		where date(bd_date) = #{bd_date}
+	</update>
+
+	<insert id="insertResTime" useGeneratedKeys="true" keyProperty="bh_num">
+		insert into businesshour
+			(bh_start, bh_end, bh_seat_max, bh_seat_current, bh_table_max, bh_table_current, bh_state, bh_rt_num)
+		value(#{bh_start}, #{bh_end}, #{bh_seat_max}, 0, #{bh_table_max}, 0, #{bh_state}, #{bh_rt_num})
+	</insert>
+
+	<select id="checkResTime" resultType="BusinessHourVO">
+		select * from businesshour where bh_rt_num = #{bh_rt_num} and bh_start = #{bh_start} and bh_end = #{bh_end}
+	</select>
+
+	
+</mapper>

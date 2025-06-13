@@ -5,7 +5,10 @@ xmlns:th="http://www.thymeleaf.org"
 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
 layout:decorate="~{layout/layout.html}"
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+
 <head>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 	<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>테이블업 - 식당 예약</title>
@@ -20,47 +23,224 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				max-width: 100%; width: 100%; padding: 1rem;
 				/* height: 700px; */
 				margin: 0 auto;
-				background: #f5f5f5; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 4px 0;
+				/* background: #f5f5f5; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);  */
+				padding: 4px 0;
 			}
+			.btn svg {
+				vertical-align: middle;
+				margin-right: 4px;
+			}
+			.first-bar{
+				padding: 0.25rem 0.5rem;
+				height: auto;
+				min-height: 0;
+
+			}
+
+			.navbar-brand {
+				font-size: 1.6rem;
+				font-weight: 700;
+			}
+			.btn {
+				padding: 0.25rem 0.5rem;
+				font-size: 0.9rem;
+				line-height: 1.2;
+			}
+			.btn-region {
+				background-color: transparent;
+				outline: solid black 1px;
+				/* border: 1px solid #aaa; */
+				border-radius: 8px;
+				color: #333;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 4px 10px;
+				transition: background-color 0.2s ease;
+			}
+
+
+			.btn-region:hover {
+				background-color: rgba(0, 0, 0, 0.03);
+			}
+
+			.btn-region svg {
+				width: 18px;
+				height: 29px;
+				stroke: #333;
+			}
+
+			#demo.carousel {
+				height: 300px;
+				transition: height 0.3s ease;
+				overflow: hidden;
+			}
+
+			.carousel-item {
+				position: relative;
+				height: 100%;
+			}
+
+			.carousel-inner img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				object-position: center center;
+				/* transform: translateY(-50%); */
+			}
+
+			
+			#autocompleteBox {
+				position: absolute;
+				margin-top: 10px;
+				top: 100%;
+				left: 0;
+				z-index: 10;
+				width: 100%;
+				background: white;
+				border: 1px solid #ccc;
+				max-height: 200px;
+				overflow-y: auto;
+				border-radius: 4px;
+			}
+
+			.autocomplete-item {
+				padding: 8px 12px;
+				cursor: pointer;
+			}
+
+			.autocomplete-item:hover {
+				background-color: #f0f0f0;
+				font-weight: bold;
+			}
+
+			.search-box {
+				position: relative;
+				margin-top: 10px;
+			}
+
+			.autocomplete-item.recent {
+				background-color: #f9f9f9;
+				font-style: italic;
+			}
+
+			.autocomplete-item.recent:hover {
+				background-color: #e0e0e0;
+				font-weight: normal;
+			}
+			.dropdown {
+				z-index: 11;
+			}
+			.back {
+				display: none !important;
+			}
+
 		</style>
 
 		<div class="container mt-4">
 			<div class="main-container">
-				<!-- 상단 지역 선택 버튼 -->
-				<button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#regionModal">
-					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#aaa" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:middle;">
-						<circle cx="12" cy="10" r="3"/>
-						<path d="M12 2C8 2 5 5.5 5 9.5c0 5.5 7 12.5 7 12.5s7-7 7-12.5C19 5.5 16 2 12 2z"/>
-					</svg>
-					<strong>전국</strong>
-					<svg width="24" height="24" viewBox="0 0 24 24">
-						<polyline points="6 9 12 15 18 9" style="fill:none;stroke:black;stroke-width:2"/>
-					</svg>
-				</button>
+				<div class="d-flex justify-content-between align-items-center px-2 first-bar">
+					<!--임시로-->
+					<a class="navbar-brand fw-bold fs-4 text-dark text-decoration-none" th:href="@{/}">
+						TABLEUP
+					</a>
+
+					<div class="d-flex align-items-center gap-2">
+						
+						<!-- 상단 지역 선택 버튼 -->
+						<button type="button" class="btn btn-light btn-region" data-bs-toggle="modal" data-bs-target="#regionModal">
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#aaa" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:middle;">
+								<circle cx="12" cy="10" r="3"/>
+								<path d="M12 2C8 2 5 5.5 5 9.5c0 5.5 7 12.5 7 12.5s7-7 7-12.5C19 5.5 16 2 12 2z"/>
+							</svg>
+							<strong>전국</strong>
+							<svg width="24" height="24" viewBox="0 0 24 24">
+								<polyline points="6 9 12 15 18 9" style="fill:none;stroke:black;stroke-width:2"/>
+							</svg>
+						</button>
+
+
+
+						<div>
+							<div class="dropdown" th:if="${user != null}">
+								<button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center gap-2" type="button"
+												id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+									<span th:if="${user != null}">
+										<img th:src="@{/file{path}(path=${user.upi_file_path})}" onerror="this.onerror=null;this.src='/resources/static/img/index/profile.png';"
+											class="rounded-circle" style="width:30px; height:30px; object-fit:cover;">
+									</span>
+									<span th:if="${user != null}" class="fw-bold">[[${user.us_name}]]님</span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="max-height: 300px; overflow-y: auto;">
+									<li><a th:if="${user != null}"  class="dropdown-item" th:href="@{/user/info}">마이페이지</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=res}">예약 목록</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=rev}">리뷰 목록</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=flwrst}">찜한 식당</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/mypage?tab=flwrvw}">찜한 리뷰</a></li>
+									<li><hr class="dropdown-divider"></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/edit}">내 정보 수정</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/user/help}">도움말</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item text-danger" th:href="@{/user/logout}">로그아웃</a></li>
+								</ul>
+							</div>
+							
+							<div class="dropdown" th:if="${user == null}">
+								<button class="btn btn-outline-dark dropdown-toggle d-flex align-items-center gap-2" type="button"
+												id="toDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+									<span>
+										<img th:src='@{/resources/static/img/index/default.jpg}' class="rounded-circle" style="width:30px; height:30px; object-fit:cover;">
+									</span>
+									<span th:if="${user == null}" class="fw-bold">로그인 메뉴</span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="toDropdown" style="max-height: 300px; overflow-y: auto;">
+									<li><a th:if="${user == null}" th:href="@{/user/login}" class="dropdown-item">로그인</a></li>
+									<li><a th:if="${user == null}" th:href="@{/user/signup}" class="dropdown-item">회원가입</a></li>
+									<li><a th:if="${user != null}" class="dropdown-item" th:href="@{/}">도움말</a></li>
+									<li><a th:if="${user == null}" th:href="@{/manager/}" class="dropdown-item text-primary">점주분이신가요?</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>	
+
+				<!-- 검색창 -->
+				<div class="search-box mb-3 position-relative">
+					<div class="input-group">
+						<input type="text" id="searchKeyword" class="form-control" th:placeholder=" ${kCount} + '개의 키워드로부터 식당명, 지역, 음식, 편의시설 등을 검색 가능'" onkeyup="handleSearchEnter(event)" autocomplete="off">
+						<button class="btn btn-outline-secondary" type="button" onclick="search()">검색</button>
+					</div>
+					<div id="autocompleteBox"></div>
+				</div>
+
 
 				<!-- 관심지역 모달 -->
 				<div class="modal fade" id="regionModal" tabindex="-1" aria-labelledby="regionModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered modal-lg">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title">관심지역 설정</h5>
+								<h5 class="modal-title">지역 선택</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 							</div>
 							<div class="modal-body" th:if="${regionList != null and #lists.size(regionList) > 0}">
 								<!-- 인기 지역 (동그란 이미지/버튼) -->
-								<div class="mb-3">
+								<div class="mb-3" th:if="${favoriteRegion != null}">
 									<strong>인기 지역</strong>
-									<div class="d-flex flex-row mt-2">
-										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">전국</button>
-										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">잠실</button>
-										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">서초</button>
-										<button class="btn btn-outline-primary rounded-circle m-1" style="width:60px; height:60px;">제주</button>
+									<div class="d-flex flex-wrap mt-2">
+										<!-- 전국 버튼은 항상 고정 -->
+										<button class="btn btn-outline-primary rounded-circle m-1 region-btn"
+											style="width:60px; height:60px;" data-dreg="0" data-reg="0">전국</button>
+										<!-- 동적으로 인기 지역 버튼 출력 -->
+										<div th:each="favRegion : ${favoriteRegion}">
+											<div th:each="r : ${regionList}" th:if="${r.dreg_num == favRegion}" class="d-inline-block">
+												<button class="btn btn-outline-primary rounded-circle m-1 region-btn"
+													style="width:60px; height:60px;"
+													th:attr="data-dreg=${r.dreg_num}, data-reg=${r.reg_num}"
+													th:text="${#strings.length(r.dreg_sub) > 2 ? #strings.substring(r.dreg_sub, 0, 2) : r.dreg_sub}">지역명</button>
+											</div>
+										</div>
 									</div>
 								</div>
-								
 								<div class="row">
-
-
 									<!-- 대분류 -->
 									<div class="col-4">
 										<ul class="list-group">
@@ -77,7 +257,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 											</li>
 										</ul>
 									</div>
-
 									<!-- 소분류 -->
 									<div class="col-8">
 										<div class="tab-content p-3">
@@ -85,12 +264,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 												th:if="${parent.dreg_sub == '전체'}"
 												class="tab-pane fade"
 												th:id="${'tab-' + #strings.replace(parent.reg_main, ' ', '')}">
-
 												<!-- 전체 버튼 -->
 												<button type="button"
 													class="btn btn-outline-dark m-1 btn-sm region-btn"
 													th:attr="data-dreg=0, data-reg=${parent.reg_num}">전체</button>
-
 												<!-- 소분류 -->
 												<button th:each="child : ${regionList}"
 													th:if="${child.reg_main == parent.reg_main and child.dreg_sub != '전체' and child.dreg_num != 0}"
@@ -98,12 +275,60 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 													class="btn btn-outline-secondary m-1 btn-sm region-btn"
 													th:attr="data-dreg=${child.dreg_num}, data-reg=${child.reg_num}"
 													th:text="${child.dreg_sub}"></button>
-													
 											</div>
 										</div>
 									</div>
-
-
+								</div>
+								<!-- 관심지역 등록된 항목 출력 -->
+								<div class="mt-3">
+									<strong>내 관심지역</strong>
+									<div id="myFavoriteRegions" class="d-flex flex-wrap gap-2 mt-2">
+										<!-- 관심지역 버튼이 동적으로 여기에 표시됩니다 -->
+									</div>
+								</div>
+								<script th:inline="javascript">
+									document.addEventListener("DOMContentLoaded", function () {
+										function renderMyFavoriteRegions() {
+											const container = document.getElementById("myFavoriteRegions");
+											if (!container) return;
+											container.innerHTML = "";
+											const cookie = document.cookie.split('; ').find(row => row.startsWith('favoriteRegion='));
+											let favs = [];
+											if (cookie) {
+												favs = decodeURIComponent(cookie.split('=')[1]).split(',').filter(Boolean);
+											}
+											if (favs.length === 0) {
+												container.innerHTML = '<span class="text-muted">등록된 관심지역이 없습니다.</span>';
+												return;
+											}
+											// regionList는 Thymeleaf에서 렌더링된 데이터 사용
+											/*<![CDATA[*/
+												const regionList = [[${regionList}]];
+											/*]]>*/
+											favs.forEach(key => {
+												const [dreg, reg] = key.split('-');
+												const region = regionList.find(r => r.dreg_num == dreg && r.reg_num == reg);
+												const name = region ? region.reg_main + " : " + region.dreg_sub : '알수없음';
+												const btn = document.createElement("button");
+												btn.type = "button";
+												btn.className = "btn btn-outline-primary btn-sm";
+												btn.textContent = name;
+												btn.onclick = function() {
+													window.location.href = `/user/list?dreg_num=${dreg}&reg_num=${reg}`;
+												};
+												container.appendChild(btn);
+											});
+										}
+										renderMyFavoriteRegions();
+										// 관심지역 변경 시에도 갱신
+										document.getElementById("saveFavoriteRegionBtn")?.addEventListener("click", function () {
+											setTimeout(renderMyFavoriteRegions, 500);
+										});
+									});
+								</script>
+								<!-- 관심지역 설정 버튼 -->
+								<div class="mt-3 text-end">
+									<button type="button" class="btn btn-outline-primary" id="openFavoriteRegionModal">관심지역 설정</button>
 								</div>
 							</div>
 							<div th:if="${regionList == null or #lists.size(regionList) == 0}" class="modal-body">
@@ -111,15 +336,133 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 									지역 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.
 								</div>
 							</div>
-
 							<div class="modal-footer">
-								<button type="button" class="btn btn-outline-secondary">초기화</button>
-								<button type="button" class="btn btn-primary" disabled>관심지역 설정 완료</button>
+								<button type="button" class="btn btn-outline-secondary" id="resetRegionBtn">초기화</button>
 								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
 							</div>
 						</div>
 					</div>
 				</div>
+
+				<!-- 관심지역 선택 모달 -->
+				<div class="modal fade" id="favoriteRegionModal" tabindex="-1" aria-labelledby="favoriteRegionModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-md">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">관심지역 선택</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<div th:if="${regionList != null and #lists.size(regionList) > 0}">
+									<div class="mb-2">최대 3개까지 선택할 수 있습니다.</div>
+									<div class="d-flex flex-wrap gap-2">
+										<button th:each="region : ${regionList}"
+											th:if="${region.dreg_sub != '전체' and region.dreg_num != 0}"
+											type="button"
+											class="btn btn-outline-secondary favorite-region-btn"
+											th:attr="data-dreg=${region.dreg_num}, data-reg=${region.reg_num}"
+											th:text="${region.dreg_sub}"></button>
+									</div>
+								</div>
+								<div th:if="${regionList == null or #lists.size(regionList) == 0}">
+									<div class="alert alert-warning" role="alert">
+										지역 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-outline-secondary" id="resetFavoriteRegionBtn">초기화</button>
+								<button type="button" class="btn btn-primary" id="saveFavoriteRegionBtn" disabled>관심지역 설정</button>
+								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<script>
+					// 관심지역 모달에서 관심지역 설정 버튼 클릭 시 관심지역 선택 모달로 전환
+					document.addEventListener("DOMContentLoaded", function () {
+						const openFavBtn = document.getElementById("openFavoriteRegionModal");
+						if (openFavBtn) {
+							openFavBtn.addEventListener("click", function () {
+								const regionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('regionModal'));
+								regionModal.hide();
+								setTimeout(() => {
+									const favModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('favoriteRegionModal'));
+									favModal.show();
+								}, 300);
+							});
+						}
+
+						// 관심지역 선택 버튼 로직
+						let selectedFavoriteRegions = [];
+
+						// 버튼 클릭 시 선택/해제
+						$(document).on('click', '.favorite-region-btn', function () {
+							const dreg = $(this).attr('data-dreg');
+							const reg = $(this).attr('data-reg');
+							const key = dreg + '-' + reg;
+							const idx = selectedFavoriteRegions.findIndex(r => r === key);
+
+							if (idx > -1) {
+								selectedFavoriteRegions.splice(idx, 1);
+								$(this).removeClass('btn-primary').addClass('btn-outline-secondary');
+							} else {
+								if (selectedFavoriteRegions.length >= 3) return;
+								selectedFavoriteRegions.push(key);
+								$(this).removeClass('btn-outline-secondary').addClass('btn-primary');
+							}
+							$('#saveFavoriteRegionBtn').prop('disabled', selectedFavoriteRegions.length === 0);
+						});
+
+						// 초기화 버튼
+						$('#resetFavoriteRegionBtn').on('click', function () {
+							selectedFavoriteRegions = [];
+							$('.favorite-region-btn').removeClass('btn-primary').addClass('btn-outline-secondary');
+							$('#saveFavoriteRegionBtn').prop('disabled', true);
+						});
+
+						// 관심지역 설정(쿠키 등록)
+						$('#saveFavoriteRegionBtn').on('click', function () {
+							if (selectedFavoriteRegions.length === 0) return;
+							document.cookie = "favoriteRegion=" + encodeURIComponent(selectedFavoriteRegions.join(',')) + ";path=/;max-age=2592000";
+							// 모달 닫고 지역선택 모달로 복귀
+							const favModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('favoriteRegionModal'));
+							favModal.hide();
+							setTimeout(() => {
+								const regionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('regionModal'));
+								regionModal.show();
+							}, 300);
+						});
+
+						// 관심지역 모달 열릴 때 기존 선택 복원
+						$('#favoriteRegionModal').on('show.bs.modal', function () {
+							// 쿠키에서 기존 값 읽기
+							const cookie = document.cookie.split('; ').find(row => row.startsWith('favoriteRegion='));
+							selectedFavoriteRegions = [];
+							if (cookie) {
+								selectedFavoriteRegions = decodeURIComponent(cookie.split('=')[1]).split(',').filter(Boolean);
+							}
+							$('.favorite-region-btn').each(function () {
+								const dreg = $(this).attr('data-dreg');
+								const reg = $(this).attr('data-reg');
+								const key = dreg + '-' + reg;
+								if (selectedFavoriteRegions.includes(key)) {
+									$(this).removeClass('btn-outline-secondary').addClass('btn-primary');
+								} else {
+									$(this).removeClass('btn-primary').addClass('btn-outline-secondary');
+								}
+							});
+							$('#saveFavoriteRegionBtn').prop('disabled', selectedFavoriteRegions.length === 0);
+						});
+
+						// 지역선택 모달 초기화 버튼
+						$('#resetRegionBtn').on('click', function () {
+							// 선택된 지역 초기화 (필요시 구현)
+							// location.reload(); // 또는 원하는 초기화 동작
+						});
+					});
+				</script>
 
 						<!-- 여기에 나머지 홈 콘텐츠 삽입 가능 -->
 
@@ -140,16 +483,16 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 				<!-- The slideshow/carousel -->
 				<div class="carousel-inner">
 					<div class="carousel-item active">
-						<img src="/resources/static/img/index/index1.jpg" alt="Los Angeles" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index1.jpg" alt="Los Angeles" class="d-block" onclick="toggleSize(this)">
 					</div>
 					<div class="carousel-item">
-						<img src="/resources/static/img/index/index2.jpg" alt="Chicago" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index2.jpg" alt="Chicago" class="d-block" onclick="toggleSize(this)">
 					</div>
 					<div class="carousel-item">
-						<img src="/resources/static/img/index/index3.jpg" alt="New York" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index3.jpg" alt="New York" class="d-block" onclick="toggleSize(this)">
 					</div>
 					<div class="carousel-item">
-						<img src="/resources/static/img/index/index4.jpg" alt="4" class="d-block" style="width:100%">
+						<img src="/resources/static/img/index/index4.jpg" alt="4" class="d-block" onclick="toggleSize(this)">
 					</div>
 				</div>
 				
@@ -161,7 +504,23 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					<span class="carousel-control-next-icon"></span>
 				</button>
 				</div>
+				
+				<div class="container mt-4">
+					<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
+					<div class="d-flex gap-4">
+						<div th:each="favNum : ${favoriteFood}">
+							<div class="text-center" th:each="f : ${foodList}" th:if="${f.dfc_num == favNum}">
+								<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
+									<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
+											onerror="this.onerror=null;this.src='/resources/static/img/index/default.jpg'" 
+											class="rounded" style="width:110px; height:110px; object-fit:cover;">
+									<div class="mt-2" th:text="${f.dfc_sub}">카테고리명</div>
+								</a>
+							</div>
+						</div>
 
+					</div>
+				</div>
 
 				<div class="container mt-4"  th:if="${foodList != null}">
 					<h4 class="fw-bold mb-3">음식 카테고리 선택</h4>
@@ -173,16 +532,24 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 										th:if="${fc.dfc_sub == '전체'}"
 										class="btn btn-outline-primary"
 										th:data-fc="${fc.fc_main}"
+										th:data-dfc="${fc.dfc_num}"
 										th:text="${fc.fc_main}">
 						</button>
 					</div>
 
 					<!-- 소분류 아이콘들 -->
 					<div class="d-flex flex-wrap gap-3" id="dfcIcons">
+						<div class="dfc-item text-center" >
+							<a th:href="@{/user/list}">
+								<img th:src="@{/resources/static/img/index/default.jpg}" 
+											onerror="this.onerror=null;this.src='/resources/static/img/index/default.jpg'" class="rounded" style="width:110px; height:110px; object-fit:cover;">
+								<div class="mt-2">전체</div>
+							</a>
+						</div>
 						<div th:each="f : ${foodList}" class="dfc-item text-center" th:data-fc="${f.fc_main}" th:data-dfc="${f.dfc_num}">
 							<a th:href="@{/user/list(dfc_num=${f.dfc_num}, fc_num=${f.fc_num})}">
 								<img th:src="@{/resources/static/img/index/{sub}.jpg(sub=${f.dfc_sub})}" 
-										onerror="this.src='/resources/static/img/index/default.jpg'" 
+										onerror="this.onerror=null;this.src='/resources/static/img/index/default.jpg'" 
 										class="rounded" style="width:110px; height:110px; object-fit:cover;">
 								
 								<div class="mt-2">
@@ -201,31 +568,6 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 					</div>
 				</div>
 
-				<div class="container mt-4">
-					<h4 class="fw-bold mb-3">음식종류별 BEST</h4>
-					<div class="d-flex gap-4">
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/Sushi.jpg" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">스시</div>
-						</div>
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">예시</div>
-						</div>
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">예시</div>
-						</div>
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">예시</div>
-						</div>
-						<div class="text-center">
-							<img src="/resources/static/img/index/Cuisine/" class="rounded" style="width:110px; height:110px; object-fit:cover;">
-							<div class="mt-2">예시</div>
-						</div>
-					</div>
-				</div>
 		
 			</div>
 
@@ -298,9 +640,142 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
 			</script>
 
+			<script>
+				let toggle = false; 
+				function toggleSize(e) {
+					const $carousel = e.closest('.carousel');
+					const $img = e;
+					if($carousel){
+						if (toggle) {
+							$carousel.style.height = "300px"; 
+							// $img.style.transform="translateY(-50%)";
+						}	else {
+							$carousel.style.height = "100vh"; 
+							// $img.style.transform="translateY(+50%)";
+						}
+						toggle = !toggle;
+					}
+				}	
+			</script>
+
+  <script>
+     // 검색 적용
+    function search() {
+			const keyword = $('#searchKeyword').val().trim();
+			if (keyword) {
+				window.location.href = `/user/list?keyword=${encodeURIComponent(keyword)}`;
+			}
+    }
+
+    function handleSearchEnter(event) {
+      if (event.key === 'Enter') {
+        search();
+      }
+    }
+
+    let autocompleteRequest = null; 
+    $('#searchKeyword').on('input', function () {
+      const raw = $(this).val();
+      const lastWord = raw.split(',').pop().trim();
+
+      if (lastWord.length < 2) {
+        $('#autocompleteBox').empty();
+        return;
+      }
+
+      if (autocompleteRequest) {
+        autocompleteRequest.abort();
+      }
+
+      autocompleteRequest = $.ajax({
+        url: '/restaurant/search/recommend',
+        method: 'POST',
+        data: { input: lastWord },
+        dataType: 'json',
+
+        success: function (data) {
+          if (!data || data.length === 0) {
+            $('#autocompleteBox').empty();
+            return;
+          }
+
+          const html = data.map(item => `
+            <div class="autocomplete-item" data-keyword="${item.keyword}">
+              <span>${item.keyword}</span> <small class="text-muted">(${item.source})</small>
+            </div>
+          `).join('');
+          $('#autocompleteBox').html(html);
+        },
+
+        error: function () {
+          $('#autocompleteBox').empty();
+        }
+      });
+    });
+
+    // 추천어 클릭 
+    $(document).on('click', '.autocomplete-item', function () {
+      const selected = $(this).attr('data-keyword');
+      if (!selected || selected === 'null') return;
+      let currentVal = $('#searchKeyword').val();
+      let words = currentVal.split(',');
+
+      words[words.length - 1] = selected;
+      const newVal = words.map(w => w.trim()).filter(w => w.length > 0).join(', ') + ', ';
+      $('#searchKeyword').val(newVal);
+      $('#autocompleteBox').empty();
+      saveRecentKeyword(selected); 
+    });
+
+    // 최근 검색어 클릭
+    $(document).on('click', '.autocomplete-item.recent', function () {
+      const selected = $(this).data('keyword');
+      if (!selected || selected === 'null') return;
+
+      $('#searchKeyword').val(selected);
+      $('#autocompleteBox').empty();
+
+      saveRecentKeyword(selected); 
+    });
+
+    function saveRecentKeyword(keyword) {
+      if (!keyword || keyword.trim().toLowerCase() === 'null') return;
+      let recent = JSON.parse(localStorage.getItem("recentKeywords") || "[]");
+
+      // 중복 제거 및 최신순 정렬
+      recent = [keyword, ...recent.filter(k => k !== keyword)].slice(0, 5);
+      localStorage.setItem("recentKeywords", JSON.stringify(recent));
+    }
+
+    function renderRecentKeywords() {
+      let recent = JSON.parse(localStorage.getItem("recentKeywords") || "[]");
+      if (recent.length === 0) return;
+
+      const html = recent.map(item => `
+        <div class="autocomplete-item recent" data-keyword="${item}">${item}</div>
+      `).join('');
+      $('#autocompleteBox').html(html);
+    }
 
 
+    // 최근 검색어
+    $('#searchKeyword').on('focus', function () {
+      if ($(this).val().trim() === '') {
+        renderRecentKeywords();
+      }
+    });
 
+		// 검색창 외 클릭 시 닫기
+		document.addEventListener("click", function (event) {
+			const autocompleteBox = document.getElementById("autocompleteBox");
+			const searchInput = document.getElementById("searchKeyword");
+
+			if (!autocompleteBox.contains(event.target) && event.target !== searchInput) {
+				autocompleteBox.innerHTML = "";
+			}
+		});
+
+  </script>
 
 
 			

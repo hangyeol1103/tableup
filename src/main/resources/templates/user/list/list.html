@@ -33,14 +33,117 @@
       -webkit-appearance: none;
     }
 
-    .price-range-label {
+    /* .price-range-label {
       margin-top: 8px;
       font-weight: bold;
       font-size: 0.9rem;
+    } */
+
+    #autocompleteBox {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 1000;
+      width: 100%;
+      background: white;
+      border: 1px solid #ccc;
+      max-height: 200px;
+      overflow-y: auto;
+      border-radius: 4px;
     }
 
+    .autocomplete-item {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
 
+    .autocomplete-item:hover {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
 
+    .search-box {
+      position: relative;
+      margin-top: 10px;
+    }
+
+    .autocomplete-item.recent {
+      background-color: #f9f9f9;
+      font-style: italic;
+    }
+
+    .autocomplete-item.recent:hover {
+      background-color: #e0e0e0;
+      font-weight: normal;
+    }
+
+    .pl-container {
+      position: relative;
+    }
+
+    .pl-container .restaurant-card {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .pl-container .restaurant-card .follow-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+    }
+
+    .btn-attr {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      color: #0d6efd;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: inherit;
+    }
+
+    .btn-attr:hover {
+      color: #0a58ca;
+    }
+
+    .restaurant-card {
+      border-radius: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      overflow: hidden;
+    }
+
+    .restaurant-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .restaurant-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px 0 0 16px;
+    }
+
+    .restaurant-info {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .badge-title {
+      background-color: #f8d57e;
+      color: #333;
+      font-weight: 600;
+      padding: 0.35em 0.6em;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .btn-more, .btn-secondary {
+      border-radius: 2rem;
+      font-weight: 600;
+    }
   </style>
 
 
@@ -48,10 +151,22 @@
 <body>
 <main layout:fragment="content" class="container mt-5">
 
-  <h2 class="">식당 목록</h2>
+  <a class="navbar-brand fw-bold fs-4 text-dark text-decoration-none" th:href="@{/}">
+    TABLEUP
+  </a>
 
   <!-- 전체 레이아웃 -->
   <div class="row">
+
+    <!-- 검색창 -->
+    <div class="search-box mb-3 position-relative">
+      <div class="input-group mb-3" >
+        <input type="text" id="searchKeyword" class="form-control" placeholder="식당명, 지역, 음식 키워드로 검색" onkeyup="handleSearchEnter(event)" autocomplete="off" th:value="${keyword != null ? keyword : ''}">
+        <button class="btn btn-outline-secondary" type="button" onclick="search()">검색</button>
+      </div>
+      <div id="autocompleteBox"></div>
+    </div>
+
 
     <!-- 좌측 -->
     <aside class="col-md-3">
@@ -86,7 +201,7 @@
                         th:data-dfc-num="${food.dfc_num}"
                         th:data-fc-num="${food.fc_num}"
                         th:text="${food.fc_main + ' : ' + food.dfc_sub}"
-                        th:selected="${food.dfc_num == dfc_num}"></option>
+                        th:selected="${dfc_num != null and fc_num != null and food.dfc_num == dfc_num and food.fc_num == fc_num}"></option>
               </select>
             </div>
           </div>
@@ -142,22 +257,25 @@
 
             <!-- 편의시설 -->
             <div class="fw-bold mt-3 mb-2">편의시설</div>
-            <div class="form-check mb-1" th:each="fac : ${facilityList}">
+            <div class="form-check mb-1" th:each="fac : ${facilityList}"
+               th:classappend="${fac.fa_name == null} ? 'd-none' : ''">
               <input class="form-check-input facility-check" type="checkbox"
-                    th:id="'fac-' + ${fac.fa_num}" th:value="${fac.fa_num}">
+                th:id="'fac-' + ${fac.fa_num}" th:value="${fac.fa_num}">
               <label class="form-check-label" th:for="'fac-' + ${fac.fa_num}"
-                    th:text="${fac.fa_name}"></label>
+                th:text="${fac.fa_name}"></label>
             </div>
 
           </div>
           <div class="card-footer text-end">
-            <button type="button" class="btn btn-success w-100" onclick="applyDetailedFilter()">적용</button>
+            <button type="button" class="btn btn-outline-success w-100" onclick="applyDetailedFilter()">적용</button>
+
+            <button type="button" class="btn btn-outline-warning w-100 mt-3" onclick="location.href='/user/list'">초기화</button>
+
           </div>
         </div>
       </form>
     </aside>
 
-    <!-- 우측 -->
     <section class="col-md-9">
       <!-- 정렬 선택 -->
       <div class="d-flex justify-content-end mb-3">
@@ -165,7 +283,7 @@
           <option value="default">기본 정렬</option>
           <option value="reservation">예약 많은 순</option>
           <option value="reviewCount">리뷰 많은 순</option>
-          <option value="avg">전체 평점순(일단 테스트용으로 얘만 역순)</option>
+          <option value="avg">전체 평점순</option>
           <option th:each="scoreType : ${scoreTypeList}"
                   th:value="${scoreType.st_num}"
                   th:text="${scoreType.st_category + ' 점수순'}">
@@ -177,12 +295,14 @@
       <div id="list-container" class="pl-container">
         <!-- sub.html -->
       </div>
+
     </section>
   </div>
 
   <!-- 스크립트 -->
   <script type="text/javascript">
     let cri = {
+      keyword: "",
       rt_dfc_num : 0,
       rt_dreg_num : 0,
       dreg_reg_num: 0,
@@ -238,8 +358,10 @@
       cri.dfc_fc_num = Number($('#foodSelect option:selected').data('fc-num')) || 0;
       cri.orderBy = $('.sel-type').val();
 
-      if (resetPage) cri.page = 1;
-
+      if (resetPage) {
+        cri.page = 1;
+        cri.keyword = $('#searchKeyword').val().trim();
+      }
       $.ajax({
         async: true,
         url: "/user/list/sub",
@@ -252,11 +374,13 @@
           } else {
             $(".pl-container").append(data);
           }
+          checkVisibleLikes();
         },
         error: function () {
-          $(".pl-container").html('<div class="text-danger">불러오는 데 실패했습니다.</div>');
+          $(".pl-container").html('<div class="text-danger">해당하는 결과가 없습니다.</div>');
         }
       });
+
     }
 
 
@@ -268,15 +392,16 @@
       cri.rt_dfc_num = Number($('#foodSelect').val()) || 0;
       loadList(true);
     });
-
-    function likeRestaurant(rtNum) {
-      alert(rtNum + '번 매장');
+/*
+    function likeRestaurant(rt_num) {
+      alert(rt_num + '번 매장');
       // 추후 AJAX 찜 처리 연동
     }
-
-    function openReviewModal(rtNum) {
-      alert(rtNum + '번 매장');
+*/
+    function openReviewModal(rt_num) {
+      //alert(rt_num + '번 매장');
       // 추후 리뷰 모달 연동
+      window.location.href = '/user/review/view/' + rt_num;
     }
   </script>
 
@@ -339,7 +464,285 @@
     syncInputFromSlider();
 
     syncSliderFromInput();
+
+
+
+
+    
   </script>
+
+
+
+ <script>
+
+  const us_num = document.getElementById('us_num') ? parseInt(document.getElementById('us_num').dataset.usNum) : null;
+
+  // 찜 토글 함수
+  function likeRestaurant(rt_num) {
+    // if (!us_num || Number(us_num) < 1) {
+    //   window.location.href = '/user/login';
+    //   return;
+    // }
+    $.ajax({
+      url: '/user/follow',
+      type: 'POST',
+      contentType: "application/json; charset=utf-8",
+      dataType : "json", 
+      data: JSON.stringify({ uf_foreign : rt_num, uf_us_num : us_num, uf_type : "RESTAURANT" }),
+      success: res => {
+        const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
+        if (res.liked) {
+          //icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+          alert('찜 성공');
+          checkVisibleLikes(); 
+        } if (res.liked == false) {
+          //icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+          alert('찜 해제 성공');
+          checkVisibleLikes();
+        } else{
+          console.error('찜 상태 업데이트 실패:', res.error);
+        }
+      },
+      error: err => console.error('찜 실패:', err)
+    });
+  }
+/*
+  // 찜 여부 로딩 (페이지 로딩 시 실행)
+  function loadUserLikes() {
+    if (!us_num) return;
+
+    $.ajax({
+      url: `/user/follow/list?us_num=${us_num}`,
+      type: 'GET',
+      success: function(likedList) {
+        likedList.forEach(rt_num => {
+          const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
+          icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+        });
+      },
+      error: function() {
+        console.error("찜 불러오기 실패");
+      }
+    });
+  }
+
+  $(document).ready(function() {
+    loadUserLikes();
+  });
+*/
+
+
+    function checkVisibleLikes() {
+      //const us_num = parseInt(document.getElementById('us_num').dataset.usNum);
+      const rtNums = $(".follow-btn").map(function() {
+        return parseInt($(this).data("rt-num"));
+      }).get(); // ex: [3, 5, 9]
+      console.log("찜 상태 확인을 위한 rtNums:", rtNums);
+      $.ajax({
+        url: '/user/follow/check',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ uf_us_num: us_num, uf_type: "RESTAURANT", uf_foreign_list: rtNums }),
+        success: function(res) {
+          for (const [rt_num, liked] of Object.entries(res)) {
+            console.log(`찜 상태 업데이트: rt_num=${rt_num}, liked=${liked}`);
+            const icon = $(`.follow-btn[data-rt-num='${rt_num}'] i`);
+            if (liked) {
+              icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+            } else {
+              icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+            }
+          }
+        },
+        error: function() {
+          console.error("찜 상태 확인 실패");
+        }
+      });
+    }
+    $(document).ready(function() {
+      if(us_num) checkVisibleLikes();
+    });
+
+  </script>
+
+  <script>
+     // 검색 적용
+    function search() {
+      cri.keyword = $('#searchKeyword').val().trim().replace(/'/g, "\\'");
+      console.log("검색어:", cri.keyword);
+      loadList(true);
+    }
+
+    function handleSearchEnter(event) {
+      if (event.key === 'Enter') {
+        search();
+      }
+    }
+
+    // 초기화
+    $(document).ready(function() {
+      $('#searchKeyword').val(cri.keyword);
+      //$('#regionSelect').val(cri.rt_dreg_num);
+      //$('#foodSelect').val(cri.rt_dfc_num);
+      $('.sel-type').val(cri.orderBy);
+      $('#minPriceInput').val(cri.minPrice || 0);
+      $('#maxPriceInput').val(cri.maxPrice || 50000);
+      loadList(true);
+    });
+    
+
+  </script>
+
+  <script>
+    let autocompleteRequest = null; 
+    $('#searchKeyword').on('input', function () {
+      const raw = $(this).val();
+      const lastWord = raw.split(',').pop().trim();
+
+      if (lastWord.length < 2) {
+        $('#autocompleteBox').empty();
+        return;
+      }
+
+      if (autocompleteRequest) {
+        autocompleteRequest.abort();
+      }
+
+      autocompleteRequest = $.ajax({
+        url: '/restaurant/search/recommend',
+        method: 'POST',
+        data: { input: lastWord },
+        dataType: 'json',
+
+        success: function (data) {
+          if (!data || data.length === 0) {
+            $('#autocompleteBox').empty();
+            return;
+          }
+
+          const html = data.map(item => `
+            <div class="autocomplete-item" data-keyword="${item.keyword}">
+              <span>${item.keyword}</span> <small class="text-muted">(${item.source})</small>
+            </div>
+          `).join('');
+          $('#autocompleteBox').html(html);
+        },
+
+        error: function () {
+          $('#autocompleteBox').empty();
+        }
+      });
+    });
+
+    // 추천어 클릭 
+    $(document).on('click', '.autocomplete-item', function () {
+      const selected = $(this).attr('data-keyword');
+      if (!selected || selected === 'null') return;
+      let currentVal = $('#searchKeyword').val();
+      let words = currentVal.split(',');
+
+      words[words.length - 1] = selected;
+      const newVal = words.map(w => w.trim()).filter(w => w.length > 0).join(', ') + ', ';
+      $('#searchKeyword').val(newVal);
+      $('#autocompleteBox').empty();
+      saveRecentKeyword(selected); 
+    });
+
+    // // 최근 검색어 클릭
+    // $(document).on('click', '.autocomplete-item.recent', function () {
+    //   const selected = $(this).text().trim();  
+    //   let currentVal = $('#searchKeyword').val();
+    //   let words = currentVal.split(',');
+
+    //   if (words.length === 0 || words[words.length - 1].trim() === '') {
+    //     words.pop(); // 마지막 빈 항목 제거
+    //   }
+    //   words[words.length - 1] = selected;
+
+    //   const newVal = words.map(w => w.trim()).filter(w => w.length > 0).join(', ') + ', ';
+    //   $('#searchKeyword').val(newVal);
+    //   $('#autocompleteBox').empty();
+
+    //   saveRecentKeyword(selected); 
+    // });
+
+    // 최근 검색어 클릭
+    $(document).on('click', '.autocomplete-item.recent', function () {
+      const selected = $(this).data('keyword');
+      if (!selected || selected === 'null') return;
+
+      $('#searchKeyword').val(selected);
+      $('#autocompleteBox').empty();
+
+      saveRecentKeyword(selected); 
+    });
+
+
+
+
+
+    function saveRecentKeyword(keyword) {
+      if (!keyword || keyword.trim().toLowerCase() === 'null') return;
+      let recent = JSON.parse(localStorage.getItem("recentKeywords") || "[]");
+
+      // 중복 제거 및 최신순 정렬
+      recent = [keyword, ...recent.filter(k => k !== keyword)].slice(0, 5);
+      localStorage.setItem("recentKeywords", JSON.stringify(recent));
+    }
+
+    function renderRecentKeywords() {
+      let recent = JSON.parse(localStorage.getItem("recentKeywords") || "[]");
+      if (recent.length === 0) return;
+
+      const html = recent.map(item => `
+        <div class="autocomplete-item recent" data-keyword="${item}">${item}</div>
+      `).join('');
+      $('#autocompleteBox').html(html);
+    }
+
+
+    // 최근 검색어
+    $('#searchKeyword').on('focus', function () {
+      if ($(this).val().trim() === '') {
+        renderRecentKeywords();
+      }
+    });
+
+
+  function resDetail(event) {
+    const target = event.target;
+    if (target.closest('button')) return;
+    const card = target.closest('.restaurant-card');
+    if (!card) return;
+    const rt_num = card.getAttribute('data-rt-num');
+    if (rt_num) {
+      location.href = `/user/list/detail/${rt_num}`;
+    }
+  }
+
+  function homePage(event) {
+    event.stopPropagation(); 
+    const url = event.currentTarget.getAttribute('data-home');
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      alert("링크가 존재하지 않습니다.");
+    }
+  }
+
+  // 검색창 외 클릭 -> 닫기
+  document.addEventListener("click", function (event) {
+    const autocompleteBox = document.getElementById("autocompleteBox");
+    const searchInput = document.getElementById("searchKeyword");
+
+    if (!autocompleteBox.contains(event.target) && event.target !== searchInput) {
+      autocompleteBox.innerHTML = "";
+    }
+  });
+  </script>
+
+
+
 </main>
 
 </body>

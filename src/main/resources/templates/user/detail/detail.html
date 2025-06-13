@@ -8,14 +8,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!--  Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Bootstrap Icons -->
+ 
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
@@ -29,24 +22,50 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
 
+    <!-- 카카오 api -->
+    <script th:src="'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${apiKey} + '&libraries=services'"></script>
+
     <title>식당 리스트</title>
     <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
       #calendar-wrapper .flatpickr-calendar.inline {
         display: inline-block;
       }
       .tab-container {
-        margin-top: 1rem;
-        margin-bottom: 1rem;
         display: flex;
         justify-content: center;
+        width: 100%;
+        padding: 0 1rem;
+        box-sizing: border-box;
       }
 
       .nav-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 0;
         list-style: none;
         padding: 0;
-        display: flex;
-        gap: 0;
+        margin: 0 auto;
+        width: fit-content;
       }
+
+      .sticky-tabs {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        z-index: 10;
+
+        border-bottom: none !important;
+        box-shadow: none !important;
+      }
+
+        
 
       .tab-item:not(:first-child) {
         margin-left: -10px; /* 각 탭이 앞의 탭과 겹치게 */
@@ -86,6 +105,11 @@
         color: #ffffff;
       }
 
+      .tab-link:hover, .tab-link.active {
+        z-index: 2; /* 활성/호버된 탭을 앞에 보이게 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
       .badge {
         display: inline-block;
         background-color: #e8e6dd;
@@ -96,10 +120,157 @@
         margin-left: 0.3rem;
       }
 
-      .tab-link:hover,
-      .tab-link.active {
-        z-index: 2; /* 활성/호버된 탭을 앞에 보이게 */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      #map {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border: 1px solid #ccc;
+      }
+
+      .restaurant-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .facility-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 80px;
+        margin: 10px;
+      }
+
+      .facility-icon {
+        width: 80px; height: 80px; overflow: hidden;
+        background-image: url(/resources/static/img/facility/facility.jpg);
+        display: inline-block;
+      }
+
+      .facility-name {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #222;
+      }
+
+      .facility-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 10px;
+        border-top: 1px solid #ddd;
+      }
+
+      .facility-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        color: #333;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .check-icon {
+        color: #186ADE;
+      }
+
+      .dropdown-icon {
+        margin-left: auto;
+        color: #9E9E9E;
+      }
+
+      .drop-icon {
+        margin-left: auto;
+        color: #9E9E9E;
+      }
+
+      .facility-detail {
+        display: none;
+        background-color: #f5f5f5; /* 밝은 회색 배경 */
+        padding: 16px;
+        font-size: 14px;
+        color: #333;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .facility-detail .detail-icon {
+        margin-right: 8px;
+        color: #666;
+      }
+
+      .news-box {
+        border: 1px solid #e3e3e3;
+        border-radius: 12px;
+        padding: 16px;
+        background-color: #fff;
+        margin-top: 10px;
+      }
+
+      .img-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3장씩 정렬 */
+        gap: 15px;
+      }
+
+      .img-grid img {
+        width: 100%;
+        aspect-ratio: 1 / 1;       /* 정사각형 비율 유지 */
+        object-fit: cover;         /* 이미지 비율 유지하며 잘라냄 */
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
+      
+      .today-time {
+        font-weight: bold;
+        color: #000;
+      }
+
+      .normal-time {
+        font-weight: normal;
+        color: #000;
+      }
+
+      .category-label{
+        color: #6c757d; /* Bootstrap의 .text-muted 색상 */
+        font-size: 0.875rem; /* Bootstrap의 .small */
+      }
+      .flatpickr-day {
+        position: relative;
+        font-size: 14px;
+      }
+
+      .flatpickr-day .custom-badge {
+        position: absolute;
+        top: 12px; 
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        background-color: rgba(255, 255, 255, 0.0); /* 숫자와 구분 */
+        padding: 1px 4px;
+        border-radius: 8px;
+        color: green;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 5;
+        transition: transform 0.2s ease;
+      }
+
+      .flatpickr-day:hover .custom-badge {
+        transform: translateX(-50%) scale(1.3);
+        font-weight: bold;
+      }
+      #select-time option:disabled {
+        color: #aaa;
+      }
+
+      .flatpickr-calendar {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+      }
+
+      #calendar-wrapper {
+        width: 100%;
+        max-width: 100%;
       }
     </style>
   </head>
@@ -107,7 +278,6 @@
   <body>
     <main layout:fragment="content" class="container">
       <!-- <div class="row text-center">
-        <div class="col-1 border">1</div>
         <div class="col-1 border">2</div>
         <div class="col-1 border">3</div>
         <div class="col-1 border">4</div>
@@ -121,25 +291,28 @@
         <div class="col-1 border">12</div>
       </div> -->
 
+      <!-- 매장 주소 -->
+      <input type="hidden" id="restaurant-addr" th:value="${restaurant.rd_addr}" />
+
+
       <div class="tab-container col-11 offset-1">
         <ul class="nav-tabs">
           <li class="tab-item">
             <a class="tab-link active home" href="javascript:void(0)">홈</a>
           </li>
           <li class="tab-item">
-            <a class="tab-link news" href="#">소식</a>
+            <a class="tab-link news" href="javascript:void(0)">소식</a>
           </li>
-            <li class="tab-item"><a class="tab-link" href="#">메뉴</a>
-          </li>
-          <li class="tab-item">
-            <a class="tab-link" href="#">사진
-            <span class="badge">1834</span></a>
+            <li class="tab-item">
+              <a class="tab-link menu" href="javascript:void(0)">메뉴</a>
           </li>
           <li class="tab-item">
-            <a class="tab-link" href="#">리뷰
-            <span class="badge">74</span></a>
+            <a class="tab-link picture" href="javascript:void(0)">사진
+            <span class="badge" th:text="${photoCount}"></span></a>
           </li>
-            <li class="tab-item"><a class="tab-link" href="#">매장정보</a>
+          <li class="tab-item">
+            <a class="tab-link review" href="javascript:void(0)">리뷰
+            <span class="badge" th:text="${reviewCount}"></span></a>
           </li>
         </ul>
       </div>
@@ -150,11 +323,11 @@
           
         </div>
         <!-- 우측 -->
-        <div class="col-4 mt-3">
+        <form method="post" action="/user/reservation/confirm" class="col-4 mt-3">
           <div class="mt-3 p-3 bg-white rounded shadow">
             <div
-              class="mt-2 text-white p-2 rounded mx-auto text-center"
-              style="background-color: #4a3f2c; font-size: 1rem; width: 310px"
+              class="mt-2 text-white p-2 rounded text-center w-100"
+              style="background-color: #4a3f2c; font-size: 1rem;"
             >
               <div class="fw-bold">인터넷 예약</div>
               <div>기다릴 필요 없이 바로 실시간 예약</div>
@@ -168,6 +341,7 @@
             <!-- 선택한 날짜 보여주고 싶으면 아래 추가 -->
             <p class="fw-bold text-center mt-3">
               선택 날짜: <span id="selected-date">없음</span>
+              <input type="hidden" name="date" id="selected-date-input">
             </p>
 
             <!-- <hr class="my-2 border-secondary" />
@@ -175,50 +349,104 @@
             <p class="fw-bold text-center">시간&nbsp;&nbsp;00:00</p> -->
             <div class="px-3">
               <!-- 인원수 선택 -->
-              <label for="select-people" class="form-label fw-bold"
-                >인원수</label
-              >
-              <select id="select-people" class="form-select mb-3">
-                <option value="2" selected>2명</option>
-                <option value="3">3명</option>
-                <option value="4">4명</option>
-                <option value="5">5명</option>
-                <option value="6">6명</option>
-                <option value="7">7명</option>
-                <option value="8">8명</option>
+              <label for="select-people" class="form-label fw-bold">인원수</label>
+              <select id="select-people" class="form-select mb-3" name="person">
+                <!--잔여 인원수까지-->
               </select>
 
               <!-- 시간 선택 -->
               <label for="select-time" class="form-label fw-bold">시간</label>
-              <select id="select-time" class="form-select mb-3"></select>
+              <select id="select-time" class="form-select mb-3" name="time">
+                <option disabled>예약 가능한 날을 선택해주세요.</option>
+              </select>
             </div>
+            <input type="hidden" name="rt_num" th:value="${restaurant.rt_num}">
             <button
-              type="button"
-              class="btn btn-warning btn-lg d-block mx-auto"
-              onclick="submitReservation()"
+              type="submit"
+              class="btn btn-warning btn-lg d-block mx-auto w-100 "
+              id="reserveBtn"
             >
               예약하기
             </button>
-            <button
-              type="button"
-              class="btn btn-secondary btn-lg d-block mx-auto mt-3"
-            >
-              빈자리 알림
-            </button>
           </div>
-        </div>
+        </form>
       </div>
+
       <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          document.getElementById("reserveBtn").addEventListener("click", function (e) {
+            const date = document.getElementById("selected-date-input").value;
+            if (!date || date === "없음") {
+              e.preventDefault(); // 폼 전송 막기
+              alert("예약할 날짜를 선택해주세요.");
+            }
+          });
+        });
+      </script>
+
+      <script th:inline="javascript">
+        const remain = /*[[${remain}]]*/ {}; 
+        const businessHourList = /*[[${businessHour}]]*/ [];
+        const MSG = "예약 가능한 날을 선택해주세요.";
+        const enableDates = Object.keys(remain).filter(date => remain[date] > 0).sort();
+        const urlParams = new URLSearchParams(window.location.search)
+        const initDate = urlParams.get("date");
+      </script>
+      
+      <script>
+        function updatePeopleOptions(dateStr, timeStr) {
+          const peopleSelect = document.getElementById("select-people");
+          peopleSelect.innerHTML = "";
+
+          const matched = businessHourList.find(bh => {
+            const [date, time] = bh.bh_start.split("T");
+            return date === dateStr && time.startsWith(timeStr);
+          });
+
+          if (!matched || matched.bh_seat_remain <= 0) {
+            peopleSelect.innerHTML = `<option disabled>${MSG}</option>`;
+            return;
+          }
+
+          for (let i = 1; i <= matched.bh_seat_remain; i++) {
+            const opt = document.createElement("option");
+            opt.value = i;
+            opt.textContent = `${i}명`;
+            peopleSelect.appendChild(opt);
+          }
+        }
+        document.addEventListener("DOMContentLoaded", function () {
         flatpickr("#reservation-calendar", {
           inline: true,
           minDate: "today",
-          defaultDate: "today",
+          //defaultDate: initDate || "today",
           dateFormat: "Y-m-d",
           locale: "ko",
 
+          enable: Object.keys(remain).filter(date => remain[date] > 0),
+          defaultDate: initDate || enableDates[0],
+
+          onDayCreate: function (dObj, dStr, fp, dayElem) {
+            const existing = dayElem.querySelector('.custom-badge');
+            if (existing) existing.remove();
+
+            const date = dayElem.dateObj.toLocaleDateString('sv-SE'); // ex) 2025-06-28
+
+            if (remain[date] != null) {
+              const badge = document.createElement("span");
+              badge.className = "custom-badge";
+              badge.textContent = remain[date] > 0 ? `${remain[date]}자리` : "마감";
+              badge.style.color = remain[date] > 0 ? "green" : "red";
+
+              dayElem.appendChild(badge);
+            }
+          },
+
+
+
           onReady: function (selectedDates, dateStr, instance) {
             document.getElementById("selected-date").textContent = dateStr;
-
+            document.getElementById("selected-date-input").value = dateStr;
             // ✅ 달력 헤더: 년 → 월 순서로 재배치
             const monthElement = instance.calendarContainer.querySelector(
               ".flatpickr-current-month"
@@ -228,53 +456,63 @@
               const monthSelect = monthElement.querySelector(
                 ".flatpickr-monthDropdown-months"
               );
-
+          
               if (yearInput && monthSelect) {
                 monthElement.insertBefore(yearInput, monthSelect);
               }
             }
+            // 기본 날짜에 따른 인원수 설정
+            updateReservation(dateStr);
+            const firstOption = document.querySelector("#select-time option:not(:disabled)");
+            if (firstOption) {
+              firstOption.selected = true;
+              updatePeopleOptions(dateStr, firstOption.value);
+            }
           },
 
           onChange: function (selectedDates, dateStr) {
-            document.getElementById("selected-date").textContent = dateStr;
+            updateReservation(dateStr);
           },
+
         });
+        
+      });
 
         // 시간 선택 반복문
         const selectTime = document.getElementById("select-time");
         selectTime.innerHTML = ""; // 초기화
 
-        const now = new Date();
+        // const now = new Date();
 
-        // 현재 시간 + 30분을 기준으로 예약 가능 시간 설정
-        const minReservable = new Date(now.getTime() + 30 * 60 * 1000);
-        let firstAvailableSelected = false;
+        // // 현재 시간 + 30분을 기준으로 예약 가능 시간 설정
+        // const minReservable = new Date(now.getTime() + 30 * 60 * 1000);
+        // let firstAvailableSelected = false;
 
-        for (let h = 7; h < 31; h++) {
-          for (let m of [0, 30]) {
-            const realH = h % 24;
-            const timeStr = `${String(realH).padStart(2, "0")}:${String(
-              m
-            ).padStart(2, "0")}`;
+        // for (let h = 7; h < 31; h++) {
+        //   for (let m of [0, 30]) {
+        //     const realH = h % 24;
+        //     const timeStr = `${String(realH).padStart(2, "0")}:${String(
+        //       m
+        //     ).padStart(2, "0")}`;
 
-            // 시간 비교용 객체
-            const timeObj = new Date(now);
-            timeObj.setHours(realH, m, 0, 0);
+        //     // 시간 비교용 객체
+        //     const timeObj = new Date(now);
+        //     timeObj.setHours(realH, m, 0, 0);
 
-            if (timeObj >= minReservable) {
-              const option = document.createElement("option");
-              option.value = timeStr;
-              option.textContent = timeStr;
+        //     if (timeObj >= minReservable) {
+        //       const option = document.createElement("option");
+        //       option.value = timeStr;
+        //       option.textContent = timeStr;
 
-              if (!firstAvailableSelected) {
-                option.selected = true;
-                firstAvailableSelected = true;
-              }
+        //       if (!firstAvailableSelected) {
+        //         option.selected = true;
+        //         firstAvailableSelected = true;
+        //       }
 
-              selectTime.appendChild(option);
-            }
-          }
-        }
+        //       selectTime.appendChild(option);
+        //     }
+        //   }
+        // }
 
         // 예약하기 URL 이동
         function submitReservation() {
@@ -289,22 +527,127 @@
 
           location.href = url;
         }
+
+        function updateTimeOptions(dateStr) {
+          const timeSelect = document.getElementById("select-time");
+          timeSelect.innerHTML = "";
+
+          const now = new Date();
+          const isToday = new Date().toISOString().split("T")[0] === dateStr;
+
+          const filtered = businessHourList.filter(bh => {
+            const [date, time] = bh.bh_start.split("T");
+            return date === dateStr;
+          });
+
+          if (filtered.length === 0) {
+            timeSelect.innerHTML = `<option disabled>${MSG}</option>`;
+            return;
+          }
+
+          let hasAvailable = false;
+          for (const bh of filtered) {
+            const [date, time] = bh.bh_start.split("T");
+            const timeStr = time.substring(0, 5); // "11:00"
+            const remain = bh.bh_seat_remain;
+
+            const option = document.createElement("option");
+            option.value = timeStr;
+            if (remain <= 0) {
+              option.textContent = `${timeStr} (마감)`;
+              option.disabled = true;
+            } else {
+              option.textContent = `${timeStr} (${remain}석)`;
+              const bhDateTime = new Date(`${date}T${timeStr}`);
+              const reservableTime = new Date(now.getTime());
+
+              if (isToday && bhDateTime < reservableTime) {
+                option.disabled = true;
+              } else if (!hasAvailable) {
+                option.selected = true;
+                hasAvailable = true;
+              }
+          }
+
+            // // 현재 시간 + 30분 기준
+            // const bhDateTime = new Date(`${date}T${time}`);
+            // const reservableTime = new Date(now.getTime() + 30 * 60 * 1000);
+
+            // // 조건: 예약 불가 시 비활성화
+            // if (remain <= 0 || (isToday && bhDateTime < reservableTime)) {
+            //   option.disabled = true;
+            // } else if (!hasAvailable) {
+            //   option.selected = true;
+            //   hasAvailable = true;
+            // }
+
+            timeSelect.appendChild(option);
+          }
+
+          if (!hasAvailable) {
+            timeSelect.innerHTML = `<option disabled>${MSG}</option>`;
+          }
+          return hasAvailable;
+        }
+
+        function updateReservation(dateStr) {
+          document.getElementById("selected-date").textContent = dateStr;
+          document.getElementById("selected-date-input").value = dateStr;
+          const peopleSelect = document.getElementById("select-people");
+          peopleSelect.innerHTML = "";
+          const maxPeople = remain[dateStr];
+          const reserveBtn = document.querySelector(".btn-warning");
+          // let hasAvailable = false
+
+          if (!maxPeople || maxPeople <= 0) {
+            peopleSelect.innerHTML = `<option disabled>${MSG}</option>`;
+            return;
+          }
+
+          for (let i = 1; i <= maxPeople; i++) {
+            const opt = document.createElement("option");
+            opt.value = i;
+            opt.textContent = `${i}명`;
+            peopleSelect.appendChild(opt);
+          }
+
+          const hasAvailable = updateTimeOptions(dateStr);
+          setTimeout(() => {
+            const timeValue = document.getElementById("select-time").value;
+            updatePeopleOptions(dateStr, timeValue);
+          }, 10);
+
+
+          if (!hasAvailable) {
+            reserveBtn.disabled = true;
+            reserveBtn.textContent = "예약 불가";
+          } else {
+            reserveBtn.disabled = false;
+            reserveBtn.textContent = "예약하기";
+          }
+        }
+
       </script>
 
       <script>
-        document.querySelectorAll('.tab-link').forEach(tab => {
-          tab.addEventListener('click', function (e) {
-            document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-          });
-        });
+        // document.querySelectorAll('.tab-link').forEach(tab => {
+        //   tab.addEventListener('click', function (e) {
+        //     document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+        //     this.classList.add('active');
+        //   });
+        // });
+        $(document).on("click", ".tab-link", function(){
+         
+        })
+       
       </script>
 
       <script th:inline="javascript">
         //새소식 클릭시
         $(".news").on("click", function(e){
           e.preventDefault();
-          
+          $(".tab-link").removeClass("active");
+          $(this).addClass("active");
 
           $.ajax({
             url : "/user/list/news/[[${rt_num}]] ",
@@ -313,27 +656,196 @@
 
               $(".container-content").html(data)
             }
-
+            
           })
         })
-        //화면 로딩 시 홈 내용이 보이게 하는 비동기 통신
-        $(".home").on("click", function(e){
+        
+        //메뉴 클릭시
+        $(document).on("click",".menu", clickMenu)
+        function clickMenu(e){
           e.preventDefault();
-          
+          $(".tab-link").removeClass("active");
+          $(".tab-link.menu").addClass("active");
 
           $.ajax({
-            url : "/user/list/home/[[${rt_num}]] ",
+            async : false,
+            url : "/user/list/menu/[[${rt_num}]] ",
             method : "post",
             success : function(data){
-              console.log(data)
+
+              $(".container-content").html(data)
+            }
+
+          })
+        }
+        //사진 클릭시
+        $(".picture").on("click", function(e){
+          e.preventDefault();
+          $(".tab-link").removeClass("active");
+          $(this).addClass("active");
+
+          $.ajax({
+            url : "/user/list/picture/[[${rt_num}]] ",
+            method : "post",
+            success : function(data){
+
               $(".container-content").html(data)
             }
 
           })
         })
-        $(".home").click()
+
+        //리뷰 클릭시
+        $(document).on("click", ".review", clickReview)
+        function clickReview(e){
+          e.preventDefault();
+          $(".tab-link").removeClass("active");
+          $(".tab-link.review").addClass("active");
+
+          getRevieList(page);
+        }
+
+        //화면 로딩 시 홈 내용이 보이게 하는 비동기 통신
+        $(".home").on("click", function(e){
+          e.preventDefault();
+          $(".tab-link").removeClass("active");
+          $(this).addClass("active");
+
+          $.ajax({
+            url : "/user/list/home/[[${rt_num}]] ",
+            method : "post",
+            success : function(data){
+              // <!--console.log(data)-->
+              $(".container-content").html(data);
+
+              if (typeof initMap === 'function') {
+                initMap(); 
+              }
+            }
+
+          });
+        });
+        $(".home").click();
+
+        var page = 1;
+        getRevieList(page);
+        
+        $(document).on("click","#loadMoreBtn", function () {
+          $(this).remove();
+          page++;
+          getRevieList(page)
+          
+        });
+        function getRevieList(page){
+          console.log(page)
+          $.ajax({
+            url: "/user/list/review/[[${rt_num}]]",
+            method: "POST",
+            contentType : 'application/json; charset=utf-8',
+            data: JSON.stringify({
+              page : page
+            }),
+
+            success: function (data){
+              if(page == 1){
+                $(".container-content").html(data);
+              }else{
+                $(".container-content").append(data);
+              }
+
+              // total 개수 비교해서 더보기 버튼 제거
+              const meta = document.getElementById("review-meta");
+              if (meta) {
+                const total = parseInt(meta.dataset.totalCount);
+                const currentPage = parseInt(meta.dataset.currentPage);
+                const perPage = parseInt(meta.dataset.perPage);
+                const shown = currentPage * perPage;
+
+                if (shown >= total) {
+                  $("#loadMoreBtn").remove(); // 더보기 버튼 제거
+                }
+              
+              }
+            }
+
+          });
+        }
+        
       </script>
 
+     
+ 
+  <!-- 카카오 지도 -->
+      <script>
+
+        function initMap() {
+          const address = document.getElementById("restaurant-addr")?.value;
+          if (!address) {
+            console.warn("주소 정보가 없습니다.");
+            return;
+          }
+
+          const container = document.getElementById("map");
+          if (!container) {
+            document.getElementById("map-error").textContent = "지도를 불러올 수 없습니다.";
+            return;
+          }
+
+          const map = new kakao.maps.Map(container, {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), 
+            level: 3,
+          });
+
+          const geocoder = new kakao.maps.services.Geocoder();
+          geocoder.addressSearch(address, function (result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+              const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+              new kakao.maps.Marker({
+                map: map,
+                position: coords,
+              });
+
+              map.setCenter(coords);
+            } else {
+              console.warn("주소 변환 실패:", address);
+              alert("지도를 표시할 수 없습니다. 주소 정보를 확인해 주세요.");
+              return;
+            }
+          });
+          
+        }
+        
+
+        document.getElementById("select-time").addEventListener("change", function () {
+          const selectedDate = document.getElementById("selected-date").textContent;
+          const selectedTime = this.value;
+          updatePeopleOptions(selectedDate, selectedTime);
+        });
+
+      
+
+
+
+      </script>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const tabContainer = document.querySelector(".tab-container");
+          const navTabs = tabContainer.querySelector(".nav-tabs");
+          const triggerPoint = tabContainer.offsetTop + 300;
+
+          window.addEventListener("scroll", function () {
+            if (window.scrollY > triggerPoint) {
+              navTabs.classList.add("sticky-tabs");
+            } else {
+              navTabs.classList.remove("sticky-tabs");
+            }
+          });
+        });
+      </script>
+
+
+  
     </main>
   </body>
 </html>

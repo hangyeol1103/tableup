@@ -21,7 +21,7 @@ public class AdminDetailService implements UserDetailsService{
 		AdminVO admin = adminDAO.selectUser(username);
 
 		if (admin == null) {
-            throw new UsernameNotFoundException("존재하지 않는 관리자입니다: " + username);
+            throw new UsernameNotFoundException("존재하지 않는 사용자입니다: " + username);
         }
 
         return new CustomAdmin(admin);

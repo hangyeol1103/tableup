@@ -1,6 +1,9 @@
 package kr.kh.tableup.model.vo;
 
+import java.time.LocalTime;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 
@@ -34,5 +37,30 @@ public class RestaurantVO {
 
 	List<TagVO> tagList;
 	List<ReviewVO> reviewList;
+
+	DefaultResTimeVO defaultResTime;
+
+	//예비 영업시간 
+	int drt_num;
+	int drt_rt_num;
+	//"ENUM"
+	String drt_date;
+	boolean drt_off;
+	@DateTimeFormat(pattern = "HH:mm")
+	LocalTime drt_open;
+	@DateTimeFormat(pattern = "HH:mm")
+	LocalTime drt_close;
+	@DateTimeFormat(pattern = "HH:mm")
+	LocalTime drt_brstart;
+	@DateTimeFormat(pattern = "HH:mm")
+	LocalTime drt_brend;
+	@DateTimeFormat(pattern = "HH:mm")
+	LocalTime drt_loam;
+	@DateTimeFormat(pattern = "HH:mm")
+	LocalTime drt_lopm;
+
+	//썸네일
+	String file_path;
+
 
 }

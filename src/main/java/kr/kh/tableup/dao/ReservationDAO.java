@@ -12,7 +12,7 @@ public interface ReservationDAO {
 
 	// 1. 예약 등록
 	boolean insertReservation(ReservationVO reservation);
-	void updateReservationState(@Param("res_num") int res_num, @Param("state") int state);
+	boolean updateReservationState(@Param("res_num") int res_num, @Param("state") int state);
 
 	List<BusinessHourVO> selectOverlapHours(@Param("rt_num") int rt_num,
 	                                        @Param("resStart") LocalDateTime resStart,
@@ -23,5 +23,16 @@ public interface ReservationDAO {
 	//List<ReservationVO> selectReservationList(int rt_num);
 
 	List<ReservationVO> selectReservationList(int rt_num, String date);
+	
+	ReservationVO selectReservation(int res_num);
+	
+	List<ReservationVO> selectReservations(int rt_num);
+	
+	int[] selectFavorateCategory();
+
+	int[] selectFavorateRegion();
+	
+	List<ReservationVO> selectReservationsList(int rt_num);
+
 
 }

@@ -12,9 +12,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
   <!-- <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.css" rel="stylesheet"> -->
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
-	<title>테이블업 - 매니저페이지</title>
+	<title>예약 현황</title>
 	<style>
-  
+    .modal-body-scrollable {
+      max-height: 400px; /* 약 2.5개 카드 정도 높이 */
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -23,6 +26,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       <h1>예약 현황</h1>
       <div id='calendar'></div>
     </div>
+    <!-- 날짜 클릭 시 뜨는 모달 창 -->
     <div class="modal fade" id="dateModal" tabindex="-1" aria-labelledby="dateModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -32,7 +36,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
           </div>
-          <div class="modal-body" id="modalBody">
+          <div class="modal-body modal-body-scrollable" id="modalBody">
             
           </div>
           <div class="modal-footer">
@@ -41,7 +45,12 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         </div>
       </div>
     </div>
-		<script>
+    <a th:href="@{/manager/restime/restimepage}" class="btn btn-outline-secondary col-12 mb-3 mt-3">예약 관리 페이지로 돌아가기</a>
+		
+    <script th:inline="javascript">
+      const dateModal = new bootstrap.Modal(document.getElementById('dateModal'));
+      const resTimeList = /*[[${resTimeList}]]*/[];
+      console.log("resTimeList : ", resTimeList);
       /***************************************
       * 문구 변경시 여기를 수정해주세요.
       ****************************************/
@@ -57,24 +66,43 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       function viewModal(info){
         const selectedDateEl = document.getElementById('selectedDate');
         selectedDateEl.textContent = info.dateStr;
-        const dateModal = new bootstrap.Modal(document.getElementById('dateModal'));
+        
         dateModal.show();
         let list = getReservateionList(info.dateStr);
         let str = '';
         list.forEach(res=>{
           let obj = convertReservationToObject(res);
-          str += 
-          `
-            <div>
-              <div>${obj.time}</div>
-              <div>${obj.user}</div>
-              <div>${obj.state}</div>
+          str += `
+             <div class="card mb-3 shadow-sm reservation-card" data-target="memo-${obj.res_num}" style="cursor:pointer; border-left: 4px solid ${obj.res_state == 0 ? 'green' : obj.res_state == 1 ? 'skyblue' : 'red'};">
+              <div class="card-body">
+                <h5 class="card-title mb-2">
+                  <i class="bi bi-clock"></i> ${obj.time}
+                  <span class="badge bg-light text-dark ms-2">남은 좌석: ${obj.remainSeat}</span>
+                </h5>
+                <p class="mb-1"><strong>예약자:</strong> ${obj.user}</p>
+                <p class="mb-1"><strong>전화번호:</strong> ${obj.phone}</p>
+                <p class="mb-1"><strong>인원 수:</strong> ${obj.person}명</p>
+                <p class="mb-2"><strong>상태:</strong> 
+                  <span style="color: ${obj.res_state == 0 ? 'green' : obj.res_state == 1 ? 'skyblue' : 'red'}">${obj.state}</span>
+                </p>
+
+                <div class="collapse mt-2" id="memo-${obj.res_num}">
+                  <div class="alert alert-secondary mb-2 py-2 px-3">
+                    <strong>요청사항:</strong> ${obj.request || '없음'}
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  ${obj.res_state == 0 
+                    ? '<button type="button" class="btn btn-sm btn-outline-info btn-reservation"  data-target="'+obj.res_num+'" data-state="1" data-date="'+obj.date+'">'+confirmState+'</button>' 
+                    : ''}
+                  ${obj.res_state >= 0 
+                    ? '<button type="button" class="btn btn-sm btn-outline-danger btn-reservation" data-target="'+obj.res_num+'" data-state="-1" data-date="'+obj.date+'">'+cancelState+'</button>' 
+                    : ''}
+                </div>
+              </div>
             </div>
-            <div>
-              ${obj.res_state == 0 ? '<button type="button" class="btn btn-outline-success">'+confirmState+'</button>' : ''}
-              ${obj.res_state >= 0 ? '<button type="button" class="btn btn-outline-danger">'+cancelState+'</button>' : ''}
-            </div>
-          `
+          `;
         })
         str = str.length == 0 ? "예약이 없습니다." : str;
         $("#modalBody").html(str);
@@ -83,24 +111,34 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
       /***************************************
        * 변환 함수들 : 코드의 재사용을 위해 만듬
       ****************************************/
-      //num 앞에 0으로 채워 반환. 글자 길이를 size 기준으로
+      /***************************************
+       * 함수 : num 앞에 0으로 채워 반환. 글자 길이를 size 기준으로
+       * 예시 : 5 => 05로 변환
+      ****************************************/
       function fillZero(num, size) {
         return num.toString().padStart(size, '0');
       }
-      //Date객체를 yyyy-MM 문자열로 변환
+      /***************************************
+       * 함수 : Date객체를 yyyy-MM 문자열로 변환
+      ****************************************/
       function convertDateToString(date){
         const year = date.getFullYear();
         const month = fillZero(date.getMonth() + 1, 2); 
         return `${year}-${month}`;
       }
-      //[yyyy, M, d] 년, 월, 일이 들어 있는 배열을 yyyy-MM-dd 문자열로 변환
+      /***************************************
+       * 함수 : [yyyy, M, d] 년, 월, 일이 들어 있는 배열을 yyyy-MM-dd 문자열로 변환
+       * 예시 : [2025,5,15] => 2025-05-15
+      ****************************************/
       function convertArrayToDateString(arr){
         const year = arr[0];
         const month = fillZero(arr[1],2); 
         const date = fillZero(arr[2],2); ; 
         return `${year}-${month}-${date}`;
       } 
-      //날짜를 기준으로 예약 목록을 가져와서 배열로 반환
+      /***************************************
+       * 함수 : 날짜를 기준으로 예약 목록을 가져와서 배열로 반환
+      ****************************************/
       function getReservateionList(date){
         //date가 없으면 오늘 날짜 기준으로 년 월 일
         if(!date){
@@ -119,9 +157,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
         })
         return res;
       }
-      
-      
-      //예약 내역리스트를 켈린더에 추가하기 위해 event들로 변환
+
+      /***************************************
+       * 함수 : 예약 내역리스트를 켈린더에 추가하기 위해 event들로 변환
+      ****************************************/
       function getEvents(date){
 
         let list = getReservateionList(date);
@@ -137,18 +176,35 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
           }
         })
       }
-      //예약 내역을 객체로 변환
+      /***************************************
+       * 함수 : 예약 내역을 객체로 변환
+      ****************************************/
       function convertReservationToObject(res){
         
         let date = convertArrayToDateString(res.res_time);
-        let time = res.res_time.slice(3,5).join(":");
+        let hour = res.res_time.slice(3,4);
+        let minute = res.res_time.slice(4,5);
+        let time = fillZero(hour, 2) + ":" + fillZero(minute,2);
         let user = res.user.us_id;
+        let phone = res.user.us_phone;
         let res_state = res.res_state;
+        let person = res.res_person;
         let state = res_state == 0 ? readyState : res_state == 1 ? confirmState : cancelState;
-        
-        let title = `${time} ${user} ${state}`;
+        let title = `${time} ${user}(${person}명) ${state}`;
         let color = colorList[res_state+1];
-        return { date,time,title,color,state,user, res_state}
+        let request = res.res_request || '';
+        let res_num = res.res_num;
+
+        //좌석 정보 처리
+        const fullDateStr = `${date}T${time}:00`; // ex. 2025-06-09 12:00:00
+        const timeInfo = resTimeList.find(rt => rt.bh_start === fullDateStr);
+
+        let remainSeat = "정보 없음";
+        if (timeInfo) {
+          remainSeat = timeInfo.bh_seat_max - timeInfo.bh_seat_current;
+        }
+
+        return { date,time,title,color,state,user, res_state, person, res_num, date, remainSeat, request, phone}
       }
   
       
@@ -189,6 +245,66 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 			});
 			calendar.render(); //캘린더 렌더링(화면에 출력)
       
+      /***************************************
+       * 이벤트 : 예약 확정/취소 버튼 클릭
+      ****************************************/
+      $(document).on('click', '.btn-reservation', function(){
+        console.log("버튼 클릭됨");
+        let res_num = $(this).data("target");
+        let res_state = $(this).data("state");
+        let date = $(this).data("date");
+
+        console.log("보낼 값 : ", res_num, res_state)
+        $.ajax({
+          url : "/manager/reservation/state",
+          method : "post",
+          data : JSON.stringify({res_num , res_state}),
+          contentType : "application/json; charset=utf-8",
+          dataType : "json",
+          success : data=>{
+            let res = data.res;
+            let error = data.error;
+            if(error){
+              alert(error);
+              return;
+            }
+            if(res){
+              alert(res_state == 1 ? "예약이 확정되었습니다." : "예약이 취소되었습니다.");
+              
+              dateModal.hide();
+              calendar.refetchEvents();//캘린더 새로고침
+              setTimeout(() => {
+                calendarDateClick(date);
+              },400)
+              location.reload();
+            }
+          }
+        })
+      })
+      /**
+       * 함수 : 캘린더에서 지정 날짜(date)를 주면 js에서 클릭 이벤트를 호출하는 함수
+      */
+      function calendarDateClick(date){
+        // dateClick 콜백 수동 실행
+        const dateClickHandler = calendar.getOption('dateClick');
+        if (typeof dateClickHandler === 'function') {
+          dateClickHandler({
+            date: new Date(date),
+            dateStr: date,
+            view: calendar.view
+          });
+        }
+      }
+
+      // 예약 현황 정보 카드 클릭시 요구사항 출력되는 토글
+      $(document).on('click', '.reservation-card', function (e) {
+        // 버튼 클릭 시에는 이벤트 무시
+        if ($(e.target).closest('.btn-reservation').length > 0) return;
+
+        const targetId = $(this).data('target');
+        $('#' + targetId).collapse('toggle');
+      });
+
 		</script>
 	</main>
 </body>

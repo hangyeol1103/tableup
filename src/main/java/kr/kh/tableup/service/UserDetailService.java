@@ -18,13 +18,18 @@ public class UserDetailService implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-			System.out.println("로그인 시도: " + username); 
+			// System.out.println("로그인 시도: " + username); 
 			UserVO user = userDAO.selectUserById(username);
 			if (user == null) throw new UsernameNotFoundException("사용자 없음");
-			System.out.println("불러온 비밀번호: " + user.getUs_pw());
-			System.out.println("UserDetails.getPassword(): " + user.getUs_pw());
+			// System.out.println("불러온 비밀번호: " + user.getUs_pw());
+			// System.out.println("UserDetails.getPassword(): " + user.getUs_pw());
 
 			return new CustomUser(user); 
+	}
+
+	public UserVO selectUserByEmail(String email){
+		if(email.isBlank()||email.length()<2) return null;
+		return userDAO.selectUserByEmail(email);
 	}
 
 

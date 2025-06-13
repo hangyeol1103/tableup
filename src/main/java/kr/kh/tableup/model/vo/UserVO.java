@@ -46,5 +46,15 @@ public class UserVO{
   
   private int us_state;
 
+  // User Profile Image fields
+  private int upi_num;
+  private int upi_us_num;
+  private String upi_file_name;
+  private String upi_file_path;
+  private Date upi_upload_date;
+
+  public boolean hasUPI() {
+    return upi_file_path != null && upi_file_path.length()>0;
+}
 
 }
